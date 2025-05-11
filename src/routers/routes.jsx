@@ -1,8 +1,17 @@
-// src/Routers/AppRoutes.jsx
+// src/routers/routes.jsx
 import { Routes, Route } from 'react-router-dom';
-import { Suspense } from 'react';
+import { Suspense, lazy } from 'react';
 import { routes } from './routeTree';
 
+
+// Loading component
+const LoadingSpinner = () => (
+  <div className="flex items-center justify-center min-h-screen">
+    <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
+  </div>
+);
+
+// Route rendering helper
 const renderRoutes = (routes) =>
   routes.map(({ path, index, component: Component, children }, i) => {
     if (children) {
@@ -13,7 +22,6 @@ const renderRoutes = (routes) =>
       );
     }
 
-    // For leaf routes, either index or path should be present
     return (
       <Route
         key={i}
@@ -24,9 +32,10 @@ const renderRoutes = (routes) =>
     );
   });
 
+// Main routing component
 export default function AppRoutes() {
   return (
-    <Suspense fallback={<div>Loading...</div>}>
+    <Suspense fallback={<LoadingSpinner />}>
       <Routes>{renderRoutes(routes)}</Routes>
     </Suspense>
   );
