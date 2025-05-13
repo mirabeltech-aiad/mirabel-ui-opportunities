@@ -9,17 +9,7 @@ export const useApiGet = (key, endpoint, options = {}) => {
     queryFn: async () => {
       try {
         const response = await axiosInstance.get(endpoint);
-
-        // If response structure is unexpected, handle accordingly
-        if (!response || !response.data) {
-          throw new Error("No data received from API.");
-        }
-
-        if (response.data.content.List.length > 0) {
-          return response.data.content.List;
-        }
-
-        return response.data; // only data is returned to the component
+        return response.data.content;
       } catch (error) {
         // Centralized error handler (optional)
         handleApiError(error);

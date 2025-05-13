@@ -1,13 +1,13 @@
 import React from 'react';
-import Sales from '../../features/sales/index.jsx';
+import SiteWideDefaults from '../../features/sitewidedefaults/index.jsx';
 
 
-const SalesPage = () => {
+const SiteWideDefaultsPage = () => {
   return (
     <div>
-      <Sales />
+      <SiteWideDefaults />
     </div>
   );
 };
 
-export default SalesPage;
+export default SiteWideDefaultsPage;

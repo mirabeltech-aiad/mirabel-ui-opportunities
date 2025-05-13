@@ -22,10 +22,10 @@ axiosInstance.interceptors.request.use((config) => {
   if (import.meta.env.MODE === "development") {
     baseURL = `https://mirabeldev-qa.magazinemanager.com`;
     domain = "mirabeldev-qa";
-    token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJMb2dnZWRJblVzZXJJRCI6IjE4OCIsIkxvZ2dlZEluU2l0ZUNsaWVudElEIjoiOTk0MSIsIkxvZ2dlZEluU2l0ZUN1bHR1cmVVSSI6ImVuLVVTIiwiRGF0ZVRpbWUiOiI1LzYvMjAyNSA1OjE0OjM5IEFNIiwiTG9nZ2VkSW5TaXRlQ3VycmVuY3lTeW1ib2wiOiIkIiwiTG9nZ2VkSW5TaXRlRGF0ZUZvcm1hdCI6IiIsIkRvbWFpbiI6Im1pcmFiZWxkZXYtcWEiLCJMb2dnZWRJblNpdGVUaW1lQWRkIjpbIjAiLCIwIl0sIlNvdXJjZSI6IlRNTSIsIkVtYWlsIjoic2FAbWFnYXppbmVtYW5hZ2VyLmNvbSIsIklzQVBJVXNlciI6IkZhbHNlIiwibmJmIjoxNzQ2NTA4NDc5LCJleHAiOjE3NDY4MDg0NzksImlhdCI6MTc0NjUwODQ3OSwiaXNzIjoiTWFnYXppbmVNYW5hZ2VyIiwiYXVkIjoiKiJ9.4n4h4r8Vj1_6fc8ZyWlLl8MeuhQyKb_FIviaVR20gR4"
+    token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJMb2dnZWRJblVzZXJJRCI6IjEiLCJMb2dnZWRJblNpdGVDbGllbnRJRCI6Ijk5MjAiLCJMb2dnZWRJblNpdGVDdWx0dXJlVUkiOiJlbi11cyIsIkRhdGVUaW1lIjoiNS8xMy8yMDI1IDY6MjM6NTkgUE0iLCJMb2dnZWRJblNpdGVDdXJyZW5jeVN5bWJvbCI6IiQiLCJMb2dnZWRJblNpdGVEYXRlRm9ybWF0IjoiIiwiRG9tYWluIjoibWlyYWJlbGRldiIsIkxvZ2dlZEluU2l0ZVRpbWVBZGQiOlsiMCIsIjAiXSwiU291cmNlIjoiVE1NIiwiRW1haWwiOiJzYUBtYWdhemluZW1hbmFnZXIuY29tIiwiSXNBUElVc2VyIjoiRmFsc2UiLCJuYmYiOjE3NDcxNjA2MzksImV4cCI6MTc0NzQ2MDYzOSwiaWF0IjoxNzQ3MTYwNjM5LCJpc3MiOiJNYWdhemluZU1hbmFnZXIiLCJhdWQiOiIqIn0._tLCZ3Gu32HBXeSy5BSxGnRdWpJYRmQXxH-AntS1mus"
   } else {
     baseURL = process.env.REACT_APP_API_BASE_URL;
-    domain = "your_production_domain"; // replace with getGlobalMessage if needed
+    domain = import.meta.url // replace with getGlobalMessage if needed
     token = localStorage.getItem("Token");
   }
 
