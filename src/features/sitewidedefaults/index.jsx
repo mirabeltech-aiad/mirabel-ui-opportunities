@@ -1,16 +1,11 @@
 import React from 'react';
-import { Button } from '@/components/ui/button';
+import { FeatureSettingsProvider } from './context/FeatureSettingsProvider';
 import DashboardDemoPage from './DashboardDemoPage';
-import { StoreSupplyProvider } from './context/StoreSupplyContext';
 
-const SalesModule = () => {
+export default function SiteWideDefaultsPage() {
   return (
-    <StoreSupplyProvider>
-      <div className="container mx-auto text-3xl font-bold text-center">
-        <DashboardDemoPage />
-      </div>
-    </StoreSupplyProvider>
+    <FeatureSettingsProvider>
+      <DashboardDemoPage />
+    </FeatureSettingsProvider>
   );
-};
-
-export default SalesModule;
+}
