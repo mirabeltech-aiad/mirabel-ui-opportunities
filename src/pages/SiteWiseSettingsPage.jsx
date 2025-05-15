@@ -1,5 +1,5 @@
 import React from 'react';
-import SiteWideDefaults from '../../features/sitewidedefaults/index.jsx';
+import SiteWideDefaults from '../features/sitewidedefaults/index.jsx';
 
 
 const SiteWideDefaultsPage = () => {

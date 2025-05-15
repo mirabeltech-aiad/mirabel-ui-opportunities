@@ -12,28 +12,35 @@ const axiosInstance = axios.create({
 
 // Request Interceptor for Token and Domain
 axiosInstance.interceptors.request.use((config) => {
-  let token = ""; // same token logic from your apiCall
+  let token = "";
   let domain = "";
   let baseURL = "";
-  console.log("config", config,import.meta.env);
-
-//   const TokenDetails = JSON.parse(localStorage.getItem("TokenData") || "{}");
-
   if (import.meta.env.MODE === "development") {
-    baseURL = `https://mirabeldev-qa.magazinemanager.com`;
-    domain = "mirabeldev-qa";
-    token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJMb2dnZWRJblVzZXJJRCI6IjE4OCIsIkxvZ2dlZEluU2l0ZUNsaWVudElEIjoiOTk0MSIsIkxvZ2dlZEluU2l0ZUN1bHR1cmVVSSI6ImVuLVVTIiwiRGF0ZVRpbWUiOiI1LzE0LzIwMjUgMTE6MDM6NDQgQU0iLCJMb2dnZWRJblNpdGVDdXJyZW5jeVN5bWJvbCI6IiQiLCJMb2dnZWRJblNpdGVEYXRlRm9ybWF0IjoiIiwiRG9tYWluIjoibWlyYWJlbGRldi1xYSIsIkxvZ2dlZEluU2l0ZVRpbWVBZGQiOlsiMCIsIjAiXSwiU291cmNlIjoiVE1NIiwiRW1haWwiOiJzYUBtYWdhemluZW1hbmFnZXIuY29tIiwiSXNBUElVc2VyIjoiRmFsc2UiLCJuYmYiOjE3NDcyMjA2MjQsImV4cCI6MTc0NzUyMDYyNCwiaWF0IjoxNzQ3MjIwNjI0LCJpc3MiOiJNYWdhemluZU1hbmFnZXIiLCJhdWQiOiIqIn0.hJHS9bUEaz53c9cetdVGhWHBJvls_t_5G5JCDEPt_v0"
+    // Development environment
+    baseURL = `https://tier1-feature18.magazinemanager.com/`;
+    domain = "tier1-feature18";
+    token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJMb2dnZWRJblVzZXJJRCI6IjEiLCJMb2dnZWRJblNpdGVDbGllbnRJRCI6Ijk5NzAiLCJMb2dnZWRJblNpdGVDdWx0dXJlVUkiOiJlbi1VUyIsIkRhdGVUaW1lIjoiNS8xNS8yMDI1IDc6NTY6NDkgQU0iLCJMb2dnZWRJblNpdGVDdXJyZW5jeVN5bWJvbCI6IiQiLCJMb2dnZWRJblNpdGVEYXRlRm9ybWF0IjoiZXVyb3BlYW4iLCJEb21haW4iOiJ0aWVyMS1mZWF0dXJlMTgiLCJMb2dnZWRJblNpdGVUaW1lQWRkIjpbIjAiLCIwIl0sIlNvdXJjZSI6IlRNTSIsIkVtYWlsIjoic2FAbWFnYXppbmVtYW5hZ2VyLmNvbSIsIklzQVBJVXNlciI6IkZhbHNlIiwibmJmIjoxNzQ3Mjk1ODA5LCJleHAiOjE3NDczMTAyMDksImlhdCI6MTc0NzI5NTgwOSwiaXNzIjoiTWFnYXppbmVNYW5hZ2VyIiwiYXVkIjoiKiJ9.4cxrlKy_Y_m99w7cG9b1weBufAOy1G7mx3iogEQMhjU";
+    console.log("configCheck_Dev", baseURL,domain);
+
   } else {
-    baseURL = process.env.REACT_APP_API_BASE_URL;
-    domain = import.meta.url // replace with getGlobalMessage if needed
-    token = localStorage.getItem("Token");
+    // Production or other environments
+    const envBaseUrl = import.meta.env.BASE_URL;
+    
+    if (envBaseUrl) {
+      // Use environment variable if available
+      baseURL = `${window.location.origin}${envBaseUrl}`;
+      domain = window.location.hostname;
+    } 
+    console.log("configCheck", baseURL,domain);
+    
+    // Get token from localStorage
+    token = localStorage.getItem("Token") || "";
   }
 
   config.baseURL = baseURL;
   config.headers.Authorization = `Bearer ${token}`;
   config.headers.domain = domain;
-  console.log("tokennddd", config);
-
+  console.log("Request config:", { baseURL, domain });
 
   return config;
 }, error => Promise.reject(error));

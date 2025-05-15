@@ -28,7 +28,7 @@ ReactDOM.createRoot(document.getElementById('root')).render(
       }}
     >
       <QueryClientProvider client={queryClient}>
-        <BrowserRouter>
+        <BrowserRouter basename="/modern">
           <AppRoutes />
         </BrowserRouter>
         {import.meta.env.DEV && (

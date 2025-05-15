@@ -2,16 +2,16 @@ import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react-swc'
 import tailwindcss from '@tailwindcss/postcss'
 import path from 'path'
-// https://vite.dev/config/
+
 export default defineConfig({
+  base: '/modern/', // required for production to work from sub-path
   plugins: [react(), tailwindcss()],
   server: {
-    port: 3000
+    port: 3000,
   },
   resolve: {
     alias: {
       '@': path.resolve(__dirname, 'src'),
     },
   },
-  base: '/modern/'
-})
+});

@@ -1,16 +1,16 @@
 // src/Routers/routeTree.js
 import { lazy } from 'react';
 
-const SalesPage = lazy(() => import('../pages/sales/SalesPage'));
+const SiteWiseSettingsPage = lazy(() => import('../pages/SiteWiseSettingsPage'));
 
 export const routes = [
   {
-    path: '/',
-    component: SalesPage,
+    path: '/sitewidesettings',
+    component: SiteWiseSettingsPage,
     children: [
       {
         index: true,
-        component: SalesPage,
+        component: SiteWiseSettingsPage,
       },
     ],
   },
