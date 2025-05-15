@@ -8,9 +8,9 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { ChevronLeft, ChevronRight, X } from "lucide-react";
-import { useSiteWideList } from "./hooks/useSiteWideList";
-import { tabList } from "./helpers/constants.helper";
-import { useFeatureSettings } from "./context/Context";
+import { useSiteWideList } from "../hooks/useSiteWideList";
+import { tabList } from "../helpers/constants.helper";
+import { useFeatureSettings } from "../context/Context";
 
 // Settings metadata for headings and descriptions
 const settingsMeta = {

@@ -1,11 +1,11 @@
 import React from 'react';
 import { FeatureSettingsProvider } from './context/FeatureSettingsProvider';
-import DashboardDemoPage from './DashboardDemoPage';
+import FeatureSettings from './components/FeatureSettings';
 
 export default function SiteWideDefaultsPage() {
   return (
     <FeatureSettingsProvider>
-      <DashboardDemoPage />
+      <FeatureSettings />
     </FeatureSettingsProvider>
   );
 }
