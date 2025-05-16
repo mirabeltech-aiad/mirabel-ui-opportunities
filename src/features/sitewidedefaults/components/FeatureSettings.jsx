@@ -1,4 +1,4 @@
-import React, { useState, useContext, useRef, useEffect, memo } from "react";
+import React, { useState, memo } from "react";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Switch } from "@/components/ui/switch";
@@ -8,7 +8,6 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { ChevronLeft, ChevronRight, X } from "lucide-react";
-import { useSiteWideList } from "../hooks/useSiteWideList";
 import { tabList } from "../helpers/constants.helper";
 import { useFeatureSettings } from "../context/Context";
 
@@ -304,17 +303,6 @@ function DashboardDemoPage() {
   } = useFeatureSettings();
   const [tabWindow, setTabWindow] = useState([0, 5]);
   const [activeTab, setActiveTab] = useState("adManagement");
-
-  // Using a ref to prevent multiple console logs during renders
-  const hasLoggedRef = useRef(false);
-  
-  console.log("statestatestatestatestate", state);
-  useEffect(() => {
-    if (!hasLoggedRef.current && state) {
-      console.log("State initialized:", state);
-      hasLoggedRef.current = true;
-    }
-  }, [state]);
 
   const handlePrevTabs = () => {
     setTabWindow([tabWindow[0] - 1, tabWindow[1] - 1]);
