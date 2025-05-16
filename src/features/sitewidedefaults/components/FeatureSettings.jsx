@@ -313,7 +313,7 @@ function DashboardDemoPage() {
   };
 
   return (
-    <div className="container px-8 py-8 mx-auto">
+    <div className="px-4 py-2 mx-auto">
       <div className="sticky top-0 z-20 pb-2 bg-background">
         <Tabs
           value={activeTab}
