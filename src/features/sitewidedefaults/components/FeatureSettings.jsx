@@ -495,7 +495,7 @@ function DashboardDemoPage() {
         <TabsContent value="adManagement" className="w-11/12 m-auto">
           <Card className="mb-6">
             <CardHeader>
-              <CardTitle>Ad Management Settings</CardTitle>
+              <CardTitle>Ad - Management Settings</CardTitle>
             </CardHeader>
             <CardContent className="p-6">
               {settingsMeta.adManagement.map((item, idx) => (
