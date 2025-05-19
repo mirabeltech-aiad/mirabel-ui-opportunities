@@ -490,8 +490,9 @@ function DashboardDemoPage() {
           </TabsContent>
         </Tabs>
       </div>
-      {/* Ad Management Tab */}
+      
       <Tabs value={activeTab} className="w-full">
+        {/* Ad Management Tab */}
         <TabsContent value="adManagement" className="w-11/12 m-auto">
           <Card className="mb-6">
             <CardHeader>
@@ -513,7 +514,7 @@ function DashboardDemoPage() {
                       {item.label}
                     </Label>
                     <p className="text-sm text-left text-muted-foreground">
-                      {item.description} + {item.key}
+                      {item.description}
                     </p>
                   </div>
                   <Switch
@@ -1113,6 +1114,7 @@ function DashboardDemoPage() {
             </CardContent>
           </Card>
         </TabsContent>
+
         {/* Customer Portal Tab */}
         <TabsContent value="customerPortal">
           <Card className="mb-6">
@@ -1134,6 +1136,7 @@ function DashboardDemoPage() {
             </CardContent>
           </Card>
         </TabsContent>
+
         {/* User Settings Tab */}
         <TabsContent value="userSettings">
           <Card className="mb-6">
@@ -1207,6 +1210,7 @@ function DashboardDemoPage() {
             </CardContent>
           </Card>
         </TabsContent>
+
         {/* Communications Tab */}
         <TabsContent value="communications">
           <Card className="mb-6">
@@ -1253,6 +1257,7 @@ function DashboardDemoPage() {
             </CardContent>
           </Card>
         </TabsContent>
+
         {/* Google Calendar Tab */}
         <TabsContent value="googleCalendar">
           <Card className="mb-6">
@@ -1284,6 +1289,7 @@ function DashboardDemoPage() {
             </CardContent>
           </Card>
         </TabsContent>
+
         {/* Helpdesk Tab */}
         <TabsContent value="helpdesk">
           <Card className="mb-6">
@@ -1301,6 +1307,7 @@ function DashboardDemoPage() {
             </CardContent>
           </Card>
         </TabsContent>
+
         {/* Media MailKit Tab */}
         <TabsContent value="mediaMailKit">
           <Card className="mb-6">
@@ -1345,6 +1352,7 @@ function DashboardDemoPage() {
             </CardContent>
           </Card>
         </TabsContent>
+        
       </Tabs>
 
       <div className="flex justify-end mt-8">
