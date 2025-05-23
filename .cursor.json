@@ -1,0 +1,6 @@
+{
+    "contextFiles": [
+      "src/context.md",
+      "src/features/sitewidedefaults/context.md"
+    ]
+}

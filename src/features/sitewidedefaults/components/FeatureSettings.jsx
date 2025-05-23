@@ -1,4 +1,4 @@
-import React, { useState, useContext, useRef, useEffect, memo } from "react";
+import React, { useState, memo } from "react";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Switch } from "@/components/ui/switch";
@@ -8,7 +8,6 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { ChevronLeft, ChevronRight, X } from "lucide-react";
-import { useSiteWideList } from "../hooks/useSiteWideList";
 import { tabList } from "../helpers/constants.helper";
 import { useFeatureSettings } from "../context/Context";
 
@@ -305,17 +304,6 @@ function DashboardDemoPage() {
   const [tabWindow, setTabWindow] = useState([0, 5]);
   const [activeTab, setActiveTab] = useState("adManagement");
 
-  // Using a ref to prevent multiple console logs during renders
-  const hasLoggedRef = useRef(false);
-  
-  console.log("statestatestatestatestate", state);
-  useEffect(() => {
-    if (!hasLoggedRef.current && state) {
-      console.log("State initialized:", state);
-      hasLoggedRef.current = true;
-    }
-  }, [state]);
-
   const handlePrevTabs = () => {
     setTabWindow([tabWindow[0] - 1, tabWindow[1] - 1]);
   };
@@ -325,7 +313,7 @@ function DashboardDemoPage() {
   };
 
   return (
-    <div className="container px-8 py-8 mx-auto">
+    <div className="px-4 py-2 mx-auto">
       <div className="sticky top-0 z-20 pb-2 bg-background">
         <Tabs
           value={activeTab}
@@ -502,12 +490,13 @@ function DashboardDemoPage() {
           </TabsContent>
         </Tabs>
       </div>
-      {/* Ad Management Tab */}
+      
       <Tabs value={activeTab} className="w-full">
+        {/* Ad Management Tab */}
         <TabsContent value="adManagement" className="w-11/12 m-auto">
           <Card className="mb-6">
             <CardHeader>
-              <CardTitle>Ad Management Settings</CardTitle>
+              <CardTitle>Ad - Management Settings</CardTitle>
             </CardHeader>
             <CardContent className="p-6">
               {settingsMeta.adManagement.map((item, idx) => (
@@ -525,7 +514,7 @@ function DashboardDemoPage() {
                       {item.label}
                     </Label>
                     <p className="text-sm text-left text-muted-foreground">
-                      {item.description} + {item.key}
+                      {item.description}
                     </p>
                   </div>
                   <Switch
@@ -1125,6 +1114,7 @@ function DashboardDemoPage() {
             </CardContent>
           </Card>
         </TabsContent>
+
         {/* Customer Portal Tab */}
         <TabsContent value="customerPortal">
           <Card className="mb-6">
@@ -1146,6 +1136,7 @@ function DashboardDemoPage() {
             </CardContent>
           </Card>
         </TabsContent>
+
         {/* User Settings Tab */}
         <TabsContent value="userSettings">
           <Card className="mb-6">
@@ -1219,6 +1210,7 @@ function DashboardDemoPage() {
             </CardContent>
           </Card>
         </TabsContent>
+
         {/* Communications Tab */}
         <TabsContent value="communications">
           <Card className="mb-6">
@@ -1265,6 +1257,7 @@ function DashboardDemoPage() {
             </CardContent>
           </Card>
         </TabsContent>
+
         {/* Google Calendar Tab */}
         <TabsContent value="googleCalendar">
           <Card className="mb-6">
@@ -1296,6 +1289,7 @@ function DashboardDemoPage() {
             </CardContent>
           </Card>
         </TabsContent>
+
         {/* Helpdesk Tab */}
         <TabsContent value="helpdesk">
           <Card className="mb-6">
@@ -1313,6 +1307,7 @@ function DashboardDemoPage() {
             </CardContent>
           </Card>
         </TabsContent>
+
         {/* Media MailKit Tab */}
         <TabsContent value="mediaMailKit">
           <Card className="mb-6">
@@ -1357,6 +1352,7 @@ function DashboardDemoPage() {
             </CardContent>
           </Card>
         </TabsContent>
+        
       </Tabs>
 
       <div className="flex justify-end mt-8">
