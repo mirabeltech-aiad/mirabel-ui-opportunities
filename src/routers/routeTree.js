@@ -3,7 +3,6 @@ import { lazy } from 'react';
 
 const WelcomePage = lazy(() => import('../pages/Welcome'));
 const SiteWiseSettingsPage = lazy(() => import('../pages/SiteWiseSettingsPage'));
-const New = lazy(() => import('../features/sales/NewUI'));
 
 export const routes = [
   {
@@ -15,11 +14,6 @@ export const routes = [
   {
     path: '/sitewidesettings',
     component: SiteWiseSettingsPage,
-    exact: true,
-  },
-  {
-    path: '/dashboard',
-    component: New,
     exact: true,
   }
 ];
