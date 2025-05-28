@@ -42,6 +42,17 @@ Main source code of the application, organized as follows:
   - `index.jsx` — Feature entry point  
   - `context.md` — Feature-specific documentation
 
+  ## Feature Context Awareness
+
+Each feature folder inside `/src/features/` contains its own `context.md` file that provides detailed documentation about the feature’s state management, logic, and usage patterns.
+
+These per-feature `context.md` files follow a consistent structure and include:
+- Purpose and responsibilities of the feature
+- Key components and how they interact
+- State structure and reducer logic
+- Custom hooks and helper usage
+- API/service interactions specific to that feature
+
 - `/global/`  
   Application-wide state and context management including:  
   - `GlobalContext.js` — React context object for global state  
