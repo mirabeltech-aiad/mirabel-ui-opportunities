@@ -4,7 +4,7 @@ import tailwindcss from '@tailwindcss/postcss'
 import path from 'path'
 
 export default defineConfig({
-  base: '/modern/', // required for production to work from sub-path
+  // base: '/modern/', // required for production to work from sub-path
   plugins: [react(), tailwindcss()],
   server: {
     port: 3000,

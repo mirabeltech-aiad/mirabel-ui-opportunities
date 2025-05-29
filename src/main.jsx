@@ -2,7 +2,7 @@ import { StrictMode, Suspense, lazy } from 'react';
 import ReactDOM from 'react-dom/client';
 // import App from './App.jsx';
 import './styles/index.css';
-import { HashRouter } from 'react-router-dom';
+import { BrowserRouter } from 'react-router-dom';
 import AppRoutes from './routers/routes.jsx';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ErrorBoundary } from 'react-error-boundary';
@@ -28,9 +28,9 @@ ReactDOM.createRoot(document.getElementById('root')).render(
       }}
     >
       <QueryClientProvider client={queryClient}>
-        <HashRouter>
+        <BrowserRouter basename="/modern">
           <AppRoutes />
-        </HashRouter>
+        </BrowserRouter>
         {import.meta.env.DEV && (
           <Suspense fallback={null}>
             <ReactQueryDevtools initialIsOpen={false} />
