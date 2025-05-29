@@ -4,6 +4,7 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
+    "preinstall": "node scripts/update-mirabel-ui-tag.cjs",
     "dev": "vite",
     "build": "vite build",
     "lint": "eslint .",
@@ -33,6 +34,7 @@
     "cmdk": "^1.1.1",
     "date-fns": "^3.6.0",
     "lucide-react": "^0.509.0",
+    "mirabel-ui": "bitbucket:mirabeldevelopment/mirabel-ui-components#v1.0.3",
     "react": "^18.2.0",
     "react-day-picker": "^8.10.1",
     "react-dom": "^18.2.0",
