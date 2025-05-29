@@ -2,7 +2,7 @@
 import { lazy } from 'react';
 
 const WelcomePage = lazy(() => import('../pages/Welcome'));
-const SiteWiseSettingsPage = lazy(() => import('../pages/SiteWiseSettingsPage'));
+const SiteWideSettingsPage = lazy(() => import('../pages/SiteWideSettingsPage'));
 
 export const routes = [
   {
@@ -13,7 +13,7 @@ export const routes = [
   },
   {
     path: '/sitewidesettings',
-    component: SiteWiseSettingsPage,
+    component: SiteWideSettingsPage,
     exact: true,
   }
 ];
