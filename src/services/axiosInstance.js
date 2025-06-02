@@ -1,5 +1,6 @@
 // src/services/axiosInstance.js
 import axios from "axios";
+import { DEV_BASE_URL, DEV_DOMAIN, DEV_TOKEN } from '../config/devHelper';
 
 const axiosInstance = axios.create({
   headers: {
@@ -17,9 +18,9 @@ axiosInstance.interceptors.request.use((config) => {
   let baseURL = "";
   if (import.meta.env.MODE === "development") {
     // Development environment
-    baseURL = `https://tier1-feature18.magazinemanager.com/`;
-    domain = "tier1-feature18";
-    token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJMb2dnZWRJblVzZXJJRCI6IjEiLCJMb2dnZWRJblNpdGVDbGllbnRJRCI6Ijk5NzAiLCJMb2dnZWRJblNpdGVDdWx0dXJlVUkiOiJlbi1VUyIsIkRhdGVUaW1lIjoiNS8xNS8yMDI1IDc6NTY6NDkgQU0iLCJMb2dnZWRJblNpdGVDdXJyZW5jeVN5bWJvbCI6IiQiLCJMb2dnZWRJblNpdGVEYXRlRm9ybWF0IjoiZXVyb3BlYW4iLCJEb21haW4iOiJ0aWVyMS1mZWF0dXJlMTgiLCJMb2dnZWRJblNpdGVUaW1lQWRkIjpbIjAiLCIwIl0sIlNvdXJjZSI6IlRNTSIsIkVtYWlsIjoic2FAbWFnYXppbmVtYW5hZ2VyLmNvbSIsIklzQVBJVXNlciI6IkZhbHNlIiwibmJmIjoxNzQ3Mjk1ODA5LCJleHAiOjE3NDczMTAyMDksImlhdCI6MTc0NzI5NTgwOSwiaXNzIjoiTWFnYXppbmVNYW5hZ2VyIiwiYXVkIjoiKiJ9.4cxrlKy_Y_m99w7cG9b1weBufAOy1G7mx3iogEQMhjU";
+    baseURL = DEV_BASE_URL;
+    domain = DEV_DOMAIN;
+    token = DEV_TOKEN;
     console.log("configCheck_Dev", baseURL,domain);
 
   } else {
