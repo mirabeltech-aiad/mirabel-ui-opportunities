@@ -1,142 +1,379 @@
-# Application Context Documentation
+# Mirabel UI Project Documentation
 
-## Project Folder Structure Overview
+## Project Overview
+Mirabel UI is a modern React application built with Vite, utilizing React Query for data management, ShadCN UI components, and a robust theming system. The project follows a feature-based architecture with clear separation of concerns.
 
-The project is organized to support modular development, maintainability, and scalability. Below is the high-level folder structure with brief descriptions:
+### Key Architectural Decisions
+- **Feature-First Organization**: Each feature is self-contained with its own components, hooks, and services
+- **Type-Safe Development**: Zod schemas for runtime type checking and validation
+- **Performance-Focused**: Code splitting, lazy loading, and efficient data fetching patterns
+- **Developer Experience**: Comprehensive error boundaries, development tools, and clear documentation
 
-### Root Level
-- `.gitignore` — Git ignore rules  
-- `components.json` — Component metadata/configuration file  
-- `dist/` — Compiled distributable files (bundled JS and source maps)  
-- `index.html` — Main HTML entry point  
-- `jsconfig.json` — JavaScript project configuration  
-- `package.json` — Project dependencies and scripts  
-- `postcss.config.js` — PostCSS configuration for CSS processing  
-- `README.md` — Project documentation  
-- `tailwind.config.js` — Tailwind CSS configuration  
-- `vite.config.js` — Vite bundler configuration  
-- `eslint.config.js` — ESLint configuration  
-- `public/` — Static assets served as-is  
+## Tech Stack & Dependencies
 
-### `/src/`
-Main source code of the application, organized as follows:
+### Core Framework
+- **React 18**: Latest version with concurrent features and automatic batching
+- **Vite**: Fast development server and optimized production builds
+- **TypeScript**: Type-safe development (via jsconfig.json)
 
-- `index.css` — Global CSS styles  
-- `App.jsx` — Root React component  
-- `main.jsx` — Application entry point and rendering logic  
+### State Management
+- **React Query v5**: Server state management with:
+  - Automatic background refetching
+  - Optimistic updates
+  - Infinite scrolling support
+  - Prefetching capabilities
+- **Context API**: Global state management for:
+  - Theme preferences
+  - User settings
+  - Application-wide configurations
 
-- `/lib/`  
-  Utility functions and helpers used across the application, e.g., `utils.js`.
+### UI & Styling
+- **ShadCN UI**: Component library built on:
+  - Radix UI primitives for accessibility
+  - Tailwind CSS for styling
+  - Custom theming support
+- **Tailwind CSS v4**: Utility-first CSS framework
+- **Lucide React**: Icon library integration
+- **Sonner**: Toast notifications
 
-- `/components/ui/`  
-  Reusable UI components implementing consistent design patterns, including:  
-  Accordion, Alert, Button, Calendar, Card, Checkbox, Combobox, Dialog, Dropdown, Form, Label, NavigationMenu, Popover, Select, Skeleton, Switch, Table, Tabs, Sonner, and others.
+### Form Handling
+- **React Hook Form**: Form state management
+- **Zod**: Schema validation
+- **@hookform/resolvers**: Form validation integration
 
-- `/features/`  
-  Contains all self-contained feature modules. Each feature has its own folder with:  
-  - `components/` — UI components specific to the feature  
-  - `context/` — React context, provider, reducer, actions, and initial state files managing feature-specific state  
-  - `helpers/` — Utility functions or constants supporting the feature  
-  - `hooks/` — Custom React hooks encapsulating feature logic  
-  - `services/` — API communication and service logic for the feature  
-  - `index.jsx` — Feature entry point  
-  - `context.md` — Feature-specific documentation
+### Routing & Navigation
+- **React Router v6**: Client-side routing with:
+  - Nested routes
+  - Route guards
+  - Dynamic imports
+  - Layout patterns
 
-  ## Feature Context Awareness
+### API & Data Fetching
+- **Axios**: HTTP client with:
+  - Request/response interceptors
+  - Error handling
+  - Request cancellation
+- **React Query**: Data fetching with:
+  - Automatic caching
+  - Background updates
+  - Error handling
+  - Loading states
 
-Each feature folder inside `/src/features/` contains its own `context.md` file that provides detailed documentation about the feature’s state management, logic, and usage patterns.
+## Project Structure
 
-These per-feature `context.md` files follow a consistent structure and include:
-- Purpose and responsibilities of the feature
-- Key components and how they interact
-- State structure and reducer logic
-- Custom hooks and helper usage
-- API/service interactions specific to that feature
+```
+src/
+├── assets/         # Static assets (images, fonts, etc.)
+├── components/     # Reusable UI components
+│   ├── shared/    # Common components (buttons, inputs, etc.)
+│   ├── layout/    # Layout components (header, sidebar, etc.)
+│   └── ui/        # ShadCN UI components
+├── config/         # Configuration files
+│   ├── api.js     # API configuration
+│   └── constants.js # Application constants
+├── features/       # Feature-specific components and logic
+│   ├── auth/      # Authentication feature
+│   ├── settings/  # Settings feature
+│   └── [feature]/ # Other features
+├── hooks/          # Custom React hooks
+│   ├── useAuth.js # Authentication hook
+│   └── useTheme.js # Theme management hook
+├── lib/           # Utility libraries and helpers
+│   ├── utils.js   # General utilities
+│   └── validators.js # Validation helpers
+├── pages/         # Page components
+│   ├── Welcome.jsx
+│   └── SiteWideSettingsPage.jsx
+├── routers/       # Routing configuration
+│   ├── routes.jsx # Route definitions
+│   └── routeTree.js # Route tree structure
+├── services/      # API services and data fetching
+│   ├── api.js     # API client setup
+│   └── endpoints/ # API endpoint definitions
+├── store/         # Global state management
+│   ├── GlobalContext.jsx
+│   └── ThemeProvider.jsx
+└── styles/        # Global styles and Tailwind configuration
+    ├── index.css  # Global styles
+    └── tailwind.css # Tailwind imports
+```
 
-- `/global/`  
-  Application-wide state and context management including:  
-  - `GlobalContext.js` — React context object for global state  
-  - `GlobalProvider.jsx` — Context provider wrapping the app to provide global state  
-  - `globalActions.js` — Action types and creators for global state  
-  - `globalReducer.js` — Reducer handling global state changes  
-  - `globalInitialState.js` — Default initial global state  
-  - `context.md` — Documentation for global context and state management
+## API Integration
 
-- `/routers/`  
-  Routing configuration and route trees managing app navigation.
+### React Query Setup
+```javascript
+// main.jsx
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: 5 * 60 * 1000, // 5 minutes
+      cacheTime: 10 * 60 * 1000, // 10 minutes
+      retry: 1,
+      refetchOnWindowFocus: false
+    }
+  }
+});
+```
 
-- `/services/`  
-  Centralized API setup and service utilities, including `axiosInstance.js` for HTTP requests.
+### API Service Pattern
+```javascript
+// services/api.js
+const api = axios.create({
+  baseURL: import.meta.env.VITE_API_URL,
+  timeout: 10000,
+  headers: {
+    'Content-Type': 'application/json'
+  }
+});
 
----
+// services/endpoints/auth.js
+export const authService = {
+  login: async (credentials) => {
+    const response = await api.post('/auth/login', credentials);
+    return response.data;
+  },
+  // ... other auth endpoints
+};
+```
 
-## Feature Module Structure (Generalized)
+## Component Architecture
 
-Each feature inside `/src/features/` adheres to the following pattern to encapsulate feature-specific logic and UI:
+### ShadCN UI Integration
+Components are built using a consistent pattern:
+```javascript
+// components/ui/button.jsx
+import { cn } from "@/lib/utils";
+import { Button as ShadcnButton } from "@/components/ui/button";
 
-- **components/**  
-  UI components dedicated to the feature’s user interface.
+export const Button = ({ className, ...props }) => {
+  return (
+    <ShadcnButton
+      className={cn("custom-styles", className)}
+      {...props}
+    />
+  );
+};
+```
 
-- **context/**  
-  Manages feature state using React Context API and reducer pattern:  
-  - `Actions.js`: Defines actions for state changes  
-  - `Context.js`: Creates context and custom hooks for access  
-  - `FeatureSettingsProvider.jsx`: Provider component managing feature state lifecycle  
-  - `Reducer.js`: Reducer functions handling state updates  
-  - `initialState.js`: Default state values for the feature
+### Component Categories
+1. **Shared Components** (`components/shared/`)
+   - Error boundaries with fallback UI
+   - Loading states with skeleton screens
+   - Common UI elements with consistent styling
 
-- **helpers/**  
-  Helper functions or constants supporting feature functionality.
+2. **Layout Components** (`components/layout/`)
+   - Main layout with responsive design
+   - Navigation with active state handling
+   - Sidebar with collapsible sections
 
-- **hooks/**  
-  Custom hooks abstracting logic such as data fetching, caching, or business rules.
+3. **Feature Components** (`features/`)
+   - Domain-specific components
+   - Business logic encapsulation
+   - Feature-specific hooks and utilities
 
-- **services/**  
-  API clients and service calls dedicated to the feature’s backend interactions.
+## Theming System
 
-- **index.jsx**  
-  Entry point exporting feature components or context providers.
+### Theme Configuration
+```javascript
+// tailwind.config.js
+module.exports = {
+  darkMode: ["class"],
+  theme: {
+    extend: {
+      colors: {
+        primary: {
+          DEFAULT: "hsl(var(--primary))",
+          foreground: "hsl(var(--primary-foreground))"
+        },
+        // ... other color definitions
+      }
+    }
+  }
+};
+```
 
-- **context.md**  
-  Documentation detailing the feature’s internal state management, components, and usage.
+### Theme Provider Implementation
+```javascript
+// components/theme/ThemeProvider.jsx
+export function ThemeProvider({ children }) {
+  const [theme, setTheme] = useState(() => {
+    const stored = localStorage.getItem("theme");
+    return stored || (window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+  });
 
----
+  useEffect(() => {
+    const root = window.document.documentElement;
+    root.classList.remove("light", "dark");
+    root.classList.add(theme);
+    localStorage.setItem("theme", theme);
+  }, [theme]);
+
+  return (
+    <ThemeContext.Provider value={{ theme, setTheme }}>
+      {children}
+    </ThemeContext.Provider>
+  );
+}
+```
+
+## Routing Structure
+
+### Route Configuration
+```javascript
+// routers/routeTree.js
+export const routes = [
+  {
+    path: '/',
+    component: lazy(() => import('../pages/Welcome')),
+    children: []
+  },
+  {
+    path: '/sitewidesettings',
+    component: lazy(() => import('../pages/SiteWideSettingsPage'))
+  }
+];
+```
+
+### Route Protection Pattern
+```javascript
+// routers/ProtectedRoute.jsx
+export const ProtectedRoute = ({ children }) => {
+  const { isAuthenticated } = useAuth();
+  const location = useLocation();
+
+  if (!isAuthenticated) {
+    return <Navigate to="/login" state={{ from: location }} replace />;
+  }
+
+  return children;
+};
+```
 
 ## Global State Management
 
-- The `/src/global/` folder contains centralized global state and context providers that span across features and components.  
-- Global state uses React Context with reducers to maintain a single source of truth for data shared by multiple parts of the application.  
-- Global actions and reducers are defined to handle state transitions triggered by various events or API responses.  
-- The global provider wraps the main application component to supply global state throughout the app.
+### Context Providers
+1. **GlobalProvider**
+```javascript
+// store/GlobalContext.jsx
+export const GlobalProvider = ({ children }) => {
+  const [clientVars, setClientVars] = useState(() => {
+    try {
+      return JSON.parse(localStorage.getItem('MMClientVars')) || null;
+    } catch {
+      return null;
+    }
+  });
 
----
+  const value = useMemo(() => ({
+    clientVars,
+    setClientVars: (newVars) => {
+      setClientVars(newVars);
+      localStorage.setItem('MMClientVars', JSON.stringify(newVars));
+    }
+  }), [clientVars]);
 
-## Services and API Communication
+  return (
+    <GlobalContext.Provider value={value}>
+      {children}
+    </GlobalContext.Provider>
+  );
+};
+```
 
-- The `/src/services/axiosInstance.js` file configures a shared Axios instance for consistent HTTP request handling including interceptors, base URLs, and headers.  
-- Feature-specific API calls build on top of this instance located inside each feature’s `/services/` folder.  
-- This abstraction enables centralized error handling, authentication, and API versioning.
+## Development Workflow
 
----
+### Available Scripts
+```json
+{
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "lint": "eslint .",
+    "preview": "vite preview"
+  }
+}
+```
 
-## Routing
+### Development Tools
+- **React Query DevTools**: Available in development mode
+- **Error Boundary**: Graceful error handling with fallback UI
+- **Strict Mode**: Development-time checks for potential issues
+- **ESLint**: Code quality and style enforcement
 
-- All route definitions and navigation trees reside in the `/src/routers/` folder, enabling organized and scalable route management.  
-- Routes are split logically and imported where needed for clear routing logic.
+## Best Practices
 
----
+### Code Organization
+- Feature-based architecture for scalability
+- Clear separation of concerns
+- Reusable component patterns
+- Type-safe development with Zod
 
-## Tools and Libraries Used
+### Performance Considerations
+- Code splitting through lazy loading
+- React Query for efficient data fetching
+- Optimized bundle size
+- Suspense for loading states
 
-- **React** for building UI components and managing application state.  
-- **React Context API** combined with reducers for state management.  
-- **Axios** for HTTP client functionality.  
-- **Tailwind CSS** for utility-first styling.  
-- **Vite** as the build tool and dev server.  
-- **ESLint** for code linting and style enforcement.
+## Getting Started
 
----
+1. Install dependencies:
+   ```bash
+   npm install
+   ```
 
-## Summary
+2. Start development server:
+   ```bash
+   npm run dev
+   ```
 
-This project follows a modular and scalable architecture with clear separation between UI components, feature logic, global state, and services. Features are self-contained, making the codebase maintainable and easy to enhance or debug. Global state and services provide shared resources, while routing and utilities are organized for clean app navigation and consistent functionality.
+3. Build for production:
+   ```bash
+   npm run build
+   ```
+
+## Additional Resources
+- [React Query Documentation](https://tanstack.com/query/latest)
+- [ShadCN UI Documentation](https://ui.shadcn.com)
+- [Tailwind CSS Documentation](https://tailwindcss.com)
+- [React Router Documentation](https://reactrouter.com)
+- [Vite Documentation](https://vitejs.dev)
+- [Zod Documentation](https://zod.dev)
+
+## Cursor AI Integration
+
+### Auto-Update Mechanism
+The context.md file is designed to be automatically updated by Cursor AI when changes are made to the codebase. This ensures that the documentation stays in sync with the actual implementation.
+
+### Update Triggers
+The following actions will trigger automatic updates to context.md:
+1. **File Changes**: When Cursor AI modifies any file in the project
+2. **New Files**: When new files or directories are added
+3. **Dependency Updates**: When package.json is modified
+4. **Configuration Changes**: When config files (vite.config.js, tailwind.config.js, etc.) are updated
+
+### Update Process
+1. Cursor AI analyzes the changes made to the codebase
+2. Updates relevant sections of context.md
+3. Maintains consistency with existing documentation
+4. Preserves manual documentation while updating automated sections
+
+### Sections That Auto-Update
+- Project Structure (when files/directories change)
+- Tech Stack (when dependencies change)
+- API Integration (when services or endpoints change)
+- Component Architecture (when components are added/modified)
+- Routing Structure (when routes change)
+- Global State Management (when context providers change)
+
+### Manual Override
+While most sections auto-update, some sections can be manually maintained:
+- Project Overview
+- Key Architectural Decisions
+- Best Practices
+- Getting Started Guide
+- Additional Resources
+
+### Version Control
+- Changes to context.md are tracked in version control
+- Each auto-update includes a reference to the triggering change
+- Manual modifications are preserved in git history
