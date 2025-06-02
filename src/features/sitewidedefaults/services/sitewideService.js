@@ -1,8 +1,9 @@
 import axiosInstance from "@/services/axiosInstance";
+import { API_GET_SITEWIDE_DEFAULTS } from "@/config/apiUrls";
 // import { handleApiError } from "@/services/errorHandler";
 export const getSiteWideList = async () => {
   try {
-    const response = await axiosInstance.get("/services/Admin/SiteSettings/All");
+    const response = await axiosInstance.get(API_GET_SITEWIDE_DEFAULTS);
     if(response.data.content.Status === "Success"){
       return response.data.content.Data;
     }else{

@@ -8,6 +8,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ErrorBoundary } from 'react-error-boundary';
 import ErrorFallback from './components/shared/ErrorBoundary';
 import { GlobalProvider } from './store/GlobalContext';
+import { ThemeProvider } from './components/theme/ThemeProvider';
 const queryClient = new QueryClient();
 
 // Lazy-load Devtools only in development
@@ -29,16 +30,18 @@ ReactDOM.createRoot(document.getElementById('root')).render(
       }}
     >
       <QueryClientProvider client={queryClient}>
-        <GlobalProvider>
-          <BrowserRouter basename="/modern">
-            <AppRoutes />
-          </BrowserRouter>
-          {import.meta.env.DEV && (
-            <Suspense fallback={null}>
-              <ReactQueryDevtools initialIsOpen={false} />
-            </Suspense>
-          )}
-        </GlobalProvider>
+        <ThemeProvider>
+          <GlobalProvider>
+            <BrowserRouter basename="/modern">
+              <AppRoutes />
+            </BrowserRouter>
+            {import.meta.env.DEV && (
+              <Suspense fallback={null}>
+                <ReactQueryDevtools initialIsOpen={false} />
+              </Suspense>
+            )}
+          </GlobalProvider>
+        </ThemeProvider>
       </QueryClientProvider>
     </ErrorBoundary>
   </StrictMode>

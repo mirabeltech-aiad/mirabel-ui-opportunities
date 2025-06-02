@@ -2,7 +2,7 @@
 import { Routes, Route } from 'react-router-dom';
 import { Suspense, lazy } from 'react';
 import { routes } from './routeTree';
-
+import { Layout } from '@/components/layout/Layout';
 
 // Loading component
 const LoadingSpinner = () => (
@@ -27,7 +27,13 @@ const renderRoutes = (routes) =>
         key={i}
         path={path}
         index={index}
-        element={Component ? <Component /> : null}
+        element={
+          Component ? (
+            <Layout>
+              <Component />
+            </Layout>
+          ) : null
+        }
       />
     );
   });
