@@ -46,16 +46,47 @@ axiosInstance.interceptors.request.use((config) => {
   return config;
 }, error => Promise.reject(error));
 
-// Optional: Response interceptor for token refresh or error
+// Response interceptor for token refresh or error
 axiosInstance.interceptors.response.use(
   response => response,
   async (error) => {
-    if (error.response?.status === 401) {
-      // implement token refresh logic here if needed
+    const originalRequest = error.config;
+    if (error.response?.status === 401 && !originalRequest._retry) {
+      originalRequest._retry = true;
+      try {
+        await refreshTokenWithWebMethodCall();
+        // After refreshing token, retry the original request
+        return axiosInstance.request(originalRequest);
+      } catch (refreshError) {
+        return Promise.reject(refreshError);
+      }
     }
     return Promise.reject(error);
   }
 );
 
 export default axiosInstance;
+
+// Standalone async function for token refresh
+export async function refreshTokenWithWebMethodCall() {
+  try {
+    const response = await axiosInstance.request({
+      url: "/intranet/Members/Home/Home.aspx/GenerateTokenByRefreshToken",
+      method: "post",
+    });
+    const resp = response.data;
+    debugger
+    if (resp.d.Status === 200) {
+      const MMClientVars = JSON.parse(localStorage.getItem("MMClientVars") || "{}");
+      MMClientVars.Token = resp.d.Data.AccessToken;
+      localStorage.setItem("MMClientVars", JSON.stringify(MMClientVars));
+    } else {
+      throw new Error("Token refresh failed: Invalid status");
+    }
+  } catch (error) {
+    console.error("Token refresh error:", error);
+    throw error; // Important: rethrow so retry logic knows it failed
+  }
+}
+
 
