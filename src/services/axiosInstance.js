@@ -75,7 +75,6 @@ export async function refreshTokenWithWebMethodCall() {
       method: "post",
     });
     const resp = response.data;
-    debugger
     if (resp.d.Status === 200) {
       const MMClientVars = JSON.parse(localStorage.getItem("MMClientVars") || "{}");
       MMClientVars.Token = resp.d.Data.AccessToken;
