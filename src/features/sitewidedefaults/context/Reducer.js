@@ -5,19 +5,13 @@ export const settingsReducer = (state, action) => {
     case Actions.TOGGLE_SETTING:
       return {
         ...state,
-        [action.payload.section]: {
-          ...state[action.payload.section],
-          [action.payload.key]: !state[action.payload.section][action.payload.key]
-        }
+        [action.payload.key]: !state[action.payload.key]
       };
       
     case Actions.UPDATE_SETTING:
       return {
         ...state,
-        [action.payload.section]: {
-          ...state[action.payload.section],
-          [action.payload.key]: action.payload.value
-        }
+        [action.payload.key]: action.payload.value
       };
 
     case Actions.LOAD_SETTINGS:

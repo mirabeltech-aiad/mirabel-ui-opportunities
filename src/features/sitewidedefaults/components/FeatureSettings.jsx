@@ -1,4 +1,4 @@
-import React, { useState, memo } from "react";
+import React, { useState, memo, useEffect } from "react";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Switch } from "@/components/ui/switch";
@@ -62,9 +62,6 @@ const settingsMeta = {
       description:
         "Allow TextImage Changes in JobJacket. Note: This will not affect the invoice or quantity on order. It will just allow to change the text/image in the job jacket.",
     },
-
-    //
-
     {
       key: "IsESignature",
       label: "eSignature",
@@ -150,6 +147,47 @@ const settingsMeta = {
       description:
         "Selecting this checkbox will allow customers to store their payment information through a new 'Update Card Details' modal window that opens upon signing and approving the proposal.",
       enabled: false,
+    },
+    {
+      key: "IsMoveContractsEnabled",
+      label: "Allow Non-Admins to Move Orders",
+      description: "Allow Reps to move Orders from one contact record to another.",
+    },
+    {
+      key: "IsContactReqFieldsEnabled",
+      label: "Required Fields during Add Contact",
+      description: "Required Fields must be filled in to add a new contact.",
+    },
+    {
+      key: "InvPropCheck",
+      label: "Proposal Inventory Warning",
+      description: "Show a warning before creating, converting, or copying proposals if inventory limits are exceeded.",
+    },
+    {
+      key: "StopInvPropFail",
+      label: "Proposal Stop Processing",
+      description: "Prevent proposal creation/copy/convert if inventory limits are exceeded (Admins can override).",
+    },
+    {
+      key: "InvCheck",
+      label: "Order Inventory Warning",
+      description: "Show a warning before creating, converting, or copying orders if inventory limits are exceeded.",
+    },
+    {
+      key: "StopInvFail",
+      label: "Order Stop Processing",
+      description: "Prevent order creation/copy/convert if inventory limits are exceeded (Admins can override).",
+    },
+    {
+      key: "IsShowAmountOnInventoryReport",
+      label: "Show Amount on Inventory Report",
+      description: "Display the amount on the inventory report.",
+    },
+    {
+      key: "RsKey",
+      label: "RightSignature API Key",
+      description: "API Key for RightSignature integration.",
+      input: true,
     },
   ],
   accountReceivable: [
@@ -288,6 +326,125 @@ const settingsMeta = {
     },
   ],
 };
+
+const pickupFromOptions = [
+  { value: "ProductName", label: "Product Name" },
+  { value: "IssueName", label: "Issue Name" },
+  { value: "IssueYear", label: "Issue Year" },
+  { value: "AdSize", label: "Ad Size" },
+  { value: "AdName", label: "Ad Name" },
+  // Add more as needed
+];
+
+const separatorOptions = [
+  { value: '', label: '' },
+  { value: "' '", label: ' ' },
+  { value: "':'", label: ':' },
+  { value: "','", label: ',' },
+  { value: "'-'", label: '-' },
+];
+
+const pickupOptions = [
+  { Key: '', Description: '', Script: "''" },
+  { Key: 'ProductName', Description: 'Product Name', Script: "ISNULL(gsPublications.PubName,'')" },
+  { Key: 'Description', Description: 'Description', Script: "ISNULL(gsContracts.Description,'')" },
+  { Key: 'IssueName', Description: 'Issue Name', Script: "ISNULL(tblMagFrequency.IssueName,'')" },
+  { Key: 'IssueYear', Description: 'Issue Year', Script: "ISNULL(CONVERT(VARCHAR,tblMagFrequency.IssueYear),'')" },
+  { Key: 'IssueDate', Description: 'Issue Date', Script: "ISNULL(CONVERT(VARCHAR,tblMagFrequency.IssueDate,101),'')" },
+  { Key: 'AdSize', Description: 'Ad Size', Script: "ISNULL(gsAdSize.AdSizeName,'')" },
+  { Key: 'Frequency', Description: 'Frequency', Script: "ISNULL(gsContracts.Frequency,'')" },
+  { Key: 'Color', Description: 'Color', Script: "ISNULL(gsContracts.Color,'')" },
+  { Key: 'Position', Description: 'Position', Script: "ISNULL(gsContracts.PosReq1,'')" },
+  { Key: 'Section', Description: 'Section', Script: "ISNULL(gsPubSections.SectionName,'')" },
+  { Key: 'AdName', Description: 'Ad Name', Script: "ISNULL(gsContracts.AdName,'')" },
+];
+
+function PickupFromSection({ pickupState = {}, handlePickupInput }) {
+  const [pickupOptions, setPickupOptions] = useState([
+    { Key: "", Description: "", Script: "''" },
+    { Key: "ProductName", Description: "Product Name", Script: "ISNULL(gsPublications.PubName,'')" },
+    { Key: "Description", Description: "Description", Script: "ISNULL(gsContracts.Description,'')" },
+    { Key: "IssueName", Description: "Issue Name", Script: "ISNULL(tblMagFrequency.IssueName,'')" },
+    { Key: "IssueYear", Description: "Issue Year", Script: "ISNULL(CONVERT(VARCHAR,tblMagFrequency.IssueYear),'')" },
+    { Key: "IssueDate", Description: "Issue Date", Script: "ISNULL(CONVERT(VARCHAR,tblMagFrequency.IssueDate,101),'')" },
+    { Key: "AdSize", Description: "Ad Size", Script: "ISNULL(gsAdSize.AdSizeName,'')" },
+    { Key: "Frequency", Description: "Frequency", Script: "ISNULL(gsContracts.Frequency,'')" },
+    { Key: "Color", Description: "Color", Script: "ISNULL(gsContracts.Color,'')" },
+    { Key: "Position", Description: "Position", Script: "ISNULL(gsContracts.PosReq1,'')" },
+    { Key: "Section", Description: "Section", Script: "ISNULL(gsPubSections.SectionName,'')" },
+    { Key: "AdName", Description: "Ad Name", Script: "ISNULL(gsContracts.AdName,'')" },
+  ]);
+
+  const pickupKeys = [
+    "PickupFrom1",
+    "PickupFrom2",
+    "PickupFrom3",
+    "PickupFrom4",
+    "PickupFrom5",
+  ];
+  const separatorKeys = [
+    "PickupFromTextSeparator1",
+    "PickupFromTextSeparator2",
+    "PickupFromTextSeparator3",
+    "PickupFromTextSeparator4",
+  ];
+
+  const handlePickupFromChange = (fieldKey, value) => {
+    const otherValues = pickupKeys.filter(k => k !== fieldKey).map(k => pickupState[k]);
+    if (value !== "''" && otherValues.includes(value)) {
+      window.alert("This field is already used in another dropdown.");
+      handlePickupInput(fieldKey, "''");
+      return;
+    }
+    handlePickupInput(fieldKey, value);
+  };
+
+  return (
+    <div className="mt-6 mb-2">
+      <Label className="font-semibold text-base block mb-1">
+        'Pickup From' Description
+      </Label>
+      <div className="text-sm text-muted-foreground mb-3">
+        Choose the data to display in the 'Pickup From' drop down lists and reports in order to give users the information they need to choose or view the correct insertion to pick up
+      </div>
+      <div className="flex flex-col gap-2">
+        {/* First field (no separator) */}
+        <select
+          className="border rounded px-2 py-0.5 h-8 text-sm min-w-[140px]"
+          value={(pickupState && pickupState.PickupFrom1) || "''"}
+          onChange={e => handlePickupFromChange("PickupFrom1", e.target.value)}
+        >
+          {pickupOptions.map(opt => (
+            <option key={opt.Script} value={opt.Script}>{opt.Description}</option>
+          ))}
+        </select>
+        {/* Remaining fields with separators */}
+        {[1, 2, 3, 4].map(i => (
+          <div key={i} className="flex flex-row gap-2 items-center">
+            <select
+              className="border rounded px-2 py-0.5 h-8 text-sm w-12"
+              value={(pickupState && pickupState[separatorKeys[i - 1]]) || ''}
+              onChange={e => handlePickupInput(separatorKeys[i - 1], e.target.value)}
+            >
+              {separatorOptions.map(opt => (
+                <option key={opt.value} value={opt.value}>{opt.label}</option>
+              ))}
+            </select>
+            <select
+              className="border rounded px-2 py-0.5 h-8 text-sm min-w-[140px]"
+              value={(pickupState && pickupState[pickupKeys[i]]) || "''"}
+              onChange={e => handlePickupFromChange(pickupKeys[i], e.target.value)}
+            >
+              {pickupOptions.map(opt => (
+                <option key={opt.Script} value={opt.Script}>{opt.Description}</option>
+              ))}
+            </select>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
 
 function DashboardDemoPage() {
   const {
@@ -517,18 +674,60 @@ function DashboardDemoPage() {
                       {item.description}
                     </p>
                   </div>
-                  <Switch
-                    id={item.key}
-                    checked={state.adManagement?.[item.key] || false}
-                    onCheckedChange={() =>
-                      handleToggle("adManagement", item.key)
-                    }
-                  />
+                  {item.input ? (
+                    <Input
+                      id={item.key}
+                      value={state[item.key] || ""}
+                      onChange={e => handleInput(item.key, e.target.value)}
+                      className="w-64"
+                    />
+                  ) : (
+                    <Switch
+                      id={item.key}
+                      checked={!!state[item.key]}
+                      onCheckedChange={() => handleToggle(item.key)}
+                    />
+                  )}
                 </div>
               ))}
+              <div className="flex flex-col p-2 border-b">
+                <Label className="mb-1 text-base font-semibold" htmlFor="LoggedInRepChoiceProposal">
+                  Default Sales Rep for Item Entry
+                </Label>
+                <div className="flex flex-row items-center gap-4 flex-wrap">
+                  <div className="flex flex-row items-center min-w-[420px]">
+                    <select
+                      id="LoggedInRepChoiceProposal"
+                      className="border rounded px-2 py-1 mr-2"
+                      value={state.LoggedInRepChoiceProposal === false ? "false" : "true"}
+                      onChange={e => handleInput("LoggedInRepChoiceProposal", e.target.value === "true")}
+                    >
+                      <option value="true">Logged in Rep</option>
+                      <option value="false">Rep on Client Account</option>
+                    </select>
+                    <span className="text-sm text-muted-foreground ml-2">
+                      for the default sales rep that is assigned to a new item on <b>proposals</b>.
+                    </span>
+                  </div>
+                  <div className="flex flex-row items-center min-w-[420px] mt-2 md:mt-0">
+                    <select
+                      id="LoggedInRepChoice"
+                      className="border rounded px-2 py-1 mr-2"
+                      value={state.LoggedInRepChoice === false ? "false" : "true"}
+                      onChange={e => handleInput("LoggedInRepChoice", e.target.value === "true")}
+                    >
+                      <option value="true">Logged in Rep</option>
+                      <option value="false">Rep on Client Account</option>
+                    </select>
+                    <span className="text-sm text-muted-foreground ml-2">
+                      for the default sales rep that is assigned to a new item on <b>order</b>.
+                    </span>
+                  </div>
+                </div>
+              </div>
 
               <div className="flex items-center justify-between p-2 border-b">
-                <div className="flex flex-col items-start ">
+                <div className="flex flex-col items-start">
                   <Label
                     className="mb-1 text-base font-semibold"
                     htmlFor={"Show Additional Insertion Years"}
@@ -541,13 +740,9 @@ function DashboardDemoPage() {
                       type="number"
                       min={0}
                       className="w-16 mx-2"
-                      value={state.adManagement?.IssueYearCheckBoxEnd || 12}
+                      value={state.IssueYearCheckBoxEnd || 12}
                       onChange={(e) =>
-                        handleInput(
-                          "adManagement",
-                          "IssueYearCheckBoxEnd",
-                          parseInt(e.target.value, 10)
-                        )
+                        handleInput("IssueYearCheckBoxEnd", parseInt(e.target.value, 10))
                       }
                     />{" "}
                     years of issues starting with the year{" "}
@@ -555,112 +750,23 @@ function DashboardDemoPage() {
                       type="number"
                       min={0}
                       className="w-16 mx-2"
-                      value={state.adManagement?.IssueYearCheckBoxStart || -1}
+                      value={state.IssueYearCheckBoxStart || -1}
                       onChange={(e) =>
-                        handleInput(
-                          "adManagement",
-                          "IssueYearCheckBoxStart",
-                          parseInt(e.target.value, 10)
-                        )
+                        handleInput("IssueYearCheckBoxStart", parseInt(e.target.value, 10))
                       }
                     />{" "}
                     (use -1 for the current year)
                   </div>
                 </div>
               </div>
-              <Separator />
-              <div className="flex items-center justify-between p-2 ">
-                <div className="flex flex-col items-start">
-                  <Label
-                    className="mb-1 text-base font-semibold"
-                    htmlFor={"Allow Non-Admins to Move Orders"}
-                  >
-                    Allow Non-Admins to Move Orders
-                  </Label>
-                  <p className="text-sm text-left text-muted-foreground">
-                    Allow Reps to move Orders from one contact record to
-                    another.
-                  </p>
-                </div>
-                <Switch
-                  checked={true}
-                  onCheckedChange={() =>
-                    handleToggle(
-                      "adManagement",
-                      "Allow Non-Admins to Move Orders"
-                    )
-                  }
-                />
-              </div>
-
-              <div className="flex items-center justify-between p-2 ">
-                <div className="flex flex-col items-start">
-                  <Label
-                    className="mb-1 text-base font-semibold"
-                    htmlFor={"Required Fields during Add Contact"}
-                  >
-                    Required Fields during Add Contact
-                  </Label>
-                  <p className="text-sm text-left text-muted-foreground">
-                    Required Fields must be filled in to add a new contact.
-                  </p>
-                </div>
-                <Switch
-                  checked={true}
-                  onCheckedChange={() =>
-                    handleToggle(
-                      "adManagement",
-                      "Required Fields during Add Contact"
-                    )
-                  }
-                />
-              </div>
-
-              <div className="flex items-center justify-between p-2 border-b">
-                <div className="flex flex-col items-start ">
-                  <Label
-                    className="mb-1 text-base font-semibold"
-                    htmlFor={"Show Additional Insertion Years"}
-                  >
-                    Display Credit Limit on Runsheet
-                  </Label>
-                  <div className="flex flex-wrap text-sm text-muted-foreground">
-                    Clients that have an unpaid balance more than{" "}
-                    <Input
-                      type="number"
-                      min={0}
-                      className="w-16 mx-2"
-                      value={true || ""}
-                      onChange={(e) =>
-                        handleInput(
-                          "adManagement",
-                          "CheckCreditLimitOnRunsheetDays",
-                          parseInt(e.target.value, 10)
-                        )
-                      }
-                    />{" "}
-                    days past due that are over their credit limit will be
-                    displayed in red on the "Sales Runsheet" report.
-                  </div>
-                </div>
-                <Switch
-                  checked={true || false}
-                  onCheckedChange={() =>
-                    handleToggle(
-                      "adManagement",
-                      "Required Fields during Add Contact"
-                    )
-                  }
-                />
-              </div>
 
               <div className="flex items-center justify-between p-2 border-b">
                 <div className="flex flex-col items-start">
                   <Label
                     className="mb-1 text-base font-semibold"
-                    htmlFor={"Show Additional Insertion Years"}
+                    htmlFor={"Don't Allow Proposals for Customers Over their Credit Limit"}
                   >
-                    Don't Allow Proposals for Customers Over their Credit Limit{" "}
+                    Don't Allow Proposals for Customers Over their Credit Limit
                   </Label>
                   <div className="flex flex-wrap text-sm text-muted-foreground">
                     Do not allow proposals to be created for clients that have
@@ -669,10 +775,9 @@ function DashboardDemoPage() {
                       type="number"
                       min={0}
                       className="w-16 mx-2"
-                      value={12 || ""}
+                      value={state.CheckCreditLimitOnProposeDays || ""}
                       onChange={(e) =>
                         handleInput(
-                          "adManagement",
                           "CheckCreditLimitOnProposeDays",
                           parseInt(e.target.value, 10)
                         )
@@ -683,11 +788,10 @@ function DashboardDemoPage() {
                   </div>
                 </div>
                 <Switch
-                  checked={true || false}
+                  checked={state.CheckCreditLimitOnPropose || false}
                   onCheckedChange={() =>
                     handleToggle(
-                      "adManagement",
-                      "Required Fields during Add Contact"
+                      "CheckCreditLimitOnPropose"
                     )
                   }
                 />
@@ -697,7 +801,7 @@ function DashboardDemoPage() {
                 <div className="flex flex-col items-start">
                   <Label
                     className="mb-1 text-base font-semibold"
-                    htmlFor={"Show Additional Insertion Years"}
+                    htmlFor={"Don't Allow Orders for Customers Over their Credit Limit"}
                   >
                     Don't Allow Orders for Customers Over their Credit Limit
                   </Label>
@@ -709,10 +813,9 @@ function DashboardDemoPage() {
                       type="number"
                       min={0}
                       className="w-16 mx-2"
-                      value={12 || ""}
+                      value={state.CheckCreditLimitOnAddDays || ""}
                       onChange={(e) =>
                         handleInput(
-                          "adManagement",
                           "CheckCreditLimitOnAddDays",
                           parseInt(e.target.value, 10)
                         )
@@ -723,11 +826,10 @@ function DashboardDemoPage() {
                   </div>
                 </div>
                 <Switch
-                  checked={true || false}
+                  checked={state.CheckCreditLimitOnAdd || false}
                   onCheckedChange={() =>
                     handleToggle(
-                      "adManagement",
-                      "Required Fields during Add Contact"
+                      "CheckCreditLimitOnAdd"
                     )
                   }
                 />
@@ -737,14 +839,35 @@ function DashboardDemoPage() {
                 <div className="flex flex-col items-start">
                   <Label
                     className="mb-1 text-base font-semibold"
-                    htmlFor={"Show Additional Insertion Years"}
+                    htmlFor={"Display Credit Limit on Runsheet"}
                   >
-                    Default Sales
+                    Display Credit Limit on Runsheet
                   </Label>
+                  <div className="flex flex-wrap text-sm text-muted-foreground">
+                    Clients that have an unpaid balance more than{" "}
+                    <Input
+                      type="number"
+                      min={0}
+                      className="w-16 mx-2"
+                      value={state.CheckCreditLimitOnRunsheetDays || ""}
+                      onChange={(e) =>
+                        handleInput(
+                          "CheckCreditLimitOnRunsheetDays",
+                          parseInt(e.target.value, 10)
+                        )
+                      }
+                    />{" "}
+                    days past due that are over their credit limit will be
+                    displayed in red on the "Sales Runsheet" report.
+                  </div>
                 </div>
+                <Switch
+                   id="CheckCreditLimitOnRunsheet"
+                   checked={state.CheckCreditLimitOnRunsheet || false}
+                   onCheckedChange={() => handleToggle("CheckCreditLimitOnRunsheet")}
+                />
               </div>
-
-              <div className="flex items-center justify-between p-2 ">
+              <div className="flex items-center justify-between p-2">
                 <div className="flex flex-col items-start">
                   <Label
                     className="mb-1 text-base font-semibold"
@@ -779,7 +902,7 @@ function DashboardDemoPage() {
                 </div>
               </div>
 
-              <div className="flex flex-col gap-4 md:flex-row">
+              <div className="flex flex-col gap-4 md:flex-row border-b p-2">
                 {/* Proposal Items */}
                 <div className="border rounded p-3 flex-1 min-w-[220px]">
                   <div className="mb-2 font-semibold text-center">
@@ -846,9 +969,13 @@ function DashboardDemoPage() {
                   </div>
                 </div>
               </div>
+
+              <PickupFromSection
+                pickupState={state.PickupFromSettings || {}}
+                handlePickupInput={(key, value) => handleInput('PickupFromSettings', { ...state.PickupFromSettings, [key]: value })}
+              />
             </CardContent>
           </Card>
-          {/* Additional Controls Card */}
         </TabsContent>
         {/* Account Tab */}
 
@@ -913,12 +1040,8 @@ function DashboardDemoPage() {
                       </div>
                       <Switch
                         id={item.key}
-                        checked={
-                          settings.accountReceivable?.[item.key] || false
-                        }
-                        onCheckedChange={() =>
-                          handleToggle("accountReceivable", item.key)
-                        }
+                        checked={state[item.key] || false}
+                        onCheckedChange={() => handleToggle(item.key)}
                       />
                     </>
                   )}
@@ -945,10 +1068,8 @@ function DashboardDemoPage() {
                   </a>
                 </div>
                 <Switch
-                  checked={true}
-                  onCheckedChange={() =>
-                    handleToggle("production", "digitalStudio")
-                  }
+                  checked={state.digitalStudio || false}
+                  onCheckedChange={() => handleToggle('digitalStudio')}
                 />
               </div>
 
@@ -964,10 +1085,8 @@ function DashboardDemoPage() {
                   </p>
                 </div>
                 <Switch
-                  checked={true}
-                  onCheckedChange={() =>
-                    handleToggle("production", "digitalStudio")
-                  }
+                  checked={state.enableProject || false}
+                  onCheckedChange={() => handleToggle('enableProject')}
                 />
               </div>
 
@@ -981,10 +1100,8 @@ function DashboardDemoPage() {
                   </a>
                 </div>
                 <Switch
-                  checked={true}
-                  onCheckedChange={() =>
-                    handleToggle("production", "digitalStudio")
-                  }
+                  checked={state.digitalStudio || false}
+                  onCheckedChange={() => handleToggle('digitalStudio')}
                 />
               </div>
             </CardContent>
@@ -1062,53 +1179,43 @@ function DashboardDemoPage() {
               <div className="flex items-center justify-between">
                 <Label>Allow Job # Edit</Label>
                 <Switch
-                  checked={true}
-                  onCheckedChange={() =>
-                    handleToggle("contact", "allowJobEdit")
-                  }
+                  checked={state.allowJobEdit || false}
+                  onCheckedChange={() => handleToggle('allowJobEdit')}
                 />
               </div>
               <div className="flex items-center justify-between">
                 <Label>Enable Call Disposition</Label>
                 <Switch
-                  checked={true}
-                  onCheckedChange={() =>
-                    handleToggle("contact", "callDisposition")
-                  }
+                  checked={state.callDisposition || false}
+                  onCheckedChange={() => handleToggle('callDisposition')}
                 />
               </div>
               <div className="flex items-center justify-between">
                 <Label>Display Report</Label>
                 <Switch
-                  checked={true}
-                  onCheckedChange={() =>
-                    handleToggle("contact", "displayReport")
-                  }
+                  checked={state.displayReport || false}
+                  onCheckedChange={() => handleToggle('displayReport')}
                 />
               </div>
               <div className="flex items-center justify-between">
                 <Label>Enable Primary Contact Switch</Label>
                 <Switch
-                  checked={true}
-                  onCheckedChange={() =>
-                    handleToggle("contact", "primaryContactSwitch")
-                  }
+                  checked={state.primaryContactSwitch || false}
+                  onCheckedChange={() => handleToggle('primaryContactSwitch')}
                 />
               </div>
               <div className="flex items-center justify-between">
                 <Label>Enable Billing Contact</Label>
                 <Switch
-                  checked={true}
-                  onCheckedChange={() =>
-                    handleToggle("contact", "billingContact")
-                  }
+                  checked={state.billingContact || false}
+                  onCheckedChange={() => handleToggle('billingContact')}
                 />
               </div>
               <div className="flex items-center justify-between">
                 <Label>Enable Cloud Communications</Label>
                 <Switch
-                  checked={true}
-                  onCheckedChange={() => handleToggle("contact", "enableCloud")}
+                  checked={state.enableCloud || false}
+                  onCheckedChange={() => handleToggle('enableCloud')}
                 />
               </div>
             </CardContent>
@@ -1127,10 +1234,8 @@ function DashboardDemoPage() {
                 <Label>Enable Customer Portal</Label>{" "}
                 <Switch
                   id="customerPortal-enable"
-                  checked={state.customerPortal?.enable || false}
-                  onCheckedChange={() =>
-                    handleToggle("customerPortal", "enable")
-                  }
+                  checked={state.enable || false}
+                  onCheckedChange={() => handleToggle("enable")}
                 />{" "}
               </div>
             </CardContent>
@@ -1147,64 +1252,50 @@ function DashboardDemoPage() {
               <div className="flex items-center justify-between">
                 <Label>Restrict Customer Search</Label>
                 <Switch
-                  checked={true}
-                  onCheckedChange={() =>
-                    handleToggle("userSettings", "restrictCustomerSearch")
-                  }
+                  checked={state.restrictCustomerSearch || false}
+                  onCheckedChange={() => handleToggle('restrictCustomerSearch')}
                 />
               </div>
               <div className="flex items-center justify-between">
                 <Label>Restrict Calendar Access</Label>
                 <Switch
-                  checked={true}
-                  onCheckedChange={() =>
-                    handleToggle("userSettings", "restrictCalendar")
-                  }
+                  checked={state.restrictCalendar || false}
+                  onCheckedChange={() => handleToggle('restrictCalendar')}
                 />
               </div>
               <div className="flex items-center justify-between">
                 <Label>Restrict Product Access</Label>
                 <Switch
-                  checked={true}
-                  onCheckedChange={() =>
-                    handleToggle("userSettings", "restrictProduct")
-                  }
+                  checked={state.restrictProduct || false}
+                  onCheckedChange={() => handleToggle('restrictProduct')}
                 />
               </div>
               <div className="flex items-center justify-between">
                 <Label>Enable Email Capture</Label>
                 <Switch
-                  checked={true}
-                  onCheckedChange={() =>
-                    handleToggle("userSettings", "enableEmailCapture")
-                  }
+                  checked={state.enableEmailCapture || false}
+                  onCheckedChange={() => handleToggle('enableEmailCapture')}
                 />
               </div>
               <div className="flex items-center justify-between">
                 <Label>Enable Summary Email Notifications</Label>
                 <Switch
-                  checked={true}
-                  onCheckedChange={() =>
-                    handleToggle("userSettings", "summaryEmail")
-                  }
+                  checked={state.summaryEmail || false}
+                  onCheckedChange={() => handleToggle('summaryEmail')}
                 />
               </div>
               <div className="flex items-center justify-between">
                 <Label>Enable Marketing Manager Notifications</Label>
                 <Switch
-                  checked={true}
-                  onCheckedChange={() =>
-                    handleToggle("userSettings", "marketingManager")
-                  }
+                  checked={state.marketingManager || false}
+                  onCheckedChange={() => handleToggle('marketingManager')}
                 />
               </div>
               <div className="flex items-center justify-between">
                 <Label>Enable Rep Notifications</Label>
                 <Switch
-                  checked={true}
-                  onCheckedChange={() =>
-                    handleToggle("userSettings", "repNotifications")
-                  }
+                  checked={state.repNotifications || false}
+                  onCheckedChange={() => handleToggle('repNotifications')}
                 />
               </div>
             </CardContent>
@@ -1221,37 +1312,29 @@ function DashboardDemoPage() {
               <div className="flex items-center justify-between">
                 <Label>Enable Campaign</Label>
                 <Switch
-                  checked={true}
-                  onCheckedChange={() =>
-                    handleToggle("communications", "campaign")
-                  }
+                  checked={state.campaign || false}
+                  onCheckedChange={() => handleToggle('campaign')}
                 />
               </div>
               <div className="flex items-center justify-between">
                 <Label>Enable Mailing Manager</Label>
                 <Switch
-                  checked={true}
-                  onCheckedChange={() =>
-                    handleToggle("communications", "mailingManager")
-                  }
+                  checked={state.mailingManager || false}
+                  onCheckedChange={() => handleToggle('mailingManager')}
                 />
               </div>
               <div className="flex items-center justify-between">
                 <Label>Enable Mailer</Label>
                 <Switch
-                  checked={true}
-                  onCheckedChange={() =>
-                    handleToggle("communications", "mailer")
-                  }
+                  checked={state.mailer || false}
+                  onCheckedChange={() => handleToggle('mailer')}
                 />
               </div>
               <div className="flex items-center justify-between">
                 <Label>Enable Helpdesk</Label>
                 <Switch
-                  checked={true}
-                  onCheckedChange={() =>
-                    handleToggle("communications", "enableHelpdesk")
-                  }
+                  checked={state.enableHelpdesk || false}
+                  onCheckedChange={() => handleToggle('enableHelpdesk')}
                 />
               </div>
             </CardContent>
@@ -1268,17 +1351,15 @@ function DashboardDemoPage() {
               <div className="flex items-center justify-between">
                 <Label>Enable Google Calendar</Label>
                 <Switch
-                  checked={true}
-                  onCheckedChange={() =>
-                    handleToggle("googleCalendar", "enable")
-                  }
+                  checked={state.googleCalendar || false}
+                  onCheckedChange={() => handleToggle('googleCalendar')}
                 />
               </div>
               <div className="flex flex-col gap-2">
                 <Label htmlFor="apiKey">API Key</Label>
                 <Input
                   id="apiKey"
-                  value={""}
+                  value={state.googleCalendarApiKey || ""}
                   onChange={(e) =>
                     handleInput("googleCalendar", "apiKey", e.target.value)
                   }
@@ -1300,8 +1381,8 @@ function DashboardDemoPage() {
               <div className="flex items-center justify-between">
                 <Label>Enable Helpdesk</Label>
                 <Switch
-                  checked={true}
-                  onCheckedChange={() => handleToggle("helpdesk", "enable")}
+                  checked={state.helpdesk || false}
+                  onCheckedChange={() => handleToggle('helpdesk')}
                 />
               </div>
             </CardContent>
@@ -1318,35 +1399,29 @@ function DashboardDemoPage() {
               <div className="flex items-center justify-between">
                 <Label>Send Lead as HTML</Label>
                 <Switch
-                  checked={true}
-                  onCheckedChange={() =>
-                    handleToggle("mediaMailKit", "sendLead")
-                  }
+                  checked={state.mediaMailKitSendLead || false}
+                  onCheckedChange={() => handleToggle('mediaMailKitSendLead')}
                 />
               </div>
               <div className="flex items-center justify-between">
                 <Label>Send Ad as HTML</Label>
                 <Switch
-                  checked={true}
-                  onCheckedChange={() => handleToggle("mediaMailKit", "sendAd")}
+                  checked={state.mediaMailKitSendAd || false}
+                  onCheckedChange={() => handleToggle('mediaMailKitSendAd')}
                 />
               </div>
               <div className="flex items-center justify-between">
                 <Label>Send Email as HTML</Label>
                 <Switch
-                  checked={true}
-                  onCheckedChange={() =>
-                    handleToggle("mediaMailKit", "sendEmail")
-                  }
+                  checked={state.mediaMailKitSendEmail || false}
+                  onCheckedChange={() => handleToggle('mediaMailKitSendEmail')}
                 />
               </div>
               <div className="flex items-center justify-between">
                 <Label>Enable Media MailKit</Label>
                 <Switch
-                  checked={true}
-                  onCheckedChange={() =>
-                    handleToggle("mediaMailKit", "enableKit")
-                  }
+                  checked={state.mediaMailKitEnableKit || false}
+                  onCheckedChange={() => handleToggle('mediaMailKitEnableKit')}
                 />
               </div>
             </CardContent>

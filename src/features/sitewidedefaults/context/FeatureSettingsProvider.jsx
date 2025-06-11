@@ -12,10 +12,11 @@ export const FeatureSettingsProvider = ({ children }) => {
   // Load settings from API when data is available
   useEffect(() => {
     if (data && !isLoading && !error) {
-      // Process the data directly, initialize missing values with defaults
+      console.log('data', data);
+      
+      // Process the data directly without sectioning
       const processedData = {
-        // Initialize storeSupply section if needed
-        storeSupply: {
+       storeSupply: {
           trackInventory: false,
           lowStockAlert: false,
           lowStockThreshold: 5,
@@ -23,18 +24,7 @@ export const FeatureSettingsProvider = ({ children }) => {
           preferredSuppliers: [],
           ...(data.storeSupply || {})
         },
-        
-        // Include any other sections from API data
-        ...(data.adManagement && { adManagement: data.adManagement }),
-        ...(data.accountReceivable && { accountReceivable: data.accountReceivable }),
-        ...(data.production && { production: data.production }),
-        ...(data.contact && { contact: data.contact }),
-        ...(data.customerPortal && { customerPortal: data.customerPortal }),
-        ...(data.userSettings && { userSettings: data.userSettings }),
-        ...(data.communications && { communications: data.communications }),
-        ...(data.googleCalendar && { googleCalendar: data.googleCalendar }),
-        ...(data.helpdesk && { helpdesk: data.helpdesk }),
-        ...(data.mediaMailKit && { mediaMailKit: data.mediaMailKit })
+        ...data
       };
       
       dispatch({ 
@@ -45,18 +35,18 @@ export const FeatureSettingsProvider = ({ children }) => {
   }, [data]);
 
   // Handle toggle setting
-  const handleToggle = (section, key) => {
+  const handleToggle = (key) => {
     dispatch({ 
       type: Actions.TOGGLE_SETTING, 
-      payload: { section, key } 
+      payload: { key } 
     });
   };
 
   // Handle input change
-  const handleInput = (section, key, value) => {
+  const handleInput = (key, value) => {
     dispatch({ 
       type: Actions.UPDATE_SETTING, 
-      payload: { section, key, value } 
+      payload: { key, value } 
     });
   };
 
