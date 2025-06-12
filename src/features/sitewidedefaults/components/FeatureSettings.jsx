@@ -912,11 +912,10 @@ function DashboardDemoPage() {
                     <div className="flex items-center gap-2">
                       <Checkbox
                         id="proposalInventoryWarning"
-                        checked={true || false}
+                        checked={state.InvPropCheck || false}
                         onCheckedChange={() =>
                           handleToggle(
-                            "adManagement",
-                            "proposalInventoryWarning"
+                            "InvPropCheck"
                           )
                         }
                       />
@@ -927,9 +926,9 @@ function DashboardDemoPage() {
                     <div className="flex items-center gap-2">
                       <Checkbox
                         id="proposalStopProcessing"
-                        checked={true || false}
+                        checked={state.StopInvPropFail || false}
                         onCheckedChange={() =>
-                          handleToggle("adManagement", "proposalStopProcessing")
+                          handleToggle("StopInvPropFail")
                         }
                       />
                       <Label htmlFor="proposalStopProcessing">
@@ -945,9 +944,9 @@ function DashboardDemoPage() {
                     <div className="flex items-center gap-2">
                       <Checkbox
                         id="orderInventoryWarning"
-                        checked={true || false}
+                        checked={state.InvCheck || false}
                         onCheckedChange={() =>
-                          handleToggle("adManagement", "orderInventoryWarning")
+                          handleToggle("InvCheck")
                         }
                       />
                       <Label htmlFor="orderInventoryWarning">
@@ -957,9 +956,9 @@ function DashboardDemoPage() {
                     <div className="flex items-center gap-2">
                       <Checkbox
                         id="orderStopProcessing"
-                        checked={true || false}
+                        checked={state.StopInvFail || false}
                         onCheckedChange={() =>
-                          handleToggle("adManagement", "orderStopProcessing")
+                          handleToggle("StopInvFail")
                         }
                       />
                       <Label htmlFor="orderStopProcessing">
