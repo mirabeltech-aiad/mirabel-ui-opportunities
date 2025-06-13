@@ -169,13 +169,31 @@ export const initialStoreSupplyState = {
       enable: false,
       apiKey: "",
     },
-    helpdesk: {
-      enable: false,
-    },
-    mediaMailKit: {
-      sendLead: false,
-      sendAd: false,
-      sendEmail: false,
-      enableKit: false,
-    },
+    // helpdesk: {
+    //   enable: false,
+    // },
+
+    //helpdesk
+    IsChatEnabled: true,
+    IsTicketEnabled: true,
+
+
+    // mediaMateAI: {
+    //   sendEmail: true,
+    //   companyNote: false,
+    //   salesLetters: false,
+    //   companyExecutiveInfo:false,
+    //   addNote:false,
+    //   aitextImprover:false,
+    //   mediaKitAI:false,
+    // },
+
+    // mediaMateAI
+    sendEmail: true,
+    companyNote: false,
+    salesLetters: false,
+    companyExecutiveInfo:false,
+    addNote:false,
+    aitextImprover:false,
+    mediaKitAI:false,
   };

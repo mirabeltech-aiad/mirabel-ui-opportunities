@@ -2,11 +2,30 @@ import * as Actions from './Actions';
 
 export const settingsReducer = (state, action) => {
   switch (action.type) {
-    case Actions.TOGGLE_SETTING:
-      return {
-        ...state,
-        [action.payload.key]: !state[action.payload.key]
-      };
+    // case Actions.TOGGLE_SETTING:
+    //   return {
+    //     ...state,
+    //     [action.payload.key]: !state[action.payload.key]
+    //   };
+
+      case Actions.TOGGLE_SETTING: {
+        const { key, parentKey } = action.payload;
+      
+        if (parentKey) {
+          return {
+            ...state,
+            [parentKey]: {
+              ...state[parentKey],
+              [key]: !state[parentKey][key],
+            },
+          };
+        } else {
+          return {
+            ...state,
+            [key]: !state[key],
+          };
+        }
+      }
       
     case Actions.UPDATE_SETTING:
       return {

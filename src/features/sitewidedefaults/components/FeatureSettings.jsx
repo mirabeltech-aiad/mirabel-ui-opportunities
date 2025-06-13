@@ -152,7 +152,8 @@ const settingsMeta = {
     {
       key: "IsMoveContractsEnabled",
       label: "Allow Non-Admins to Move Orders",
-      description: "Allow Reps to move Orders from one contact record to another.",
+      description:
+        "Allow Reps to move Orders from one contact record to another.",
     },
     {
       key: "IsContactReqFieldsEnabled",
@@ -162,22 +163,26 @@ const settingsMeta = {
     {
       key: "InvPropCheck",
       label: "Proposal Inventory Warning",
-      description: "Show a warning before creating, converting, or copying proposals if inventory limits are exceeded.",
+      description:
+        "Show a warning before creating, converting, or copying proposals if inventory limits are exceeded.",
     },
     {
       key: "StopInvPropFail",
       label: "Proposal Stop Processing",
-      description: "Prevent proposal creation/copy/convert if inventory limits are exceeded (Admins can override).",
+      description:
+        "Prevent proposal creation/copy/convert if inventory limits are exceeded (Admins can override).",
     },
     {
       key: "InvCheck",
       label: "Order Inventory Warning",
-      description: "Show a warning before creating, converting, or copying orders if inventory limits are exceeded.",
+      description:
+        "Show a warning before creating, converting, or copying orders if inventory limits are exceeded.",
     },
     {
       key: "StopInvFail",
       label: "Order Stop Processing",
-      description: "Prevent order creation/copy/convert if inventory limits are exceeded (Admins can override).",
+      description:
+        "Prevent order creation/copy/convert if inventory limits are exceeded (Admins can override).",
     },
     {
       key: "IsShowAmountOnInventoryReport",
@@ -264,42 +269,130 @@ const pickupFromOptions = [
 ];
 
 const separatorOptions = [
-  { value: '', label: '' },
-  { value: "' '", label: ' ' },
-  { value: "':'", label: ':' },
-  { value: "','", label: ',' },
-  { value: "'-'", label: '-' },
+  { value: "", label: "" },
+  { value: "' '", label: " " },
+  { value: "':'", label: ":" },
+  { value: "','", label: "," },
+  { value: "'-'", label: "-" },
 ];
 
 const pickupOptions = [
-  { Key: '', Description: '', Script: "''" },
-  { Key: 'ProductName', Description: 'Product Name', Script: "ISNULL(gsPublications.PubName,'')" },
-  { Key: 'Description', Description: 'Description', Script: "ISNULL(gsContracts.Description,'')" },
-  { Key: 'IssueName', Description: 'Issue Name', Script: "ISNULL(tblMagFrequency.IssueName,'')" },
-  { Key: 'IssueYear', Description: 'Issue Year', Script: "ISNULL(CONVERT(VARCHAR,tblMagFrequency.IssueYear),'')" },
-  { Key: 'IssueDate', Description: 'Issue Date', Script: "ISNULL(CONVERT(VARCHAR,tblMagFrequency.IssueDate,101),'')" },
-  { Key: 'AdSize', Description: 'Ad Size', Script: "ISNULL(gsAdSize.AdSizeName,'')" },
-  { Key: 'Frequency', Description: 'Frequency', Script: "ISNULL(gsContracts.Frequency,'')" },
-  { Key: 'Color', Description: 'Color', Script: "ISNULL(gsContracts.Color,'')" },
-  { Key: 'Position', Description: 'Position', Script: "ISNULL(gsContracts.PosReq1,'')" },
-  { Key: 'Section', Description: 'Section', Script: "ISNULL(gsPubSections.SectionName,'')" },
-  { Key: 'AdName', Description: 'Ad Name', Script: "ISNULL(gsContracts.AdName,'')" },
+  { Key: "", Description: "", Script: "''" },
+  {
+    Key: "ProductName",
+    Description: "Product Name",
+    Script: "ISNULL(gsPublications.PubName,'')",
+  },
+  {
+    Key: "Description",
+    Description: "Description",
+    Script: "ISNULL(gsContracts.Description,'')",
+  },
+  {
+    Key: "IssueName",
+    Description: "Issue Name",
+    Script: "ISNULL(tblMagFrequency.IssueName,'')",
+  },
+  {
+    Key: "IssueYear",
+    Description: "Issue Year",
+    Script: "ISNULL(CONVERT(VARCHAR,tblMagFrequency.IssueYear),'')",
+  },
+  {
+    Key: "IssueDate",
+    Description: "Issue Date",
+    Script: "ISNULL(CONVERT(VARCHAR,tblMagFrequency.IssueDate,101),'')",
+  },
+  {
+    Key: "AdSize",
+    Description: "Ad Size",
+    Script: "ISNULL(gsAdSize.AdSizeName,'')",
+  },
+  {
+    Key: "Frequency",
+    Description: "Frequency",
+    Script: "ISNULL(gsContracts.Frequency,'')",
+  },
+  {
+    Key: "Color",
+    Description: "Color",
+    Script: "ISNULL(gsContracts.Color,'')",
+  },
+  {
+    Key: "Position",
+    Description: "Position",
+    Script: "ISNULL(gsContracts.PosReq1,'')",
+  },
+  {
+    Key: "Section",
+    Description: "Section",
+    Script: "ISNULL(gsPubSections.SectionName,'')",
+  },
+  {
+    Key: "AdName",
+    Description: "Ad Name",
+    Script: "ISNULL(gsContracts.AdName,'')",
+  },
 ];
 
 function PickupFromSection({ pickupState = {}, handlePickupInput }) {
   const [pickupOptions, setPickupOptions] = useState([
     { Key: "", Description: "", Script: "''" },
-    { Key: "ProductName", Description: "Product Name", Script: "ISNULL(gsPublications.PubName,'')" },
-    { Key: "Description", Description: "Description", Script: "ISNULL(gsContracts.Description,'')" },
-    { Key: "IssueName", Description: "Issue Name", Script: "ISNULL(tblMagFrequency.IssueName,'')" },
-    { Key: "IssueYear", Description: "Issue Year", Script: "ISNULL(CONVERT(VARCHAR,tblMagFrequency.IssueYear),'')" },
-    { Key: "IssueDate", Description: "Issue Date", Script: "ISNULL(CONVERT(VARCHAR,tblMagFrequency.IssueDate,101),'')" },
-    { Key: "AdSize", Description: "Ad Size", Script: "ISNULL(gsAdSize.AdSizeName,'')" },
-    { Key: "Frequency", Description: "Frequency", Script: "ISNULL(gsContracts.Frequency,'')" },
-    { Key: "Color", Description: "Color", Script: "ISNULL(gsContracts.Color,'')" },
-    { Key: "Position", Description: "Position", Script: "ISNULL(gsContracts.PosReq1,'')" },
-    { Key: "Section", Description: "Section", Script: "ISNULL(gsPubSections.SectionName,'')" },
-    { Key: "AdName", Description: "Ad Name", Script: "ISNULL(gsContracts.AdName,'')" },
+    {
+      Key: "ProductName",
+      Description: "Product Name",
+      Script: "ISNULL(gsPublications.PubName,'')",
+    },
+    {
+      Key: "Description",
+      Description: "Description",
+      Script: "ISNULL(gsContracts.Description,'')",
+    },
+    {
+      Key: "IssueName",
+      Description: "Issue Name",
+      Script: "ISNULL(tblMagFrequency.IssueName,'')",
+    },
+    {
+      Key: "IssueYear",
+      Description: "Issue Year",
+      Script: "ISNULL(CONVERT(VARCHAR,tblMagFrequency.IssueYear),'')",
+    },
+    {
+      Key: "IssueDate",
+      Description: "Issue Date",
+      Script: "ISNULL(CONVERT(VARCHAR,tblMagFrequency.IssueDate,101),'')",
+    },
+    {
+      Key: "AdSize",
+      Description: "Ad Size",
+      Script: "ISNULL(gsAdSize.AdSizeName,'')",
+    },
+    {
+      Key: "Frequency",
+      Description: "Frequency",
+      Script: "ISNULL(gsContracts.Frequency,'')",
+    },
+    {
+      Key: "Color",
+      Description: "Color",
+      Script: "ISNULL(gsContracts.Color,'')",
+    },
+    {
+      Key: "Position",
+      Description: "Position",
+      Script: "ISNULL(gsContracts.PosReq1,'')",
+    },
+    {
+      Key: "Section",
+      Description: "Section",
+      Script: "ISNULL(gsPubSections.SectionName,'')",
+    },
+    {
+      Key: "AdName",
+      Description: "Ad Name",
+      Script: "ISNULL(gsContracts.AdName,'')",
+    },
   ]);
 
   const pickupKeys = [
@@ -317,7 +410,9 @@ function PickupFromSection({ pickupState = {}, handlePickupInput }) {
   ];
 
   const handlePickupFromChange = (fieldKey, value) => {
-    const otherValues = pickupKeys.filter(k => k !== fieldKey).map(k => pickupState[k]);
+    const otherValues = pickupKeys
+      .filter((k) => k !== fieldKey)
+      .map((k) => pickupState[k]);
     if (value !== "''" && otherValues.includes(value)) {
       window.alert("This field is already used in another dropdown.");
       handlePickupInput(fieldKey, "''");
@@ -328,42 +423,56 @@ function PickupFromSection({ pickupState = {}, handlePickupInput }) {
 
   return (
     <div className="mt-6 mb-2">
-      <Label className="font-semibold text-base block mb-1">
+      <Label className="block mb-1 text-base font-semibold">
         'Pickup From' Description
       </Label>
-      <div className="text-sm text-muted-foreground mb-3">
-        Choose the data to display in the 'Pickup From' drop down lists and reports in order to give users the information they need to choose or view the correct insertion to pick up
+      <div className="mb-3 text-sm text-muted-foreground">
+        Choose the data to display in the 'Pickup From' drop down lists and
+        reports in order to give users the information they need to choose or
+        view the correct insertion to pick up
       </div>
       <div className="flex flex-col gap-2">
         {/* First field (no separator) */}
         <select
           className="border rounded px-2 py-0.5 h-8 text-sm min-w-[140px]"
           value={(pickupState && pickupState.PickupFrom1) || "''"}
-          onChange={e => handlePickupFromChange("PickupFrom1", e.target.value)}
+          onChange={(e) =>
+            handlePickupFromChange("PickupFrom1", e.target.value)
+          }
         >
-          {pickupOptions.map(opt => (
-            <option key={opt.Script} value={opt.Script}>{opt.Description}</option>
+          {pickupOptions.map((opt) => (
+            <option key={opt.Script} value={opt.Script}>
+              {opt.Description}
+            </option>
           ))}
         </select>
         {/* Remaining fields with separators */}
-        {[1, 2, 3, 4].map(i => (
-          <div key={i} className="flex flex-row gap-2 items-center">
+        {[1, 2, 3, 4].map((i) => (
+          <div key={i} className="flex flex-row items-center gap-2">
             <select
               className="border rounded px-2 py-0.5 h-8 text-sm w-12"
-              value={(pickupState && pickupState[separatorKeys[i - 1]]) || ''}
-              onChange={e => handlePickupInput(separatorKeys[i - 1], e.target.value)}
+              value={(pickupState && pickupState[separatorKeys[i - 1]]) || ""}
+              onChange={(e) =>
+                handlePickupInput(separatorKeys[i - 1], e.target.value)
+              }
             >
-              {separatorOptions.map(opt => (
-                <option key={opt.value} value={opt.value}>{opt.label}</option>
+              {separatorOptions.map((opt) => (
+                <option key={opt.value} value={opt.value}>
+                  {opt.label}
+                </option>
               ))}
             </select>
             <select
               className="border rounded px-2 py-0.5 h-8 text-sm min-w-[140px]"
               value={(pickupState && pickupState[pickupKeys[i]]) || "''"}
-              onChange={e => handlePickupFromChange(pickupKeys[i], e.target.value)}
+              onChange={(e) =>
+                handlePickupFromChange(pickupKeys[i], e.target.value)
+              }
             >
-              {pickupOptions.map(opt => (
-                <option key={opt.Script} value={opt.Script}>{opt.Description}</option>
+              {pickupOptions.map((opt) => (
+                <option key={opt.Script} value={opt.Script}>
+                  {opt.Description}
+                </option>
               ))}
             </select>
           </div>
@@ -387,7 +496,11 @@ function DashboardDemoPage() {
   } = useFeatureSettings();
   const [tabWindow, setTabWindow] = useState([0, 5]);
   const [activeTab, setActiveTab] = useState("adManagement");
-  const { data: circulationTypes, isLoading: isTypesLoading, error: typesError } = useCirculationTypes();
+  const {
+    data: circulationTypes,
+    isLoading: isTypesLoading,
+    error: typesError,
+  } = useCirculationTypes();
   console.log("circulationTypes", circulationTypes);
   const handlePrevTabs = () => {
     setTabWindow([tabWindow[0] - 1, tabWindow[1] - 1]);
@@ -397,6 +510,7 @@ function DashboardDemoPage() {
     setTabWindow([tabWindow[0] + 1, tabWindow[1] + 1]);
   };
 
+  console.log("ststatestatestateate", state);
   return (
     <div className="px-4 py-2 mx-auto">
       <div className="sticky top-0 z-20 pb-2 bg-background">
@@ -457,14 +571,17 @@ function DashboardDemoPage() {
                           checked={state.storeSupply?.trackInventory || false}
                           onCheckedChange={() =>
                             updateInventory({
-                              trackInventory: !state.storeSupply?.trackInventory,
+                              trackInventory:
+                                !state.storeSupply?.trackInventory,
                             })
                           }
                         />
                       </div>
 
                       <div className="flex items-center justify-between">
-                        <Label htmlFor="low-stock-alert">Low Stock Alerts</Label>
+                        <Label htmlFor="low-stock-alert">
+                          Low Stock Alerts
+                        </Label>
                         <Switch
                           id="low-stock-alert"
                           checked={state.storeSupply?.lowStockAlert || false}
@@ -527,7 +644,9 @@ function DashboardDemoPage() {
                   ) : (
                     <>
                       <div className="space-y-2">
-                        <Label htmlFor="new-supplier">Add Preferred Supplier</Label>
+                        <Label htmlFor="new-supplier">
+                          Add Preferred Supplier
+                        </Label>
                         <div className="flex gap-2">
                           <Input
                             id="new-supplier"
@@ -557,7 +676,9 @@ function DashboardDemoPage() {
                                   <Button
                                     variant="ghost"
                                     size="sm"
-                                    onClick={() => handleRemoveSupplier(supplier)}
+                                    onClick={() =>
+                                      handleRemoveSupplier(supplier)
+                                    }
                                   >
                                     <X className="w-4 h-4" />
                                   </Button>
@@ -575,7 +696,7 @@ function DashboardDemoPage() {
           </TabsContent>
         </Tabs>
       </div>
-      
+
       <Tabs value={activeTab} className="w-full">
         {/* Ad Management Tab */}
         <TabsContent value="adManagement" className="w-11/12 m-auto">
@@ -588,7 +709,9 @@ function DashboardDemoPage() {
                 <div
                   key={item.key}
                   className={`flex items-center justify-between p-2 ${
-                    idx !== settingsMeta.adManagement.length - 1 ? "border-b" : ""
+                    idx !== settingsMeta.adManagement.length - 1
+                      ? "border-b"
+                      : ""
                   }`}
                 >
                   <div className="flex flex-col items-start">
@@ -606,7 +729,7 @@ function DashboardDemoPage() {
                     <Input
                       id={item.key}
                       value={state[item.key] || ""}
-                      onChange={e => handleInput(item.key, e.target.value)}
+                      onChange={(e) => handleInput(item.key, e.target.value)}
                       className="w-64"
                     />
                   ) : (
@@ -619,36 +742,57 @@ function DashboardDemoPage() {
                 </div>
               ))}
               <div className="flex flex-col p-2 border-b">
-                <Label className="mb-1 text-base font-semibold" htmlFor="LoggedInRepChoiceProposal">
+                <Label
+                  className="mb-1 text-base font-semibold"
+                  htmlFor="LoggedInRepChoiceProposal"
+                >
                   Default Sales Rep for Item Entry
                 </Label>
-                <div className="flex flex-row items-center gap-4 flex-wrap">
+                <div className="flex flex-row flex-wrap items-center gap-4">
                   <div className="flex flex-row items-center min-w-[420px]">
                     <select
                       id="LoggedInRepChoiceProposal"
-                      className="border rounded px-2 py-1 mr-2"
-                      value={state.LoggedInRepChoiceProposal === false ? "false" : "true"}
-                      onChange={e => handleInput("LoggedInRepChoiceProposal", e.target.value === "true")}
+                      className="px-2 py-1 mr-2 border rounded"
+                      value={
+                        state.LoggedInRepChoiceProposal === false
+                          ? "false"
+                          : "true"
+                      }
+                      onChange={(e) =>
+                        handleInput(
+                          "LoggedInRepChoiceProposal",
+                          e.target.value === "true"
+                        )
+                      }
                     >
                       <option value="true">Logged in Rep</option>
                       <option value="false">Rep on Client Account</option>
                     </select>
-                    <span className="text-sm text-muted-foreground ml-2">
-                      for the default sales rep that is assigned to a new item on <b>proposals</b>.
+                    <span className="ml-2 text-sm text-muted-foreground">
+                      for the default sales rep that is assigned to a new item
+                      on <b>proposals</b>.
                     </span>
                   </div>
                   <div className="flex flex-row items-center min-w-[420px] mt-2 md:mt-0">
                     <select
                       id="LoggedInRepChoice"
-                      className="border rounded px-2 py-1 mr-2"
-                      value={state.LoggedInRepChoice === false ? "false" : "true"}
-                      onChange={e => handleInput("LoggedInRepChoice", e.target.value === "true")}
+                      className="px-2 py-1 mr-2 border rounded"
+                      value={
+                        state.LoggedInRepChoice === false ? "false" : "true"
+                      }
+                      onChange={(e) =>
+                        handleInput(
+                          "LoggedInRepChoice",
+                          e.target.value === "true"
+                        )
+                      }
                     >
                       <option value="true">Logged in Rep</option>
                       <option value="false">Rep on Client Account</option>
                     </select>
-                    <span className="text-sm text-muted-foreground ml-2">
-                      for the default sales rep that is assigned to a new item on <b>order</b>.
+                    <span className="ml-2 text-sm text-muted-foreground">
+                      for the default sales rep that is assigned to a new item
+                      on <b>order</b>.
                     </span>
                   </div>
                 </div>
@@ -670,7 +814,10 @@ function DashboardDemoPage() {
                       className="w-16 mx-2"
                       value={state.IssueYearCheckBoxEnd || 12}
                       onChange={(e) =>
-                        handleInput("IssueYearCheckBoxEnd", parseInt(e.target.value, 10))
+                        handleInput(
+                          "IssueYearCheckBoxEnd",
+                          parseInt(e.target.value, 10)
+                        )
                       }
                     />{" "}
                     years of issues starting with the year{" "}
@@ -680,7 +827,10 @@ function DashboardDemoPage() {
                       className="w-16 mx-2"
                       value={state.IssueYearCheckBoxStart || -1}
                       onChange={(e) =>
-                        handleInput("IssueYearCheckBoxStart", parseInt(e.target.value, 10))
+                        handleInput(
+                          "IssueYearCheckBoxStart",
+                          parseInt(e.target.value, 10)
+                        )
                       }
                     />{" "}
                     (use -1 for the current year)
@@ -692,7 +842,9 @@ function DashboardDemoPage() {
                 <div className="flex flex-col items-start">
                   <Label
                     className="mb-1 text-base font-semibold"
-                    htmlFor={"Don't Allow Proposals for Customers Over their Credit Limit"}
+                    htmlFor={
+                      "Don't Allow Proposals for Customers Over their Credit Limit"
+                    }
                   >
                     Don't Allow Proposals for Customers Over their Credit Limit
                   </Label>
@@ -718,9 +870,7 @@ function DashboardDemoPage() {
                 <Switch
                   checked={state.CheckCreditLimitOnPropose || false}
                   onCheckedChange={() =>
-                    handleToggle(
-                      "CheckCreditLimitOnPropose"
-                    )
+                    handleToggle("CheckCreditLimitOnPropose")
                   }
                 />
               </div>
@@ -729,7 +879,9 @@ function DashboardDemoPage() {
                 <div className="flex flex-col items-start">
                   <Label
                     className="mb-1 text-base font-semibold"
-                    htmlFor={"Don't Allow Orders for Customers Over their Credit Limit"}
+                    htmlFor={
+                      "Don't Allow Orders for Customers Over their Credit Limit"
+                    }
                   >
                     Don't Allow Orders for Customers Over their Credit Limit
                   </Label>
@@ -755,11 +907,7 @@ function DashboardDemoPage() {
                 </div>
                 <Switch
                   checked={state.CheckCreditLimitOnAdd || false}
-                  onCheckedChange={() =>
-                    handleToggle(
-                      "CheckCreditLimitOnAdd"
-                    )
-                  }
+                  onCheckedChange={() => handleToggle("CheckCreditLimitOnAdd")}
                 />
               </div>
 
@@ -790,9 +938,11 @@ function DashboardDemoPage() {
                   </div>
                 </div>
                 <Switch
-                   id="CheckCreditLimitOnRunsheet"
-                   checked={state.CheckCreditLimitOnRunsheet || false}
-                   onCheckedChange={() => handleToggle("CheckCreditLimitOnRunsheet")}
+                  id="CheckCreditLimitOnRunsheet"
+                  checked={state.CheckCreditLimitOnRunsheet || false}
+                  onCheckedChange={() =>
+                    handleToggle("CheckCreditLimitOnRunsheet")
+                  }
                 />
               </div>
               <div className="flex items-center justify-between p-2">
@@ -830,7 +980,7 @@ function DashboardDemoPage() {
                 </div>
               </div>
 
-              <div className="flex flex-col gap-4 md:flex-row border-b p-2">
+              <div className="flex flex-col gap-4 p-2 border-b md:flex-row">
                 {/* Proposal Items */}
                 <div className="border rounded p-3 flex-1 min-w-[220px]">
                   <div className="mb-2 font-semibold text-center">
@@ -841,11 +991,7 @@ function DashboardDemoPage() {
                       <Checkbox
                         id="proposalInventoryWarning"
                         checked={state.InvPropCheck || false}
-                        onCheckedChange={() =>
-                          handleToggle(
-                            "InvPropCheck"
-                          )
-                        }
+                        onCheckedChange={() => handleToggle("InvPropCheck")}
                       />
                       <Label htmlFor="proposalInventoryWarning">
                         Inventory Warning
@@ -855,9 +1001,7 @@ function DashboardDemoPage() {
                       <Checkbox
                         id="proposalStopProcessing"
                         checked={state.StopInvPropFail || false}
-                        onCheckedChange={() =>
-                          handleToggle("StopInvPropFail")
-                        }
+                        onCheckedChange={() => handleToggle("StopInvPropFail")}
                       />
                       <Label htmlFor="proposalStopProcessing">
                         Stop Processing
@@ -873,9 +1017,7 @@ function DashboardDemoPage() {
                       <Checkbox
                         id="orderInventoryWarning"
                         checked={state.InvCheck || false}
-                        onCheckedChange={() =>
-                          handleToggle("InvCheck")
-                        }
+                        onCheckedChange={() => handleToggle("InvCheck")}
                       />
                       <Label htmlFor="orderInventoryWarning">
                         Inventory Warning
@@ -885,9 +1027,7 @@ function DashboardDemoPage() {
                       <Checkbox
                         id="orderStopProcessing"
                         checked={state.StopInvFail || false}
-                        onCheckedChange={() =>
-                          handleToggle("StopInvFail")
-                        }
+                        onCheckedChange={() => handleToggle("StopInvFail")}
                       />
                       <Label htmlFor="orderStopProcessing">
                         Stop Processing
@@ -899,7 +1039,12 @@ function DashboardDemoPage() {
 
               <PickupFromSection
                 pickupState={state.PickupFromSettings || {}}
-                handlePickupInput={(key, value) => handleInput('PickupFromSettings', { ...state.PickupFromSettings, [key]: value })}
+                handlePickupInput={(key, value) =>
+                  handleInput("PickupFromSettings", {
+                    ...state.PickupFromSettings,
+                    [key]: value,
+                  })
+                }
               />
             </CardContent>
           </Card>
@@ -916,7 +1061,10 @@ function DashboardDemoPage() {
               {/* Barter/Trade Display Name input */}
               <div className="flex items-center justify-between p-2 border-b">
                 <div className="flex flex-col items-start">
-                  <Label className="mb-1 text-base font-semibold" htmlFor="BarterDisplayName">
+                  <Label
+                    className="mb-1 text-base font-semibold"
+                    htmlFor="BarterDisplayName"
+                  >
                     Barter/Trade Display Name
                   </Label>
                   <p className="text-sm text-left text-muted-foreground">
@@ -924,7 +1072,9 @@ function DashboardDemoPage() {
                     <Input
                       id="BarterDisplayName"
                       value={state.BarterDisplayName || ""}
-                      onChange={e => handleInput("BarterDisplayName", e.target.value)}
+                      onChange={(e) =>
+                        handleInput("BarterDisplayName", e.target.value)
+                      }
                       placeholder="Trade"
                       className="inline-block w-24 mx-1"
                     />
@@ -940,7 +1090,10 @@ function DashboardDemoPage() {
                   className={`flex items-center justify-between p-2 border-b`}
                 >
                   <div className="flex flex-col items-start">
-                    <Label className="mb-1 text-base font-semibold" htmlFor={item.key}>
+                    <Label
+                      className="mb-1 text-base font-semibold"
+                      htmlFor={item.key}
+                    >
                       {item.label}
                     </Label>
                     <p className="text-sm text-left text-muted-foreground">
@@ -958,7 +1111,10 @@ function DashboardDemoPage() {
               {/* QuickBooks/Xero Integration row */}
               <div className="flex items-center justify-between p-2 border-b">
                 <div className="flex flex-col items-start">
-                  <Label className="mb-1 text-base font-semibold" htmlFor="IsQBIntegrationEnabled">
+                  <Label
+                    className="mb-1 text-base font-semibold"
+                    htmlFor="IsQBIntegrationEnabled"
+                  >
                     Allow QuickBooks/Xero Integration
                   </Label>
                   <p className="text-sm text-left text-muted-foreground">
@@ -968,9 +1124,11 @@ function DashboardDemoPage() {
                 <div className="flex items-center gap-2">
                   <select
                     id="QBIntegrationType"
-                    className="border rounded px-2 py-1 text-sm"
+                    className="px-2 py-1 text-sm border rounded"
                     value={state.QBIntegrationType || ""}
-                    onChange={e => handleInput("QBIntegrationType", e.target.value)}
+                    onChange={(e) =>
+                      handleInput("QBIntegrationType", e.target.value)
+                    }
                   >
                     <option value="5">Xero</option>
                     <option value="1">US Desktop Edition</option>
@@ -980,14 +1138,18 @@ function DashboardDemoPage() {
                   <Button
                     variant="default"
                     size="sm"
-                    onClick={() => {/* Disconnect logic here */}}
+                    onClick={() => {
+                      /* Disconnect logic here */
+                    }}
                   >
                     Disconnect QuickBooks/Xero
                   </Button>
                   <Switch
                     id="IsQBIntegrationEnabled"
                     checked={!!state.IsQBIntegrationEnabled}
-                    onCheckedChange={() => handleToggle("IsQBIntegrationEnabled")}
+                    onCheckedChange={() =>
+                      handleToggle("IsQBIntegrationEnabled")
+                    }
                   />
                 </div>
               </div>
@@ -995,17 +1157,23 @@ function DashboardDemoPage() {
               {/* MultiCurrency Checkbox */}
               <div className="flex items-center justify-between p-2">
                 <div className="flex flex-col items-start">
-                  <Label className="mb-1 text-base font-semibold" htmlFor="IsQBMultiCurrencyEnabled">
+                  <Label
+                    className="mb-1 text-base font-semibold"
+                    htmlFor="IsQBMultiCurrencyEnabled"
+                  >
                     Enable MultiCurrency to QuickBooks/Xero
                   </Label>
                   <p className="text-sm text-left text-muted-foreground">
-                    This feature will enable Billed Currency Value sending to QuickBooks/Xero Transactions.
+                    This feature will enable Billed Currency Value sending to
+                    QuickBooks/Xero Transactions.
                   </p>
                 </div>
                 <Switch
                   id="IsQBMultiCurrencyEnabled"
                   checked={!!state.IsQBMultiCurrencyEnabled}
-                  onCheckedChange={() => handleToggle("IsQBMultiCurrencyEnabled")}
+                  onCheckedChange={() =>
+                    handleToggle("IsQBMultiCurrencyEnabled")
+                  }
                 />
               </div>
             </CardContent>
@@ -1030,7 +1198,7 @@ function DashboardDemoPage() {
                 </div>
                 <Switch
                   checked={state.IsIndesignEnabled || false}
-                  onCheckedChange={() => handleToggle('IsIndesignEnabled')}
+                  onCheckedChange={() => handleToggle("IsIndesignEnabled")}
                 />
               </div>
 
@@ -1047,7 +1215,7 @@ function DashboardDemoPage() {
                 </div>
                 <Switch
                   checked={state.IsFileRenameEnabled || false}
-                  onCheckedChange={() => handleToggle('IsFileRenameEnabled')}
+                  onCheckedChange={() => handleToggle("IsFileRenameEnabled")}
                 />
               </div>
 
@@ -1062,7 +1230,9 @@ function DashboardDemoPage() {
                 </div>
                 <Switch
                   checked={state.IsSingleAdIndesignEnabled || false}
-                  onCheckedChange={() => handleToggle('IsSingleAdIndesignEnabled')}
+                  onCheckedChange={() =>
+                    handleToggle("IsSingleAdIndesignEnabled")
+                  }
                 />
               </div>
             </CardContent>
@@ -1097,7 +1267,9 @@ function DashboardDemoPage() {
                     id="subscription_type_dropdown"
                     className="px-2 py-1 text-sm border rounded"
                     value={state.SubscriptionTypeID || ""}
-                    onChange={e => handleInput("SubscriptionTypeID", e.target.value)}
+                    onChange={(e) =>
+                      handleInput("SubscriptionTypeID", e.target.value)
+                    }
                   >
                     <option value="">Subscription Type</option>
                     {isTypesLoading && <option>Loading...</option>}
@@ -1404,28 +1576,28 @@ function DashboardDemoPage() {
                 <Label>Enable Campaign</Label>
                 <Switch
                   checked={state.campaign || false}
-                  onCheckedChange={() => handleToggle('campaign')}
+                  onCheckedChange={() => handleToggle("campaign")}
                 />
               </div>
               <div className="flex items-center justify-between">
                 <Label>Enable Mailing Manager</Label>
                 <Switch
                   checked={state.mailingManager || false}
-                  onCheckedChange={() => handleToggle('mailingManager')}
+                  onCheckedChange={() => handleToggle("mailingManager")}
                 />
               </div>
               <div className="flex items-center justify-between">
                 <Label>Enable Mailer</Label>
                 <Switch
                   checked={state.mailer || false}
-                  onCheckedChange={() => handleToggle('mailer')}
+                  onCheckedChange={() => handleToggle("mailer")}
                 />
               </div>
               <div className="flex items-center justify-between">
                 <Label>Enable Helpdesk</Label>
                 <Switch
                   checked={state.enableHelpdesk || false}
-                  onCheckedChange={() => handleToggle('enableHelpdesk')}
+                  onCheckedChange={() => handleToggle("enableHelpdesk")}
                 />
               </div>
             </CardContent>
@@ -1443,7 +1615,7 @@ function DashboardDemoPage() {
                 <Label>Enable Google Calendar</Label>
                 <Switch
                   checked={state.googleCalendar || false}
-                  onCheckedChange={() => handleToggle('googleCalendar')}
+                  onCheckedChange={() => handleToggle("googleCalendar")}
                 />
               </div>
               <div className="flex flex-col gap-2">
@@ -1469,11 +1641,43 @@ function DashboardDemoPage() {
               <CardTitle>Helpdesk Settings</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
-              <div className="flex items-center justify-between">
-                <Label>Enable Helpdesk</Label>
+              <div className={`flex items-center justify-between p-2 border-b`}>
+                <div className="flex flex-col items-start">
+                  <Label
+                    className="mb-1 text-base font-semibold"
+                    htmlFor="helpdesk"
+                  >
+                    Enable Ticket
+                  </Label>
+                  <p className="text-sm text-left text-muted-foreground">
+                    Enable/disable access to new tech support ticket portal for
+                    site. Please refresh the entire site to see the changes
+                    after clicking the save button.
+                  </p>
+                </div>
                 <Switch
-                  checked={state.helpdesk || false}
-                  onCheckedChange={() => handleToggle('helpdesk')}
+                  checked={!!state.IsTicketEnabled}
+                  onCheckedChange={() => handleToggle("IsTicketEnabled")}
+                />
+              </div>
+              <div className={`flex items-center justify-between p-2 border-b`}>
+                <div className="flex flex-col items-start">
+                  <Label
+                    className="mb-1 text-base font-semibold"
+                    htmlFor="helpdesk"
+                  >
+                    Enable Live Chat
+                  </Label>
+                  <p className="text-sm text-left text-muted-foreground">
+                    Enable/disable access to online tech support chat for this
+                    site. Please refresh the entire site to see the changes
+                    after clicking the save button.
+                  </p>
+                </div>
+                <Switch
+                  id="helpdesk"
+                  checked={!!state.IsChatEnabled}
+                  onCheckedChange={() => handleToggle("IsChatEnabled")}
                 />
               </div>
             </CardContent>
@@ -1481,38 +1685,59 @@ function DashboardDemoPage() {
         </TabsContent>
 
         {/* Media MailKit Tab */}
-        <TabsContent value="mediaMailKit">
+        <TabsContent value="mediaMateAI">
           <Card className="mb-6">
             <CardHeader>
-              <CardTitle>Media MailKit</CardTitle>
+              <CardTitle>Media Mate AI</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="flex items-center justify-between">
-                <Label>Send Lead as HTML</Label>
+                <Label>Send Email</Label>
                 <Switch
-                  checked={state.mediaMailKitSendLead || false}
-                  onCheckedChange={() => handleToggle('mediaMailKitSendLead')}
+                  checked={!!state.sendEmail}
+                  onCheckedChange={() => handleToggle("sendEmail")}
                 />
               </div>
               <div className="flex items-center justify-between">
-                <Label>Send Ad as HTML</Label>
+                <Label>Company Notes</Label>
                 <Switch
-                  checked={state.mediaMailKitSendAd || false}
-                  onCheckedChange={() => handleToggle('mediaMailKitSendAd')}
+                  checked={!!state.companyNote}
+                  onCheckedChange={() => handleToggle("companyNote")}
                 />
               </div>
               <div className="flex items-center justify-between">
-                <Label>Send Email as HTML</Label>
+                <Label>Sales Letters</Label>
                 <Switch
-                  checked={state.mediaMailKitSendEmail || false}
-                  onCheckedChange={() => handleToggle('mediaMailKitSendEmail')}
+                  checked={!!state.salesLetters}
+                  onCheckedChange={() => handleToggle("salesLetters")}
                 />
               </div>
               <div className="flex items-center justify-between">
-                <Label>Enable Media MailKit</Label>
+                <Label>Company Executive Info</Label>
                 <Switch
-                  checked={state.mediaMailKitEnableKit || false}
-                  onCheckedChange={() => handleToggle('mediaMailKitEnableKit')}
+                  checked={!!state.companyExecutiveInfo}
+                  onCheckedChange={() => handleToggle("companyExecutiveInfo")}
+                />
+              </div>
+              <div className="flex items-center justify-between">
+                <Label>Add Note</Label>
+                <Switch
+                  checked={!!state.addNote}
+                  onCheckedChange={() => handleToggle("addNote")}
+                />
+              </div>
+              <div className="flex items-center justify-between">
+                <Label>AI Text Improver</Label>
+                <Switch
+                  checked={!!state.aitextImprover}
+                  onCheckedChange={() => handleToggle("aitextImprover")}
+                />
+              </div>
+              <div className="flex items-center justify-between">
+                <Label>Media Kit AI</Label>
+                <Switch
+                  checked={!!state.mediaKitAI}
+                  onCheckedChange={() => handleToggle("mediaKitAI")}
                 />
               </div>
             </CardContent>
