@@ -169,9 +169,15 @@ export const initialStoreSupplyState = {
       enable: false,
       apiKey: "",
     },
-    helpdesk: {
-      enable: false,
-    },
+    // helpdesk: {
+    //   enable: false,
+    // },
+
+    //helpdesk
+    IsChatEnabled: true,
+    IsTicketEnabled: true,
+
+
     // mediaMateAI: {
     //   sendEmail: true,
     //   companyNote: false,
