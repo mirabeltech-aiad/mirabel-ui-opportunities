@@ -1122,46 +1122,184 @@ function DashboardDemoPage() {
               <CardTitle>Contact Management</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
-              <div className="flex items-center justify-between">
-                <Label>Allow Job # Edit</Label>
+              {/* Allow Job # Edit */}
+              <div className="flex items-center justify-between p-2 border-b">
+                <div className="flex flex-col items-start">
+                  <Label htmlFor="AllowEditAdNumber" className="font-semibold">Allow Job # Editing</Label>
+                  <p className="text-sm text-muted-foreground">Allow user to edit the Job # number on an Order</p>
+                </div>
                 <Switch
-                  checked={state.allowJobEdit || false}
-                  onCheckedChange={() => handleToggle('allowJobEdit')}
+                  id="AllowEditAdNumber"
+                  checked={!!state.AllowEditAdNumber}
+                  onCheckedChange={() => handleToggle("AllowEditAdNumber")}
                 />
               </div>
-              <div className="flex items-center justify-between">
-                <Label>Enable Call Disposition</Label>
+
+              {/* Call Disposition */}
+              <div className="flex items-center justify-between p-2 border-b">
+                <div className="flex flex-col items-start">
+                  <Label htmlFor="IsCallDispositionEnabled" className="font-semibold">Enable Call Disposition</Label>
+                  <p className="text-sm text-muted-foreground">Allow to mark call as complete with call disposition</p>
+                </div>
                 <Switch
-                  checked={state.callDisposition || false}
-                  onCheckedChange={() => handleToggle('callDisposition')}
+                  id="IsCallDispositionEnabled"
+                  checked={!!state.IsCallDispositionEnabled}
+                  onCheckedChange={() => handleToggle("IsCallDispositionEnabled")}
                 />
               </div>
-              <div className="flex items-center justify-between">
-                <Label>Display Report</Label>
-                <Switch
-                  checked={state.displayReport || false}
-                  onCheckedChange={() => handleToggle('displayReport')}
-                />
+
+              {/* State/Region Input */}
+              <div className="flex items-center justify-between p-2 border-b">
+                <div className="flex flex-col items-start">
+                  <Label htmlFor="IsStateAsTextBox" className="font-semibold">State/Region Input</Label>
+                  <p className="text-sm text-muted-foreground">Choose whether to use a drop down list to select US states and Canadian Regions or use a text box to type in the region/state.</p>
+                </div>
+                <select
+                  id="IsStateAsTextBox"
+                  value={state.IsStateAsTextBox ? "true" : "false"}
+                  onChange={e => handleInput("IsStateAsTextBox", e.target.value === "true")}
+                >
+                  <option value="false">Drop down</option>
+                  <option value="true">Textbox</option>
+                </select>
               </div>
-              <div className="flex items-center justify-between">
-                <Label>Enable Primary Contact Switch</Label>
-                <Switch
-                  checked={state.primaryContactSwitch || false}
-                  onCheckedChange={() => handleToggle('primaryContactSwitch')}
-                />
+
+              {/* Primary Contact Switch */}
+              <div className="p-2 border-b">
+                <Label htmlFor="IsEnablePrimaryContactSwitch" className="font-semibold mb-2 block">
+                  Primary Contact Switch
+                </Label>
+                <div className="flex flex-col gap-2 ml-4">
+                  <div className="flex items-center justify-between">
+                    <span>Allow users to switch the company/primary contact with one of the sub-contacts.</span>
+                    <Switch
+                      id="IsEnablePrimaryContactSwitch"
+                      checked={!!state.IsEnablePrimaryContactSwitch}
+                      onCheckedChange={() => handleToggle("IsEnablePrimaryContactSwitch")}
+                    />
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span>Only admin users can switch contacts.</span>
+                    <Switch
+                      id="IsEnablePrimaryContactSwitchForAdminOnly"
+                      checked={!!state.IsEnablePrimaryContactSwitchForAdminOnly}
+                      onCheckedChange={() => handleToggle("IsEnablePrimaryContactSwitchForAdminOnly")}
+                    />
+                  </div>
+                </div>
+                <div className="text-sm text-muted-foreground my-2 ml-4">
+                  Orders, invoices, proposal line items, and payment plans in [Magazine Manager/Newspaper Manager] can be set to "default billing contact", which looks up whoever is set as the billing contact at the time the item is created.<br /><br />
+                  Leaving a box unchecked will keep the existing items that are set to "default billing contact" unchanged; they'll continue to look up the current default billing contact as defined on the company record.
+                </div>
+                <div className="flex flex-col gap-2 ml-4">
+                  <div className="flex items-center justify-between">
+                    <span>Check this box if you want to permanently assign all existing proposal line items that were set to "default billing contact" to that previous primary contact.</span>
+                    <Switch
+                      id="SwitchProposals"
+                      checked={!!state.SwitchProposals}
+                      onCheckedChange={() => handleToggle("SwitchProposals")}
+                    />
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span>Check this box if you want to permanently assign all existing orders & installments that were set to "default billing contact" to that previous primary contact.</span>
+                    <Switch
+                      id="SwitchOrders"
+                      checked={!!state.SwitchOrders}
+                      onCheckedChange={() => handleToggle("SwitchOrders")}
+                    />
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span>Check this box if you want to permanently assign all existing invoices that were set to "default billing contact" to that previous primary contact.</span>
+                    <Switch
+                      id="SwitchInvoices"
+                      checked={!!state.SwitchInvoices}
+                      onCheckedChange={() => handleToggle("SwitchInvoices")}
+                    />
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span>Check this box if you want to permanently assign all existing payment plan installments that were set to "default billing contact" to that previous primary contact.</span>
+                    <Switch
+                      id="SwitchPaymentPlan"
+                      checked={!!state.SwitchPaymentPlan}
+                      onCheckedChange={() => handleToggle("SwitchPaymentPlan")}
+                    />
+                  </div>
+                </div>
               </div>
-              <div className="flex items-center justify-between">
-                <Label>Enable Billing Contact</Label>
-                <Switch
-                  checked={state.billingContact || false}
-                  onCheckedChange={() => handleToggle('billingContact')}
-                />
+
+              {/* Billing Contact Remove */}
+              <div className="p-2 border-b">
+                <Label htmlFor="IsBillingContactRemoveEnabled" className="font-semibold mb-2 block">
+                  Billing Contact Remove
+                </Label>
+                <div className="flex flex-col gap-2 ml-4">
+                  <div className="flex items-center justify-between">
+                    <span>Allow users to remove the billing contact type.</span>
+                    <Switch
+                      id="IsBillingContactRemoveEnabled"
+                      checked={!!state.IsBillingContactRemoveEnabled}
+                      onCheckedChange={() => handleToggle("IsBillingContactRemoveEnabled")}
+                    />
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span>Only admin users can remove the billing contact type.</span>
+                    <Switch
+                      id="CanAdminOnlyRemoveBillingContact"
+                      checked={!!state.CanAdminOnlyRemoveBillingContact}
+                      onCheckedChange={() => handleToggle("CanAdminOnlyRemoveBillingContact")}
+                    />
+                  </div>
+                </div>
+                <div className="text-sm text-muted-foreground my-2 ml-4">
+                  Orders, invoices, proposal line items, and payment plans in [Magazine Manager/Newspaper Manager] can be set to "default billing contact", which looks up whoever is set as the billing contact at the time the item is created.<br /><br />
+                  Leaving a box unchecked will keep the existing items that are set to "default billing contact" unchanged; they'll continue to look up the current default billing contact as defined on the company record.
+                </div>
+                <div className="flex flex-col gap-2 ml-4">
+                  <div className="flex items-center justify-between">
+                    <span>Check this box if you want to permanently assign all existing proposal line items that were set to "default billing contact" to that previous contact.</span>
+                    <Switch
+                      id="SwitchProposalsOnBCR"
+                      checked={!!state.SwitchProposalsOnBCR}
+                      onCheckedChange={() => handleToggle("SwitchProposalsOnBCR")}
+                    />
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span>Check this box if you want to permanently assign all existing orders & installments that were set to "default billing contact" to that previous contact.</span>
+                    <Switch
+                      id="SwitchOrdersOnBCR"
+                      checked={!!state.SwitchOrdersOnBCR}
+                      onCheckedChange={() => handleToggle("SwitchOrdersOnBCR")}
+                    />
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span>Check this box if you want to permanently assign all existing invoices that were set to "default billing contact" to that previous contact.</span>
+                    <Switch
+                      id="SwitchInvoicesOnBCR"
+                      checked={!!state.SwitchInvoicesOnBCR}
+                      onCheckedChange={() => handleToggle("SwitchInvoicesOnBCR")}
+                    />
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span>Check this box if you want to permanently assign all existing payment plan installments that were set to "default billing contact" to that previous contact.</span>
+                    <Switch
+                      id="SwitchPaymentPlansOnBCR"
+                      checked={!!state.SwitchPaymentPlansOnBCR}
+                      onCheckedChange={() => handleToggle("SwitchPaymentPlansOnBCR")}
+                    />
+                  </div>
+                </div>
               </div>
-              <div className="flex items-center justify-between">
-                <Label>Enable Cloud Communications</Label>
+
+              {/* Enable Cloud Communication */}
+              <div className="flex items-center justify-between p-2">
+                <div className="flex flex-col items-start">
+                  <Label htmlFor="IsCloudCommunicationEnabled" className="font-semibold">Enable Cloud Communication</Label>
+                  <p className="text-sm text-muted-foreground">Selecting this checkbox allows users to initiate calls to contact phone numbers directly within the application.</p>
+                </div>
                 <Switch
-                  checked={state.enableCloud || false}
-                  onCheckedChange={() => handleToggle('enableCloud')}
+                  id="IsCloudCommunicationEnabled"
+                  checked={!!state.IsCloudCommunicationEnabled}
+                  onCheckedChange={() => handleToggle("IsCloudCommunicationEnabled")}
                 />
               </div>
             </CardContent>
@@ -1175,15 +1313,21 @@ function DashboardDemoPage() {
               <CardTitle>Customer Portal</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
-              <div className="flex items-center justify-between">
-                {" "}
-                <Label>Enable Customer Portal</Label>{" "}
+              <div className="flex items-center justify-between p-2">
+                <Label className="font-semibold" htmlFor="customerPortal-enable">
+                  Enable Customer Portal for client?
+                </Label>
                 <Switch
                   id="customerPortal-enable"
-                  checked={state.enable || false}
-                  onCheckedChange={() => handleToggle("enable")}
-                />{" "}
+                  checked={!!state.CustomerPortalDetails?.IsEnabled}
+                  onCheckedChange={() => handleInput("CustomerPortalDetails", { ...state.CustomerPortalDetails, IsEnabled: !state.CustomerPortalDetails?.IsEnabled })}
+                />
               </div>
+              {state.CustomerPortalDetails?.IsEnabled && (
+                <div className="text-sm text-muted-foreground p-2">
+                  Note: You can send contacts this link to let them sign up for access to the portal: "http://tier1-portal2.mirabeltechnologies.com/signup/9970"
+                </div>
+              )}
             </CardContent>
           </Card>
         </TabsContent>
@@ -1195,53 +1339,54 @@ function DashboardDemoPage() {
               <CardTitle>User Settings</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
-              <div className="flex items-center justify-between">
-                <Label>Restrict Customer Search</Label>
+              <div className="flex items-center justify-between p-2 border-b">
+                <div className="flex flex-col items-start">
+                  <Label className="font-semibold">Restrict Customer Search to Allowed Reps Only</Label>
+                  <span className="text-sm text-muted-foreground">Users can only search for clients assigned to reps that they have set been set up to view in additional security access.</span>
+                </div>
                 <Switch
-                  checked={state.restrictCustomerSearch || false}
-                  onCheckedChange={() => handleToggle('restrictCustomerSearch')}
+                  checked={!!state.LimitCustomerSearchByRep}
+                  onCheckedChange={() => handleToggle('LimitCustomerSearchByRep')}
                 />
               </div>
-              <div className="flex items-center justify-between">
-                <Label>Restrict Calendar Access</Label>
+              <div className="flex items-center justify-between p-2 border-b">
+                <div className="flex flex-col items-start">
+                  <Label className="font-semibold">Restrict Customer Add to Allowed Reps Only</Label>
+                  <span className="text-sm text-muted-foreground">Users can add clients and assign them to reps that they have set been set up to view in additional security access.</span>
+                </div>
                 <Switch
-                  checked={state.restrictCalendar || false}
-                  onCheckedChange={() => handleToggle('restrictCalendar')}
+                  checked={!!state.LimitCustomerAddByRep}
+                  onCheckedChange={() => handleToggle('LimitCustomerAddByRep')}
                 />
               </div>
-              <div className="flex items-center justify-between">
-                <Label>Restrict Product Access</Label>
+              <div className="flex items-center justify-between p-2 border-b">
+                <div className="flex flex-col items-start">
+                  <Label className="font-semibold">Restrict Calendar Viewing to Allowed Reps Only</Label>
+                  <span className="text-sm text-muted-foreground">Users can only view calendars of other users that they have set been set up to view in additional security access.</span>
+                </div>
                 <Switch
-                  checked={state.restrictProduct || false}
-                  onCheckedChange={() => handleToggle('restrictProduct')}
+                  checked={!!state.LimitCalendarByRep}
+                  onCheckedChange={() => handleToggle('LimitCalendarByRep')}
                 />
               </div>
-              <div className="flex items-center justify-between">
-                <Label>Enable Email Capture</Label>
+              <div className="flex items-center justify-between p-2 border-b">
+                <div className="flex flex-col items-start">
+                  <Label className="font-semibold">Allow Non Admin Users to Add to Calendar</Label>
+                  <span className="text-sm text-muted-foreground">Allow users who are not site administrators to add items to other calendars, if not set only admin users can add items to other user's calendars.</span>
+                </div>
                 <Switch
-                  checked={state.enableEmailCapture || false}
-                  onCheckedChange={() => handleToggle('enableEmailCapture')}
+                  checked={!!state.AllowNonAdminAddToCalendar}
+                  onCheckedChange={() => handleToggle('AllowNonAdminAddToCalendar')}
                 />
               </div>
-              <div className="flex items-center justify-between">
-                <Label>Enable Summary Email Notifications</Label>
+              <div className="flex items-center justify-between p-2">
+                <div className="flex flex-col items-start">
+                  <Label className="font-semibold">Filter/Restrict Contact Page Items by Product</Label>
+                  <span className="text-sm text-muted-foreground">Users/Reps with product security set will only see items (orders, proposals, invoices etc.) summaries for products they have specific access for.</span>
+                </div>
                 <Switch
-                  checked={state.summaryEmail || false}
-                  onCheckedChange={() => handleToggle('summaryEmail')}
-                />
-              </div>
-              <div className="flex items-center justify-between">
-                <Label>Enable Marketing Manager Notifications</Label>
-                <Switch
-                  checked={state.marketingManager || false}
-                  onCheckedChange={() => handleToggle('marketingManager')}
-                />
-              </div>
-              <div className="flex items-center justify-between">
-                <Label>Enable Rep Notifications</Label>
-                <Switch
-                  checked={state.repNotifications || false}
-                  onCheckedChange={() => handleToggle('repNotifications')}
+                  checked={!!state.IsOrderListSecurityEnabled}
+                  onCheckedChange={() => handleToggle('IsOrderListSecurityEnabled')}
                 />
               </div>
             </CardContent>
@@ -1368,6 +1513,68 @@ function DashboardDemoPage() {
                 <Switch
                   checked={state.mediaMailKitEnableKit || false}
                   onCheckedChange={() => handleToggle('mediaMailKitEnableKit')}
+                />
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        {/* Email Settings Tab */}
+        <TabsContent value="emailSettings">
+          <Card className="mb-6">
+            <CardHeader>
+              <CardTitle>Email Settings</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="flex items-center justify-between p-2 border-b">
+                <div className="flex flex-col items-start">
+                  <Label className="font-semibold">Enable Email Capture</Label>
+                  <span className="text-sm text-muted-foreground">Enable/Disable Email Capture feature</span>
+                </div>
+                <Switch
+                  checked={!!state.IsBccFeatureEnabled}
+                  onCheckedChange={() => handleToggle('IsBccFeatureEnabled')}
+                />
+              </div>
+              <div className="flex items-center justify-between p-2 border-b">
+                <div className="flex flex-col items-start">
+                  <Label className="font-semibold">Summary Email Notifications</Label>
+                  <span className="text-sm text-muted-foreground">Enable/Disable Summary Email Notifications</span>
+                </div>
+                <Switch
+                  checked={!!state.IsCESummaryEmail}
+                  onCheckedChange={() => handleToggle('IsCESummaryEmail')}
+                />
+              </div>
+              <div className="flex items-center justify-between p-2 border-b">
+                <div className="flex flex-col items-start">
+                  <Label className="font-semibold">Marketing Manager Notifications</Label>
+                  <span className="text-sm text-muted-foreground">Enable/Disable Marketing Manager Notifications, Please contact the Marketing Manager team to make sure this client has been set up before enabling this feature here.</span>
+                  <span className="text-xs text-muted-foreground mt-1">*Note: if "Marketing Manager Notifications" feature is disabled, all? of the marketing manager notification settings for all users will be removed and will have to be re-added after enabling this feature again.</span>
+                </div>
+                <Switch
+                  checked={!!state.IsMarketingManagerNotifications}
+                  onCheckedChange={() => handleToggle('IsMarketingManagerNotifications')}
+                />
+              </div>
+              <div className="flex items-center justify-between p-2 border-b">
+                <div className="flex flex-col items-start">
+                  <Label className="font-semibold">Tracking Code</Label>
+                  <span className="text-sm text-muted-foreground">This will allow us to track replies/Links from Emails that we sent from Mailing List Wizard</span>
+                </div>
+                <Switch
+                  checked={!!state.IsTrackingCodeEnabled}
+                  onCheckedChange={() => handleToggle('IsTrackingCodeEnabled')}
+                />
+              </div>
+              <div className="flex items-center justify-between p-2">
+                <div className="flex flex-col items-start">
+                  <Label className="font-semibold">Rep Notifications From Marketing Manager</Label>
+                  <span className="text-sm text-muted-foreground">Send Rep Notifications through Marketing Manager</span>
+                </div>
+                <Switch
+                  checked={!!state.IsRepNotificationsEnabled}
+                  onCheckedChange={() => handleToggle('IsRepNotificationsEnabled')}
                 />
               </div>
             </CardContent>
