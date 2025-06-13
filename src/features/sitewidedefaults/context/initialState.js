@@ -172,10 +172,22 @@ export const initialStoreSupplyState = {
     helpdesk: {
       enable: false,
     },
-    mediaMailKit: {
-      sendLead: false,
-      sendAd: false,
-      sendEmail: false,
-      enableKit: false,
-    },
+    // mediaMateAI: {
+    //   sendEmail: true,
+    //   companyNote: false,
+    //   salesLetters: false,
+    //   companyExecutiveInfo:false,
+    //   addNote:false,
+    //   aitextImprover:false,
+    //   mediaKitAI:false,
+    // },
+
+    // mediaMateAI
+    sendEmail: true,
+    companyNote: false,
+    salesLetters: false,
+    companyExecutiveInfo:false,
+    addNote:false,
+    aitextImprover:false,
+    mediaKitAI:false,
   };

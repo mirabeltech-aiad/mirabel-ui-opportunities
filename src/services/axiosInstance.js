@@ -21,7 +21,6 @@ axiosInstance.interceptors.request.use((config) => {
     baseURL = DEV_BASE_URL;
     domain = DEV_DOMAIN;
     token = DEV_TOKEN;
-    console.log("configCheck_Dev", baseURL,domain);
 
   } else {
     // Production or other environments
@@ -32,7 +31,6 @@ axiosInstance.interceptors.request.use((config) => {
       baseURL = `${window.location.origin}${envBaseUrl}`;
       domain = window.location.hostname;
     } 
-    console.log("configCheck", baseURL,domain);
     
     // Get token from localStorage
     token = localStorage.getItem("Token") || "";
@@ -41,7 +39,6 @@ axiosInstance.interceptors.request.use((config) => {
   config.baseURL = baseURL;
   config.headers.Authorization = `Bearer ${token}`;
   config.headers.domain = domain;
-  console.log("Request config:", { baseURL, domain });
 
   return config;
 }, error => Promise.reject(error));
