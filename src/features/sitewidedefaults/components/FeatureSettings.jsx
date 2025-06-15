@@ -28,6 +28,7 @@ import { CustomerPortal } from './CustomerPortal';
 import { UserSettings } from './UserSettings';
 import { Communications } from './Communications';
 import { GoogleCalendar } from './GoogleCalendar';
+import { MarketingManagerPackage } from './MarketingManagerPackage';
 // Settings metadata for headings and descriptions
 const settingsMeta = {
   adManagement: [
@@ -728,114 +729,11 @@ function DashboardDemoPage() {
 
         {/* Marketing Manager Package Settings */}
         <TabsContent value="marketingManagerPackageSettings">
-          <Card className="mb-6">
-            <CardHeader>
-              <CardTitle>Marketing Manager Package Settings</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="p-4 bg-white border rounded">
-                {/* Package Type Row */}
-                <div className="flex flex-row items-center mb-2">
-                  <div className="font-semibold min-w-[160px] text-right pr-2">Package Type</div>
-                  <select
-                    id="packageType"
-                    className="px-2 py-1 text-sm border rounded min-w-[260px]"
-                    value={state.packageType || "Trial"}
-                    onChange={e => handleInput("packageType", e.target.value)}
-                  >
-                    {packageTypeOptions.map((option) => (
-                      <option key={option.value} value={option.value}>
-                        {option.label}
-                      </option>
-                    ))}
-                  </select>
-                  <div className="ml-4 text-sm">{packageTypeDescriptions[state.packageType || "Trial"]}</div>
-                </div>
-
-                {/* Data Pack Section (only for certain package types) */}
-                {showDataPackTypes.includes(state.packageType) && (
-                  <>
-                    {/* Data Pack Type Row */}
-                    <div className="flex flex-row items-center mb-2">
-                      <div className="font-semibold min-w-[160px] text-right pr-2">Data Pack Type</div>
-                      <select
-                        id="dataPackType"
-                        className="px-2 py-1 text-sm border rounded min-w-[260px]"
-                        value={state.dataPackType || "Basic"}
-                        onChange={e => handleInput("dataPackType", e.target.value)}
-                      >
-                        <option value="Basic">Basic</option>
-                        <option value="Standard">Standard</option>
-                        <option value="Enterprise">Enterprise</option>
-                      </select>
-                      <div className="ml-4 text-sm">
-                        {dataPackTypeOptions.find(option => option.value === state.dataPackType)?.label} contact records per month</div>
-                    </div>
-                    {/* Base Data Pack Count Row */}
-                    <div className="flex flex-row items-center mb-2">
-                      <div className="font-semibold min-w-[160px] text-right pr-2">Base Data Pack Count</div>
-                      <Input
-                        id="baseDataPackCount"
-                        type="number"
-                        min={0}
-                        className="w-16"
-                        value={state.baseDataPackCount || 0}
-                        onChange={e => handleInput("baseDataPackCount", parseInt(e.target.value, 10))}
-                      />
-                    </div>
-                    {/* Count of Data Packs charged for current month Row */}
-                    <div className="flex flex-row items-center mb-2">
-                      <div className="font-semibold min-w-[320px] text-right pr-2">Count of Data Packs charged for current month</div>
-                      <Input
-                        id="countDataPacksCurrentMonth"
-                        type="number"
-                        min={0}
-                        className="w-16"
-                        value={state.countDataPacksCurrentMonth || 0}
-                        disabled={true}
-                        onChange={e => handleInput("countDataPacksCurrentMonth", parseInt(e.target.value, 10))}
-                      />
-                    </div>
-                  </>
-                )}
-
-                {/* Links Row (center aligned) */}
-                <div className="flex flex-row flex-wrap justify-center w-full gap-8 pt-2">
-                  <Dialog>
-                    <DialogTrigger asChild>
-                      <a href="#" className="text-sm text-blue-600 hover:underline">
-                        Package and Data Pack Details applicable for next month
-                      </a>
-                    </DialogTrigger>
-                    <DialogContent className="max-w-3xl">
-                      <DialogHeader>
-                        <DialogTitle>Package and Data Pack Details applicable for next month</DialogTitle>
-                      </DialogHeader>
-                      <DummyPackageDetailsTable />
-                    </DialogContent>
-                  </Dialog>
-                  {showDataPackTypes.includes(state.packageType) && (
-                    <Dialog>
-                      <DialogTrigger asChild>
-                        <a href="#" className="text-sm text-blue-600 hover:underline">
-                          Show users with data packs assigned
-                        </a>
-                      </DialogTrigger>
-                      <DialogContent className="max-w-3xl">
-                        <DialogHeader>
-                          <DialogTitle>Users with Data Packs Assigned</DialogTitle>
-                        </DialogHeader>
-                        <DummyUsersWithDataPacksTable />
-                      </DialogContent>
-                    </Dialog>
-                  )}
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+          <MarketingManagerPackage 
+            state={state}
+            handleInput={handleInput}
+          />
         </TabsContent>
-
-
 
         {/* Helpdesk Tab */}
         <TabsContent value="helpdesk">
