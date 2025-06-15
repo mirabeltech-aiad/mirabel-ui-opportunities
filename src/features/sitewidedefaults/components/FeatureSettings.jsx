@@ -1,37 +1,24 @@
-import React, { useState, memo, useEffect } from "react";
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+import React, { useState, memo } from "react";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import { Switch } from "@/components/ui/switch";
-import { Checkbox } from "@/components/ui/checkbox";
-import { Separator } from "@/components/ui/separator";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { ChevronLeft, ChevronRight, X } from "lucide-react";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import { tabList } from "../helpers/constants.helper";
 import { useFeatureSettings } from "../context/Context";
 import { useCirculationTypes } from "../hooks/useCirculationTypes";
-import {
-  Dialog,
-  DialogTrigger,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogClose,
-} from "@/components/ui/dialog";
-import { AdManagement } from './AdManagement';
-import { AccountReceivable } from './AccountReceivable';
-import { Production } from './Production';
-import { CirculationSettings } from './CirculationSettings';
-import { ContactManagement } from './ContactManagement';
-import { CustomerPortal } from './CustomerPortal';
-import { UserSettings } from './UserSettings';
-import { Communications } from './Communications';
-import { GoogleCalendar } from './GoogleCalendar';
-import { MarketingManagerPackage } from './MarketingManagerPackage';
-import { Helpdesk } from './Helpdesk';
-import { MediaMateAI } from './MediaMateAI';
-import { EmailSettings } from './EmailSettings';
+import { AdManagement } from "./AdManagement";
+import { AccountReceivable } from "./AccountReceivable";
+import { Production } from "./Production";
+import { CirculationSettings } from "./CirculationSettings";
+import { ContactManagement } from "./ContactManagement";
+import { CustomerPortal } from "./CustomerPortal";
+import { UserSettings } from "./UserSettings";
+import { Communications } from "./Communications";
+import { GoogleCalendar } from "./GoogleCalendar";
+import { MarketingManagerPackage } from "./MarketingManagerPackage";
+import { Helpdesk } from "./Helpdesk";
+import { MediaMateAI } from "./MediaMateAI";
+import { EmailSettings } from "./EmailSettings";
+
 // Settings metadata for headings and descriptions
 const settingsMeta = {
   adManagement: [
@@ -279,161 +266,6 @@ const settingsMeta = {
   ],
 };
 
-const pickupFromOptions = [
-  { value: "ProductName", label: "Product Name" },
-  { value: "IssueName", label: "Issue Name" },
-  { value: "IssueYear", label: "Issue Year" },
-  { value: "AdSize", label: "Ad Size" },
-  { value: "AdName", label: "Ad Name" },
-  // Add more as needed
-];
-
-
-
-const packageTypeOptions = [
-  { value: "Trial", label: "Trial" },
-  { value: "CRM", label: "CRM" },
-  { value: "CRM + MKM", label: "CRM + MKM" },
-  { value: "Other CRM Int + DATA", label: "Other CRM Int + DATA" },
-  { value: "CRM + DATA", label: "CRM + DATA" },
-  { value: "CRM + MKM + DATA", label: "CRM + MKM + DATA" },
-];
-
-// Descriptions for each package type
-const packageTypeDescriptions = {
-  Trial: "Trial Version",
-  CRM: "CRM/MagazineManager Only",
-  "CRM + MKM": "CRM, Marketing Manager Reports and Content Analytics",
-  "Other CRM Int + DATA": "Browser Extension with third party CRM Integration",
-  "CRM + DATA": "CRM, Prospecting Dashboard and Browser Extension with data restrictions",
-  "CRM + MKM + DATA": "CRM, Marketing Manager Reports, Prospecting Dashboard with data restriction and Browser Extension with data restrictions",
-};
-
-// Which package types show the Data Pack section
-const showDataPackTypes = [
-  "Other CRM Int + DATA",
-  "CRM + DATA",
-  "CRM + MKM + DATA",
-];
-
-const dataPackTypeOptions = [
-  { value: "Basic", label: 150 },
-  { value: "Standard", label: 300 },
-  { value: "Enterprise", label: 1000 },
-];
-
-const pickupOptions = [
-  { Key: "", Description: "", Script: "''" },
-  {
-    Key: "ProductName",
-    Description: "Product Name",
-    Script: "ISNULL(gsPublications.PubName,'')",
-  },
-  {
-    Key: "Description",
-    Description: "Description",
-    Script: "ISNULL(gsContracts.Description,'')",
-  },
-  {
-    Key: "IssueName",
-    Description: "Issue Name",
-    Script: "ISNULL(tblMagFrequency.IssueName,'')",
-  },
-  {
-    Key: "IssueYear",
-    Description: "Issue Year",
-    Script: "ISNULL(CONVERT(VARCHAR,tblMagFrequency.IssueYear),'')",
-  },
-  {
-    Key: "IssueDate",
-    Description: "Issue Date",
-    Script: "ISNULL(CONVERT(VARCHAR,tblMagFrequency.IssueDate,101),'')",
-  },
-  {
-    Key: "AdSize",
-    Description: "Ad Size",
-    Script: "ISNULL(gsAdSize.AdSizeName,'')",
-  },
-  {
-    Key: "Frequency",
-    Description: "Frequency",
-    Script: "ISNULL(gsContracts.Frequency,'')",
-  },
-  {
-    Key: "Color",
-    Description: "Color",
-    Script: "ISNULL(gsContracts.Color,'')",
-  },
-  {
-    Key: "Position",
-    Description: "Position",
-    Script: "ISNULL(gsContracts.PosReq1,'')",
-  },
-  {
-    Key: "Section",
-    Description: "Section",
-    Script: "ISNULL(gsPubSections.SectionName,'')",
-  },
-  {
-    Key: "AdName",
-    Description: "Ad Name",
-    Script: "ISNULL(gsContracts.AdName,'')",
-  },
-];
-
-
-
-function DummyPackageDetailsTable() {
-  return (
-    <div className="overflow-x-auto">
-      <table className="min-w-full text-sm border">
-        <thead>
-          <tr>
-            <th className="px-2 py-1 border">Package Type</th>
-            <th className="px-2 py-1 border">Data Pack Type</th>
-            <th className="px-2 py-1 border">Base Data Pack Count</th>
-            <th className="px-2 py-1 border">Effective count of Data Packs</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td className="px-2 py-1 font-bold border">Trial</td>
-            <td className="px-2 py-1 border">N/A</td>
-            <td className="px-2 py-1 border">N/A</td>
-            <td className="px-2 py-1 border">N/A</td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-  );
-}
-
-function DummyUsersWithDataPacksTable() {
-  return (
-    <div className="overflow-x-auto">
-      <div className="mb-2 font-semibold">Count of Active packs2</div>
-      <table className="min-w-full text-sm border">
-        <thead>
-          <tr>
-            <th className="px-2 py-1 border">User</th>
-            <th className="px-2 py-1 border">Assigned Date</th>
-            <th className="px-2 py-1 border">Disabled Date</th>
-            <th className="px-2 py-1 border">Data Pack Enabled</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td className="px-2 py-1 border">-</td>
-            <td className="px-2 py-1 border">-</td>
-            <td className="px-2 py-1 border">-</td>
-            <td className="px-2 py-1 border">-</td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-  );
-}
-
 function DashboardDemoPage() {
   const {
     state,
@@ -453,7 +285,7 @@ function DashboardDemoPage() {
     isLoading: isTypesLoading,
     error: typesError,
   } = useCirculationTypes();
-  console.log("circulationTypes", circulationTypes);
+
   const handlePrevTabs = () => {
     setTabWindow([tabWindow[0] - 1, tabWindow[1] - 1]);
   };
@@ -462,7 +294,6 @@ function DashboardDemoPage() {
     setTabWindow([tabWindow[0] + 1, tabWindow[1] + 1]);
   };
 
-  console.log("ststatestatestateate", state,activeTab);
   return (
     <div className="px-4 py-2 mx-auto">
       <div className="sticky top-0 z-20 pb-2 bg-background">
@@ -500,177 +331,29 @@ function DashboardDemoPage() {
               <ChevronRight className="w-5 h-5" />
             </Button>
           </div>
-          <TabsContent value="storeSupply" className="p-0">
-            <div className="grid gap-6 md:grid-cols-2">
-              {/* Inventory Settings Card */}
-              <Card>
-                <CardHeader>
-                  <CardTitle>Inventory Settings</CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  {apiLoading ? (
-                    <div>Loading inventory settings...</div>
-                  ) : apiError ? (
-                    <div>
-                      Error loading inventory settings: {apiError.message}
-                    </div>
-                  ) : (
-                    <>
-                      <div className="flex items-center justify-between">
-                        <Label htmlFor="track-inventory">Track Inventory</Label>
-                        <Switch
-                          id="track-inventory"
-                          checked={state.storeSupply?.trackInventory || false}
-                          onCheckedChange={() =>
-                            updateInventory({
-                              trackInventory:
-                                !state.storeSupply?.trackInventory,
-                            })
-                          }
-                        />
-                      </div>
-
-                      <div className="flex items-center justify-between">
-                        <Label htmlFor="low-stock-alert">
-                          Low Stock Alerts
-                        </Label>
-                        <Switch
-                          id="low-stock-alert"
-                          checked={state.storeSupply?.lowStockAlert || false}
-                          onCheckedChange={() =>
-                            updateInventory({
-                              lowStockAlert: !state.storeSupply?.lowStockAlert,
-                            })
-                          }
-                          disabled={!state.storeSupply?.trackInventory}
-                        />
-                      </div>
-
-                      {state.storeSupply?.lowStockAlert && (
-                        <div className="flex flex-col space-y-2">
-                          <Label htmlFor="threshold">Low Stock Threshold</Label>
-                          <Input
-                            id="threshold"
-                            type="number"
-                            value={state.storeSupply?.lowStockThreshold || 5}
-                            onChange={(e) =>
-                              updateInventory({
-                                lowStockThreshold: Number(e.target.value),
-                              })
-                            }
-                            min={1}
-                          />
-                        </div>
-                      )}
-
-                      <div className="flex items-center justify-between">
-                        <Label htmlFor="auto-reorder">Auto Reorder</Label>
-                        <Switch
-                          id="auto-reorder"
-                          checked={state.storeSupply?.autoReorder || false}
-                          onCheckedChange={() =>
-                            updateInventory({
-                              autoReorder: !state.storeSupply?.autoReorder,
-                            })
-                          }
-                          disabled={!state.storeSupply?.trackInventory}
-                        />
-                      </div>
-                    </>
-                  )}
-                </CardContent>
-              </Card>
-
-              {/* Supplier Settings Card */}
-              <Card>
-                <CardHeader>
-                  <CardTitle>Supplier Management</CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  {apiLoading ? (
-                    <div>Loading supplier settings...</div>
-                  ) : apiError ? (
-                    <div>
-                      Error loading supplier settings: {apiError.message}
-                    </div>
-                  ) : (
-                    <>
-                      <div className="space-y-2">
-                        <Label htmlFor="new-supplier">
-                          Add Preferred Supplier
-                        </Label>
-                        <div className="flex gap-2">
-                          <Input
-                            id="new-supplier"
-                            value={state.newSupplier || ""}
-                            onChange={(e) => setNewSupplier(e.target.value)}
-                            placeholder="Enter supplier name"
-                          />
-                          <Button onClick={handleAddSupplier}>Add</Button>
-                        </div>
-                      </div>
-
-                      <div className="space-y-2">
-                        <Label>Preferred Suppliers</Label>
-                        {!state.storeSupply?.preferredSuppliers?.length ? (
-                          <p className="text-sm text-muted-foreground">
-                            No preferred suppliers added yet.
-                          </p>
-                        ) : (
-                          <div className="space-y-2">
-                            {state.storeSupply?.preferredSuppliers?.map(
-                              (supplier, index) => (
-                                <div
-                                  key={index}
-                                  className="flex items-center justify-between p-2 border rounded"
-                                >
-                                  <span>{supplier}</span>
-                                  <Button
-                                    variant="ghost"
-                                    size="sm"
-                                    onClick={() =>
-                                      handleRemoveSupplier(supplier)
-                                    }
-                                  >
-                                    <X className="w-4 h-4" />
-                                  </Button>
-                                </div>
-                              )
-                            )}
-                          </div>
-                        )}
-                      </div>
-                    </>
-                  )}
-                </CardContent>
-              </Card>
-            </div>
-          </TabsContent>
         </Tabs>
       </div>
 
       <Tabs value={activeTab} className="w-full">
         {/* Ad Management Tab */}
         <TabsContent value="adManagement" className="w-11/12 m-auto">
-          <AdManagement 
+          <AdManagement
             state={state}
             handleInput={handleInput}
             handleToggle={handleToggle}
             settingsMeta={settingsMeta}
           />
         </TabsContent>
-        {/* Account Tab */}
 
         {/* Account Receivable Settings */}
-        
         <TabsContent value="accountReceivable" className="w-11/12 m-auto">
-  <AccountReceivable
-    state={state}
-    handleInput={handleInput}
-    handleToggle={handleToggle}
-    settingsMeta={settingsMeta}
-  />
-</TabsContent>
+          <AccountReceivable
+            state={state}
+            handleInput={handleInput}
+            handleToggle={handleToggle}
+            settingsMeta={settingsMeta}
+          />
+        </TabsContent>
 
         {/* Production Tab */}
         <TabsContent value="production">
@@ -679,7 +362,7 @@ function DashboardDemoPage() {
 
         {/* Circulation Settings */}
         <TabsContent value="circulationSettings">
-          <CirculationSettings 
+          <CirculationSettings
             state={state}
             handleInput={handleInput}
             circulationTypes={circulationTypes}
@@ -690,7 +373,7 @@ function DashboardDemoPage() {
 
         {/* Contact Management Tab */}
         <TabsContent value="contact">
-          <ContactManagement 
+          <ContactManagement
             state={state}
             handleInput={handleInput}
             handleToggle={handleToggle}
@@ -699,31 +382,22 @@ function DashboardDemoPage() {
 
         {/* Customer Portal Tab */}
         <TabsContent value="customerPortal">
-          <CustomerPortal 
-            state={state}
-            handleInput={handleInput}
-          />
+          <CustomerPortal state={state} handleInput={handleInput} />
         </TabsContent>
 
         {/* User Settings Tab */}
         <TabsContent value="userSettings">
-          <UserSettings 
-            state={state}
-            handleToggle={handleToggle}
-          />
+          <UserSettings state={state} handleToggle={handleToggle} />
         </TabsContent>
 
         {/* Communications Tab */}
         <TabsContent value="communications">
-          <Communications 
-            state={state}
-            handleToggle={handleToggle}
-          />
+          <Communications state={state} handleToggle={handleToggle} />
         </TabsContent>
 
         {/* Google Calendar Tab */}
         <TabsContent value="googleCalendar">
-          <GoogleCalendar 
+          <GoogleCalendar
             state={state}
             handleToggle={handleToggle}
             handleInput={handleInput}
@@ -732,36 +406,23 @@ function DashboardDemoPage() {
 
         {/* Marketing Manager Package Settings */}
         <TabsContent value="marketingManagerPackageSettings">
-          <MarketingManagerPackage 
-            state={state}
-            handleInput={handleInput}
-          />
+          <MarketingManagerPackage state={state} handleInput={handleInput} />
         </TabsContent>
 
         {/* Helpdesk Tab */}
         <TabsContent value="helpdesk">
-          <Helpdesk 
-            state={state}
-            handleToggle={handleToggle}
-          />
+          <Helpdesk state={state} handleToggle={handleToggle} />
         </TabsContent>
 
         {/* Media MailKit Tab */}
         <TabsContent value="mediaMateAI">
-          <MediaMateAI 
-            state={state}
-            handleToggle={handleToggle}
-          />
+          <MediaMateAI state={state} handleToggle={handleToggle} />
         </TabsContent>
 
         {/* Email Settings Tab */}
         <TabsContent value="emailSettings">
-          <EmailSettings 
-            state={state}
-            handleToggle={handleToggle}
-          />
+          <EmailSettings state={state} handleToggle={handleToggle} />
         </TabsContent>
-        
       </Tabs>
 
       <div className="flex justify-end mt-8">
@@ -771,5 +432,4 @@ function DashboardDemoPage() {
   );
 }
 
-// Wrap component with memo to prevent unnecessary renders
 export default memo(DashboardDemoPage);
