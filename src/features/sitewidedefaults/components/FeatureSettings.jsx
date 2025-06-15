@@ -26,6 +26,8 @@ import { CirculationSettings } from './CirculationSettings';
 import { ContactManagement } from './ContactManagement';
 import { CustomerPortal } from './CustomerPortal';
 import { UserSettings } from './UserSettings';
+import { Communications } from './Communications';
+import { GoogleCalendar } from './GoogleCalendar';
 // Settings metadata for headings and descriptions
 const settingsMeta = {
   adManagement: [
@@ -709,73 +711,20 @@ function DashboardDemoPage() {
 
         {/* Communications Tab */}
         <TabsContent value="communications">
-          <Card className="mb-6">
-            <CardHeader>
-              <CardTitle>Communications</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="flex items-center justify-between">
-                <Label>Enable Campaign</Label>
-                <Switch
-                  checked={state.campaign || false}
-                  onCheckedChange={() => handleToggle("campaign")}
-                />
-              </div>
-              <div className="flex items-center justify-between">
-                <Label>Enable Mailing Manager</Label>
-                <Switch
-                  checked={state.mailingManager || false}
-                  onCheckedChange={() => handleToggle("mailingManager")}
-                />
-              </div>
-              <div className="flex items-center justify-between">
-                <Label>Enable Mailer</Label>
-                <Switch
-                  checked={state.mailer || false}
-                  onCheckedChange={() => handleToggle("mailer")}
-                />
-              </div>
-              <div className="flex items-center justify-between">
-                <Label>Enable Helpdesk</Label>
-                <Switch
-                  checked={state.enableHelpdesk || false}
-                  onCheckedChange={() => handleToggle("enableHelpdesk")}
-                />
-              </div>
-            </CardContent>
-          </Card>
+          <Communications 
+            state={state}
+            handleToggle={handleToggle}
+          />
         </TabsContent>
 
         {/* Google Calendar Tab */}
         <TabsContent value="googleCalendar">
-          <Card className="mb-6">
-            <CardHeader>
-              <CardTitle>Google Calendar Integration</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="flex items-center justify-between">
-                <Label>Enable Google Calendar</Label>
-                <Switch
-                  checked={state.googleCalendar || false}
-                  onCheckedChange={() => handleToggle("googleCalendar")}
-                />
-              </div>
-              <div className="flex flex-col gap-2">
-                <Label htmlFor="apiKey">API Key</Label>
-                <Input
-                  id="apiKey"
-                  value={state.googleCalendarApiKey || ""}
-                  onChange={(e) =>
-                    handleInput("googleCalendar", "apiKey", e.target.value)
-                  }
-                  placeholder="Enter your Google Calendar API Key"
-                  className="w-full"
-                />
-              </div>
-            </CardContent>
-          </Card>
+          <GoogleCalendar 
+            state={state}
+            handleToggle={handleToggle}
+            handleInput={handleInput}
+          />
         </TabsContent>
-
 
         {/* Marketing Manager Package Settings */}
         <TabsContent value="marketingManagerPackageSettings">
