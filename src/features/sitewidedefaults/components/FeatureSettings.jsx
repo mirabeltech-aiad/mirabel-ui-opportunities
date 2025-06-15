@@ -29,6 +29,9 @@ import { UserSettings } from './UserSettings';
 import { Communications } from './Communications';
 import { GoogleCalendar } from './GoogleCalendar';
 import { MarketingManagerPackage } from './MarketingManagerPackage';
+import { Helpdesk } from './Helpdesk';
+import { MediaMateAI } from './MediaMateAI';
+import { EmailSettings } from './EmailSettings';
 // Settings metadata for headings and descriptions
 const settingsMeta = {
   adManagement: [
@@ -737,174 +740,26 @@ function DashboardDemoPage() {
 
         {/* Helpdesk Tab */}
         <TabsContent value="helpdesk">
-          <Card className="mb-6">
-            <CardHeader>
-              <CardTitle>Helpdesk Settings</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className={`flex items-center justify-between p-2 border-b`}>
-                <div className="flex flex-col items-start">
-                  <Label
-                    className="mb-1 text-base font-semibold"
-                    htmlFor="helpdesk"
-                  >
-                    Enable Ticket
-                  </Label>
-                  <p className="text-sm text-left text-muted-foreground">
-                    Enable/disable access to new tech support ticket portal for
-                    site. Please refresh the entire site to see the changes
-                    after clicking the save button.
-                  </p>
-                </div>
-                <Switch
-                  checked={!!state.IsTicketEnabled}
-                  onCheckedChange={() => handleToggle("IsTicketEnabled")}
-                />
-              </div>
-              <div className={`flex items-center justify-between p-2 border-b`}>
-                <div className="flex flex-col items-start">
-                  <Label
-                    className="mb-1 text-base font-semibold"
-                    htmlFor="helpdesk"
-                  >
-                    Enable Live Chat
-                  </Label>
-                  <p className="text-sm text-left text-muted-foreground">
-                    Enable/disable access to online tech support chat for this
-                    site. Please refresh the entire site to see the changes
-                    after clicking the save button.
-                  </p>
-                </div>
-                <Switch
-                  id="helpdesk"
-                  checked={!!state.IsChatEnabled}
-                  onCheckedChange={() => handleToggle("IsChatEnabled")}
-                />
-              </div>
-            </CardContent>
-          </Card>
+          <Helpdesk 
+            state={state}
+            handleToggle={handleToggle}
+          />
         </TabsContent>
 
         {/* Media MailKit Tab */}
         <TabsContent value="mediaMateAI">
-          <Card className="mb-6">
-            <CardHeader>
-              <CardTitle>Media Mate AI</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="flex items-center justify-between">
-                <Label>Send Email</Label>
-                <Switch
-                  checked={!!state.sendEmail}
-                  onCheckedChange={() => handleToggle("sendEmail")}
-                />
-              </div>
-              <div className="flex items-center justify-between">
-                <Label>Company Notes</Label>
-                <Switch
-                  checked={!!state.companyNote}
-                  onCheckedChange={() => handleToggle("companyNote")}
-                />
-              </div>
-              <div className="flex items-center justify-between">
-                <Label>Sales Letters</Label>
-                <Switch
-                  checked={!!state.salesLetters}
-                  onCheckedChange={() => handleToggle("salesLetters")}
-                />
-              </div>
-              <div className="flex items-center justify-between">
-                <Label>Company Executive Info</Label>
-                <Switch
-                  checked={!!state.companyExecutiveInfo}
-                  onCheckedChange={() => handleToggle("companyExecutiveInfo")}
-                />
-              </div>
-              <div className="flex items-center justify-between">
-                <Label>Add Note</Label>
-                <Switch
-                  checked={!!state.addNote}
-                  onCheckedChange={() => handleToggle("addNote")}
-                />
-              </div>
-              <div className="flex items-center justify-between">
-                <Label>AI Text Improver</Label>
-                <Switch
-                  checked={!!state.aitextImprover}
-                  onCheckedChange={() => handleToggle("aitextImprover")}
-                />
-              </div>
-              <div className="flex items-center justify-between">
-                <Label>Media Kit AI</Label>
-                <Switch
-                  checked={!!state.mediaKitAI}
-                  onCheckedChange={() => handleToggle("mediaKitAI")}
-                />
-              </div>
-            </CardContent>
-          </Card>
+          <MediaMateAI 
+            state={state}
+            handleToggle={handleToggle}
+          />
         </TabsContent>
 
         {/* Email Settings Tab */}
         <TabsContent value="emailSettings">
-          <Card className="mb-6">
-            <CardHeader>
-              <CardTitle>Email Settings</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="flex items-center justify-between p-2 border-b">
-                <div className="flex flex-col items-start">
-                  <Label className="font-semibold">Enable Email Capture</Label>
-                  <span className="text-sm text-muted-foreground">Enable/Disable Email Capture feature</span>
-                </div>
-                <Switch
-                  checked={!!state.IsBccFeatureEnabled}
-                  onCheckedChange={() => handleToggle('IsBccFeatureEnabled')}
-                />
-              </div>
-              <div className="flex items-center justify-between p-2 border-b">
-                <div className="flex flex-col items-start">
-                  <Label className="font-semibold">Summary Email Notifications</Label>
-                  <span className="text-sm text-muted-foreground">Enable/Disable Summary Email Notifications</span>
-                </div>
-                <Switch
-                  checked={!!state.IsCESummaryEmail}
-                  onCheckedChange={() => handleToggle('IsCESummaryEmail')}
-                />
-              </div>
-              <div className="flex items-center justify-between p-2 border-b">
-                <div className="flex flex-col items-start">
-                  <Label className="font-semibold">Marketing Manager Notifications</Label>
-                  <span className="text-sm text-muted-foreground">Enable/Disable Marketing Manager Notifications, Please contact the Marketing Manager team to make sure this client has been set up before enabling this feature here.</span>
-                  <span className="mt-1 text-xs text-muted-foreground">*Note: if "Marketing Manager Notifications" feature is disabled, all? of the marketing manager notification settings for all users will be removed and will have to be re-added after enabling this feature again.</span>
-                </div>
-                <Switch
-                  checked={!!state.IsMarketingManagerNotifications}
-                  onCheckedChange={() => handleToggle('IsMarketingManagerNotifications')}
-                />
-              </div>
-              <div className="flex items-center justify-between p-2 border-b">
-                <div className="flex flex-col items-start">
-                  <Label className="font-semibold">Tracking Code</Label>
-                  <span className="text-sm text-muted-foreground">This will allow us to track replies/Links from Emails that we sent from Mailing List Wizard</span>
-                </div>
-                <Switch
-                  checked={!!state.IsTrackingCodeEnabled}
-                  onCheckedChange={() => handleToggle('IsTrackingCodeEnabled')}
-                />
-              </div>
-              <div className="flex items-center justify-between p-2">
-                <div className="flex flex-col items-start">
-                  <Label className="font-semibold">Rep Notifications From Marketing Manager</Label>
-                  <span className="text-sm text-muted-foreground">Send Rep Notifications through Marketing Manager</span>
-                </div>
-                <Switch
-                  checked={!!state.IsRepNotificationsEnabled}
-                  onCheckedChange={() => handleToggle('IsRepNotificationsEnabled')}
-                />
-              </div>
-            </CardContent>
-          </Card>
+          <EmailSettings 
+            state={state}
+            handleToggle={handleToggle}
+          />
         </TabsContent>
         
       </Tabs>
