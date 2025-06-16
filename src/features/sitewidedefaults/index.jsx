@@ -78,7 +78,7 @@ function FeatureSettings() {
       </Tabs> 
 
       <div className="sticky bottom-0 flex justify-center py-3 bg-white shadow">
-        <Button variant="default">Save</Button>
+        <Button variant="default" className="w-1/8">Save</Button>
       </div>
     </div>
   );
