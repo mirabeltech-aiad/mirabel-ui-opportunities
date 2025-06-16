@@ -13,4 +13,4 @@ import MediaMateAI from "./MediaMateAI";
 import EmailSettings from "./EmailSettings";
 
 
-export { AdManagement, AccountReceivable, Production, CirculationSettings, ContactManagement, CustomerPortal, UserSettings, Communications, GoogleCalendar, MarketingManagerPackage, Helpdesk, MediaMateAI, EmailSettings, };
+export { AdManagement, AccountReceivable, Production, CirculationSettings, ContactManagement, CustomerPortal, UserSettings, Communications, GoogleCalendar, MarketingManagerPackage, Helpdesk, MediaMateAI, EmailSettings };

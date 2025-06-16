@@ -3,8 +3,10 @@ import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
+import { useFeatureSettings } from "../context/Context";
 
-function GoogleCalendar({ state, handleToggle, handleInput }) {
+function GoogleCalendar() {
+  const { state, handleInput } = useFeatureSettings();
   return (
     <Card className="mb-6">
       <CardHeader>

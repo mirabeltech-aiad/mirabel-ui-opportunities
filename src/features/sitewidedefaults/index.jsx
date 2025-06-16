@@ -4,22 +4,6 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { tabList } from "./helpers/constants.helper";
-import { useFeatureSettings } from "./context/Context";
-import {
-  AdManagement,
-  AccountReceivable,
-  Production,
-  CirculationSettings,
-  ContactManagement,
-  CustomerPortal,
-  UserSettings,
-  Communications,
-  GoogleCalendar,
-  MarketingManagerPackage,
-  Helpdesk,
-  MediaMateAI,
-  EmailSettings,
-} from "./components/Index";
 
 export default function SiteWideDefaultsPage() {
   return (
@@ -30,16 +14,9 @@ export default function SiteWideDefaultsPage() {
 }
 
 function FeatureSettings() {
-  const {
-    state,
-    handleToggle,
-    handleInput,
-    isLoading: apiLoading,
-    error: apiError,
-  } = useFeatureSettings();
 
   const [tabWindow, setTabWindow] = useState([0, 5]);
-  const [activeTab, setActiveTab] = useState("adManagement");
+  const [activeTab, setActiveTab] = useState("AdManagement");
 
 
   const handlePrevTabs = () => {
@@ -71,8 +48,8 @@ function FeatureSettings() {
             </Button>
             <TabsList className="flex flex-wrap gap-2 grow">
               {tabList.slice(tabWindow[0], tabWindow[1]).map((tab) => (
-                <TabsTrigger key={tab.value} value={tab.value}>
-                  {tab.label}
+                <TabsTrigger key={tab.Value} value={tab.Value}>
+                  {tab.Label}
                 </TabsTrigger>
               ))}
             </TabsList>
@@ -90,85 +67,17 @@ function FeatureSettings() {
         </Tabs>
       </div>
 
-      <Tabs value={activeTab} className="w-full">
-        {/* Ad Management Tab */}
-        <TabsContent value="adManagement" className="w-11/12 m-auto">
-          <AdManagement />
-        </TabsContent>
+      
 
-        {/* Account Receivable Settings */}
-        <TabsContent value="accountReceivable" className="w-11/12 m-auto">
-          <AccountReceivable />
-        </TabsContent>
+       <Tabs value={activeTab} className="w-full">
+        {tabList.map((tab) => (
+          <TabsContent key={tab.Value} value={tab.Value}>
+            <tab.Component />
+          </TabsContent>
+        ))}
+      </Tabs> 
 
-        {/* Production Tab */}
-        <TabsContent value="production">
-          <Production state={state} handleToggle={handleToggle} />
-        </TabsContent>
-
-        {/* Circulation Settings */}
-        <TabsContent value="circulationSettings">
-          <CirculationSettings
-            state={state}
-            handleInput={handleInput}
-          />
-        </TabsContent>
-
-        {/* Contact Management Tab */}
-        <TabsContent value="contact">
-          <ContactManagement
-            state={state}
-            handleInput={handleInput}
-            handleToggle={handleToggle}
-          />
-        </TabsContent>
-
-        {/* Customer Portal Tab */}
-        <TabsContent value="customerPortal">
-          <CustomerPortal state={state} handleInput={handleInput} />
-        </TabsContent>
-
-        {/* User Settings Tab */}
-        <TabsContent value="userSettings">
-          <UserSettings state={state} handleToggle={handleToggle} />
-        </TabsContent>
-
-        {/* Communications Tab */}
-        <TabsContent value="communications">
-          <Communications state={state} handleToggle={handleToggle} />
-        </TabsContent>
-
-        {/* Google Calendar Tab */}
-        <TabsContent value="googleCalendar">
-          <GoogleCalendar
-            state={state}
-            handleToggle={handleToggle}
-            handleInput={handleInput}
-          />
-        </TabsContent>
-
-        {/* Marketing Manager Package Settings */}
-        <TabsContent value="marketingManagerPackageSettings">
-          <MarketingManagerPackage state={state} handleInput={handleInput} />
-        </TabsContent>
-
-        {/* Helpdesk Tab */}
-        <TabsContent value="helpdesk">
-          <Helpdesk state={state} handleToggle={handleToggle} />
-        </TabsContent>
-
-        {/* Media MailKit Tab */}
-        <TabsContent value="mediaMateAI">
-          <MediaMateAI state={state} handleToggle={handleToggle} />
-        </TabsContent>
-
-        {/* Email Settings Tab */}
-        <TabsContent value="emailSettings">
-          <EmailSettings state={state} handleToggle={handleToggle} />
-        </TabsContent>
-      </Tabs>
-
-      <div className="flex justify-end mt-8">
+      <div className="sticky bottom-0 flex justify-center py-3 bg-white shadow">
         <Button variant="default">Save</Button>
       </div>
     </div>

@@ -2,8 +2,10 @@ import React from "react";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
+import { useFeatureSettings } from "../context/Context";
 
-function CustomerPortal({ state, handleInput }) {
+function CustomerPortal() {
+  const { state, handleInput } = useFeatureSettings();
   return (
     <Card className="mb-6">
       <CardHeader>

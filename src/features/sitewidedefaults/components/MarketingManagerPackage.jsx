@@ -9,6 +9,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { useFeatureSettings } from "../context/Context";
 
 // Package type options and descriptions
 const packageTypeOptions = [
@@ -93,7 +94,8 @@ function UsersWithDataPacksTable() {
   );
 }
 
-function MarketingManagerPackage({ state, handleInput }) {
+function MarketingManagerPackage() {
+  const { state, handleInput } = useFeatureSettings();
   return (
     <Card className="mb-6">
       <CardHeader>
