@@ -11,21 +11,22 @@ export function GoogleCalendar({ state, handleToggle, handleInput }) {
         <CardTitle>Google Calendar Integration</CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
-        <div className="flex items-center justify-between">
-          <Label>Enable Google Calendar</Label>
-          <Switch
-            checked={state.googleCalendar || false}
-            onCheckedChange={() => handleToggle("googleCalendar")}
+        <div className="flex flex-col gap-2">
+          <Label htmlFor="apiKey">API Client ID</Label>
+          <Input
+            id="apiKey"
+            value={state.ClientID || ""}
+            onChange={(e) => handleInput("ClientID", e.target.value)}
+            placeholder="Enter your Google Calendar API Key"
+            className="w-full"
           />
         </div>
         <div className="flex flex-col gap-2">
-          <Label htmlFor="apiKey">API Key</Label>
+          <Label htmlFor="apiKey">API Client Secret</Label>
           <Input
             id="apiKey"
-            value={state.googleCalendarApiKey || ""}
-            onChange={(e) =>
-              handleInput("googleCalendar", "apiKey", e.target.value)
-            }
+            value={state.ClientSecret || ""}
+            onChange={(e) => handleInput("ClientSecret", e.target.value)}
             placeholder="Enter your Google Calendar API Key"
             className="w-full"
           />
@@ -33,4 +34,4 @@ export function GoogleCalendar({ state, handleToggle, handleInput }) {
       </CardContent>
     </Card>
   );
-} 
+}

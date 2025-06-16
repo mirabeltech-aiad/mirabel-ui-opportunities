@@ -47,7 +47,6 @@ function DashboardDemoPage() {
     setTabWindow([tabWindow[0] + 1, tabWindow[1] + 1]);
   };
 
-  console.log("state",state );
 
   return (
     <div className="px-4 py-2 mx-auto">

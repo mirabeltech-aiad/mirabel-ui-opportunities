@@ -185,14 +185,8 @@ export const settingsMeta = {
     },
     {
       key: "IsShowAmountOnInventoryReport",
-      label: "Show Amount on Inventory Report",
+      label: "Show Amounts on Inventory Report",
       description: "Display the amount on the inventory report.",
-    },
-    {
-      key: "RsKey",
-      label: "RightSignature API Key",
-      description: "API Key for RightSignature integration.",
-      input: true,
     },
   ],
   accountReceivable: [

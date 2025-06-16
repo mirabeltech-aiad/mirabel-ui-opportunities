@@ -1,6 +1,7 @@
 // Default initial state for store supply
 export const initialStoreSupplyState = {
-    adManagement: {
+    
+    // adManagement
       IsInstallmentBillingEnabled: false,
       IsMultiplePubsEnabled: true,
       IsDefaultToGrossRateCardEnabled: false,
@@ -49,7 +50,8 @@ export const initialStoreSupplyState = {
       IsSplitRepChangeOrder: false,
       IsChargebriteMediaOrderEnabled: false,
       CaptureCCProfileOnProposalApproval: true,
-    },
+
+      // end adManagement
   
     accountReceivable: {
       barterTradeDisplayName: "", // Add this property
@@ -165,28 +167,16 @@ export const initialStoreSupplyState = {
       mailer: false,
       enableHelpdesk: false,
     },
-    googleCalendar: {
-      enable: false,
-      apiKey: "",
-    },
-    // helpdesk: {
-    //   enable: false,
-    // },
 
-    //helpdesk
-    IsChatEnabled: true,
-    IsTicketEnabled: true,
+    // googleCalendar
+    ClientID:"",
+    ClientSecret:"",
+    // end googleCalendar
 
-
-    // mediaMateAI: {
-    //   sendEmail: true,
-    //   companyNote: false,
-    //   salesLetters: false,
-    //   companyExecutiveInfo:false,
-    //   addNote:false,
-    //   aitextImprover:false,
-    //   mediaKitAI:false,
-    // },
+    // helpdesk
+    IsChatEnabled: false,
+    IsTicketEnabled: false,
+    // end helpdesk
 
     // mediaMateAI
     sendEmail: true,
@@ -196,4 +186,5 @@ export const initialStoreSupplyState = {
     addNote:false,
     aitextImprover:false,
     mediaKitAI:false,
+    // end mediaMateAI
   };
