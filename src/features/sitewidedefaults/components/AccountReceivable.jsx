@@ -9,8 +9,16 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
 import { Button } from "@/components/ui/button";
+import { settingsMeta } from '../helpers/configData';
+import { useFeatureSettings } from '../context/Context';
 
-export function AccountReceivable({ state, handleInput, handleToggle, settingsMeta }) {
+export function AccountReceivable() {
+  const {
+    state,
+    handleToggle,
+    handleInput,
+  } = useFeatureSettings();
+
   return (
     <Card className="mb-6">
       <CardHeader>

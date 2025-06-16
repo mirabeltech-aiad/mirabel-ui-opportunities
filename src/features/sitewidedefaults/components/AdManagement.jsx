@@ -10,6 +10,8 @@ import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useState } from 'react';
+import { settingsMeta } from '../helpers/configData';
+import { useFeatureSettings } from '../context/Context';
 
 const separatorOptions = [
     { value: "", label: "" },
@@ -19,7 +21,13 @@ const separatorOptions = [
     { value: "'-'", label: "-" },
   ];
 
-export function AdManagement({ state, handleInput, handleToggle, settingsMeta }) {
+export function AdManagement() {
+  const {
+    state,
+    handleToggle,
+    handleInput,
+  } = useFeatureSettings();
+  
   return (
     <Card className="mb-6">
       <CardHeader>
