@@ -35,10 +35,6 @@ function FeatureSettings() {
     state,
     handleToggle,
     handleInput,
-    setNewSupplier,
-    handleAddSupplier,
-    handleRemoveSupplier,
-    updateInventory,
     isLoading: apiLoading,
     error: apiError,
   } = useFeatureSettings();

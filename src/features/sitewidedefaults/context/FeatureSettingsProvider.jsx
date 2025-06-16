@@ -50,49 +50,11 @@ export const FeatureSettingsProvider = ({ children }) => {
     });
   };
 
-  // Handle new supplier input
-  const setNewSupplier = (value) => {
-    dispatch({
-      type: Actions.SET_NEW_SUPPLIER,
-      payload: value
-    });
-  };
-
-  // Handle add supplier
-  const handleAddSupplier = () => {
-    if (state.newSupplier && state.newSupplier.trim() !== '') {
-      dispatch({
-        type: Actions.ADD_SUPPLIER,
-        payload: state.newSupplier.trim()
-      });
-    }
-  };
-
-  // Handle remove supplier
-  const handleRemoveSupplier = (supplier) => {
-    dispatch({
-      type: Actions.REMOVE_SUPPLIER,
-      payload: supplier
-    });
-  };
-
-  // Handle inventory update
-  const updateInventory = (inventoryData) => {
-    dispatch({
-      type: Actions.UPDATE_INVENTORY,
-      payload: inventoryData
-    });
-  };
-
   // Value to be provided to consumers
   const value = {
     state,
     handleToggle,
     handleInput,
-    setNewSupplier,
-    handleAddSupplier,
-    handleRemoveSupplier,
-    updateInventory,
     isLoading,
     error
   };
