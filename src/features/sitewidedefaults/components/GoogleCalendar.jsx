@@ -4,7 +4,7 @@ import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 
-export function GoogleCalendar({ state, handleToggle, handleInput }) {
+function GoogleCalendar({ state, handleToggle, handleInput }) {
   return (
     <Card className="mb-6">
       <CardHeader>
@@ -35,3 +35,5 @@ export function GoogleCalendar({ state, handleToggle, handleInput }) {
     </Card>
   );
 }
+
+export default GoogleCalendar;

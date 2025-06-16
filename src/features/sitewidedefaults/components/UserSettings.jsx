@@ -3,7 +3,7 @@ import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 
-export function UserSettings({ state, handleToggle }) {
+function UserSettings({ state, handleToggle }) {
   return (
     <Card className="mb-6">
       <CardHeader>
@@ -63,4 +63,6 @@ export function UserSettings({ state, handleToggle }) {
       </CardContent>
     </Card>
   );
-} 
+}
+
+export default UserSettings;

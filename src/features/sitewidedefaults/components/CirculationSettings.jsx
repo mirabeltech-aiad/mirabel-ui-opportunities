@@ -2,7 +2,13 @@ import React from "react";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 
-export function CirculationSettings({ state, handleInput, circulationTypes, isTypesLoading, typesError }) {
+function CirculationSettings({
+  state,
+  handleInput,
+  circulationTypes,
+  isTypesLoading,
+  typesError,
+}) {
   return (
     <Card className="mb-6">
       <CardHeader>
@@ -49,4 +55,6 @@ export function CirculationSettings({ state, handleInput, circulationTypes, isTy
       </CardContent>
     </Card>
   );
-} 
+}
+
+export default CirculationSettings;

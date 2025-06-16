@@ -12,7 +12,7 @@ import { Button } from "@/components/ui/button";
 import { settingsMeta } from '../helpers/configData';
 import { useFeatureSettings } from '../context/Context';
 
-export function AccountReceivable() {
+function AccountReceivable() {
   const {
     state,
     handleToggle,
@@ -146,4 +146,6 @@ export function AccountReceivable() {
       </CardContent>
     </Card>
   );
-} 
+}
+
+export default AccountReceivable;

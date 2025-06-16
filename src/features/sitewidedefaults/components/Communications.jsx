@@ -3,7 +3,7 @@ import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 
-export function Communications({ state, handleToggle }) {
+function Communications({ state, handleToggle }) {
   return (
     <Card className="mb-6">
       <CardHeader>
@@ -41,4 +41,6 @@ export function Communications({ state, handleToggle }) {
       </CardContent>
     </Card>
   );
-} 
+}
+
+export default Communications;

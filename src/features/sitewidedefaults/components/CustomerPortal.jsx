@@ -3,7 +3,7 @@ import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 
-export function CustomerPortal({ state, handleInput }) {
+function CustomerPortal({ state, handleInput }) {
   return (
     <Card className="mb-6">
       <CardHeader>
@@ -28,4 +28,6 @@ export function CustomerPortal({ state, handleInput }) {
       </CardContent>
     </Card>
   );
-} 
+}
+
+export default CustomerPortal;

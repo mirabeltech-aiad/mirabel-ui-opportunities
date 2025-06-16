@@ -3,7 +3,7 @@ import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 
-export function MediaMateAI({ state, handleToggle }) {
+function MediaMateAI({ state, handleToggle }) {
   return (
     <Card className="mb-6">
       <CardHeader>
@@ -63,3 +63,4 @@ export function MediaMateAI({ state, handleToggle }) {
     </Card>
   );
 } 
+export default MediaMateAI;

@@ -93,7 +93,7 @@ function UsersWithDataPacksTable() {
   );
 }
 
-export function MarketingManagerPackage({ state, handleInput }) {
+function MarketingManagerPackage({ state, handleInput }) {
   return (
     <Card className="mb-6">
       <CardHeader>
@@ -200,4 +200,6 @@ export function MarketingManagerPackage({ state, handleInput }) {
       </CardContent>
     </Card>
   );
-} 
+}
+
+export default MarketingManagerPackage;

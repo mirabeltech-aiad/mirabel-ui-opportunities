@@ -17,7 +17,7 @@ const separatorOptions = [
   { value: "'-'", label: "-" },
 ];
 
-export function AdManagement() {
+function AdManagement() {
   const { state, handleToggle, handleInput } = useFeatureSettings();
 
   return (
@@ -557,3 +557,5 @@ function PickupFromSection({ pickupState = {}, handlePickupInput }) {
     </div>
   );
 }
+
+export default AdManagement;
