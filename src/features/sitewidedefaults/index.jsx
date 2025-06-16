@@ -5,7 +5,6 @@ import { Button } from "@/components/ui/button";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { tabList } from "./helpers/constants.helper";
 import { useFeatureSettings } from "./context/Context";
-import { useCirculationTypes } from "./hooks/useCirculationTypes";
 import {
   AdManagement,
   AccountReceivable,
@@ -38,13 +37,10 @@ function FeatureSettings() {
     isLoading: apiLoading,
     error: apiError,
   } = useFeatureSettings();
+
   const [tabWindow, setTabWindow] = useState([0, 5]);
   const [activeTab, setActiveTab] = useState("adManagement");
-  const {
-    data: circulationTypes,
-    isLoading: isTypesLoading,
-    error: typesError,
-  } = useCirculationTypes();
+
 
   const handlePrevTabs = () => {
     setTabWindow([tabWindow[0] - 1, tabWindow[1] - 1]);
@@ -115,9 +111,6 @@ function FeatureSettings() {
           <CirculationSettings
             state={state}
             handleInput={handleInput}
-            circulationTypes={circulationTypes}
-            isTypesLoading={isTypesLoading}
-            typesError={typesError}
           />
         </TabsContent>
 

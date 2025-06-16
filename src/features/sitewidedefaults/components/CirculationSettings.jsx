@@ -1,14 +1,20 @@
 import React from "react";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
+import { useCirculationTypes } from "../hooks/useCirculationTypes";
 
 function CirculationSettings({
   state,
   handleInput,
-  circulationTypes,
-  isTypesLoading,
-  typesError,
 }) {
+
+  const {
+    data: circulationTypes,
+    isLoading: isTypesLoading,
+    error: typesError,
+  } = useCirculationTypes();
+
+
   return (
     <Card className="mb-6">
       <CardHeader>
