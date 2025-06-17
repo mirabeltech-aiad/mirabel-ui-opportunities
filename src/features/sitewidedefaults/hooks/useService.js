@@ -2,6 +2,7 @@
 
 
 import { getSiteWideList } from "../services/sitewideService";
+import { getCirculationTypes } from "../services/sitewideService";
 import { useQuery } from "@tanstack/react-query";
 
 export const useSiteWideList = () => {
@@ -12,9 +13,11 @@ export const useSiteWideList = () => {
   });
 };
 
-
-
-
-
-
+export const useCirculationTypes = () => {
+  return useQuery({
+    queryKey: ["circulation-types"],
+    queryFn: getCirculationTypes,
+    staleTime: 1000 * 60 * 10,
+  });
+};
 

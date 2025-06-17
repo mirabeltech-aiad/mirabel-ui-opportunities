@@ -16,8 +16,7 @@ The SiteWide Defaults feature is responsible for managing global settings that a
 - **initialState.js**: Defines the default state structure with initial values for all settings.
 
 ### `/hooks/`
-- **useDashboard.js**: Custom hook for accessing dashboard-related data.
-- **useSiteWideList.js**: Custom hook that uses React Query to fetch the list of sitewide settings from the API.
+- **useService.js**: Custom hook that uses React Query to fetch the list of sitewide settings from the API.
 
 ### `/helpers/`
 - **constants.helper.js**: Contains constant values used across the feature, like tab definitions for the settings UI.

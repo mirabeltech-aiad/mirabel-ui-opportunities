@@ -2,7 +2,7 @@ import React, { useReducer, useEffect } from 'react';
 import { FeatureSettingsContext } from './Context';
 import { settingsReducer } from './Reducer';
 import { initialStoreSupplyState } from './initialState';
-import { useSiteWideList } from '../hooks/useSiteWideList';
+import { useSiteWideList } from '../hooks/useService';
 import * as Actions from './Actions';
 
 export const FeatureSettingsProvider = ({ children }) => {
