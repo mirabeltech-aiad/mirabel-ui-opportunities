@@ -243,19 +243,69 @@ export const settingsMeta = {
   ],
 };
 
-// Tab List Configuration
-export const tabList = [
-  { value: "adManagement", label: "Ad Management" },
-  { value: "accountReceivable", label: "Account Receivable" },
-  { value: "production", label: "Production" },
-  { value: "circulationSettings", label: "Circulation Settings" },
-  { value: "contact", label: "Contact Management" },
-  { value: "customerPortal", label: "Customer Portal" },
-  { value: "userSettings", label: "User Settings" },
-  { value: "communications", label: "Communications" },
-  { value: "googleCalendar", label: "Google Calendar" },
-  { value: "marketingManagerPackageSettings", label: "Marketing Manager Package Settings" },
-  { value: "helpdesk", label: "Helpdesk" },
-  { value: "mediaMateAI", label: "Media Mate AI" },
-  { value: "emailSettings", label: "Email Settings" },
+export const separatorOptions = [
+  { value: "", label: "" },
+  { value: "' '", label: " " },
+  { value: "':'", label: ":" },
+  { value: "','", label: "," },
+  { value: "'-'", label: "-" },
+];
+
+export const pickupOptions = [
+  { Key: "", Description: "", Script: "''" },
+  {
+    Key: "ProductName",
+    Description: "Product Name",
+    Script: "ISNULL(gsPublications.PubName,'')",
+  },
+  {
+    Key: "Description",
+    Description: "Description",
+    Script: "ISNULL(gsContracts.Description,'')",
+  },
+  {
+    Key: "IssueName",
+    Description: "Issue Name",
+    Script: "ISNULL(tblMagFrequency.IssueName,'')",
+  },
+  {
+    Key: "IssueYear",
+    Description: "Issue Year",
+    Script: "ISNULL(CONVERT(VARCHAR,tblMagFrequency.IssueYear),'')",
+  },
+  {
+    Key: "IssueDate",
+    Description: "Issue Date",
+    Script: "ISNULL(CONVERT(VARCHAR,tblMagFrequency.IssueDate,101),'')",
+  },
+  {
+    Key: "AdSize",
+    Description: "Ad Size",
+    Script: "ISNULL(gsAdSize.AdSizeName,'')",
+  },
+  {
+    Key: "Frequency",
+    Description: "Frequency",
+    Script: "ISNULL(gsContracts.Frequency,'')",
+  },
+  {
+    Key: "Color",
+    Description: "Color",
+    Script: "ISNULL(gsContracts.Color,'')",
+  },
+  {
+    Key: "Position",
+    Description: "Position",
+    Script: "ISNULL(gsContracts.PosReq1,'')",
+  },
+  {
+    Key: "Section",
+    Description: "Section",
+    Script: "ISNULL(gsPubSections.SectionName,'')",
+  },
+  {
+    Key: "AdName",
+    Description: "Ad Name",
+    Script: "ISNULL(gsContracts.AdName,'')",
+  },
 ]; 

@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { Label } from "@/components/ui/label";
-import { separatorOptions } from '../helpers/separatorOptions.helper';
-import { pickupOptions } from '../helpers/pickupOptions.helper';
+import { separatorOptions, pickupOptions } from '../helpers/configData';
 
 export function PickupFromSection({ pickupState = {}, handlePickupInput }) {
   const pickupKeys = [
