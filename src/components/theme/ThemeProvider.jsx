@@ -13,10 +13,12 @@ export function ThemeProvider({ children }) {
     
     // Then check system preference
     if (window.matchMedia("(prefers-color-scheme: dark)").matches) {
-      return "dark";
+      return "light";
     }
     return "light";
   });
+
+  // const [theme, setTheme] = useState("light");
 
   useEffect(() => {
     const root = window.document.documentElement;
