@@ -1,7 +1,6 @@
-
-import React from 'react';
-import PropTypes from 'prop-types';
-import { Button } from '@/components/ui/button';
+import React from "react";
+import PropTypes from "prop-types";
+import { Button } from "@/components/ui/button";
 
 /**
  * Tab navigation component for filtering reports by category
@@ -13,25 +12,27 @@ import { Button } from '@/components/ui/button';
  */
 const TabNavigation = ({ categories, activeTab, setActiveTab, tabCounts }) => {
   return (
-    <div className="border-b border-gray-200 mb-8">
-      <nav className="flex space-x-8 overflow-x-auto pb-4">
+    <div className="mb-6">
+      <nav className="flex overflow-x-auto gap-2 pb-1">
         {categories.map((category) => (
           <Button
             key={category}
             variant={activeTab === category ? "default" : "ghost"}
             onClick={() => setActiveTab(category)}
-            className={`whitespace-nowrap flex items-center space-x-2 px-4 py-2 text-sm font-medium transition-colors ${
+            className={`flex items-center gap-2 px-4 py-2 text-sm font-medium transition-colors whitespace-nowrap border border-gray-300 ${
               activeTab === category
-                ? 'bg-blue-600 text-white hover:bg-blue-700'
-                : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
+                ? "bg-blue-600 text-white hover:bg-blue-700"
+                : "bg-transparent text-gray-600 hover:text-gray-900 hover:bg-gray-100"
             }`}
           >
             <span>{category}</span>
-            <span className={`inline-flex items-center justify-center px-2 py-1 text-xs rounded-full ${
-              activeTab === category
-                ? 'bg-blue-500 text-white'
-                : 'bg-gray-200 text-gray-600'
-            }`}>
+            <span
+              className={`inline-flex items-center justify-center px-2 py-0.5 rounded-full text-xs font-medium ${
+                activeTab === category
+                  ? "bg-blue-500/50 text-white"
+                  : "bg-gray-100 text-gray-600"
+              }`}
+            >
               {tabCounts[category] || 0}
             </span>
           </Button>
@@ -45,7 +46,7 @@ TabNavigation.propTypes = {
   categories: PropTypes.arrayOf(PropTypes.string).isRequired,
   activeTab: PropTypes.string.isRequired,
   setActiveTab: PropTypes.func.isRequired,
-  tabCounts: PropTypes.object.isRequired
+  tabCounts: PropTypes.object.isRequired,
 };
 
 export default TabNavigation;

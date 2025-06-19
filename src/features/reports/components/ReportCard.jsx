@@ -13,7 +13,7 @@ import { ArrowDown } from "lucide-react";
 const ReportCard = ({ report, onToggleStar, isUpdatingStar = false }) => {
   return (
     <Card className="h-full border border-gray-200 transition-all duration-200 cursor-pointer hover:shadow-lg group hover:border-gray-300">
-      <CardContent className="p-6">
+      <CardContent className="p-3 sm:p-4">
         {/* Header with Icon and Star */}
         <div className="flex justify-between items-center mb-4">
           <div className="flex items-center">
