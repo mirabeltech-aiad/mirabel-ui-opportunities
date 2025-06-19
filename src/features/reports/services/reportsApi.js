@@ -1,84 +1,31 @@
 
-/**
- * API service for reports functionality
- */
-import { API_CONFIG, ENDPOINTS } from '@/config/api.js';
+import axiosInstance from "@/services/axiosInstance";
+import { API_REPORTS_DASHBOARD } from "@/config/apiUrls";
 
-/**
- * Fetch all reports from the API
- * @returns {Promise<Array>} Array of report objects
- */
-export const fetchReports = async () => {
+export const getReportsDashboard = async () => {
   try {
-    const response = await fetch(`${API_CONFIG.baseURL}${ENDPOINTS.reports}`, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    });
-
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
+    const response = await axiosInstance.get(API_REPORTS_DASHBOARD);
+    console.log("response", response.data.content.Data);
+    if(response.data.content.Status === "Success"){
+      return response.data.content.Data;
+    }else{
+      throw new Error(response.data.content.Message);
     }
-
-    const data = await response.json();
-    return data;
   } catch (error) {
-    console.error('Error fetching reports:', error);
+    // Centralized error handler (optional)
+    // handleApiError(error);
+    throw error; // important: re-throw so React Query handles it
+  }
+};
+
+// add post call too with same path and send edited object.
+export const postReportsDashboard = async (data) => {
+  try {
+    const response = await axiosInstance.post(API_REPORTS_DASHBOARD, data);
+    console.log("response", response);
+    return response;
+  } catch (error) {
     throw error;
   }
 };
 
-/**
- * Search reports by query
- * @param {string} query - Search query
- * @returns {Promise<Array>} Array of matching report objects
- */
-export const searchReports = async (query) => {
-  try {
-    const response = await fetch(`${API_CONFIG.baseURL}${ENDPOINTS.search}?q=${encodeURIComponent(query)}`, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    });
-
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
-
-    const data = await response.json();
-    return data;
-  } catch (error) {
-    console.error('Error searching reports:', error);
-    throw error;
-  }
-};
-
-/**
- * Toggle favorite status of a report
- * @param {number} reportId - ID of the report
- * @param {boolean} isStarred - New starred status
- * @returns {Promise<Object>} Updated report object
- */
-export const toggleReportFavorite = async (reportId, isStarred) => {
-  try {
-    const response = await fetch(`${API_CONFIG.baseURL}${ENDPOINTS.favorites}/${reportId}`, {
-      method: 'PATCH',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ isStarred }),
-    });
-
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
-
-    const data = await response.json();
-    return data;
-  } catch (error) {
-    console.error('Error toggling report favorite:', error);
-    throw error;
-  }
-};

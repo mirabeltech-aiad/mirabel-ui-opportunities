@@ -1,4 +1,3 @@
-
 # Reports Feature Documentation
 
 ## Purpose and Overview
@@ -8,7 +7,7 @@ The Reports feature provides a comprehensive interface for browsing, searching, 
 - Displaying reports in a card-based grid layout
 - Filtering reports by categories (All, Favorites, Revenue Reports, etc.)
 - Searching reports by title, description, or tags
-- Starring/favoriting reports for quick access
+- Starring/favoriting reports for quick access with real-time API updates
 - Responsive design that works across different screen sizes
 
 ## Folder Structure
@@ -22,13 +21,13 @@ src/features/reports/
 │   ├── TabNavigation.jsx      # Category filter tabs
 │   └── index.js              # Component exports
 ├── context/             # State management
-│   ├── ReportsContext.jsx     # Context provider and hook
+│   ├── ReportsContext.jsx     # Context provider and hook (uses React Query hooks)
 │   ├── actions.js            # Action creators and types
 │   ├── reducer.js            # State reducer function
 │   ├── initialState.js       # Initial state definition
 │   └── index.js              # Context exports
 ├── hooks/               # Custom hooks
-│   ├── useReports.js         # Main reports data management hook
+│   ├── useService.js         # React Query hooks for API calls
 │   └── index.js              # Hook exports
 ├── helpers/             # Utility functions
 │   ├── constants.js          # Feature-specific constants
@@ -54,13 +53,14 @@ import ReportsFeature from '@/features/reports';
 ```
 
 #### ReportCard
-Individual report display component:
+Individual report display component with star toggle functionality:
 ```jsx
 import { ReportCard } from '@/features/reports/components';
 
 <ReportCard 
   report={reportObject} 
-  onToggleStar={handleToggleStar} 
+  onToggleStar={handleToggleStar}
+  isUpdatingStar={isUpdatingStar}
 />
 ```
 
@@ -90,10 +90,30 @@ import { TabNavigation } from '@/features/reports/components';
 
 ### Custom Hooks
 
-#### useReports
+#### useReportsDashboard
+React Query hook for fetching reports data:
+```jsx
+import { useReportsDashboard } from '@/features/reports/hooks';
+
+const { data, isLoading, error } = useReportsDashboard();
+```
+
+#### useUpdateReportStar
+React Query mutation hook for updating report star status:
+```jsx
+import { useUpdateReportStar, prepareStarTogglePayload } from '@/features/reports/hooks';
+
+const { mutate: updateStarStatus, isPending: isUpdatingStar } = useUpdateReportStar();
+
+// Usage
+const payload = prepareStarTogglePayload(report, true);
+updateStarStatus(payload);
+```
+
+#### useReportsContext
 Main hook for reports state management:
 ```jsx
-import { useReports } from '@/features/reports/hooks';
+import { useReportsContext } from '@/features/reports/context/ReportsContext';
 
 const {
   reports,
@@ -101,51 +121,72 @@ const {
   activeTab,
   searchQuery,
   tabCounts,
+  loading,
+  error,
+  isUpdatingStar,
   setActiveTab,
   setSearchQuery,
   toggleStar,
   setReports
-} = useReports();
+} = useReportsContext();
 ```
 
 ### API Services
 
-The reports feature includes API service functions for future backend integration:
+The reports feature includes API service functions for backend integration:
 
 ```jsx
-import { fetchReports, searchReports, toggleReportFavorite } from '@/features/reports/services/reportsApi';
+import { getReportsDashboard, postReportsDashboard } from '@/features/reports/services/reportsApi';
 
-// Fetch all reports
-const reports = await fetchReports();
+// Fetch all reports (handled by useReportsDashboard hook)
+const reports = await getReportsDashboard();
 
-// Search reports
-const results = await searchReports('renewal');
-
-// Toggle favorite status
-const updatedReport = await toggleReportFavorite(reportId, true);
+// Update report star status (handled by useUpdateReportStar hook)
+const payload = {
+  Id: "6853cef435ccddee84d6e20c",
+  Icon: "📊",
+  Title: "Churn by Cohort",
+  Description: "Analyze customer retention and churn patterns...",
+  Tags: ["cohort", "churn"],
+  Category: ["All", "Performance Reports"],
+  RoutePath: "/reports/churn-cohort",
+  IsStarred: true,
+  IsAdmin: true,
+  UserId: 1,
+  ModifiedTitle: "Test Churn by Cohort",
+  CreatedDate: "2025-06-19T08:12:15.104+0000",
+  ModifiedDate: null,
+  IsMaster: false,
+  SortOrder: 12
+};
+await postReportsDashboard(payload);
 ```
 
 ## State Logic and Explanation
 
 ### Context Architecture
 
-The reports feature uses React Context API for state management:
+The reports feature uses React Context API for state management with React Query for data fetching:
 
-1. **ReportsContext**: Provides state and dispatch function
-2. **reportsReducer**: Handles state updates based on actions
-3. **Actions**: Define state update operations
-4. **Initial State**: Defines the default state structure
+1. **ReportsContext**: Provides state, computed values, and action handlers
+2. **useReportsDashboard**: React Query hook for API data fetching
+3. **useUpdateReportStar**: React Query mutation hook for star status updates
+4. **reportsReducer**: Handles state updates based on actions
+5. **Actions**: Define state update operations
+6. **Initial State**: Defines the default state structure
 
 ### State Structure
 
 ```javascript
 {
   reports: [],           // All reports data
-  filteredReports: [],   // Currently filtered/displayed reports
+  filteredReports: [],   // Currently filtered/displayed reports (computed)
   activeTab: 'All',      // Active category filter
   searchQuery: '',       // Current search query
   loading: false,        // Loading state for async operations
-  error: null           // Error state
+  error: null,          // Error state
+  tabCounts: {},        // Computed counts for each category
+  isUpdatingStar: false // Loading state for star updates
 }
 ```
 
@@ -158,6 +199,16 @@ The reports feature uses React Context API for state management:
 - `TOGGLE_STAR`: Toggle favorite status of a report
 - `SET_LOADING`: Set loading state
 - `SET_ERROR`: Set error state
+
+### Star Toggle Functionality
+
+The star toggle feature includes:
+
+1. **Optimistic Updates**: UI updates immediately for better UX
+2. **API Integration**: Makes POST request to update star status
+3. **Error Handling**: Reverts optimistic update if API call fails
+4. **Loading States**: Shows spinner during API calls
+5. **Cache Invalidation**: Refreshes data after successful updates
 
 ### Filtering Logic
 
@@ -173,6 +224,16 @@ Reports are filtered in real-time based on:
    - Case-insensitive matching
    - Applied after category filtering
 
+### Data Flow
+
+1. **API Layer**: 
+   - `useReportsDashboard` hook fetches data using React Query
+   - `useUpdateReportStar` hook handles star status updates
+2. **Context Layer**: `ReportsContext` consumes the hooks and manages state
+3. **State Updates**: All state changes go through the reducer
+4. **Computed Values**: `filteredReports` and `tabCounts` are computed using `useMemo`
+5. **Component Usage**: Components consume state and actions directly from context
+
 ## Dependencies
 
 ### Internal Dependencies
@@ -184,14 +245,17 @@ Reports are filtered in real-time based on:
 - `react`: Core React functionality
 - `prop-types`: Runtime prop validation
 - `lucide-react`: Icon components
+- `@tanstack/react-query`: Data fetching and caching
 
 ### Features Used
 - React Context API for state management
+- React Query for data fetching and caching
 - React hooks (useState, useEffect, useMemo, useReducer)
 - PropTypes for component prop validation
 - CSS classes with Tailwind CSS
 - Responsive grid layout
 - Search and filtering functionality
+- Optimistic updates for better UX
 
 ## Usage Example
 
@@ -199,26 +263,20 @@ Reports are filtered in real-time based on:
 // Basic usage - just import and use
 import ReportsFeature from '@/features/reports';
 
-function App() {
-  return (
-    <div className="min-h-screen bg-gray-50">
-      <ReportsFeature />
-    </div>
-  );
-}
+// Or use the context directly in custom components
+import { useReportsContext } from '@/features/reports/context/ReportsContext';
 
-// Advanced usage - with custom wrapper
-import { ReportsProvider } from '@/features/reports/context';
-import { ReportsDirectory } from '@/features/reports/components';
+const MyComponent = () => {
+  const { reports, setActiveTab, toggleStar, isUpdatingStar } = useReportsContext();
+  // ... component logic
+};
 
-function CustomReportsPage() {
-  return (
-    <ReportsProvider>
-      <div className="custom-wrapper">
-        <h1>Custom Reports Page</h1>
-        <ReportsDirectory />
-      </div>
-    </ReportsProvider>
-  );
-}
+// Or use the API hooks directly if needed
+import { useReportsDashboard, useUpdateReportStar } from '@/features/reports/hooks';
+
+const MyApiComponent = () => {
+  const { data, isLoading, error } = useReportsDashboard();
+  const { mutate: updateStar } = useUpdateReportStar();
+  // ... component logic
+};
 ```

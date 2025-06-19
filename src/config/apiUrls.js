@@ -2,3 +2,7 @@
 
 export const API_GET_SITEWIDE_DEFAULTS = '/services/Admin/SiteSettings/All';
 export const API_CIRCULATION_TYPES = '/services/Admin/Circulations/Types';
+
+// Reports Dashboard.
+export const API_REPORTS_DASHBOARD = '/services/Report/Categories';
+

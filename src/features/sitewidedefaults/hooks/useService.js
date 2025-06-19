@@ -20,4 +20,3 @@ export const useCirculationTypes = () => {
     staleTime: 1000 * 60 * 10,
   });
 };
-

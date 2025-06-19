@@ -1,7 +1,6 @@
-
-import React, { useEffect } from 'react';
+import React from 'react';
 import { reportsData } from '../helpers/reportsData.js';
-import { useReports } from '../hooks/useReports.js';
+import { useReportsContext } from '../context/ReportsContext.jsx';
 import { formatReportCount } from '../helpers/formatters.js';
 import SearchBar from './SearchBar.jsx';
 import TabNavigation from './TabNavigation.jsx';
@@ -20,21 +19,18 @@ const ReportsDirectory = () => {
     setActiveTab,
     setSearchQuery,
     toggleStar,
-    setReports
-  } = useReports();
-
-  // Initialize reports data on component mount
-  useEffect(() => {
-    setReports(reportsData.reports);
-  }, [setReports]);
+    loading,
+    error,
+    isUpdatingStar
+  } = useReportsContext();
 
   return (
-    <div className="max-w-7xl mx-auto px-4 py-8">
+    <div className="px-4 py-8 mx-auto max-w-11/12">
       {/* Header */}
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900 mb-2">Reports Directory</h1>
-        <p className="text-gray-600 mb-6">Select a report to view detailed analytics and insights</p>
-        <div className="text-sm text-gray-500 mb-6">
+        <h1 className="mb-2 text-3xl font-bold text-gray-900">Reports Directory</h1>
+        <p className="mb-6 text-gray-600">Select a report to view detailed analytics and insights</p>
+        <div className="mb-6 text-sm text-gray-500">
           {formatReportCount(filteredReports.length, reports.length)}
         </div>
         
@@ -42,32 +38,56 @@ const ReportsDirectory = () => {
         <SearchBar searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
       </div>
 
-      {/* Tab Navigation */}
-      <TabNavigation 
-        categories={reportsData.categories}
-        activeTab={activeTab}
-        setActiveTab={setActiveTab}
-        tabCounts={tabCounts}
-      />
-
-      {/* Reports Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-        {filteredReports.map((report) => (
-          <ReportCard 
-            key={report.id} 
-            report={report} 
-            onToggleStar={toggleStar}
-          />
-        ))}
-      </div>
-
-      {/* Empty State */}
-      {filteredReports.length === 0 && (
-        <div className="text-center py-12">
-          <div className="text-6xl mb-4">📊</div>
-          <h3 className="text-lg font-medium text-gray-900 mb-2">No reports found</h3>
-          <p className="text-gray-500">Try adjusting your search or filter criteria.</p>
+      {/* Loading State */}
+      {loading && (
+        <div className="py-12 text-center">
+          <div className="mb-4 text-6xl">⏳</div>
+          <h3 className="mb-2 text-lg font-medium text-gray-900">Loading reports...</h3>
+          <p className="text-gray-500">Please wait while we fetch your reports.</p>
         </div>
+      )}
+
+      {/* Error State */}
+      {error && (
+        <div className="py-12 text-center">
+          <div className="mb-4 text-6xl">❌</div>
+          <h3 className="mb-2 text-lg font-medium text-gray-900">Error loading reports</h3>
+          <p className="text-gray-500">{error}</p>
+        </div>
+      )}
+
+      {/* Content */}
+      {!loading && !error && (
+        <>
+          {/* Tab Navigation */}
+          <TabNavigation 
+            categories={reportsData.categories}
+            activeTab={activeTab}
+            setActiveTab={setActiveTab}
+            tabCounts={tabCounts}
+          />
+
+          {/* Reports Grid */}
+          <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+            {filteredReports.map((report) => (
+              <ReportCard 
+                key={report.id} 
+                report={report} 
+                onToggleStar={toggleStar}
+                isUpdatingStar={isUpdatingStar}
+              />
+            ))}
+          </div>
+
+          {/* Empty State */}
+          {filteredReports.length === 0 && (
+            <div className="py-12 text-center">
+              <div className="mb-4 text-6xl">📊</div>
+              <h3 className="mb-2 text-lg font-medium text-gray-900">No reports found</h3>
+              <p className="text-gray-500">Try adjusting your search or filter criteria.</p>
+            </div>
+          )}
+        </>
       )}
     </div>
   );
