@@ -1,6 +1,7 @@
 import React from "react";
 import PropTypes from "prop-types";
 import { Button } from "@/components/ui/button";
+import { Star } from "lucide-react";
 
 /**
  * Tab navigation component for filtering reports by category
@@ -25,6 +26,7 @@ const TabNavigation = ({ categories, activeTab, setActiveTab, tabCounts }) => {
                 : "bg-transparent text-gray-600 hover:text-gray-900 hover:bg-gray-100"
             }`}
           >
+            {category === 'Favorites' && <Star className="mr-1 w-4 h-4 fill-current" />}
             <span>{category}</span>
             <span
               className={`inline-flex items-center justify-center px-2 py-0.5 rounded-full text-xs font-medium ${

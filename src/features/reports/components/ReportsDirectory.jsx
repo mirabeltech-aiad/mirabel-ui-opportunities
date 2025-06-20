@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useReportsContext } from '../context';
 import { ReportCard, SearchBar, TabNavigation } from './';
 import { formatReportCount } from '../helpers/formatters.js';
-import { DndContext, closestCenter, DragOverlay } from '@dnd-kit/core';
+import { DndContext, closestCenter, DragOverlay, PointerSensor, useSensor, useSensors } from '@dnd-kit/core';
 import { SortableContext, rectSortingStrategy } from '@dnd-kit/sortable';
 import SortableReportCard from './SortableReportCard';
 
@@ -27,6 +27,15 @@ const ReportsDirectory = () => {
   } = useReportsContext();
 
   const [activeReport, setActiveReport] = useState(null);
+  
+  const sensors = useSensors(
+    useSensor(PointerSensor, {
+      // Require the mouse to move by 10 pixels before activating a drag
+      activationConstraint: {
+        distance: 10,
+      },
+    })
+  );
 
   const handleDragStart = (event) => {
     const { active } = event;
@@ -91,6 +100,7 @@ const ReportsDirectory = () => {
 
           {/* Reports Grid */}
           <DndContext
+            sensors={sensors}
             collisionDetection={closestCenter}
             onDragStart={handleDragStart}
             onDragEnd={handleDragEnd}
@@ -126,8 +136,7 @@ const ReportsDirectory = () => {
           {filteredReports.length === 0 && (
             <div className="py-12 text-center">
               <div className="mb-4 text-6xl">📊</div>
-              <h3 className="mb-2 text-lg font-medium text-gray-900">No reports found</h3>
-              <p className="text-gray-500">Try adjusting your search or filter criteria.</p>
+              <h3 className="mb-2 text-lg font-medium text-gray-900">No reports found in {activeTab}</h3>
             </div>
           )}
         </>

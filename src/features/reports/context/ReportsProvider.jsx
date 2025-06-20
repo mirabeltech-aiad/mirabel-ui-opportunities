@@ -43,6 +43,19 @@ export const ReportsProvider = ({ children }) => {
     }
   }, [data, isLoading, error]);
 
+  const hasFavorites = useMemo(() => state.reports.some(report => report.isStarred), [state.reports]);
+
+  const displayCategories = useMemo(() => {
+    const favoritesCategory = 'Favorites';
+    const remainingCategories = state.categories.filter(c => c !== favoritesCategory);
+    
+    if (hasFavorites) {
+      return [favoritesCategory, ...remainingCategories];
+    }
+    
+    return remainingCategories;
+  }, [state.categories, hasFavorites]);
+
   const filteredReports = useMemo(() => {
     const reports = Array.isArray(state.reports) ? state.reports : [];
     if (state.activeTab !== 'All') {
@@ -82,8 +95,6 @@ export const ReportsProvider = ({ children }) => {
   };
 
   const handleToggleStar = (report) => {
-    // const report = state.reports.find(r => r.id === report.id);
-    console.log("report",report)
     if (report) {
         const payload = prepareStarTogglePayload(report, !report.isStarred);
         updateStarStatus(payload);
@@ -103,6 +114,7 @@ export const ReportsProvider = ({ children }) => {
 
   const value = {
     ...state,
+    categories: displayCategories,
     filteredReports,
     tabCounts,
     isLoading: isLoading || isUpdatingStar,
