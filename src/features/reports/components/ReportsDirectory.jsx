@@ -1,7 +1,10 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useReportsContext } from '../context';
 import { ReportCard, SearchBar, TabNavigation } from './';
 import { formatReportCount } from '../helpers/formatters.js';
+import { DndContext, closestCenter, DragOverlay } from '@dnd-kit/core';
+import { SortableContext, rectSortingStrategy } from '@dnd-kit/sortable';
+import SortableReportCard from './SortableReportCard';
 
 /**
  * Main reports directory component that displays all reports with filtering
@@ -19,8 +22,29 @@ const ReportsDirectory = () => {
     loading,
     error,
     isUpdatingStar,
-    categories
+    categories,
+    reorderReports
   } = useReportsContext();
+
+  const [activeReport, setActiveReport] = useState(null);
+
+  const handleDragStart = (event) => {
+    const { active } = event;
+    const report = filteredReports.find(r => r.id === active.id);
+    setActiveReport(report);
+  };
+
+  const handleDragEnd = (event) => {
+    const { active, over } = event;
+    if (over && active.id !== over.id) {
+      reorderReports(active.id, over.id);
+    }
+    setActiveReport(null);
+  };
+  
+  const handleDragCancel = () => {
+    setActiveReport(null);
+  };
 
   return (
     <div className="px-4 py-8 mx-auto max-w-11/12">
@@ -66,16 +90,37 @@ const ReportsDirectory = () => {
           />
 
           {/* Reports Grid */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-            {filteredReports.map((report) => (
-              <ReportCard 
-                key={report.id} 
-                report={report} 
-                onToggleStar={toggleStar}
-                isUpdatingStar={isUpdatingStar}
-              />
-            ))}
-          </div>
+          <DndContext
+            collisionDetection={closestCenter}
+            onDragStart={handleDragStart}
+            onDragEnd={handleDragEnd}
+            onDragCancel={handleDragCancel}
+          >
+            <SortableContext 
+              items={filteredReports.map(r => r.id)}
+              strategy={rectSortingStrategy}
+            >
+              <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+                {filteredReports.map((report) => (
+                  <SortableReportCard
+                    key={report.id}
+                    report={report}
+                    onToggleStar={() => toggleStar(report)}
+                    isUpdatingStar={isUpdatingStar}
+                  />
+                ))}
+              </div>
+            </SortableContext>
+            <DragOverlay>
+              {activeReport ? (
+                <ReportCard 
+                  report={activeReport} 
+                  isDragging
+                  onToggleStar={() => {}}
+                />
+              ) : null}
+            </DragOverlay>
+          </DndContext>
 
           {/* Empty State */}
           {filteredReports.length === 0 && (

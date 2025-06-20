@@ -9,10 +9,11 @@ import { ArrowDown } from "lucide-react";
  * @param {Object} props.report - Report object
  * @param {Function} props.onToggleStar - Function to toggle star status
  * @param {boolean} props.isUpdatingStar - Whether star is being updated
+ * @param {boolean} props.isDragging - Whether the card is being dragged
  */
-const ReportCard = ({ report, onToggleStar, isUpdatingStar = false }) => {
+const ReportCard = ({ report, onToggleStar, isUpdatingStar = false, isDragging = false }) => {
   return (
-    <Card className="h-full border border-gray-200 transition-all duration-200 cursor-pointer hover:shadow-lg group hover:border-gray-300">
+    <Card className={`h-full border border-gray-200 transition-all duration-200 group hover:shadow-lg hover:border-gray-300 ${isDragging ? 'ring-2 ring-blue-500 shadow-xl' : 'cursor-pointer'}`}>
       <CardContent className="p-3 sm:p-4">
         {/* Header with Icon and Star */}
         <div className="flex justify-between items-center mb-4">
@@ -82,6 +83,7 @@ ReportCard.propTypes = {
   }).isRequired,
   onToggleStar: PropTypes.func.isRequired,
   isUpdatingStar: PropTypes.bool,
+  isDragging: PropTypes.bool,
 };
 
 export default ReportCard;

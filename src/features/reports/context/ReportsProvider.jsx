@@ -94,6 +94,13 @@ export const ReportsProvider = ({ children }) => {
     dispatch({ type: Actions.ACTIONS.SET_REPORTS, payload: reports });
   };
 
+  const handleReorderReports = (activeId, overId) => {
+    dispatch({
+      type: Actions.ACTIONS.REORDER_REPORTS,
+      payload: { activeId, overId }
+    });
+  };
+
   const value = {
     ...state,
     filteredReports,
@@ -104,6 +111,7 @@ export const ReportsProvider = ({ children }) => {
     setSearchQuery: handleSetSearchQuery,
     toggleStar: handleToggleStar,
     setReports: handleSetReports,
+    reorderReports: handleReorderReports,
   };
 
   return (
