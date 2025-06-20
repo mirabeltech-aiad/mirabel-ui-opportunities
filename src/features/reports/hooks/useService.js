@@ -23,14 +23,35 @@ export const useUpdateReportStar = () => {
 
   return useMutation({
     mutationFn: postReportsDashboard,
-    onSuccess: (response) => {
-      console.log('Report star status updated successfully:', response);
-      
-      // Invalidate and refetch reports data to get the latest state
-      queryClient.invalidateQueries({ queryKey: ["reports-dashboard"] });
+    onMutate: async (updatedReport) => {
+      // Cancel any outgoing refetches (so they don't overwrite our optimistic update)
+      await queryClient.cancelQueries({ queryKey: ["reports-dashboard"] });
+
+      // Snapshot the previous value
+      const previousReports = queryClient.getQueryData(["reports-dashboard"]);
+
+      // Optimistically update to the new value
+      queryClient.setQueryData(["reports-dashboard"], old => {
+        const oldData = old || { Reports: [], Categories: [] };
+        return {
+          ...oldData,
+          Reports: oldData.Reports.map(report =>
+            report.Id === updatedReport.Id ? { ...report, IsStarred: updatedReport.IsStarred } : report
+          ),
+        };
+      });
+
+      // Return a context object with the snapshotted value
+      return { previousReports };
     },
-    onError: (error) => {
-      console.error('Error updating report star status:', error);
+    onError: (err, newReport, context) => {
+      // Rollback to the previous value if mutation fails
+      queryClient.setQueryData(["reports-dashboard"], context.previousReports);
+      console.error('Error updating report star status:', err);
+    },
+    onSettled: () => {
+      // Always refetch after error or success
+      queryClient.invalidateQueries({ queryKey: ["reports-dashboard"] });
     },
   });
 };
@@ -52,11 +73,11 @@ export const prepareStarTogglePayload = (report, isStarred) => {
     RoutePath: report.routePath,
     IsStarred: isStarred,
     IsAdmin: report.isAdmin,
-    UserId: report.usedID,
+    UserId: 1,
     ModifiedTitle: report.modifiedTitle,
     CreatedDate: report.createdDate || new Date().toISOString(),
     ModifiedDate: report.modifiedDate || null,
-    IsMaster: report.isMaster || false,
+    IsMaster: false,
     SortOrder: report.sortOrder || 0
   };
 }; 

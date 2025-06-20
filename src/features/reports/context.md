@@ -21,7 +21,8 @@ src/features/reports/
 │   ├── TabNavigation.jsx      # Category filter tabs
 │   └── index.js              # Component exports
 ├── context/             # State management
-│   ├── ReportsContext.jsx     # Context provider and hook (uses React Query hooks)
+│   ├── Context.js            # Defines the React context and useReportsContext hook
+│   ├── ReportsProvider.jsx   # Context provider with React Query integration
 │   ├── actions.js            # Action creators and types
 │   ├── reducer.js            # State reducer function
 │   ├── initialState.js       # Initial state definition
@@ -113,7 +114,7 @@ updateStarStatus(payload);
 #### useReportsContext
 Main hook for reports state management:
 ```jsx
-import { useReportsContext } from '@/features/reports/context/ReportsContext';
+import { useReportsContext } from '@/features/reports/context';
 
 const {
   reports,
@@ -168,12 +169,13 @@ await postReportsDashboard(payload);
 
 The reports feature uses React Context API for state management with React Query for data fetching:
 
-1. **ReportsContext**: Provides state, computed values, and action handlers
-2. **useReportsDashboard**: React Query hook for API data fetching
-3. **useUpdateReportStar**: React Query mutation hook for star status updates
-4. **reportsReducer**: Handles state updates based on actions
-5. **Actions**: Define state update operations
-6. **Initial State**: Defines the default state structure
+1. **ReportsProvider**: The context provider that wraps the feature and manages state, API hooks, and actions.
+2. **Context.js**: Defines the `ReportsContext` object and the `useReportsContext` hook.
+3. **useReportsDashboard**: React Query hook for API data fetching.
+4. **useUpdateReportStar**: React Query mutation hook for star status updates.
+5. **reportsReducer**: Handles state updates based on actions.
+6. **Actions**: Define state update operations.
+7. **Initial State**: Defines the default state structure.
 
 ### State Structure
 
@@ -229,10 +231,10 @@ Reports are filtered in real-time based on:
 1. **API Layer**: 
    - `useReportsDashboard` hook fetches data using React Query
    - `useUpdateReportStar` hook handles star status updates
-2. **Context Layer**: `ReportsContext` consumes the hooks and manages state
-3. **State Updates**: All state changes go through the reducer
-4. **Computed Values**: `filteredReports` and `tabCounts` are computed using `useMemo`
-5. **Component Usage**: Components consume state and actions directly from context
+2. **Context Layer**: `ReportsProvider` consumes the hooks and manages state via the reducer.
+3. **State Updates**: All state changes go through the reducer.
+4. **Computed Values**: `filteredReports` and `tabCounts` are computed using `useMemo`.
+5. **Component Usage**: Components get state and actions from `useReportsContext`.
 
 ## Dependencies
 
@@ -264,7 +266,7 @@ Reports are filtered in real-time based on:
 import ReportsFeature from '@/features/reports';
 
 // Or use the context directly in custom components
-import { useReportsContext } from '@/features/reports/context/ReportsContext';
+import { useReportsContext } from '@/features/reports/context';
 
 const MyComponent = () => {
   const { reports, setActiveTab, toggleStar, isUpdatingStar } = useReportsContext();

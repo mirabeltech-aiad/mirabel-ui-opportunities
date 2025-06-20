@@ -24,7 +24,7 @@ const ReportCard = ({ report, onToggleStar, isUpdatingStar = false }) => {
           </div>
           <div className="flex gap-2 justify-end items-center">
             <button
-              onClick={() => onToggleStar(report.id)}
+              onClick={() => onToggleStar(report)}
               disabled={isUpdatingStar}
               className={`text-3xl cursor-pointer transition-colors ${
                 report.isStarred

@@ -1,4 +1,3 @@
-
 /**
  * Reducer for reports context
  */
@@ -51,6 +50,12 @@ export const reportsReducer = (state, action) => {
         ...state,
         error: action.payload,
         loading: false
+      };
+
+    case ACTIONS.SET_CATEGORIES:
+      return {
+        ...state,
+        categories: action.payload
       };
 
     default:

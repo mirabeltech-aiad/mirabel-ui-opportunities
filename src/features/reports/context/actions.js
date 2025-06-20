@@ -1,4 +1,3 @@
-
 /**
  * Action types for reports context
  */
@@ -9,7 +8,8 @@ export const ACTIONS = {
   SET_SEARCH_QUERY: 'SET_SEARCH_QUERY',
   TOGGLE_STAR: 'TOGGLE_STAR',
   SET_LOADING: 'SET_LOADING',
-  SET_ERROR: 'SET_ERROR'
+  SET_ERROR: 'SET_ERROR',
+  SET_CATEGORIES: 'SET_CATEGORIES'
 };
 
 /**

@@ -1,10 +1,7 @@
 import React from 'react';
-import { reportsData } from '../helpers/reportsData.js';
-import { useReportsContext } from '../context/ReportsContext.jsx';
+import { useReportsContext } from '../context';
+import { ReportCard, SearchBar, TabNavigation } from './';
 import { formatReportCount } from '../helpers/formatters.js';
-import SearchBar from './SearchBar.jsx';
-import TabNavigation from './TabNavigation.jsx';
-import ReportCard from './ReportCard.jsx';
 
 /**
  * Main reports directory component that displays all reports with filtering
@@ -21,7 +18,8 @@ const ReportsDirectory = () => {
     toggleStar,
     loading,
     error,
-    isUpdatingStar
+    isUpdatingStar,
+    categories
   } = useReportsContext();
 
   return (
@@ -61,14 +59,14 @@ const ReportsDirectory = () => {
         <>
           {/* Tab Navigation */}
           <TabNavigation 
-            categories={reportsData.categories}
+            categories={categories}
             activeTab={activeTab}
             setActiveTab={setActiveTab}
             tabCounts={tabCounts}
           />
 
           {/* Reports Grid */}
-          <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
             {filteredReports.map((report) => (
               <ReportCard 
                 key={report.id} 
