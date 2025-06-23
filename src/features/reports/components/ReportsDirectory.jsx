@@ -1,10 +1,17 @@
-import React, { useState } from 'react';
-import { useReportsContext } from '../context';
-import { ReportCard, SearchBar, TabNavigation } from './';
-import { formatReportCount } from '../helpers/formatters.js';
-import { DndContext, closestCenter, DragOverlay, PointerSensor, useSensor, useSensors } from '@dnd-kit/core';
-import { SortableContext, rectSortingStrategy } from '@dnd-kit/sortable';
-import SortableReportCard from './SortableReportCard';
+import React, { useState } from "react";
+import { useReportsContext } from "../context";
+import { ReportCard, SearchBar, TabNavigation } from "./";
+import { formatReportCount } from "../helpers/formatters.js";
+import {
+  DndContext,
+  closestCenter,
+  DragOverlay,
+  PointerSensor,
+  useSensor,
+  useSensors,
+} from "@dnd-kit/core";
+import { SortableContext, rectSortingStrategy } from "@dnd-kit/sortable";
+import SortableReportCard from "./SortableReportCard";
 
 /**
  * Main reports directory component that displays all reports with filtering
@@ -23,11 +30,13 @@ const ReportsDirectory = () => {
     error,
     isUpdatingStar,
     categories,
-    reorderReports
+    reorderReports,
   } = useReportsContext();
 
+  console.log("reportsreports", reports);
+
   const [activeReport, setActiveReport] = useState(null);
-  
+
   const sensors = useSensors(
     useSensor(PointerSensor, {
       // Require the mouse to move by 10 pixels before activating a drag
@@ -39,7 +48,7 @@ const ReportsDirectory = () => {
 
   const handleDragStart = (event) => {
     const { active } = event;
-    const report = filteredReports.find(r => r.id === active.id);
+    const report = filteredReports.find((r) => r.id === active.id);
     setActiveReport(report);
   };
 
@@ -50,7 +59,7 @@ const ReportsDirectory = () => {
     }
     setActiveReport(null);
   };
-  
+
   const handleDragCancel = () => {
     setActiveReport(null);
   };
@@ -59,22 +68,33 @@ const ReportsDirectory = () => {
     <div className="px-4 py-8 mx-auto max-w-11/12">
       {/* Header */}
       <div className="mb-8">
-        <h1 className="mb-2 text-3xl font-bold text-gray-900">Reports Directory</h1>
-        <p className="mb-6 text-gray-600">Select a report to view detailed analytics and insights</p>
-        <div className="mb-6 text-sm text-gray-500">
-          {formatReportCount(filteredReports.length, reports.length)}
+        <h1 className="mb-2 text-3xl font-bold text-gray-900">
+          Reports Directory
+        </h1>
+        <p className="mb-6 text-gray-600">
+          Select a report to view detailed analytics and insights
+        </p>
+        <div className="flex gap-4 items-center">
+          <SearchBar
+            searchQuery={searchQuery}
+            setSearchQuery={setSearchQuery}
+          />
+          <div className="text-sm text-gray-500">
+            {formatReportCount(filteredReports.length, reports.length)}
+          </div>
         </div>
-        
-        {/* Search Bar */}
-        <SearchBar searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
       </div>
 
       {/* Loading State */}
       {loading && (
         <div className="py-12 text-center">
           <div className="mb-4 text-6xl">⏳</div>
-          <h3 className="mb-2 text-lg font-medium text-gray-900">Loading reports...</h3>
-          <p className="text-gray-500">Please wait while we fetch your reports.</p>
+          <h3 className="mb-2 text-lg font-medium text-gray-900">
+            Loading reports...
+          </h3>
+          <p className="text-gray-500">
+            Please wait while we fetch your reports.
+          </p>
         </div>
       )}
 
@@ -82,7 +102,9 @@ const ReportsDirectory = () => {
       {error && (
         <div className="py-12 text-center">
           <div className="mb-4 text-6xl">❌</div>
-          <h3 className="mb-2 text-lg font-medium text-gray-900">Error loading reports</h3>
+          <h3 className="mb-2 text-lg font-medium text-gray-900">
+            Error loading reports
+          </h3>
           <p className="text-gray-500">{error}</p>
         </div>
       )}
@@ -91,7 +113,7 @@ const ReportsDirectory = () => {
       {!loading && !error && (
         <>
           {/* Tab Navigation */}
-          <TabNavigation 
+          <TabNavigation
             categories={categories}
             activeTab={activeTab}
             setActiveTab={setActiveTab}
@@ -106,8 +128,8 @@ const ReportsDirectory = () => {
             onDragEnd={handleDragEnd}
             onDragCancel={handleDragCancel}
           >
-            <SortableContext 
-              items={filteredReports.map(r => r.id)}
+            <SortableContext
+              items={filteredReports.map((r) => r.id)}
               strategy={rectSortingStrategy}
             >
               <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
@@ -123,8 +145,8 @@ const ReportsDirectory = () => {
             </SortableContext>
             <DragOverlay>
               {activeReport ? (
-                <ReportCard 
-                  report={activeReport} 
+                <ReportCard
+                  report={activeReport}
                   isDragging
                   onToggleStar={() => {}}
                 />
@@ -136,7 +158,9 @@ const ReportsDirectory = () => {
           {filteredReports.length === 0 && (
             <div className="py-12 text-center">
               <div className="mb-4 text-6xl">📊</div>
-              <h3 className="mb-2 text-lg font-medium text-gray-900">No reports found in {activeTab}</h3>
+              <h3 className="mb-2 text-lg font-medium text-gray-900">
+                No reports found in {activeTab}
+              </h3>
             </div>
           )}
         </>
