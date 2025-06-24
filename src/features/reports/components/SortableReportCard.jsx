@@ -8,8 +8,11 @@ import ReportCard from './ReportCard';
  * A wrapper component that makes the ReportCard sortable.
  * @param {object} props - The component props.
  * @param {object} props.report - The report data.
+ * @param {Function} props.onToggleStar - Function to toggle star status
+ * @param {boolean} props.isUpdatingStar - Whether star is being updated
+ * @param {boolean} props.isReordering - Whether reports are being reordered
  */
-const SortableReportCard = ({ report, onToggleStar, isUpdatingStar }) => {
+const SortableReportCard = ({ report, onToggleStar, isUpdatingStar, isReordering = false }) => {
   const {
     attributes,
     listeners,
@@ -32,6 +35,7 @@ const SortableReportCard = ({ report, onToggleStar, isUpdatingStar }) => {
         report={report} 
         onToggleStar={onToggleStar}
         isUpdatingStar={isUpdatingStar}
+        isReordering={isReordering}
       />
     </div>
   );
@@ -40,7 +44,8 @@ const SortableReportCard = ({ report, onToggleStar, isUpdatingStar }) => {
 SortableReportCard.propTypes = {
   report: PropTypes.object.isRequired,
   onToggleStar: PropTypes.func.isRequired,
-  isUpdatingStar: PropTypes.bool
+  isUpdatingStar: PropTypes.bool,
+  isReordering: PropTypes.bool
 };
 
 export default SortableReportCard; 

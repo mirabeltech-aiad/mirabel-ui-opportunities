@@ -31,6 +31,8 @@ const ReportsDirectory = () => {
     error,
     isUpdatingStar,
     updatingReportId,
+    isReordering,
+    isReorderingPending,
     categories,
     reorderReports,
   } = useReportsContext();
@@ -86,6 +88,12 @@ const ReportsDirectory = () => {
           <div className="text-sm text-gray-500">
             {formatReportCount(filteredReports.length, reports.length)}
           </div>
+          {isReorderingPending && (
+            <div className="flex items-center gap-2 text-sm text-blue-600">
+              <Spinner size="sm" color="text-blue-600" inline />
+              <span>Reordering...</span>
+            </div>
+          )}
         </div>
       </div>
 
@@ -143,6 +151,7 @@ const ReportsDirectory = () => {
                     report={report}
                     onToggleStar={() => toggleStar(report)}
                     isUpdatingStar={updatingReportId === report.id && isUpdatingStar}
+                    isReordering={isReorderingPending}
                   />
                 ))}
               </div>

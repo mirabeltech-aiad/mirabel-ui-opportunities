@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { reportsReducer } from './reducer.js';
 import { initialState } from './initialState.js';
 import { reportsData } from '../helpers/reportsData.js';
-import { useReportsDashboard, useUpdateReportStar, prepareStarTogglePayload } from '../hooks/useService.js';
+import { useReportsDashboard, useUpdateReportStar, useReorderReports, prepareStarTogglePayload, prepareReorderPayload } from '../hooks/useService.js';
 import * as Actions from './actions.js';
 import { ReportsContext } from './Context.js';
 import { formatReportData, formatCategories } from '../helpers/formatters.js';
@@ -16,8 +16,10 @@ import { formatReportData, formatCategories } from '../helpers/formatters.js';
 export const ReportsProvider = ({ children }) => {
   const [state, dispatch] = useReducer(reportsReducer, initialState);
   const [updatingReportId, setUpdatingReportId] = useState(null);
+  const [isReordering, setIsReordering] = useState(false);
   const { data, isLoading, error } = useReportsDashboard();
   const { mutate: updateStarStatus, isPending: isUpdatingStar, isSuccess: isStarUpdateSuccess, isError: isStarUpdateError } = useUpdateReportStar();
+  const { mutate: reorderReportsApi, isPending: isReorderingPending, isSuccess: isReorderSuccess, isError: isReorderError } = useReorderReports();
   // Load initial reports data from mock file
   useEffect(() => {
     const formattedReports = reportsData.Reports.map(formatReportData);
@@ -50,6 +52,13 @@ export const ReportsProvider = ({ children }) => {
       setUpdatingReportId(null);
     }
   }, [isUpdatingStar, isStarUpdateSuccess, isStarUpdateError]);
+
+  // Clear reordering state when reorder operation completes
+  useEffect(() => {
+    if (!isReorderingPending && (isReorderSuccess || isReorderError)) {
+      setIsReordering(false);
+    }
+  }, [isReorderingPending, isReorderSuccess, isReorderError]);
 
   const hasFavorites = useMemo(() => state.reports.some(report => report.isStarred), [state.reports]);
 
@@ -115,10 +124,36 @@ export const ReportsProvider = ({ children }) => {
   };
 
   const handleReorderReports = (activeId, overId) => {
+    // First update the local state optimistically
     dispatch({
       type: Actions.ACTIONS.REORDER_REPORTS,
       payload: { activeId, overId }
     });
+
+    // Then prepare the updated reports array with new sortOrder values
+    const updatedReports = [...state.reports];
+    const activeIndex = updatedReports.findIndex(r => r.id === activeId);
+    const overIndex = updatedReports.findIndex(r => r.id === overId);
+
+    if (activeIndex !== -1 && overIndex !== -1) {
+      // Move item in array
+      const [movedItem] = updatedReports.splice(activeIndex, 1);
+      updatedReports.splice(overIndex, 0, movedItem);
+
+      // Update sortOrder for all reports
+      const reorderedReports = updatedReports.map((report, index) => ({
+        ...report,
+        sortOrder: index + 1
+      }));
+
+      // console.log("reorderedReports", reorderedReports);
+      // return;
+
+      // Set reordering state and make API call
+      setIsReordering(true);
+      const payload = prepareReorderPayload(reorderedReports);
+      reorderReportsApi(payload);
+    }
   };
 
   const value = {
@@ -130,6 +165,8 @@ export const ReportsProvider = ({ children }) => {
     error,
     isUpdatingStar,
     updatingReportId,
+    isReordering,
+    isReorderingPending,
     setActiveTab: handleSetActiveTab,
     setSearchQuery: handleSetSearchQuery,
     toggleStar: handleToggleStar,

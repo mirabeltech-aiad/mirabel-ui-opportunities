@@ -11,10 +11,11 @@ import { ArrowDown } from "lucide-react";
  * @param {Function} props.onToggleStar - Function to toggle star status
  * @param {boolean} props.isUpdatingStar - Whether star is being updated
  * @param {boolean} props.isDragging - Whether the card is being dragged
+ * @param {boolean} props.isReordering - Whether reports are being reordered
  */
-const ReportCard = ({ report, onToggleStar, isUpdatingStar = false, isDragging = false }) => {
+const ReportCard = ({ report, onToggleStar, isUpdatingStar = false, isDragging = false, isReordering = false }) => {
   return (
-    <Card className={`h-full border border-gray-200 transition-all duration-200 group hover:shadow-lg hover:border-gray-300 ${isDragging ? 'ring-2 ring-blue-500 shadow-xl' : 'cursor-pointer'}`}>
+    <Card className={`h-full border border-gray-200 transition-all duration-200 group hover:shadow-lg hover:border-gray-300 ${isDragging ? 'ring-2 ring-blue-500 shadow-xl' : 'cursor-pointer'} ${isReordering ? 'opacity-75' : ''}`}>
       <CardContent className="p-3 sm:p-4">
         {/* Header with Icon and Star */}
         <div className="flex justify-between items-center mb-4">
@@ -27,12 +28,12 @@ const ReportCard = ({ report, onToggleStar, isUpdatingStar = false, isDragging =
           <div className="flex gap-2 justify-end items-center">
             <button
               onClick={() => onToggleStar(report)}
-              disabled={isUpdatingStar}
+              disabled={isUpdatingStar || isReordering}
               className={`text-3xl cursor-pointer transition-colors ${
                 report.isStarred
                   ? "text-yellow-500"
                   : "text-gray-300 hover:text-yellow-400"
-              } ${isUpdatingStar ? 'opacity-50 cursor-not-allowed' : ''}`}
+              } ${(isUpdatingStar || isReordering) ? 'opacity-50 cursor-not-allowed' : ''}`}
             >
               {isUpdatingStar ? (
                 <Spinner size="sm" color="text-yellow-500" inline />
@@ -89,6 +90,7 @@ ReportCard.propTypes = {
   onToggleStar: PropTypes.func.isRequired,
   isUpdatingStar: PropTypes.bool,
   isDragging: PropTypes.bool,
+  isReordering: PropTypes.bool,
 };
 
 export default ReportCard;

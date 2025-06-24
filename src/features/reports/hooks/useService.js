@@ -60,6 +60,49 @@ export const useUpdateReportStar = () => {
 };
 
 /**
+ * Hook to reorder reports using React Query mutation
+ * @returns {Object} Mutation result with mutate function, loading, error states
+ */
+export const useReorderReports = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: postReportsDashboard,
+    onMutate: async (reorderedReports) => {
+      // Cancel any outgoing refetches (so they don't overwrite our optimistic update)
+      await queryClient.cancelQueries({ queryKey: ["reports-dashboard"] });
+
+      // Snapshot the previous value
+      const previousReports = queryClient.getQueryData(["reports-dashboard"]);
+
+      // Optimistically update to the new value
+      queryClient.setQueryData(["reports-dashboard"], old => {
+        const oldData = old || { Reports: [], Categories: [] };
+        return {
+          ...oldData,
+          Reports: reorderedReports
+        };
+      });
+
+      // Return a context object with the snapshotted value
+      return { previousReports };
+    },
+    onError: (err, reorderedReports, context) => {
+      // Rollback to the previous value if mutation fails
+      queryClient.setQueryData(["reports-dashboard"], context.previousReports);
+      console.error('Error reordering reports:', err);
+    },
+    onSuccess: (data, variables) => {
+      console.log('Reports reordered successfully:', variables);
+    },
+    onSettled: () => {
+      // Always refetch after error or success
+      queryClient.invalidateQueries({ queryKey: ["reports-dashboard"] });
+    },
+  });
+};
+
+/**
  * Helper function to prepare the payload for star toggle
  * @param {Object} report - The report object
  * @param {boolean} isStarred - The new star status
@@ -83,4 +126,29 @@ export const prepareStarTogglePayload = (report, isStarred) => {
     IsMaster: false,
     SortOrder: report.sortOrder || 0
   }];
+};
+
+/**
+ * Helper function to prepare the payload for reordering reports
+ * @param {Array} reports - Array of reports with updated sortOrder
+ * @returns {Array} Formatted payload for API
+ */
+export const prepareReorderPayload = (reports) => {
+  return reports.map(report => ({
+    Id: report.id,
+    Icon: report.icon,
+    Title: report.title,
+    Description: report.description,
+    Tags: report.tags,
+    Category: report.category,
+    RoutePath: report.routePath,
+    IsStarred: report.isStarred,
+    IsAdmin: report.isAdmin,
+    UserId: 1,
+    ModifiedTitle: report.modifiedTitle,
+    CreatedDate: report.createdDate || new Date().toISOString(),
+    ModifiedDate: report.modifiedDate || null,
+    IsMaster: false,
+    SortOrder: report.sortOrder
+  }));
 }; 
