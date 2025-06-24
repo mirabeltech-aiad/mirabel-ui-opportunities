@@ -1,4 +1,4 @@
-import React, { useReducer, useEffect, useMemo } from 'react';
+import React, { useReducer, useEffect, useMemo, useState } from 'react';
 import PropTypes from 'prop-types';
 import { reportsReducer } from './reducer.js';
 import { initialState } from './initialState.js';
@@ -15,8 +15,9 @@ import { formatReportData, formatCategories } from '../helpers/formatters.js';
  */
 export const ReportsProvider = ({ children }) => {
   const [state, dispatch] = useReducer(reportsReducer, initialState);
+  const [updatingReportId, setUpdatingReportId] = useState(null);
   const { data, isLoading, error } = useReportsDashboard();
-  const { mutate: updateStarStatus, isPending: isUpdatingStar } = useUpdateReportStar();
+  const { mutate: updateStarStatus, isPending: isUpdatingStar, isSuccess: isStarUpdateSuccess, isError: isStarUpdateError } = useUpdateReportStar();
   // Load initial reports data from mock file
   useEffect(() => {
     const formattedReports = reportsData.Reports.map(formatReportData);
@@ -42,6 +43,13 @@ export const ReportsProvider = ({ children }) => {
       dispatch({ type: Actions.ACTIONS.SET_CATEGORIES, payload: categoriesArray });
     }
   }, [data, isLoading, error]);
+
+  // Clear updating report ID when mutation completes
+  useEffect(() => {
+    if (!isUpdatingStar && (isStarUpdateSuccess || isStarUpdateError)) {
+      setUpdatingReportId(null);
+    }
+  }, [isUpdatingStar, isStarUpdateSuccess, isStarUpdateError]);
 
   const hasFavorites = useMemo(() => state.reports.some(report => report.isStarred), [state.reports]);
 
@@ -96,6 +104,7 @@ export const ReportsProvider = ({ children }) => {
 
   const handleToggleStar = (report) => {
     if (report) {
+        setUpdatingReportId(report.id);
         const payload = prepareStarTogglePayload(report, !report.isStarred);
         updateStarStatus(payload);
     }
@@ -117,8 +126,10 @@ export const ReportsProvider = ({ children }) => {
     categories: displayCategories,
     filteredReports,
     tabCounts,
-    isLoading: isLoading || isUpdatingStar,
+    isLoading: isLoading,
     error,
+    isUpdatingStar,
+    updatingReportId,
     setActiveTab: handleSetActiveTab,
     setSearchQuery: handleSetSearchQuery,
     toggleStar: handleToggleStar,

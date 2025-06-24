@@ -36,7 +36,7 @@ export const useUpdateReportStar = () => {
         return {
           ...oldData,
           Reports: oldData.Reports.map(report =>
-            report.Id === updatedReport.Id ? { ...report, IsStarred: updatedReport.IsStarred } : report
+            report.Id === updatedReport[0].Id ? { ...report, IsStarred: updatedReport[0].IsStarred } : report
           ),
         };
       });
@@ -48,6 +48,9 @@ export const useUpdateReportStar = () => {
       // Rollback to the previous value if mutation fails
       queryClient.setQueryData(["reports-dashboard"], context.previousReports);
       console.error('Error updating report star status:', err);
+    },
+    onSuccess: (data, variables) => {
+      console.log('Star status updated successfully:', variables);
     },
     onSettled: () => {
       // Always refetch after error or success

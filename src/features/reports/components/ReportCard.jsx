@@ -1,6 +1,7 @@
 import React from "react";
 import PropTypes from "prop-types";
 import { Card, CardContent } from "@/components/ui/card";
+import Spinner from "@/components/ui/spinner";
 import { getTagColor } from "../helpers/formatters.js";
 import { ArrowDown } from "lucide-react";
 /**
@@ -31,9 +32,13 @@ const ReportCard = ({ report, onToggleStar, isUpdatingStar = false, isDragging =
                 report.isStarred
                   ? "text-yellow-500"
                   : "text-gray-300 hover:text-yellow-400"
-              }`}
+              } ${isUpdatingStar ? 'opacity-50 cursor-not-allowed' : ''}`}
             >
-              ★
+              {isUpdatingStar ? (
+                <Spinner size="sm" color="text-yellow-500" inline />
+              ) : (
+                "★"
+              )}
             </button>
             <ArrowDown className="text-gray-400 transform rotate-[-90deg] group-hover:text-gray-600 transition-colors w-6 h-6 cursor-pointer" />
           </div>

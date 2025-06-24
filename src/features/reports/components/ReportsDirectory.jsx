@@ -12,6 +12,7 @@ import {
 } from "@dnd-kit/core";
 import { SortableContext, rectSortingStrategy } from "@dnd-kit/sortable";
 import SortableReportCard from "./SortableReportCard";
+import Spinner from "@/components/ui/spinner";
 
 /**
  * Main reports directory component that displays all reports with filtering
@@ -26,9 +27,10 @@ const ReportsDirectory = () => {
     setActiveTab,
     setSearchQuery,
     toggleStar,
-    loading,
+    isLoading,
     error,
     isUpdatingStar,
+    updatingReportId,
     categories,
     reorderReports,
   } = useReportsContext();
@@ -88,7 +90,7 @@ const ReportsDirectory = () => {
       </div>
 
       {/* Loading State */}
-      {loading && (
+      {isLoading && (
         <div className="py-12 text-center">
           <div className="mb-4 text-6xl">⏳</div>
           <h3 className="mb-2 text-lg font-medium text-gray-900">
@@ -112,7 +114,7 @@ const ReportsDirectory = () => {
       )}
 
       {/* Content */}
-      {!loading && !error && (
+      {!isLoading && (
         <>
           {/* Tab Navigation */}
           <TabNavigation
@@ -140,7 +142,7 @@ const ReportsDirectory = () => {
                     key={report.id}
                     report={report}
                     onToggleStar={() => toggleStar(report)}
-                    isUpdatingStar={isUpdatingStar}
+                    isUpdatingStar={updatingReportId === report.id && isUpdatingStar}
                   />
                 ))}
               </div>
