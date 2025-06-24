@@ -33,7 +33,9 @@ const ReportsDirectory = () => {
     reorderReports,
   } = useReportsContext();
 
-  console.log("reportsreports", reports);
+  // print only category is sales only
+  const salesReports = reports.filter((report) => report.category.includes("Accounts Receivable"));
+  console.log("salesReports",  salesReports,filteredReports);
 
   const [activeReport, setActiveReport] = useState(null);
 
@@ -133,7 +135,7 @@ const ReportsDirectory = () => {
               strategy={rectSortingStrategy}
             >
               <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
-                {filteredReports.map((report) => (
+                {filteredReports.sort((a, b) => a.sortOrder - b.sortOrder).map((report) => (
                   <SortableReportCard
                     key={report.id}
                     report={report}

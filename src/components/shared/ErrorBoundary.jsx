@@ -1,18 +1,14 @@
 // src/components/common/ErrorFallback.jsx
 import React from 'react';
+import { Button } from '../ui/button';
 
 const ErrorFallback = ({ error, resetErrorBoundary }) => {
   return (
-    <div className="min-h-screen flex items-center justify-center bg-red-50 text-center">
-      <div className="p-6 rounded bg-white shadow-lg max-w-md">
+    <div className="flex justify-center items-center min-h-screen text-center bg-red-50">
+      <div className="p-6 max-w-md bg-white rounded shadow-lg">
         <h1 className="text-xl font-semibold text-red-600">Something went wrong.</h1>
         <p className="mt-2 text-sm text-gray-700">{error.message}</p>
-        <button
-          onClick={resetErrorBoundary}
-          className="mt-4 px-4 py-2 bg-red-600 text-white rounded"
-        >
-          Try again
-        </button>
+        <Button onClick={resetErrorBoundary} variant="destructive" className='mt-4'>Try again</Button>
       </div>
     </div>
   );

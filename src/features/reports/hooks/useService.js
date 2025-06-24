@@ -63,7 +63,7 @@ export const useUpdateReportStar = () => {
  * @returns {Object} Formatted payload for API
  */
 export const prepareStarTogglePayload = (report, isStarred) => {
-  return {
+  return [{
     Id: report.id,
     Icon: report.icon,
     Title: report.title,
@@ -79,5 +79,5 @@ export const prepareStarTogglePayload = (report, isStarred) => {
     ModifiedDate: report.modifiedDate || null,
     IsMaster: false,
     SortOrder: report.sortOrder || 0
-  };
+  }];
 }; 
