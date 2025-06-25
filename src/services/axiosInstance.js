@@ -31,13 +31,15 @@ axiosInstance.interceptors.request.use((config) => {
       const devURL = `${window.location.origin}${envBaseUrl}`;
 
       const modifiedURL = devURL.replace("/modern/", "");
-      console.log("modifiedURL", {devURL,modifiedURL});
       baseURL = modifiedURL;
       domain = window.location.hostname;
+      token = localStorage.getItem("MMClientVars")?.Token || "";
+      console.log("modifiedURL", {devURL,modifiedURL,token});
+
     } 
     
-    // Get token from localStorage
-    token = localStorage.getItem("Token") || "";
+    // // Get token from localStorage
+    // token = localStorage.getItem("Token") || "";
   }
 
   config.baseURL = baseURL;
