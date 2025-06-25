@@ -32,6 +32,7 @@ ReactDOM.createRoot(document.getElementById('root')).render(
       <QueryClientProvider client={queryClient}>
         <ThemeProvider>
           <GlobalProvider>
+            {/* <BrowserRouter basename="/modern"> */}
             <BrowserRouter basename="/modern">
               <AppRoutes />
             </BrowserRouter>
