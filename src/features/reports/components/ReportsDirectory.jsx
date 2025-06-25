@@ -38,8 +38,10 @@ const ReportsDirectory = () => {
   } = useReportsContext();
 
   // print only category is sales only
-  const salesReports = reports.filter((report) => report.category.includes("Accounts Receivable"));
-  console.log("salesReports",  salesReports,filteredReports);
+  const salesReports = reports.filter((report) =>
+    report.category.includes("Accounts Receivable")
+  );
+  console.log("salesReports", salesReports, filteredReports);
 
   const [activeReport, setActiveReport] = useState(null);
 
@@ -71,113 +73,129 @@ const ReportsDirectory = () => {
   };
 
   return (
-    <div className="px-4 py-8 mx-auto max-w-11/12">
-      {/* Header */}
-      <div className="mb-8">
-        <h1 className="mb-2 text-3xl font-bold text-gray-900">
-          Reports Directory
-        </h1>
-        <p className="mb-6 text-gray-600">
-          Select a report to view detailed analytics and insights
-        </p>
-        <div className="flex gap-4 items-center">
-          <SearchBar
-            searchQuery={searchQuery}
-            setSearchQuery={setSearchQuery}
-          />
-          <div className="text-sm text-gray-500">
-            {formatReportCount(filteredReports.length, reports.length)}
-          </div>
-          {isReorderingPending && (
-            <div className="flex items-center gap-2 text-sm text-blue-600">
-              <Spinner size="sm" color="text-blue-600" inline />
-              <span>Reordering...</span>
+    <div className="flex flex-col h-screen">
+      {/* Sticky Header Section */}
+      <div className="sticky z-40 border-b border-gray-200 shadow-sm backdrop-blur-sm bg-white/95">
+        <div className="px-4 py-4 mx-auto sm:py-6 max-w-11/12">
+          {/* Header */}
+          <div className="mb-4 sm:mb-6">
+            <h1 className="mb-2 text-2xl font-bold text-gray-900 sm:text-3xl">
+              Reports Directory
+            </h1>
+            {/* <p className="mb-3 text-sm text-gray-600 sm:mb-4 sm:text-base">
+              Select a report to view detailed analytics and insights
+            </p> */}
+            <div className="flex flex-col gap-3 items-start sm:flex-row sm:gap-4 sm:items-center">
+              <SearchBar
+                searchQuery={searchQuery}
+                setSearchQuery={setSearchQuery}
+              />
+              <div className="text-sm text-gray-500">
+                {formatReportCount(filteredReports.length, reports.length)}
+              </div>
+              {isReorderingPending && (
+                <div className="flex gap-2 items-center text-sm text-blue-600">
+                  <Spinner size="sm" color="text-blue-600" inline />
+                  <span>Reordering...</span>
+                </div>
+              )}
             </div>
+          </div>
+
+          {/* Sticky Tab Navigation */}
+          {!isLoading && !error && (
+            <TabNavigation
+              categories={categories}
+              activeTab={activeTab}
+              setActiveTab={setActiveTab}
+              tabCounts={tabCounts}
+            />
           )}
         </div>
       </div>
 
-      {/* Loading State */}
-      {isLoading && (
-        <div className="py-12 text-center">
-          <div className="mb-4 text-6xl">⏳</div>
-          <h3 className="mb-2 text-lg font-medium text-gray-900">
-            Loading reports...
-          </h3>
-          <p className="text-gray-500">
-            Please wait while we fetch your reports.
-          </p>
-        </div>
-      )}
-
-      {/* Error State */}
-      {error && (
-        <div className="py-12 text-center">
-          <div className="mb-4 text-6xl">❌</div>
-          <h3 className="mb-2 text-lg font-medium text-gray-900">
-            Error loading reports
-          </h3>
-          <p className="text-gray-500">{error}</p>
-        </div>
-      )}
-
-      {/* Content */}
-      {!isLoading && (
-        <>
-          {/* Tab Navigation */}
-          <TabNavigation
-            categories={categories}
-            activeTab={activeTab}
-            setActiveTab={setActiveTab}
-            tabCounts={tabCounts}
-          />
-
-          {/* Reports Grid */}
-          <DndContext
-            sensors={sensors}
-            collisionDetection={closestCenter}
-            onDragStart={handleDragStart}
-            onDragEnd={handleDragEnd}
-            onDragCancel={handleDragCancel}
-          >
-            <SortableContext
-              items={filteredReports.map((r) => r.id)}
-              strategy={rectSortingStrategy}
-            >
-              <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
-                {filteredReports.sort((a, b) => a.sortOrder - b.sortOrder).map((report) => (
-                  <SortableReportCard
-                    key={report.id}
-                    report={report}
-                    onToggleStar={() => toggleStar(report)}
-                    isUpdatingStar={updatingReportId === report.id && isUpdatingStar}
-                    isReordering={isReorderingPending}
-                  />
-                ))}
-              </div>
-            </SortableContext>
-            <DragOverlay>
-              {activeReport ? (
-                <ReportCard
-                  report={activeReport}
-                  isDragging
-                  onToggleStar={() => {}}
-                />
-              ) : null}
-            </DragOverlay>
-          </DndContext>
-
-          {/* Empty State */}
-          {filteredReports.length === 0 && (
+      {/* Scrollable Content Area */}
+      <div className="overflow-y-auto flex-1">
+        <div className="px-4 py-4 mx-auto sm:py-6 max-w-11/12">
+          {/* Loading State */}
+          {isLoading && (
             <div className="py-12 text-center">
-              <div className="mb-4 text-6xl">📊</div>
+              <div className="mb-4 text-6xl">⏳</div>
               <h3 className="mb-2 text-lg font-medium text-gray-900">
-                No reports found in {activeTab}
+                Loading reports...
               </h3>
+              <p className="text-gray-500">
+                Please wait while we fetch your reports.
+              </p>
             </div>
           )}
-        </>
-      )}
+
+          {/* Error State */}
+          {error && (
+            <div className="py-12 text-center">
+              <div className="mb-4 text-6xl">❌</div>
+              <h3 className="mb-2 text-lg font-medium text-gray-900">
+                Error loading reports
+              </h3>
+              <p className="text-gray-500">{error}</p>
+            </div>
+          )}
+
+          {/* Content */}
+          {!isLoading && !error && (
+            <>
+              {/* Reports Grid */}
+              <DndContext
+                sensors={sensors}
+                collisionDetection={closestCenter}
+                onDragStart={handleDragStart}
+                onDragEnd={handleDragEnd}
+                onDragCancel={handleDragCancel}
+              >
+                <SortableContext
+                  items={filteredReports.map((r) => r.id)}
+                  strategy={rectSortingStrategy}
+                >
+                  <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+                    {filteredReports
+                      .sort((a, b) => a.sortOrder - b.sortOrder)
+                      .map((report) => (
+                        <SortableReportCard
+                          key={report.id}
+                          report={report}
+                          onToggleStar={() => toggleStar(report)}
+                          isUpdatingStar={
+                            updatingReportId === report.id && isUpdatingStar
+                          }
+                          isReordering={isReorderingPending}
+                        />
+                      ))}
+                  </div>
+                </SortableContext>
+                <DragOverlay>
+                  {activeReport ? (
+                    <ReportCard
+                      report={activeReport}
+                      isDragging
+                      onToggleStar={() => {}}
+                    />
+                  ) : null}
+                </DragOverlay>
+              </DndContext>
+
+              {/* Empty State */}
+              {filteredReports.length === 0 && (
+                <div className="py-12 text-center">
+                  <div className="mb-4 text-6xl">📊</div>
+                  <h3 className="mb-2 text-lg font-medium text-gray-900">
+                    No reports found in {activeTab}
+                  </h3>
+                </div>
+              )}
+            </>
+          )}
+        </div>
+      </div>
     </div>
   );
 };
