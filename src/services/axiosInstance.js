@@ -28,7 +28,11 @@ axiosInstance.interceptors.request.use((config) => {
     
     if (envBaseUrl) {
       // Use environment variable if available
-      baseURL = `${window.location.origin}${envBaseUrl}`;
+      const devURL = `${window.location.origin}${envBaseUrl}`;
+
+      const modifiedURL = devURL.replace("/modern/", "");
+      console.log("modifiedURL", {devURL,modifiedURL});
+      baseURL = modifiedURL;
       domain = window.location.hostname;
     } 
     
