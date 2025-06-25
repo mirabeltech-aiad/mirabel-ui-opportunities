@@ -13,6 +13,42 @@ import { ArrowDown } from "lucide-react";
  * @param {boolean} props.isDragging - Whether the card is being dragged
  * @param {boolean} props.isReordering - Whether reports are being reordered
  */
+
+export const isWindowTopAccessible = function () {
+  try {
+    const location = window.top.location.href; // eslint-disable-line no-unused-vars
+    return true;
+  } catch (e) {
+    return false;
+  }
+};
+
+export const openPage = ({
+  nextPage,
+  pageTitle,
+  addTabAfterActiveTab = false,
+  openInSameTab = true
+}) => {
+  try {
+    const topPage = isWindowTopAccessible() ? window.top : null;
+    const hasCustomTabHandlers = topPage?.openPageInNextTab !== undefined;
+
+    if (!hasCustomTabHandlers) {
+      window.open(nextPage, openInSameTab ? "_self" : "_blank");
+      return;
+    }
+
+    const openFn = openInSameTab
+      ? topPage.openPage
+      : topPage.openPageInNextTab;
+
+    return openFn(nextPage, pageTitle, addTabAfterActiveTab);
+  } catch (e) {
+    console.error("Error opening page:", e);
+  }
+};
+
+
 const ReportCard = ({ report, onToggleStar, isUpdatingStar = false, isDragging = false, isReordering = false }) => {
   return (
     <Card className={`h-full border border-gray-200 transition-all duration-200 group hover:shadow-lg hover:border-gray-300 ${isDragging ? 'ring-2 ring-blue-500 shadow-xl' : 'cursor-pointer'} ${isReordering ? 'opacity-75' : ''}`}>
@@ -41,7 +77,7 @@ const ReportCard = ({ report, onToggleStar, isUpdatingStar = false, isDragging =
                 "★"
               )}
             </button>
-            <ArrowDown className="text-gray-400 transform rotate-[-90deg] group-hover:text-gray-600 transition-colors w-6 h-6 cursor-pointer" />
+            <ArrowDown className="text-gray-400 transform rotate-[-90deg] group-hover:text-gray-600 transition-colors w-6 h-6 cursor-pointer" onClick={() => openPage({ nextPage: report.routePath, pageTitle: report.title })} />
           </div>
         </div>
 
