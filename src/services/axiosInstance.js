@@ -16,7 +16,7 @@ axiosInstance.interceptors.request.use((config) => {
   let token = "";
   let domain = "";
   let baseURL = "";
-  if (import.meta.env.MODE === "development") {
+  if (import.meta.env.MODE == "development") {
     // Development environment
     baseURL = DEV_BASE_URL;
     domain = DEV_DOMAIN;
@@ -24,18 +24,12 @@ axiosInstance.interceptors.request.use((config) => {
 
   } else {
     // Production or other environments
-    const envBaseUrl = import.meta.env.BASE_URL;
     
-    if (envBaseUrl) {
       // Use environment variable if available
-      const devURL = `${window.location.origin}${envBaseUrl}`;
-
-      const modifiedURL = devURL.replace("/modern/", "");
-      baseURL = modifiedURL;
+      baseURL = window.location.origin;
       domain = window.location.hostname;
       token = JSON.parse(localStorage.getItem("MMClientVars"))?.Token || "";
-
-    } 
+console.log("baseURL", {baseURL,domain,token});
     
     // // Get token from localStorage
     // token = localStorage.getItem("Token") || "";
