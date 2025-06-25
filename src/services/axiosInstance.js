@@ -33,8 +33,7 @@ axiosInstance.interceptors.request.use((config) => {
       const modifiedURL = devURL.replace("/modern/", "");
       baseURL = modifiedURL;
       domain = window.location.hostname;
-      token = localStorage.getItem("MMClientVars")?.Token || "";
-      console.log("modifiedURL", {devURL,modifiedURL,token});
+      token = JSON.parse(localStorage.getItem("MMClientVars"))?.Token || "";
 
     } 
     
