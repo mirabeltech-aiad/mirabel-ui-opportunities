@@ -4,7 +4,7 @@ import { API_REPORTS_DASHBOARD } from "@/config/apiUrls";
 
 export const getReportsDashboard = async () => {
   try {
-    const response = await axiosInstance.get(API_REPORTS_DASHBOARD+"/1/false");
+    const response = await axiosInstance.get(API_REPORTS_DASHBOARD+"/1");
     console.log("response", response.data.content.Data);
     if(response?.data?.content?.Status === "Success"){
       return response?.data?.content?.Data;
