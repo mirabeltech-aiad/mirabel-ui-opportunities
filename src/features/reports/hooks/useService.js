@@ -109,6 +109,8 @@ export const useReorderReports = () => {
  * @returns {Object} Formatted payload for API
  */
 export const prepareStarTogglePayload = (report, isStarred) => {
+  let localData = JSON.parse(window.localStorage.getItem("MMClientVars"));
+  console.log("LocalStorage", localData?.UserID);
   return [{
     Id: report.id,
     Icon: report.icon,
@@ -119,7 +121,7 @@ export const prepareStarTogglePayload = (report, isStarred) => {
     RoutePath: report.routePath,
     IsStarred: isStarred,
     IsAdmin: report.isAdmin,
-    UserId: 1,
+    UserId: localData?.UserID || 2,
     ModifiedTitle: report.modifiedTitle,
     CreatedDate: report.createdDate || new Date().toISOString(),
     ModifiedDate: report.modifiedDate || null,
@@ -144,7 +146,7 @@ export const prepareReorderPayload = (reports) => {
     RoutePath: report.routePath,
     IsStarred: report.isStarred,
     IsAdmin: report.isAdmin,
-    UserId: 1,
+    UserId: localData?.UserID || 2,
     ModifiedTitle: report.modifiedTitle,
     CreatedDate: report.createdDate || new Date().toISOString(),
     ModifiedDate: report.modifiedDate || null,
