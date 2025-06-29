@@ -22,20 +22,21 @@ src/features/reports/
 │   └── index.js              # Component exports
 ├── context/             # State management
 │   ├── Context.js            # Defines the React context and useReportsContext hook
-│   ├── ReportsProvider.jsx   # Context provider with React Query integration
+│   ├── ReportsProvider.jsx   # Context provider with direct service integration
 │   ├── actions.js            # Action creators and types
 │   ├── reducer.js            # State reducer function
 │   ├── initialState.js       # Initial state definition
 │   └── index.js              # Context exports
 ├── hooks/               # Custom hooks
-│   ├── useService.js         # React Query hooks for API calls
+│   ├── useService.js         # Custom hooks for API calls using direct services
 │   └── index.js              # Hook exports
 ├── helpers/             # Utility functions
 │   ├── constants.js          # Feature-specific constants
 │   ├── formatters.js         # Data formatting utilities
-│   └── reportsData.js        # Static reports data
+│   └── reportsData.js        # Static reports data (for fallback/mock data)
 ├── services/            # API integration
-│   └── reportsApi.js         # API service functions
+│   ├── reportsApi.js         # Direct Axios API service functions
+│   └── reportsService.js     # Service class for managing API operations
 ├── context.md           # This documentation file
 └── index.jsx            # Feature entry point
 ```
@@ -92,15 +93,15 @@ import { TabNavigation } from '@/features/reports/components';
 ### Custom Hooks
 
 #### useReportsDashboard
-React Query hook for fetching reports data:
+Custom hook for fetching reports data using direct service calls:
 ```jsx
 import { useReportsDashboard } from '@/features/reports/hooks';
 
-const { data, isLoading, error } = useReportsDashboard();
+const { data, error, refetch } = useReportsDashboard();
 ```
 
 #### useUpdateReportStar
-React Query mutation hook for updating report star status:
+Custom hook for updating report star status:
 ```jsx
 import { useUpdateReportStar, prepareStarTogglePayload } from '@/features/reports/hooks';
 
@@ -108,7 +109,19 @@ const { mutate: updateStarStatus, isPending: isUpdatingStar } = useUpdateReportS
 
 // Usage
 const payload = prepareStarTogglePayload(report, true);
-updateStarStatus(payload);
+await updateStarStatus(payload);
+```
+
+#### useReorderReports
+Custom hook for reordering reports:
+```jsx
+import { useReorderReports, prepareReorderPayload } from '@/features/reports/hooks';
+
+const { mutate: reorderReports, isPending: isReordering } = useReorderReports();
+
+// Usage
+const payload = prepareReorderPayload(reorderedReports);
+await reorderReports(payload);
 ```
 
 #### useReportsContext
@@ -122,7 +135,6 @@ const {
   activeTab,
   searchQuery,
   tabCounts,
-  loading,
   error,
   isUpdatingStar,
   setActiveTab,
@@ -134,48 +146,56 @@ const {
 
 ### API Services
 
-The reports feature includes API service functions for backend integration:
+The reports feature includes direct Axios service functions for backend integration:
 
+#### Direct API Functions
 ```jsx
 import { getReportsDashboard, postReportsDashboard } from '@/features/reports/services/reportsApi';
 
-// Fetch all reports (handled by useReportsDashboard hook)
+// Fetch all reports
 const reports = await getReportsDashboard();
 
-// Update report star status (handled by useUpdateReportStar hook)
+// Update report star status
 const payload = {
-  Id: "6853cef435ccddee84d6e20c",
-  Icon: "📊",
-  Title: "Churn by Cohort",
-  Description: "Analyze customer retention and churn patterns...",
-  Tags: ["cohort", "churn"],
-  Category: ["All", "Performance Reports"],
-  RoutePath: "/reports/churn-cohort",
-  IsStarred: true,
-  IsAdmin: true,
   UserId: 1,
-  ModifiedTitle: "Test Churn by Cohort",
-  CreatedDate: "2025-06-19T08:12:15.104+0000",
-  ModifiedDate: null,
-  IsMaster: false,
-  SortOrder: 12
+  ReportId: "6853cef435ccddee84d6e20c",
+  ModifiedTitle: "Test Report",
+  IsStarred: true,
+  SortOrder: 12,
+  CustomTags: ["tag1", "tag2"]
 };
 await postReportsDashboard(payload);
+```
+
+#### Service Class
+```jsx
+import { reportsService } from '@/features/reports/services/reportsService';
+
+// Fetch reports
+const reports = await reportsService.fetchReports();
+
+// Update star status
+await reportsService.updateReportStar(payload);
+
+// Reorder reports
+await reportsService.reorderReports(payload);
 ```
 
 ## State Logic and Explanation
 
 ### Context Architecture
 
-The reports feature uses React Context API for state management with React Query for data fetching:
+The reports feature uses React Context API for state management with direct Axios service calls:
 
-1. **ReportsProvider**: The context provider that wraps the feature and manages state, API hooks, and actions.
+1. **ReportsProvider**: The context provider that wraps the feature and manages state, service hooks, and actions.
 2. **Context.js**: Defines the `ReportsContext` object and the `useReportsContext` hook.
-3. **useReportsDashboard**: React Query hook for API data fetching.
-4. **useUpdateReportStar**: React Query mutation hook for star status updates.
-5. **reportsReducer**: Handles state updates based on actions.
-6. **Actions**: Define state update operations.
-7. **Initial State**: Defines the default state structure.
+3. **useReportsDashboard**: Custom hook for API data fetching using direct services.
+4. **useUpdateReportStar**: Custom hook for star status updates.
+5. **useReorderReports**: Custom hook for report reordering.
+6. **reportsService**: Service class that handles all API operations.
+7. **reportsReducer**: Handles state updates based on actions.
+8. **Actions**: Define state update operations.
+9. **Initial State**: Defines the default state structure.
 
 ### State Structure
 
@@ -185,10 +205,11 @@ The reports feature uses React Context API for state management with React Query
   filteredReports: [],   // Currently filtered/displayed reports (computed)
   activeTab: 'All',      // Active category filter
   searchQuery: '',       // Current search query
-  loading: false,        // Loading state for async operations
   error: null,          // Error state
   tabCounts: {},        // Computed counts for each category
-  isUpdatingStar: false // Loading state for star updates
+  isUpdatingStar: false, // Loading state for star updates
+  isReordering: false,   // Loading state for reordering
+  updatingReportId: null // ID of report being updated
 }
 ```
 
@@ -199,18 +220,21 @@ The reports feature uses React Context API for state management with React Query
 - `SET_ACTIVE_TAB`: Change active category filter
 - `SET_SEARCH_QUERY`: Update search query
 - `TOGGLE_STAR`: Toggle favorite status of a report
+- `TOGGLE_REPORT_STAR`: Optimistic update for star toggling
 - `SET_LOADING`: Set loading state
 - `SET_ERROR`: Set error state
+- `SET_CATEGORIES`: Set available categories
+- `REORDER_REPORTS`: Reorder reports in the list
 
 ### Star Toggle Functionality
 
 The star toggle feature includes:
 
-1. **Optimistic Updates**: UI updates immediately for better UX
-2. **API Integration**: Makes POST request to update star status
+1. **Optimistic Updates**: UI updates immediately for better UX using `TOGGLE_REPORT_STAR` action
+2. **API Integration**: Makes POST request to update star status via `reportsService`
 3. **Error Handling**: Reverts optimistic update if API call fails
 4. **Loading States**: Shows spinner during API calls
-5. **Cache Invalidation**: Refreshes data after successful updates
+5. **Automatic Refetching**: Refreshes data after successful updates
 
 ### Filtering Logic
 
@@ -228,13 +252,66 @@ Reports are filtered in real-time based on:
 
 ### Data Flow
 
-1. **API Layer**: 
-   - `useReportsDashboard` hook fetches data using React Query
-   - `useUpdateReportStar` hook handles star status updates
-2. **Context Layer**: `ReportsProvider` consumes the hooks and manages state via the reducer.
-3. **State Updates**: All state changes go through the reducer.
-4. **Computed Values**: `filteredReports` and `tabCounts` are computed using `useMemo`.
-5. **Component Usage**: Components get state and actions from `useReportsContext`.
+1. **Service Layer**: 
+   - `reportsService` class handles all API operations
+   - Direct Axios calls without React Query wrapper
+2. **Hook Layer**: Custom hooks (`useReportsDashboard`, `useUpdateReportStar`, `useReorderReports`) manage service calls and state
+3. **Context Layer**: `ReportsProvider` consumes the hooks and manages state via the reducer
+4. **State Updates**: All state changes go through the reducer with optimistic updates
+5. **Computed Values**: `filteredReports` and `tabCounts` are computed using `useMemo`
+6. **Component Usage**: Components get state and actions from `useReportsContext`
+
+## Service Architecture
+
+### ReportsService Class
+The `reportsService` class provides a clean interface for all API operations:
+
+```javascript
+class ReportsService {
+  async fetchReports()        // Fetch all reports
+  async updateReportStar()    // Update star status
+  async reorderReports()      // Reorder reports
+  getLoadingState()          // Get current loading state
+  getErrorState()            // Get current error state
+}
+```
+
+### Payload Format
+The API expects specific payload formats:
+
+#### Star Toggle Payload
+```javascript
+{
+  UserId: 1,
+  ReportId: "report-id",
+  ModifiedTitle: "Report Title",
+  IsStarred: true,
+  SortOrder: 1,
+  CustomTags: ["tag1", "tag2"]
+}
+```
+
+#### Reorder Payload
+```javascript
+[
+  {
+    UserId: 1,
+    ReportId: "report-id-1",
+    ModifiedTitle: "Report 1",
+    IsStarred: false,
+    SortOrder: 1,
+    CustomTags: ["tag1"]
+  },
+  {
+    UserId: 1,
+    ReportId: "report-id-2",
+    ModifiedTitle: "Report 2",
+    IsStarred: true,
+    SortOrder: 2,
+    CustomTags: ["tag2"]
+  }
+]
+```
 
 ## Dependencies
 
@@ -242,22 +319,24 @@ Reports are filtered in real-time based on:
 - `@/components/ui/*`: ShadCN UI components
 - `@/lib/utils`: Utility functions
 - `@/config/*`: Application configuration
+- `@/services/axiosInstance`: Axios instance configuration
 
 ### External Dependencies
 - `react`: Core React functionality
 - `prop-types`: Runtime prop validation
 - `lucide-react`: Icon components
-- `@tanstack/react-query`: Data fetching and caching
+- `axios`: HTTP client for API calls
 
 ### Features Used
 - React Context API for state management
-- React Query for data fetching and caching
-- React hooks (useState, useEffect, useMemo, useReducer)
+- Direct Axios service calls for data fetching
+- React hooks (useState, useEffect, useMemo, useReducer, useCallback)
 - PropTypes for component prop validation
 - CSS classes with Tailwind CSS
 - Responsive grid layout
 - Search and filtering functionality
 - Optimistic updates for better UX
+- Manual error handling and rollback
 
 ## Usage Example
 
@@ -273,12 +352,46 @@ const MyComponent = () => {
   // ... component logic
 };
 
-// Or use the API hooks directly if needed
+// Or use the service hooks directly if needed
 import { useReportsDashboard, useUpdateReportStar } from '@/features/reports/hooks';
 
 const MyApiComponent = () => {
-  const { data, isLoading, error } = useReportsDashboard();
+  const { data, error, refetch } = useReportsDashboard();
   const { mutate: updateStar } = useUpdateReportStar();
   // ... component logic
 };
+
+// Or use the service directly
+import { reportsService } from '@/features/reports/services/reportsService';
+
+const MyServiceComponent = () => {
+  const handleUpdateStar = async (report) => {
+    try {
+      await reportsService.updateReportStar(payload);
+      // Handle success
+    } catch (error) {
+      // Handle error
+    }
+  };
+  // ... component logic
+};
 ```
+
+## Migration from React Query
+
+The reports feature has been migrated from React Query to direct Axios service calls:
+
+### Key Changes:
+1. **Removed React Query dependencies**: No more `useQuery` or `useMutation`
+2. **Added direct service layer**: `reportsService` class for API operations
+3. **Custom hooks**: Replaced React Query hooks with custom hooks using `useState` and `useEffect`
+4. **Manual state management**: Loading states and error handling managed manually
+5. **Optimistic updates**: Implemented manually in the provider
+6. **Automatic refetching**: Added after successful mutations
+
+### Benefits:
+- **Simpler architecture**: No complex React Query setup
+- **Direct control**: Full control over API calls and state management
+- **Reduced dependencies**: Fewer external dependencies
+- **Better understanding**: Clearer data flow and easier debugging
+- **Same functionality**: All features maintained with improved performance

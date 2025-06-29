@@ -1,4 +1,3 @@
-
 import axiosInstance from "@/services/axiosInstance";
 import { API_REPORTS_DASHBOARD } from "@/config/apiUrls";
 
@@ -19,7 +18,7 @@ export const getReportsDashboard = async () => {
 };
 
 // add post call too with same path and send edited object.
-export const postReportsDashboard = async (data) => {
+export const postReportsDashboard = async (data) => {  
   try {
     const response = await axiosInstance.post(API_REPORTS_DASHBOARD, data);
     console.log("response", response);
@@ -27,5 +26,4 @@ export const postReportsDashboard = async (data) => {
   } catch (error) {
     throw error;
   }
-};
-
+}; 

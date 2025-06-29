@@ -2,7 +2,6 @@ import React, { useReducer, useEffect, useMemo, useState } from 'react';
 import PropTypes from 'prop-types';
 import { reportsReducer } from './reducer.js';
 import { initialState } from './initialState.js';
-import { reportsData } from '../helpers/reportsData.js';
 import { useReportsDashboard, useUpdateReportStar, useReorderReports, prepareStarTogglePayload, prepareReorderPayload } from '../hooks/useService.js';
 import * as Actions from './actions.js';
 import { ReportsContext } from './Context.js';
@@ -17,30 +16,16 @@ export const ReportsProvider = ({ children }) => {
   const [state, dispatch] = useReducer(reportsReducer, initialState);
   const [updatingReportId, setUpdatingReportId] = useState(null);
   const [isReordering, setIsReordering] = useState(false);
-  const { data, isLoading, error } = useReportsDashboard();
+  const { data, isLoading, error, refetch } = useReportsDashboard();
   const { mutate: updateStarStatus, isPending: isUpdatingStar, isSuccess: isStarUpdateSuccess, isError: isStarUpdateError } = useUpdateReportStar();
   const { mutate: reorderReportsApi, isPending: isReorderingPending, isSuccess: isReorderSuccess, isError: isReorderError } = useReorderReports();
-  // Load initial reports data from mock file
-  useEffect(() => {
-    const formattedReports = reportsData.Reports.map(formatReportData);
-    const formattedCategories = formatCategories(reportsData.Categories);
-    
-    dispatch({ 
-      type: Actions.ACTIONS.SET_REPORTS, 
-      payload: formattedReports
-    });
-    dispatch({
-      type: Actions.ACTIONS.SET_CATEGORIES,
-      payload: formattedCategories
-    });
-  }, []);
 
   // Update reports when API data is available
   useEffect(() => {
     if (data && !isLoading && !error) {
-      const reportsArray = Array.isArray(data.Reports) ? data.Reports.map(formatReportData) : [];
-      const categoriesArray = Array.isArray(data.Categories) ? formatCategories(data.Categories) : [];
-      
+      const reportsArray = Array.isArray(data) ? data.map(formatReportData) : [];
+      const categoriesArray = Array.isArray(data) ? formatCategories(data) : [];
+
       dispatch({ type: Actions.ACTIONS.SET_REPORTS, payload: reportsArray });
       dispatch({ type: Actions.ACTIONS.SET_CATEGORIES, payload: categoriesArray });
     }
@@ -50,15 +35,23 @@ export const ReportsProvider = ({ children }) => {
   useEffect(() => {
     if (!isUpdatingStar && (isStarUpdateSuccess || isStarUpdateError)) {
       setUpdatingReportId(null);
+      // Refetch data after star update to ensure consistency
+      if (isStarUpdateSuccess) {
+        refetch();
+      }
     }
-  }, [isUpdatingStar, isStarUpdateSuccess, isStarUpdateError]);
+  }, [isUpdatingStar, isStarUpdateSuccess, isStarUpdateError, refetch]);
 
   // Clear reordering state when reorder operation completes
   useEffect(() => {
     if (!isReorderingPending && (isReorderSuccess || isReorderError)) {
       setIsReordering(false);
+      // Refetch data after reorder to ensure consistency
+      if (isReorderSuccess) {
+        refetch();
+      }
     }
-  }, [isReorderingPending, isReorderSuccess, isReorderError]);
+  }, [isReorderingPending, isReorderSuccess, isReorderError, refetch]);
 
   const hasFavorites = useMemo(() => state.reports.some(report => report.isStarred), [state.reports]);
 
@@ -111,11 +104,26 @@ export const ReportsProvider = ({ children }) => {
     dispatch({ type: Actions.ACTIONS.SET_SEARCH_QUERY, payload: query });
   };
 
-  const handleToggleStar = (report) => {
+  const handleToggleStar = async (report) => {
     if (report) {
-        setUpdatingReportId(report.id);
-        const payload = prepareStarTogglePayload(report, !report.isStarred);
-        updateStarStatus(payload);
+      // Optimistic update
+      dispatch({
+        type: Actions.ACTIONS.TOGGLE_REPORT_STAR,
+        payload: { reportId: report.id, isStarred: !report.isStarred }
+      });
+      
+      setUpdatingReportId(report.id);
+      const payload = prepareStarTogglePayload(report, !report.isStarred);
+
+      try {
+        await updateStarStatus(payload);
+      } catch (error) {
+        // Revert optimistic update on error
+        dispatch({
+          type: Actions.ACTIONS.TOGGLE_REPORT_STAR,
+          payload: { reportId: report.id, isStarred: report.isStarred }
+        });
+      }
     }
   };
 
@@ -123,7 +131,7 @@ export const ReportsProvider = ({ children }) => {
     dispatch({ type: Actions.ACTIONS.SET_REPORTS, payload: reports });
   };
 
-  const handleReorderReports = (activeId, overId) => {
+  const handleReorderReports = async (activeId, overId) => {
     // First update the local state optimistically
     dispatch({
       type: Actions.ACTIONS.REORDER_REPORTS,
@@ -146,13 +154,19 @@ export const ReportsProvider = ({ children }) => {
         sortOrder: index + 1
       }));
 
-      // console.log("reorderedReports", reorderedReports);
-      // return;
-
       // Set reordering state and make API call
       setIsReordering(true);
       const payload = prepareReorderPayload(reorderedReports);
-      reorderReportsApi(payload);
+      
+      try {
+        await reorderReportsApi(payload);
+      } catch (error) {
+        // Revert optimistic update on error
+        dispatch({
+          type: Actions.ACTIONS.SET_REPORTS,
+          payload: state.reports
+        });
+      }
     }
   };
 

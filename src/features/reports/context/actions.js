@@ -7,6 +7,7 @@ export const ACTIONS = {
   SET_ACTIVE_TAB: 'SET_ACTIVE_TAB',
   SET_SEARCH_QUERY: 'SET_SEARCH_QUERY',
   TOGGLE_STAR: 'TOGGLE_STAR',
+  TOGGLE_REPORT_STAR: 'TOGGLE_REPORT_STAR',
   SET_LOADING: 'SET_LOADING',
   SET_ERROR: 'SET_ERROR',
   SET_CATEGORIES: 'SET_CATEGORIES',
@@ -41,6 +42,11 @@ export const toggleStar = (reportId) => ({
   payload: reportId
 });
 
+export const toggleReportStar = (reportId, isStarred) => ({
+  type: ACTIONS.TOGGLE_REPORT_STAR,
+  payload: { reportId, isStarred }
+});
+
 export const setLoading = (loading) => ({
   type: ACTIONS.SET_LOADING,
   payload: loading
@@ -49,4 +55,14 @@ export const setLoading = (loading) => ({
 export const setError = (error) => ({
   type: ACTIONS.SET_ERROR,
   payload: error
+});
+
+export const setCategories = (categories) => ({
+  type: ACTIONS.SET_CATEGORIES,
+  payload: categories
+});
+
+export const reorderReports = (activeId, overId) => ({
+  type: ACTIONS.REORDER_REPORTS,
+  payload: { activeId, overId }
 });

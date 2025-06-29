@@ -39,6 +39,18 @@ export const reportsReducer = (state, action) => {
         )
       };
 
+    case ACTIONS.TOGGLE_REPORT_STAR: {
+      const { reportId, isStarred } = action.payload;
+      return {
+        ...state,
+        reports: state.reports.map(report =>
+          report.id === reportId
+            ? { ...report, isStarred }
+            : report
+        )
+      };
+    }
+
     case ACTIONS.SET_LOADING:
       return {
         ...state,

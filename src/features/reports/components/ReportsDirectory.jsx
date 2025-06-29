@@ -41,7 +41,6 @@ const ReportsDirectory = () => {
   const salesReports = reports.filter((report) =>
     report.category.includes("Accounts Receivable")
   );
-  console.log("salesReports", salesReports, filteredReports);
 
   const [activeReport, setActiveReport] = useState(null);
 
@@ -76,7 +75,7 @@ const ReportsDirectory = () => {
     <div className="flex flex-col h-screen">
       {/* Sticky Header Section */}
       <div className="sticky z-40 border-b border-gray-200 shadow-sm backdrop-blur-sm bg-white/95">
-        <div className="mx-auto  sm:py-6 max-w-11/12">
+        <div className="mx-auto sm:py-6 max-w-11/12">
           {/* Header */}
           <div className="mb-4 sm:mb-6">
             <h1 className="mb-2 text-2xl font-bold text-gray-900 sm:text-3xl">

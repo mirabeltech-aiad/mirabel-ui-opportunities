@@ -1,105 +1,101 @@
-import { getReportsDashboard, postReportsDashboard } from "@/features/reports/services/reportsApi";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useState, useEffect, useCallback } from 'react';
+import { reportsService } from '../services/reportsService.js';
 
 /**
- * Hook to fetch reports dashboard data using React Query
- * @returns {Object} Query result with data, loading, error states
+ * Hook to fetch reports dashboard data using direct service calls
+ * @returns {Object} Object with data, loading, error states and refetch function
  */
 export const useReportsDashboard = () => {
-  return useQuery({
-    queryKey: ["reports-dashboard"],
-    queryFn: getReportsDashboard,
-    staleTime: 1000 * 60 * 10, // 10 minutes
-    refetchOnWindowFocus: false,
-  });
+  const [data, setData] = useState(null);
+  const [error, setError] = useState(null);
+
+  const fetchData = useCallback(async () => {
+    setError(null);
+    
+    try {
+      const result = await reportsService.fetchReports();
+      setData(result);
+    } catch (err) {
+      setError(err);
+    } finally {
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchData();
+  }, [fetchData]);
+
+  return {
+    data,
+    error,
+    refetch: fetchData
+  };
 };
 
 /**
- * Hook to update report star status using React Query mutation
- * @returns {Object} Mutation result with mutate function, loading, error states
+ * Hook to update report star status using direct service calls
+ * @returns {Object} Object with mutate function and loading states
  */
 export const useUpdateReportStar = () => {
-  const queryClient = useQueryClient();
+  const [isPending, setIsPending] = useState(false);
+  const [isSuccess, setIsSuccess] = useState(false);
+  const [isError, setIsError] = useState(false);
 
-  return useMutation({
-    mutationFn: postReportsDashboard,
-    onMutate: async (updatedReport) => {
-      // Cancel any outgoing refetches (so they don't overwrite our optimistic update)
-      await queryClient.cancelQueries({ queryKey: ["reports-dashboard"] });
-
-      // Snapshot the previous value
-      const previousReports = queryClient.getQueryData(["reports-dashboard"]);
-
-      // Optimistically update to the new value
-      queryClient.setQueryData(["reports-dashboard"], old => {
-        const oldData = old || { Reports: [], Categories: [] };
-        return {
-          ...oldData,
-          Reports: oldData.Reports.map(report =>
-            report.Id === updatedReport[0].Id ? { ...report, IsStarred: updatedReport[0].IsStarred } : report
-          ),
-        };
-      });
-
-      // Return a context object with the snapshotted value
-      return { previousReports };
-    },
-    onError: (err, newReport, context) => {
-      // Rollback to the previous value if mutation fails
-      queryClient.setQueryData(["reports-dashboard"], context.previousReports);
+  const mutate = useCallback(async (payload) => {
+    setIsPending(true);
+    setIsSuccess(false);
+    setIsError(false);
+    
+    try {
+      await reportsService.updateReportStar(payload);
+      setIsSuccess(true);
+    } catch (err) {
+      setIsError(true);
       console.error('Error updating report star status:', err);
-    },
-    onSuccess: (data, variables) => {
-      console.log('Star status updated successfully:', variables);
-    },
-    onSettled: () => {
-      // Always refetch after error or success
-      queryClient.invalidateQueries({ queryKey: ["reports-dashboard"] });
-    },
-  });
+    } finally {
+      setIsPending(false);
+    }
+  }, []);
+
+  return {
+    mutate,
+    isPending,
+    isSuccess,
+    isError
+  };
 };
 
 /**
- * Hook to reorder reports using React Query mutation
- * @returns {Object} Mutation result with mutate function, loading, error states
+ * Hook to reorder reports using direct service calls
+ * @returns {Object} Object with mutate function and loading states
  */
 export const useReorderReports = () => {
-  const queryClient = useQueryClient();
+  const [isPending, setIsPending] = useState(false);
+  const [isSuccess, setIsSuccess] = useState(false);
+  const [isError, setIsError] = useState(false);
 
-  return useMutation({
-    mutationFn: postReportsDashboard,
-    onMutate: async (reorderedReports) => {
-      // Cancel any outgoing refetches (so they don't overwrite our optimistic update)
-      await queryClient.cancelQueries({ queryKey: ["reports-dashboard"] });
-
-      // Snapshot the previous value
-      const previousReports = queryClient.getQueryData(["reports-dashboard"]);
-
-      // Optimistically update to the new value
-      queryClient.setQueryData(["reports-dashboard"], old => {
-        const oldData = old || { Reports: [], Categories: [] };
-        return {
-          ...oldData,
-          Reports: reorderedReports
-        };
-      });
-
-      // Return a context object with the snapshotted value
-      return { previousReports };
-    },
-    onError: (err, reorderedReports, context) => {
-      // Rollback to the previous value if mutation fails
-      queryClient.setQueryData(["reports-dashboard"], context.previousReports);
+  const mutate = useCallback(async (payload) => {
+    setIsPending(true);
+    setIsSuccess(false);
+    setIsError(false);
+    
+    try {
+      await reportsService.reorderReports(payload);
+      setIsSuccess(true);
+    } catch (err) {
+      setIsError(true);
       console.error('Error reordering reports:', err);
-    },
-    onSuccess: (data, variables) => {
-      console.log('Reports reordered successfully:', variables);
-    },
-    onSettled: () => {
-      // Always refetch after error or success
-      queryClient.invalidateQueries({ queryKey: ["reports-dashboard"] });
-    },
-  });
+    } finally {
+      setIsPending(false);
+    }
+  }, []);
+
+  return {
+    mutate,
+    isPending,
+    isSuccess,
+    isError
+  };
 };
 
 /**
@@ -111,23 +107,14 @@ export const useReorderReports = () => {
 export const prepareStarTogglePayload = (report, isStarred) => {
   let localData = JSON.parse(window.localStorage.getItem("MMClientVars"));
   console.log("LocalStorage", localData?.UserID);
-  return [{
-    Id: report.id,
-    Icon: report.icon,
-    Title: report.title,
-    Description: report.description,
-    Tags: report.tags,
-    Category: report.category,
-    RoutePath: report.routePath,
-    IsStarred: isStarred,
-    IsAdmin: report.isAdmin,
-    UserId: localData?.UserID || 2,
-    ModifiedTitle: report.modifiedTitle,
-    CreatedDate: report.createdDate || new Date().toISOString(),
-    ModifiedDate: report.modifiedDate || null,
-    IsMaster: false,
-    SortOrder: report.sortOrder || 0
-  }];
+  return {
+    "UserId" : localData?.UserID || 1, 
+    "ReportId" : report.id,
+    "ModifiedTitle" : report.modifiedTitle,
+    "IsStarred" : isStarred,
+    "SortOrder" : report.sortOrder || 0,
+    "CustomTags" : report.tags
+  };
 };
 
 /**
@@ -136,21 +123,13 @@ export const prepareStarTogglePayload = (report, isStarred) => {
  * @returns {Array} Formatted payload for API
  */
 export const prepareReorderPayload = (reports) => {
+  let localData = JSON.parse(window.localStorage.getItem("MMClientVars"));
   return reports.map(report => ({
-    Id: report.id,
-    Icon: report.icon,
-    Title: report.title,
-    Description: report.description,
-    Tags: report.tags,
-    Category: report.category,
-    RoutePath: report.routePath,
-    IsStarred: report.isStarred,
-    IsAdmin: report.isAdmin,
-    UserId: localData?.UserID || 2,
+    UserId: localData?.UserID || 1,
+    ReportId: report.id,
     ModifiedTitle: report.modifiedTitle,
-    CreatedDate: report.createdDate || new Date().toISOString(),
-    ModifiedDate: report.modifiedDate || null,
-    IsMaster: false,
-    SortOrder: report.sortOrder
+    IsStarred: report.isStarred,
+    SortOrder: report.sortOrder,
+    CustomTags: report.tags
   }));
 }; 

@@ -111,7 +111,7 @@ const ReportCard = ({ report, onToggleStar, isUpdatingStar = false, isDragging =
 
 ReportCard.propTypes = {
   report: PropTypes.shape({
-    id: PropTypes.number.isRequired,
+    id: PropTypes.string.isRequired,
     icon: PropTypes.string.isRequired,
     title: PropTypes.string.isRequired,
     description: PropTypes.string.isRequired,
@@ -119,9 +119,13 @@ ReportCard.propTypes = {
     category: PropTypes.arrayOf(PropTypes.string).isRequired,
     routePath: PropTypes.string.isRequired,
     isStarred: PropTypes.bool.isRequired,
-    isAdmin: PropTypes.bool.isRequired,
-    usedID: PropTypes.string.isRequired,
-    modifiedTitle: PropTypes.string.isRequired,
+    isAdmin: PropTypes.bool,
+    usedID: PropTypes.string,
+    modifiedTitle: PropTypes.string,
+    createdDate: PropTypes.string,
+    modifiedDate: PropTypes.string,
+    isMaster: PropTypes.bool,
+    sortOrder: PropTypes.number
   }).isRequired,
   onToggleStar: PropTypes.func.isRequired,
   isUpdatingStar: PropTypes.bool,

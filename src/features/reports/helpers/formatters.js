@@ -33,7 +33,7 @@ export const formatReportData = (report) => ({
   title: report.Title,
   description: report.Description,
   tags: report.Tags,
-  category: report.Category,
+  category: Array.isArray(report.Category) ? report.Category : [report.Category], // Handle both array and string
   routePath: report.RoutePath,
   isStarred: report.IsStarred,
   isAdmin: report.IsAdmin,
@@ -46,10 +46,27 @@ export const formatReportData = (report) => ({
 });
 
 /**
- * Extracts category names from the API's category objects.
- * @param {Array<object>} categories - The array of category objects from the API.
- * @returns {Array<string>} An array of category names.
+ * Extracts unique category names from the reports array.
+ * @param {Array<object>} reports - The array of report objects from the API.
+ * @returns {Array<string>} An array of unique category names.
  */
-export const formatCategories = (categories = []) => {
-  return categories.map(cat => cat.CategoryName);
+export const formatCategories = (reports = []) => {
+  const categorySet = new Set();
+  
+  reports.forEach(report => {
+    if (report.Category) {
+      // Handle both array and string formats
+      if (Array.isArray(report.Category)) {
+        report.Category.forEach(cat => {
+          if (cat && cat !== 'All') {
+            categorySet.add(cat);
+          }
+        });
+      } else if (typeof report.Category === 'string' && report.Category !== 'All') {
+        categorySet.add(report.Category);
+      }
+    }
+  });
+  
+  return Array.from(categorySet).sort();
 };
