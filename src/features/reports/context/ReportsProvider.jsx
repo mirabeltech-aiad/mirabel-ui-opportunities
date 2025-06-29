@@ -58,22 +58,36 @@ export const ReportsProvider = ({ children }) => {
 
   const displayCategories = useMemo(() => {
     const favoritesCategory = 'Favorites';
-    const remainingCategories = state.categories.filter(c => c !== favoritesCategory);
+    const allCategory = 'All';
+    const remainingCategories = state.categories.filter(c => c !== favoritesCategory && c !== allCategory);
     
+    const categories = [];
+    
+    // Always add "All" first
+    categories.push(allCategory);
+    
+    // Add "Favorites" if there are starred reports
     if (hasFavorites) {
-      return [favoritesCategory, ...remainingCategories];
+      categories.push(favoritesCategory);
     }
     
-    return remainingCategories;
+    // Add remaining categories
+    categories.push(...remainingCategories);
+    
+    return categories;
   }, [state.categories, hasFavorites]);
 
   const filteredReports = useMemo(() => {
     const reports = Array.isArray(state.reports) ? state.reports : [];
+    
+    // Apply category filter first
     if (state.activeTab !== 'All') {
       return reports.filter(report =>
         (state.activeTab === 'Favorites' ? report.isStarred : report.category.includes(state.activeTab))
       );
     }
+    
+    // Apply search filter if no category filter is active
     if (state.searchQuery) {
       return reports.filter(report =>
         report.title.toLowerCase().includes(state.searchQuery.toLowerCase()) ||
@@ -81,19 +95,26 @@ export const ReportsProvider = ({ children }) => {
         report.tags.some(tag => tag.toLowerCase().includes(state.searchQuery.toLowerCase()))
       );
     }
+    
     return reports;
   }, [state.reports, state.activeTab, state.searchQuery]);
 
   const tabCounts = useMemo(() => {
     const reports = Array.isArray(state.reports) ? state.reports : [];
-    const counts = { All: reports.length, Favorites: reports.filter(r => r.isStarred).length };
+    const counts = { 
+      All: reports.length, 
+      Favorites: reports.filter(r => r.isStarred).length 
+    };
+    
+    // Count reports for each category
     reports.forEach(report => {
       report.category.forEach(cat => {
-        if (cat !== 'All') {
+        if (cat !== 'All' && cat !== 'Favorites') {
           counts[cat] = (counts[cat] || 0) + 1;
         }
       });
     });
+    
     return counts;
   }, [state.reports]);
 
