@@ -8,6 +8,7 @@ The Reports feature provides a comprehensive interface for browsing, searching, 
 - Filtering reports by categories (All, Favorites, Revenue Reports, etc.)
 - Searching reports by title, description, or tags
 - Starring/favoriting reports for quick access with real-time API updates
+- Drag-and-drop reordering of reports
 - Responsive design that works across different screen sizes
 
 ## Folder Structure
@@ -19,21 +20,21 @@ src/features/reports/
 │   ├── ReportCard.jsx         # Individual report card display
 │   ├── SearchBar.jsx          # Search input component
 │   ├── TabNavigation.jsx      # Category filter tabs
+│   ├── SortableReportCard.jsx # Drag-and-drop wrapper for ReportCard
 │   └── index.js              # Component exports
 ├── context/             # State management
 │   ├── Context.js            # Defines the React context and useReportsContext hook
 │   ├── ReportsProvider.jsx   # Context provider with direct service integration
-│   ├── actions.js            # Action creators and types
-│   ├── reducer.js            # State reducer function
-│   ├── initialState.js       # Initial state definition
+│   ├── actions.js            # Action creators and types (simplified)
+│   ├── reducer.js            # State reducer function (simplified)
+│   ├── initialState.js       # Initial state definition (simplified)
 │   └── index.js              # Context exports
 ├── hooks/               # Custom hooks
 │   ├── useService.js         # Custom hooks for API calls using direct services
 │   └── index.js              # Hook exports
 ├── helpers/             # Utility functions
-│   ├── constants.js          # Feature-specific constants
-│   ├── formatters.js         # Data formatting utilities
-│   └── reportsData.js        # Static reports data (for fallback/mock data)
+│   ├── constants.js          # Feature-specific constants (TAG_COLORS)
+│   └── formatters.js         # Data formatting utilities
 ├── services/            # API integration
 │   ├── reportsApi.js         # Direct Axios API service functions
 │   └── reportsService.js     # Service class for managing API operations
@@ -63,6 +64,19 @@ import { ReportCard } from '@/features/reports/components';
   report={reportObject} 
   onToggleStar={handleToggleStar}
   isUpdatingStar={isUpdatingStar}
+/>
+```
+
+#### SortableReportCard
+Drag-and-drop wrapper for ReportCard (used internally):
+```jsx
+import SortableReportCard from '@/features/reports/components/SortableReportCard';
+
+<SortableReportCard
+  report={reportObject}
+  onToggleStar={handleToggleStar}
+  isUpdatingStar={isUpdatingStar}
+  isReordering={isReordering}
 />
 ```
 
@@ -193,36 +207,35 @@ The reports feature uses React Context API for state management with direct Axio
 4. **useUpdateReportStar**: Custom hook for star status updates.
 5. **useReorderReports**: Custom hook for report reordering.
 6. **reportsService**: Service class that handles all API operations.
-7. **reportsReducer**: Handles state updates based on actions.
-8. **Actions**: Define state update operations.
-9. **Initial State**: Defines the default state structure.
+7. **reportsReducer**: Handles state updates based on actions (simplified).
+8. **Actions**: Define state update operations (simplified).
+9. **Initial State**: Defines the default state structure (simplified).
 
 ### State Structure
 
 ```javascript
 {
   reports: [],           // All reports data
-  filteredReports: [],   // Currently filtered/displayed reports (computed)
+  categories: [],        // Available categories
   activeTab: 'All',      // Active category filter
   searchQuery: '',       // Current search query
   error: null,          // Error state
-  tabCounts: {},        // Computed counts for each category
-  isUpdatingStar: false, // Loading state for star updates
-  isReordering: false,   // Loading state for reordering
-  updatingReportId: null // ID of report being updated
+  // Computed values (not in state):
+  // filteredReports: []   // Currently filtered/displayed reports
+  // tabCounts: {}         // Computed counts for each category
+  // isLoading: boolean    // Managed in provider
+  // isUpdatingStar: boolean // Loading state for star updates
+  // isReordering: boolean   // Loading state for reordering
+  // updatingReportId: string // ID of report being updated
 }
 ```
 
-### Available Actions
+### Available Actions (Simplified)
 
 - `SET_REPORTS`: Set the complete reports array
-- `SET_FILTERED_REPORTS`: Set filtered reports (computed automatically)
 - `SET_ACTIVE_TAB`: Change active category filter
 - `SET_SEARCH_QUERY`: Update search query
-- `TOGGLE_STAR`: Toggle favorite status of a report
 - `TOGGLE_REPORT_STAR`: Optimistic update for star toggling
-- `SET_LOADING`: Set loading state
-- `SET_ERROR`: Set error state
 - `SET_CATEGORIES`: Set available categories
 - `REORDER_REPORTS`: Reorder reports in the list
 
@@ -235,6 +248,16 @@ The star toggle feature includes:
 3. **Error Handling**: Reverts optimistic update if API call fails
 4. **Loading States**: Shows spinner during API calls
 5. **Automatic Refetching**: Refreshes data after successful updates
+
+### Drag-and-Drop Reordering
+
+The reordering feature includes:
+
+1. **Visual Feedback**: Cards show drag states and overlay during dragging
+2. **Optimistic Updates**: UI updates immediately when dragging ends
+3. **API Integration**: Makes POST request to update sort order via `reportsService`
+4. **Error Handling**: Reverts optimistic update if API call fails
+5. **Sort Order Management**: Automatically updates sortOrder for all reports
 
 ### Filtering Logic
 
@@ -326,6 +349,9 @@ The API expects specific payload formats:
 - `prop-types`: Runtime prop validation
 - `lucide-react`: Icon components
 - `axios`: HTTP client for API calls
+- `@dnd-kit/core`: Drag-and-drop core functionality
+- `@dnd-kit/sortable`: Drag-and-drop sorting functionality
+- `@dnd-kit/utilities`: Drag-and-drop utilities
 
 ### Features Used
 - React Context API for state management
@@ -337,6 +363,7 @@ The API expects specific payload formats:
 - Search and filtering functionality
 - Optimistic updates for better UX
 - Manual error handling and rollback
+- Drag-and-drop reordering
 
 ## Usage Example
 
@@ -395,3 +422,53 @@ The reports feature has been migrated from React Query to direct Axios service c
 - **Reduced dependencies**: Fewer external dependencies
 - **Better understanding**: Clearer data flow and easier debugging
 - **Same functionality**: All features maintained with improved performance
+
+## Recent Code Cleanup
+
+The reports feature has undergone significant cleanup to remove unnecessary code and improve maintainability:
+
+### Removed Files:
+- **`reportsData.js`**: Empty file that was no longer needed after removing mock data loading
+
+### Removed Unused Actions:
+- **`SET_FILTERED_REPORTS`**: Not used since filteredReports is computed
+- **`TOGGLE_STAR`**: Replaced by `TOGGLE_REPORT_STAR`
+- **`SET_LOADING`**: Not used since loading is managed in hooks
+- **`SET_ERROR`**: Not used since error is managed in hooks
+
+### Removed Unused Action Creators:
+- **`setFilteredReports`**: Not used
+- **`toggleStar`**: Replaced by `toggleReportStar`
+- **`setLoading`**: Not used
+- **`setError`**: Not used
+
+### Removed Unused Reducer Cases:
+- **`SET_FILTERED_REPORTS`**: Removed case
+- **`TOGGLE_STAR`**: Removed case
+- **`SET_LOADING`**: Removed case
+- **`SET_ERROR`**: Removed case
+
+### Cleaned Up Initial State:
+- **`loading`**: Removed unused field
+
+### Cleaned Up Components:
+- **`ReportsDirectory.jsx`**: 
+  - Removed unused `salesReports` variable
+  - Removed commented code
+  - Fixed imports and exports
+
+### Fixed ReportsProvider:
+- **`isLoading`**: Fixed reference issue by managing it locally
+- **Dependencies**: Updated useEffect dependencies
+
+### Updated Exports:
+- **`hooks/index.js`**: Added missing exports (`useReorderReports`, `prepareReorderPayload`)
+
+### Benefits of Cleanup:
+- **Reduced bundle size**: Removed unused code and files
+- **Improved maintainability**: Cleaner, more focused codebase
+- **Better performance**: Fewer unnecessary re-renders and computations
+- **Easier debugging**: Less code to trace through
+- **Cleaner architecture**: Removed redundant patterns
+
+The reports feature is now much cleaner and more maintainable while preserving all essential functionality including drag-and-drop reordering, star toggling, search, filtering, and responsive design.
