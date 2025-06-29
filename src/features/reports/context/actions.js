@@ -3,13 +3,9 @@
  */
 export const ACTIONS = {
   SET_REPORTS: 'SET_REPORTS',
-  SET_FILTERED_REPORTS: 'SET_FILTERED_REPORTS',
   SET_ACTIVE_TAB: 'SET_ACTIVE_TAB',
   SET_SEARCH_QUERY: 'SET_SEARCH_QUERY',
-  TOGGLE_STAR: 'TOGGLE_STAR',
   TOGGLE_REPORT_STAR: 'TOGGLE_REPORT_STAR',
-  SET_LOADING: 'SET_LOADING',
-  SET_ERROR: 'SET_ERROR',
   SET_CATEGORIES: 'SET_CATEGORIES',
   REORDER_REPORTS: 'REORDER_REPORTS'
 };
@@ -19,11 +15,6 @@ export const ACTIONS = {
  */
 export const setReports = (reports) => ({
   type: ACTIONS.SET_REPORTS,
-  payload: reports
-});
-
-export const setFilteredReports = (reports) => ({
-  type: ACTIONS.SET_FILTERED_REPORTS,
   payload: reports
 });
 
@@ -37,24 +28,9 @@ export const setSearchQuery = (query) => ({
   payload: query
 });
 
-export const toggleStar = (reportId) => ({
-  type: ACTIONS.TOGGLE_STAR,
-  payload: reportId
-});
-
 export const toggleReportStar = (reportId, isStarred) => ({
   type: ACTIONS.TOGGLE_REPORT_STAR,
   payload: { reportId, isStarred }
-});
-
-export const setLoading = (loading) => ({
-  type: ACTIONS.SET_LOADING,
-  payload: loading
-});
-
-export const setError = (error) => ({
-  type: ACTIONS.SET_ERROR,
-  payload: error
 });
 
 export const setCategories = (categories) => ({

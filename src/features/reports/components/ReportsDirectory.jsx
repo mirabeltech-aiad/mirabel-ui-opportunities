@@ -37,11 +37,6 @@ const ReportsDirectory = () => {
     reorderReports,
   } = useReportsContext();
 
-  // print only category is sales only
-  const salesReports = reports.filter((report) =>
-    report.category.includes("Accounts Receivable")
-  );
-
   const [activeReport, setActiveReport] = useState(null);
 
   const sensors = useSensors(
@@ -81,9 +76,6 @@ const ReportsDirectory = () => {
             <h1 className="mb-2 text-2xl font-bold text-gray-900 sm:text-3xl">
               Reports Directory
             </h1>
-            {/* <p className="mb-3 text-sm text-gray-600 sm:mb-4 sm:text-base">
-              Select a report to view detailed analytics and insights
-            </p> */}
             <div className="flex flex-col gap-3 items-start sm:flex-row sm:gap-4 sm:items-center">
               <SearchBar
                 searchQuery={searchQuery}

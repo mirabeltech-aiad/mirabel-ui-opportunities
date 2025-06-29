@@ -7,6 +7,5 @@ export const initialState = {
   filteredReports: [],
   activeTab: 'All',
   searchQuery: '',
-  loading: false,
   error: null
 };

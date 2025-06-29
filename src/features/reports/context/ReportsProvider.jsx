@@ -16,20 +16,21 @@ export const ReportsProvider = ({ children }) => {
   const [state, dispatch] = useReducer(reportsReducer, initialState);
   const [updatingReportId, setUpdatingReportId] = useState(null);
   const [isReordering, setIsReordering] = useState(false);
-  const { data, isLoading, error, refetch } = useReportsDashboard();
+  const [isLoading, setIsLoading] = useState(false);
+  const { data, error, refetch } = useReportsDashboard();
   const { mutate: updateStarStatus, isPending: isUpdatingStar, isSuccess: isStarUpdateSuccess, isError: isStarUpdateError } = useUpdateReportStar();
   const { mutate: reorderReportsApi, isPending: isReorderingPending, isSuccess: isReorderSuccess, isError: isReorderError } = useReorderReports();
 
   // Update reports when API data is available
   useEffect(() => {
-    if (data && !isLoading && !error) {
+    if (data && !error) {
       const reportsArray = Array.isArray(data) ? data.map(formatReportData) : [];
       const categoriesArray = Array.isArray(data) ? formatCategories(data) : [];
 
       dispatch({ type: Actions.ACTIONS.SET_REPORTS, payload: reportsArray });
       dispatch({ type: Actions.ACTIONS.SET_CATEGORIES, payload: categoriesArray });
     }
-  }, [data, isLoading, error]);
+  }, [data, error]);
 
   // Clear updating report ID when mutation completes
   useEffect(() => {
@@ -175,7 +176,7 @@ export const ReportsProvider = ({ children }) => {
     categories: displayCategories,
     filteredReports,
     tabCounts,
-    isLoading: isLoading,
+    isLoading,
     error,
     isUpdatingStar,
     updatingReportId,

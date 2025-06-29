@@ -5,5 +5,7 @@
 export { 
   useReportsDashboard, 
   useUpdateReportStar, 
-  prepareStarTogglePayload 
+  useReorderReports,
+  prepareStarTogglePayload,
+  prepareReorderPayload
 } from './useService.js';

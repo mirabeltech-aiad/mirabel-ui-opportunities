@@ -11,12 +11,6 @@ export const reportsReducer = (state, action) => {
         reports: action.payload
       };
 
-    case ACTIONS.SET_FILTERED_REPORTS:
-      return {
-        ...state,
-        filteredReports: action.payload
-      };
-
     case ACTIONS.SET_ACTIVE_TAB:
       return {
         ...state,
@@ -27,16 +21,6 @@ export const reportsReducer = (state, action) => {
       return {
         ...state,
         searchQuery: action.payload
-      };
-
-    case ACTIONS.TOGGLE_STAR:
-      return {
-        ...state,
-        reports: state.reports.map(report =>
-          report.id === action.payload
-            ? { ...report, isStarred: !report.isStarred }
-            : report
-        )
       };
 
     case ACTIONS.TOGGLE_REPORT_STAR: {
@@ -50,19 +34,6 @@ export const reportsReducer = (state, action) => {
         )
       };
     }
-
-    case ACTIONS.SET_LOADING:
-      return {
-        ...state,
-        loading: action.payload
-      };
-
-    case ACTIONS.SET_ERROR:
-      return {
-        ...state,
-        error: action.payload,
-        loading: false
-      };
 
     case ACTIONS.SET_CATEGORIES:
       return {
