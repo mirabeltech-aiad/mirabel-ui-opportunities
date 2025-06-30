@@ -119,17 +119,18 @@ export const prepareStarTogglePayload = (report, isStarred) => {
 
 /**
  * Helper function to prepare the payload for reordering reports
- * @param {Array} reports - Array of reports with updated sortOrder
- * @returns {Array} Formatted payload for API
+ * @param {Object} report - The report being dragged
+ * @param {number} targetSortOrder - The target sort order
+ * @returns {Object} Formatted payload for API
  */
-export const prepareReorderPayload = (reports) => {
+export const prepareReorderPayload = (report, targetSortOrder) => {
   let localData = JSON.parse(window.localStorage.getItem("MMClientVars"));
-  return reports.map(report => ({
+  return {
     UserId: localData?.UserID || 1,
     ReportId: report.id,
     ModifiedTitle: report.modifiedTitle,
     IsStarred: report.isStarred,
-    SortOrder: report.sortOrder,
+    SortOrder: targetSortOrder,
     CustomTags: report.tags
-  }));
+  };
 }; 

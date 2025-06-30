@@ -55,15 +55,20 @@ export const reportsReducer = (state, action) => {
       const [movedItem] = reports.splice(activeIndex, 1);
       reports.splice(overIndex, 0, movedItem);
 
-      // Update sortOrder
-      const reorderedReports = reports.map((report, index) => ({
-        ...report,
-        sortOrder: index + 1
-      }));
+      // Update sortOrder for the moved item only
+      const updatedReports = reports.map((report, index) => {
+        if (report.id === activeId) {
+          return {
+            ...report,
+            sortOrder: reports[overIndex].sortOrder
+          };
+        }
+        return report;
+      });
 
       return {
         ...state,
-        reports: reorderedReports
+        reports: updatedReports
       };
     }
 

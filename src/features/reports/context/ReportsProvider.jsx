@@ -160,26 +160,15 @@ export const ReportsProvider = ({ children }) => {
       payload: { activeId, overId }
     });
 
-    // Then prepare the updated reports array with new sortOrder values
-    const updatedReports = [...state.reports];
-    const activeIndex = updatedReports.findIndex(r => r.id === activeId);
-    const overIndex = updatedReports.findIndex(r => r.id === overId);
+    // Find the active report and target report
+    const activeReport = state.reports.find(r => r.id === activeId);
+    const overReport = state.reports.find(r => r.id === overId);
 
-    if (activeIndex !== -1 && overIndex !== -1) {
-      // Move item in array
-      const [movedItem] = updatedReports.splice(activeIndex, 1);
-      updatedReports.splice(overIndex, 0, movedItem);
-
-      // Update sortOrder for all reports
-      const reorderedReports = updatedReports.map((report, index) => ({
-        ...report,
-        sortOrder: index + 1
-      }));
-
+    if (activeReport && overReport) {
       // Set reordering state and make API call
       setIsReordering(true);
-      const payload = prepareReorderPayload(reorderedReports);
-      
+      const targetSortOrder = overReport.sortOrder;
+      const payload = prepareReorderPayload(activeReport, targetSortOrder);
       try {
         await reorderReportsApi(payload);
       } catch (error) {
@@ -188,6 +177,7 @@ export const ReportsProvider = ({ children }) => {
           type: Actions.ACTIONS.SET_REPORTS,
           payload: state.reports
         });
+        console.error('Error reordering reports:', error);
       }
     }
   };
