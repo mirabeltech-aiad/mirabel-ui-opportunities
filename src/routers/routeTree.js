@@ -12,14 +12,14 @@ export const routes = [
     children: [],
     exact: true,
   },
-  {
-    path: '/sitewidesettings',
-    component: SiteWideSettingsPage,
-    exact: true,
-  },
-  {
-    path: '/reportsdashboard',
-    component: ReportsDashboardPage,
-    exact: true,
-  }
+  // {
+  //   path: '/sitewidesettings',
+  //   component: SiteWideSettingsPage,
+  //   exact: true,
+  // },
+  // {
+  //   path: '/reportsdashboard',
+  //   component: ReportsDashboardPage,
+  //   exact: true,
+  // }
 ];
