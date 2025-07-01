@@ -13,6 +13,12 @@ export default defineConfig({
   resolve: {
     alias: {
       '@': path.resolve(__dirname, 'src'),
+      '@OpportunityUtils': path.resolve(__dirname, 'src/features/Opportunity/utils'),
+      '@OpportunityConstants': path.resolve(__dirname, 'src/features/Opportunity/constants'),
+      '@OpportunityContexts': path.resolve(__dirname, 'src/features/Opportunity/contexts'),
+      '@OpportunityComponents': path.resolve(__dirname, 'src/features/Opportunity/components'),
+      '@OpportunityServices': path.resolve(__dirname, 'src/features/Opportunity/services'),
+      '@OpportunityData': path.resolve(__dirname, 'src/features/Opportunity/data'),
     },
   },
 });

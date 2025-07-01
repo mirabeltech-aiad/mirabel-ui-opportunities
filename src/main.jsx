@@ -9,6 +9,14 @@ import { ErrorBoundary } from 'react-error-boundary';
 import ErrorFallback from './components/shared/ErrorBoundary';
 import { GlobalProvider } from './store/GlobalContext';
 import { ThemeProvider } from './components/theme/ThemeProvider';
+import { SearchProvider } from './features/Opportunity/contexts/SearchContext';
+import { EditModeProvider } from './features/Opportunity/contexts/EditModeContext';
+import { Toaster } from './components/ui/sonner';
+import { TooltipProvider } from './components/ui/tooltip';
+import { initializeDesignSystem } from './lib/styleManager';
+// Initialize design system on app start - ensures knowledge base styling is applied
+initializeDesignSystem();
+
 const queryClient = new QueryClient();
 
 // Lazy-load Devtools only in development
@@ -32,9 +40,17 @@ ReactDOM.createRoot(document.getElementById('root')).render(
       <QueryClientProvider client={queryClient}>
         <ThemeProvider>
           <GlobalProvider>
-            <BrowserRouter basename="/modern">
-              <AppRoutes />
-            </BrowserRouter>
+            <TooltipProvider>
+              <BrowserRouter basename="/modern">
+                <SearchProvider>
+                  <EditModeProvider>
+                    <div className="min-h-screen bg-background font-sans antialiased">
+                      <AppRoutes />
+                    </div>
+                  </EditModeProvider>
+                </SearchProvider>
+              </BrowserRouter>
+            </TooltipProvider>
             {import.meta.env.DEV && (
               <Suspense fallback={null}>
                 <ReactQueryDevtools initialIsOpen={false} />
@@ -43,6 +59,7 @@ ReactDOM.createRoot(document.getElementById('root')).render(
           </GlobalProvider>
         </ThemeProvider>
       </QueryClientProvider>
+      <Toaster />
     </ErrorBoundary>
   </StrictMode>
 );

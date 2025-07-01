@@ -1,5 +1,5 @@
 // src/routers/routes.jsx
-import { Routes, Route } from 'react-router-dom';
+import { Routes, Route, Navigate } from 'react-router-dom';
 import { Suspense, lazy } from 'react';
 import { routes } from './routeTree';
 import { Layout } from '@/components/layout/Layout';
@@ -42,7 +42,10 @@ const renderRoutes = (routes) =>
 export default function AppRoutes() {
   return (
     <Suspense fallback={<LoadingSpinner />}>
-      <Routes>{renderRoutes(routes)}</Routes>
+      <Routes>
+        <Route path="/" element={<Navigate to="/opportunities" replace />} />
+        {renderRoutes(routes)}
+      </Routes>
     </Suspense>
   );
 }
