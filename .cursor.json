@@ -1,0 +1,14 @@
+{
+    "contextFiles": [
+      "src/context.md",
+      "src/features/sitewidedefaults/context.md"
+    ],
+    "excludes": [
+      "src/**/*.test.{js,ts,jsx,tsx}",
+      "**/__mocks__/**",
+      "**/*.stories.{js,ts,jsx,tsx}",
+      "dist",
+      "build",
+      "node_modules"
+    ]
+}

@@ -1,0 +1,8 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+[context.md](mdc:src/context.md)
+
+[context.md](mdc:src/features/sitewidedefaults/context.md)

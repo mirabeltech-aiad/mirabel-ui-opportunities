@@ -1,0 +1,117 @@
+import { FeatureSettingsProvider } from "./context/FeatureSettingsProvider";
+import React, { useState } from "react";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import { Button } from "@/components/ui/button";
+import { ChevronLeft, ChevronRight } from "lucide-react";
+import { tabList } from "./helpers/constants.helper";
+import { saveSiteWideSettings } from "./services/sitewideService";
+import { toast } from "sonner";
+import { useFeatureSettings } from "./context/Context";
+import { Toaster } from "@/components/ui/sonner";
+
+export default function SiteWideDefaultsPage() {
+  return (
+    <FeatureSettingsProvider>
+      <FeatureSettings />
+      <Toaster />
+    </FeatureSettingsProvider>
+  );
+}
+
+function FeatureSettings() {
+
+  const [tabWindow, setTabWindow] = useState([0, 5]);
+  const [activeTab, setActiveTab] = useState("AdManagement");
+  const { state } = useFeatureSettings();
+  const [isSaving, setIsSaving] = useState(false);
+
+  const handlePrevTabs = () => {
+    setTabWindow([tabWindow[0] - 1, tabWindow[1] - 1]);
+  };
+
+  const handleNextTabs = () => {
+    setTabWindow([tabWindow[0] + 1, tabWindow[1] + 1]);
+  };
+
+  const handleSave = async () => {
+    setIsSaving(true);
+    try {
+      const payload = {
+        SiteSettings: state, // TODO: Map/transform if needed
+        IsBCCFeatureModified: false, // Set as needed
+        IsSummaryEmailNotesModified: false, // Set as needed
+        IsMMEmailNotesModified: false, // Set as needed
+        PackageUpDownStatus: "", // Set as needed
+      };
+      const result = await saveSiteWideSettings(payload);
+      if (result?.Status === "Success") {
+        toast.success("Settings saved successfully!");
+      } else {
+        const errorMsg = result?.Messages?.[0]?.Message || result?.ErrorMessage || "Failed to save settings";
+        toast.error(errorMsg);
+      }
+    } catch (error) {
+      toast.error(error?.message || "Failed to save settings");
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  return (
+    <div className="px-4 py-2 mx-auto">
+      <div className="sticky top-0 z-20 pb-2 bg-background">
+        <Tabs
+          value={activeTab}
+          onValueChange={(value) => setActiveTab(value)}
+          className="w-full"
+        >
+          <div className="flex items-center gap-2 mb-6">
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={handlePrevTabs}
+              disabled={tabWindow[0] === 0}
+              className="w-8 h-8"
+              aria-label="Previous Tabs"
+            >
+              <ChevronLeft className="w-5 h-5" />
+            </Button>
+            <TabsList className="flex flex-wrap gap-2 grow">
+              {tabList.slice(tabWindow[0], tabWindow[1]).map((tab) => (
+                <TabsTrigger key={tab.Value} value={tab.Value}>
+                  {tab.Label}
+                </TabsTrigger>
+              ))}
+            </TabsList>
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={handleNextTabs}
+              disabled={tabWindow[1] >= tabList.length}
+              className="w-8 h-8"
+              aria-label="Next Tabs"
+            >
+              <ChevronRight className="w-5 h-5" />
+            </Button>
+          </div>
+        </Tabs>
+      </div>
+
+      
+
+       <Tabs value={activeTab} className="w-full">
+        {tabList.map((tab) => (
+          <TabsContent key={tab.Value} value={tab.Value}>
+            <tab.Component />
+          </TabsContent>
+        ))}
+      </Tabs> 
+
+      <div className="sticky bottom-0 flex justify-center py-3 bg-white shadow">
+        <Button variant="default" className="w-1/8" onClick={handleSave} disabled={isSaving}>
+          {isSaving ? "Saving..." : "Save"}
+        </Button>
+      </div>
+    </div>
+  );
+}
