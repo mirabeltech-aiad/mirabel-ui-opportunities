@@ -1,9 +1,9 @@
 
 import React, { useState, useMemo } from "react";
-import { Label } from "@/components/ui/label";
-import { Badge } from "@/components/ui/badge";
+import { Label } from "@OpportunityComponents/ui/label";
+import { Badge } from "@OpportunityComponents/ui/badge";
 import { Filter, Plus } from "lucide-react";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@OpportunityComponents/ui/tabs";
 
 const ColumnSelector = ({ columnOrder, selectedColumns, onColumnToggle }) => {
   const [activeCategory, setActiveCategory] = useState("standard");

@@ -1,9 +1,9 @@
 
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { ScrollArea } from "@/components/ui/scroll-area";
+import { Card, CardContent, CardHeader, CardTitle } from "@OpportunityComponents/ui/card";
+import { Button } from "@OpportunityComponents/ui/button";
+import { Badge } from "@OpportunityComponents/ui/badge";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@OpportunityComponents/ui/table";
+import { ScrollArea } from "@OpportunityComponents/ui/scroll-area";
 import { Database, ArrowRight } from "lucide-react";
 
 // Extracted for clarity - handles the field mapping table functionality

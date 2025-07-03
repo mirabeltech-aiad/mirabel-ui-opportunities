@@ -1,11 +1,10 @@
-
 import React from "react";
 import MainNavbar from "@OpportunityComponents/MainNavbar";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Switch } from "@/components/ui/switch";
-import { Label } from "@/components/ui/label";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { useEditMode } from "@/contexts/EditModeContext";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@OpportunityComponents/ui/tabs";
+import { Switch } from "@OpportunityComponents/ui/switch";
+import { Label } from "@OpportunityComponents/ui/label";
+import { Card, CardContent, CardHeader, CardTitle } from "@OpportunityComponents/ui/card";
+import { useEditMode } from "@/features/Opportunity/contexts/EditModeContext";
 import BenchmarksTab from "@/features/Opportunity/components/Admin/BenchmarksTab";
 import CustomFieldsTab from "@/features/Opportunity/components/Settings/CustomFieldsTab";
 

@@ -1,8 +1,8 @@
 
 import React, { useState, useEffect } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import { Card, CardContent, CardHeader, CardTitle } from "@OpportunityComponents/ui/card";
+import { Button } from "@OpportunityComponents/ui/button";
+import { Input } from "@OpportunityComponents/ui/input";
 import { toast } from "@/hooks/use-toast";
 
 const ColorCustomizer = () => {

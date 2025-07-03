@@ -1,6 +1,6 @@
 import React, { useState, useRef } from "react";
 import { Building2, AlertCircle, RefreshCw } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { Button } from "@OpportunityComponents/ui/button";
 import { useCompanySidebar } from "../hooks/useCompanySidebar";
 import { useCompanyData } from "../hooks/useCompanyData";
 import { useQuery } from "@tanstack/react-query";

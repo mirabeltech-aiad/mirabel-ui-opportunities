@@ -1,14 +1,14 @@
 
 import React from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@OpportunityComponents/ui/card";
 import { CheckCircle } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import MainNavbar from "@OpportunityComponents/MainNavbar";
 import EditProposalHeader from "@/features/Opportunity/components/EditProposal/EditProposalHeader";
 import EditProposalTabs from "@/features/Opportunity/components/EditProposal/EditProposalTabs";
 import { useProposalForm } from "@/hooks/useProposalForm";
-import { PROPOSAL_OPTIONS } from "@/constants/proposalOptions";
+import { PROPOSAL_OPTIONS } from "@/features/Opportunity/constants/proposalOptions";
 
 const EditProposal = () => {
   const { id } = useParams();

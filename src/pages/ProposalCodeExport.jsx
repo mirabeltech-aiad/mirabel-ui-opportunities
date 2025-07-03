@@ -1,10 +1,10 @@
 
 import React from "react";
-import { Button } from "@/components/ui/button";
+import { Button } from "@OpportunityComponents/ui/button";
 import { ArrowLeft } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import MainNavbar from "@OpportunityComponents/MainNavbar";
-import ProposalTableCodeExporter from "../components/CodeExporter/ProposalTableCodeExporter";
+import ProposalTableCodeExporter from "@/features/Opportunity/components/CodeExporter/ProposalTableCodeExporter";
 
 const ProposalCodeExport = () => {
   const navigate = useNavigate();

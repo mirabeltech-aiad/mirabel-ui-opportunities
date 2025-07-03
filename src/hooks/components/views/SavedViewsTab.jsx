@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { ScrollArea } from "@/components/ui/scroll-area";
+import { ScrollArea } from "@OpportunityComponents/ui/scroll-area";
 import ViewItem from "./ViewItem";
 
 const SavedViewsTab = ({ savedViews, onLoadView, onDeleteView, onUpdateView, onSaveAsView, onEditView, activeViewId }) => {

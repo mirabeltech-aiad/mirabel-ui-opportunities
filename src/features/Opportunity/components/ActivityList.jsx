@@ -1,7 +1,7 @@
 
 import React, { useState, useRef } from "react";
-import { Button } from "@/components/ui/button";
-import { ScrollArea } from "@/components/ui/scroll-area";
+import { Button } from "@OpportunityComponents/ui/button";
+import { ScrollArea } from "@OpportunityComponents/ui/scroll-area";
 import { Pin } from "lucide-react";
 import { useInfiniteScroll } from "@/hooks/useInfiniteScroll";
 import { useScrollObserver } from "@/hooks/useScrollObserver";

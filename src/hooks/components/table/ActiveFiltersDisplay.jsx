@@ -1,6 +1,6 @@
 import React from 'react';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
+import { Button } from '@OpportunityComponents/ui/button';
+import { Badge } from '@OpportunityComponents/ui/badge';
 import { X, Filter, RotateCcw } from 'lucide-react';
 import { useSearch } from '@/contexts/SearchContext';
 const ActiveFiltersDisplay = () => {

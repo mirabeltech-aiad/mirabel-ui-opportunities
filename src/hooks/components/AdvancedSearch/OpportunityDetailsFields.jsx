@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from "react";
 import FloatingLabelInput from "../EditOpportunity/FloatingLabelInput";
-import FloatingLabelSelect from "@/components/ui/FloatingLabelSelect";
+import FloatingLabelSelect from "@OpportunityComponents/ui/FloatingLabelSelect";
 import StageSelector from "./StageSelector";
-import { Textarea } from "@/components/ui/textarea";
-import { Label } from "@/components/ui/label";
+import { Textarea } from "@OpportunityComponents/ui/textarea";
+import { Label } from "@OpportunityComponents/ui/label";
 import Loader from "@/features/Opportunity/components/ui/loader";
 import { OPPORTUNITY_OPTIONS } from "@/constants/opportunityOptions";
 import { userService } from "../../services/userService";

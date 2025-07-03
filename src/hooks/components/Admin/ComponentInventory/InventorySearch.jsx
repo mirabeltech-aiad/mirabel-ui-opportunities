@@ -1,8 +1,8 @@
 
 import React from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import { Card, CardContent, CardHeader, CardTitle } from "@OpportunityComponents/ui/card";
+import { Button } from "@OpportunityComponents/ui/button";
+import { Input } from "@OpportunityComponents/ui/input";
 import { Filter, Search } from "lucide-react";
 
 const InventorySearch = ({ searchTerm, setSearchTerm, filterType, setFilterType }) => {

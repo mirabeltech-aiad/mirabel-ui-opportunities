@@ -1,12 +1,12 @@
 
 import React, { useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import UserAvatar from '@/components/table/UserAvatar';
+import { Card, CardContent, CardHeader, CardTitle } from '@OpportunityComponents/ui/card';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@OpportunityComponents/ui/table';
+import { Badge } from '@OpportunityComponents/ui/badge';
+import { Button } from '@OpportunityComponents/ui/button';
+import { Input } from '@OpportunityComponents/ui/input';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@OpportunityComponents/ui/select';
+import UserAvatar from '@OpportunityComponents/table/UserAvatar';
 import { 
   Filter, 
   Search, 

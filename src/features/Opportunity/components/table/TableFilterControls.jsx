@@ -1,6 +1,6 @@
 
-import { Button } from "@/components/ui/button";
-import { Tooltip, TooltipContent, TooltipTrigger, TooltipProvider } from "@/components/ui/tooltip";
+import { Button } from "@OpportunityComponents/ui/button";
+import { Tooltip, TooltipContent, TooltipTrigger, TooltipProvider } from "@OpportunityComponents/ui/tooltip";
 import { ContextMenu, ContextMenuContent, ContextMenuItem, ContextMenuTrigger } from "@OpportunityComponents/ui/context-menu";
 import { ChevronLeft, ChevronRight, Settings, RefreshCw, Search, LayoutGrid, List, Kanban, PanelRight, ArrowUpDown } from "lucide-react";
 import { useNavigate } from "react-router-dom";

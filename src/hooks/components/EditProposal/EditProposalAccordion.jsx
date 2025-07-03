@@ -1,7 +1,7 @@
 
 import React, { useState } from "react";
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
-import { Toggle } from "@/components/ui/toggle";
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@OpportunityComponents/ui/accordion";
+import { Toggle } from "@OpportunityComponents/ui/toggle";
 import { Maximize2, Minimize2 } from "lucide-react";
 import ProposalBasicInfoSection from "./ProposalBasicInfoSection";
 import ProposalStatusProgressSection from "./ProposalStatusProgressSection";

@@ -1,15 +1,15 @@
 
 import React from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@OpportunityComponents/ui/card";
+import { Badge } from "@OpportunityComponents/ui/badge";
+import { Button } from "@OpportunityComponents/ui/button";
 import { MoreHorizontal, Plus } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+} from "@OpportunityComponents/ui/dropdown-menu";
 import ViewToggle from "./ViewToggle";
 
 const ProposalKanbanView = ({ proposals = [], view, onViewChange }) => {

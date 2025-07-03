@@ -2,7 +2,7 @@
 import React from 'react';
 import { Edit } from 'lucide-react';
 import { useEditMode } from '@/contexts/EditModeContext';
-import { Button } from '@/components/ui/button';
+import { Button } from '@OpportunityComponents/ui/button';
 
 interface EditableFieldWrapperProps {
   fieldName: string;

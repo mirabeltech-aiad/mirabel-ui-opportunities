@@ -1,7 +1,7 @@
 
 import React from "react";
 import { List, RotateCcw, User, FileText, Building2, Pin } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { Button } from "@OpportunityComponents/ui/button";
 
 const ActivityIconBar = ({ refreshTabData, loadingStates }) => {
   return (

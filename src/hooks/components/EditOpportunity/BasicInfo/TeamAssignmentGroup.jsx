@@ -1,6 +1,6 @@
 import React from "react";
-import FloatingLabelInput from "@/components/ui/FloatingLabelInput";
-import FloatingLabelSelect from "@/components/ui/FloatingLabelSelect";
+import FloatingLabelInput from "@OpportunityComponents/ui/FloatingLabelInput";
+import FloatingLabelSelect from "@OpportunityComponents/ui/FloatingLabelSelect";
 import Loader from "@/features/Opportunity/components/ui/loader";
 
 const TeamAssignmentGroup = ({ 

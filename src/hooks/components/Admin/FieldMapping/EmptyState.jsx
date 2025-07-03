@@ -1,6 +1,6 @@
 
-import { Card, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@OpportunityComponents/ui/card";
+import { Button } from "@OpportunityComponents/ui/button";
 import { Database, RefreshCw } from "lucide-react";
 
 /**

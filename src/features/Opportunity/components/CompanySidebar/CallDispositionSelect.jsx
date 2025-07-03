@@ -1,6 +1,6 @@
 
 import React from "react";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@OpportunityComponents/ui/select";
 import { useQuery } from "@tanstack/react-query";
 import apiService from "@/services/apiService";
 

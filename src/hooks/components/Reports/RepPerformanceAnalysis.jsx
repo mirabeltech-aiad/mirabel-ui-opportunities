@@ -1,8 +1,8 @@
 
 import React, { useState, useMemo } from 'react';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@OpportunityComponents/ui/tabs';
 import { Users, TrendingUp, Calendar, Target, Loader2, AlertCircle } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { Button } from '@OpportunityComponents/ui/button';
 import { toast } from '@/hooks/use-toast';
 import { useRepPerformanceData } from './RepPerformance/hooks/useRepPerformanceData';
 import RepPerformanceHeader from './RepPerformance/RepPerformanceHeader';

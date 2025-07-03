@@ -3,13 +3,13 @@ import React, { useState } from "react";
 import { format } from "date-fns";
 import { Calendar as CalendarIcon, Clock } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { Button } from "@/components/ui/button";
-import { Calendar } from "@/components/ui/calendar";
+import { Button } from "@OpportunityComponents/ui/button";
+import { Calendar } from "@OpportunityComponents/ui/calendar";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
-} from "@/components/ui/popover";
+} from "@OpportunityComponents/ui/popover";
 
 const MeetingDateSelector = ({ selectedDate, onDateChange }) => {
   const [isOpen, setIsOpen] = useState(false);

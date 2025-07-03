@@ -1,10 +1,10 @@
 
 import React from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Progress } from "@/components/ui/progress";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Card, CardContent, CardHeader, CardTitle } from "@OpportunityComponents/ui/card";
+import { Badge } from "@OpportunityComponents/ui/badge";
+import { Progress } from "@OpportunityComponents/ui/progress";
+import { Avatar, AvatarFallback } from "@OpportunityComponents/ui/avatar";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@OpportunityComponents/ui/table";
 import { Users, TrendingUp, DollarSign, Target, Award } from "lucide-react";
 
 const TeamPerformanceTable = ({ data }) => {

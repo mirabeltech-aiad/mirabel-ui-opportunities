@@ -1,9 +1,9 @@
 
 import React from 'react';
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@OpportunityComponents/ui/input";
+import { Label } from "@OpportunityComponents/ui/label";
+import { Button } from "@OpportunityComponents/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@OpportunityComponents/ui/card";
 
 const ComponentControls = ({ components, onChange }) => {
   const componentOptions = [

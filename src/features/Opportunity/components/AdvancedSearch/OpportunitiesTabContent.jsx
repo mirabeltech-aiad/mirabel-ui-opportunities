@@ -1,6 +1,6 @@
 
 import React from "react";
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@OpportunityComponents/ui/accordion";
 import BasicSearchFields from "./BasicSearchFields";
 import CustomerInfoFields from "./CustomerInfoFields";
 import FinancialDataFields from "./FinancialDataFields";

@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import FloatingLabelInput from "@/components/ui/FloatingLabelInput";
+import FloatingLabelInput from "@OpportunityComponents/ui/FloatingLabelInput";
 import { userService } from "@/services/userService";
 import { ChevronDown, ChevronUp } from "lucide-react";
 

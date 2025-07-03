@@ -1,6 +1,6 @@
 
 import React from "react";
-import FloatingLabelInput from "@/components/ui/FloatingLabelInput";
+import FloatingLabelInput from "@OpportunityComponents/ui/FloatingLabelInput";
 
 const LeadSourceSection = ({ formData, handleInputChange }) => {
   return (

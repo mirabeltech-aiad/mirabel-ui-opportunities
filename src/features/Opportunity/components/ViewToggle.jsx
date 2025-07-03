@@ -1,6 +1,6 @@
 
 import React from "react";
-import { Button } from "@/components/ui/button";
+import { Button } from "@OpportunityComponents/ui/button";
 import { List, LayoutGrid, Kanban, PanelRight } from "lucide-react";
 
 const ViewToggle = ({ view, onViewChange }) => {

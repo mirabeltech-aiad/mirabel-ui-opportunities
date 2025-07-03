@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Button } from '@/components/ui/button';
+import { Button } from '@OpportunityComponents/ui/button';
 import { RefreshCw, Download } from 'lucide-react';
 
 const ControlsSection = ({ onRefresh, onExport, isLoading }) => {

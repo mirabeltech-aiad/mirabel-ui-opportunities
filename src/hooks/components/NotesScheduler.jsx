@@ -1,10 +1,10 @@
 
 import React, { useState } from "react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Checkbox } from "@/components/ui/checkbox";
+import { Button } from "@OpportunityComponents/ui/button";
+import { Input } from "@OpportunityComponents/ui/input";
+import { Textarea } from "@OpportunityComponents/ui/textarea";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@OpportunityComponents/ui/select";
+import { Checkbox } from "@OpportunityComponents/ui/checkbox";
 import { Mic, Calendar, Clock } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import TimeSelector from "./TimeSelector";

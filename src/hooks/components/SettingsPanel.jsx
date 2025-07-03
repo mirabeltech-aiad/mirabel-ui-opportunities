@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { X } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { Button } from '@OpportunityComponents/ui/button';
 import apiService from '@/services/apiService';
 
 const SettingsPanel = ({ isOpen, onClose }) => {

@@ -1,6 +1,6 @@
 import React, { useState } from "react";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Button } from "@/components/ui/button";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@OpportunityComponents/ui/tabs";
+import { Button } from "@OpportunityComponents/ui/button";
 import { Link2Off } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import apiService from "@/services/apiService";

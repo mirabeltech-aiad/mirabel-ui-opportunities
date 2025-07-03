@@ -1,13 +1,13 @@
 
 import React from "react";
-import { Label } from "@/components/ui/label";
+import { Label } from "@OpportunityComponents/ui/label";
 import { 
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
+} from "@OpportunityComponents/ui/select";
 import { X } from "lucide-react";
 import { cn } from "@/lib/utils";
 

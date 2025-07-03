@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Users, Filter } from 'lucide-react';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@OpportunityComponents/ui/select';
 import MetricTooltip from '../MetricTooltip';
 import { useDesignSystem } from '@/hooks/useDesignSystem';
 

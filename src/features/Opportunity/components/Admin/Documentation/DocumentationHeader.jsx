@@ -1,6 +1,6 @@
 
 import React from "react";
-import { Button } from "@/components/ui/button";
+import { Button } from "@OpportunityComponents/ui/button";
 import { Eye, Edit, Download } from "lucide-react";
 
 /**

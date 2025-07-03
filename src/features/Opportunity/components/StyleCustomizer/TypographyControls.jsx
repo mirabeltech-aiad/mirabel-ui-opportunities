@@ -1,8 +1,8 @@
 
 import React from 'react';
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Input } from "@OpportunityComponents/ui/input";
+import { Label } from "@OpportunityComponents/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@OpportunityComponents/ui/select";
 
 const TypographyControls = ({ typography, onChange }) => {
   const fontFamilies = [

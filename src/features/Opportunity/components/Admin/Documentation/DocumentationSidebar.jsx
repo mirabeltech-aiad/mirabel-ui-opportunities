@@ -1,6 +1,6 @@
 
 import React from "react";
-import { Card, CardContent } from "@/components/ui/card";
+import { Card, CardContent } from "@OpportunityComponents/ui/card";
 import { FileText } from "lucide-react";
 
 /**

@@ -1,7 +1,7 @@
 
 import React from "react";
 import MainNavbar from "@OpportunityComponents/MainNavbar";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@OpportunityComponents/ui/tabs";
 import ComponentInventoryTab from "@/features/Opportunity/components/Admin/ComponentInventoryTab";
 import DocumentationTab from "@/features/Opportunity/components/Admin/DocumentationTab";
 import FieldMappingTab from "@/features/Opportunity/components/Admin/FieldMappingTab";

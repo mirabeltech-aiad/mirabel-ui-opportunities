@@ -1,6 +1,6 @@
 import React from "react";
-import { TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Checkbox } from "@/components/ui/checkbox";
+import { TableHead, TableHeader, TableRow } from "@OpportunityComponents/ui/table";
+import { Checkbox } from "@OpportunityComponents/ui/checkbox";
 
 const OpportunityTableHeader = ({
   columnOrder,

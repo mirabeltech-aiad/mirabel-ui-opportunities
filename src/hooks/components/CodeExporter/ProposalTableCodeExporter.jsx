@@ -1,9 +1,9 @@
 
 import React, { useState } from 'react';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@OpportunityComponents/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@OpportunityComponents/ui/card';
 import { Copy, Check, Download } from 'lucide-react';
-import { ScrollArea } from '@/components/ui/scroll-area';
+import { ScrollArea } from '@OpportunityComponents/ui/scroll-area';
 
 const ProposalTableCodeExporter = () => {
   const [copied, setCopied] = useState(false);
@@ -20,8 +20,8 @@ const ProposalTableCodeExporter = () => {
 // ============================================
 
 // ProposalTableContent.jsx
-import { Table, TableBody } from "@/components/ui/table";
-import { ScrollArea } from "@/components/ui/scroll-area";
+import { Table, TableBody } from "@OpportunityComponents/ui/table";
+import { ScrollArea } from "@OpportunityComponents/ui/scroll-area";
 import ProposalTableHeader from "./ProposalTableHeader";
 import ProposalTableRow from "./ProposalTableRow";
 import InfiniteScrollLoader from "../table/InfiniteScrollLoader";
@@ -91,8 +91,8 @@ const ProposalTableContent = ({
 
 // ProposalTableHeader.jsx
 import React from "react";
-import { TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Checkbox } from "@/components/ui/checkbox";
+import { TableHead, TableHeader, TableRow } from "@OpportunityComponents/ui/table";
+import { Checkbox } from "@OpportunityComponents/ui/checkbox";
 
 const ProposalTableHeader = ({ 
   columnOrder, 
@@ -182,8 +182,8 @@ const ProposalTableHeader = ({
 // ProposalTableRow.jsx
 import React from "react";
 import { useNavigate } from "react-router-dom";
-import { TableRow, TableCell } from "@/components/ui/table";
-import { Checkbox } from "@/components/ui/checkbox";
+import { TableRow, TableCell } from "@OpportunityComponents/ui/table";
+import { Checkbox } from "@OpportunityComponents/ui/checkbox";
 import { Pencil } from "lucide-react";
 import TableStatusBadge from "../table/TableStatusBadge";
 import TableStageBadge from "../table/TableStageBadge";
@@ -283,8 +283,8 @@ const ProposalTableRow = ({ proposal, isSelected, onSelect, columnOrder, columnW
 
 // ViewsSidebar.jsx
 import React, { useState } from "react";
-import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@OpportunityComponents/ui/sheet";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@OpportunityComponents/ui/tabs";
 import SavedViewsTab from "./SavedViewsTab";
 import AddViewTab from "./AddViewTab";
 
@@ -400,9 +400,9 @@ const ViewsSidebar = ({ isOpen, onClose, columnOrder, onColumnOrderChange }) => 
 
 // SavedViewsTab.jsx
 import React, { useState } from "react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Separator } from "@/components/ui/separator";
+import { Button } from "@OpportunityComponents/ui/button";
+import { Input } from "@OpportunityComponents/ui/input";
+import { Separator } from "@OpportunityComponents/ui/separator";
 import { Pencil, Trash, Check, X, Save } from "lucide-react";
 
 const SavedViewsTab = ({ savedViews, onLoadView, onDeleteView, onUpdateView, activeViewId }) => {
@@ -563,10 +563,10 @@ const SavedViewsTab = ({ savedViews, onLoadView, onDeleteView, onUpdateView, act
 
 // AddViewTab.jsx
 import React, { useState, useMemo } from "react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Checkbox } from "@/components/ui/checkbox";
+import { Button } from "@OpportunityComponents/ui/button";
+import { Input } from "@OpportunityComponents/ui/input";
+import { Label } from "@OpportunityComponents/ui/label";
+import { Checkbox } from "@OpportunityComponents/ui/checkbox";
 import { Info, X, CheckCircle2, Plus } from "lucide-react";
 import ColumnSelector from "./ColumnSelector";
 
@@ -699,10 +699,10 @@ const AddViewTab = ({ columnOrder, onSaveView }) => {
 
 // ColumnSelector.jsx
 import React, { useState, useMemo } from "react";
-import { Label } from "@/components/ui/label";
-import { Badge } from "@/components/ui/badge";
+import { Label } from "@OpportunityComponents/ui/label";
+import { Badge } from "@OpportunityComponents/ui/badge";
 import { Filter, Plus } from "lucide-react";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@OpportunityComponents/ui/tabs";
 
 const ColumnSelector = ({ columnOrder, selectedColumns, onColumnToggle }) => {
   const [activeCategory, setActiveCategory] = useState("standard");
@@ -792,8 +792,8 @@ const ColumnSelector = ({ columnOrder, selectedColumns, onColumnToggle }) => {
 // ============================================
 
 // ProposalTableFilterControls.jsx
-import { Button } from "@/components/ui/button";
-import { Tooltip, TooltipContent, TooltipTrigger, TooltipProvider } from "@/components/ui/tooltip";
+import { Button } from "@OpportunityComponents/ui/button";
+import { Tooltip, TooltipContent, TooltipTrigger, TooltipProvider } from "@OpportunityComponents/ui/tooltip";
 import { ChevronLeft, ChevronRight, Settings, RefreshCw, Search, LayoutGrid, List, Kanban, PanelRight } from "lucide-react";
 
 const ProposalTableFilterControls = ({ filters, onFilterChange, totalItems, view, onViewChange, onViewsClick, onRefresh }) => {
@@ -929,7 +929,7 @@ export const useProposalTableColumns = () => {
 // ============================================
 
 // TableStatusBadge.jsx
-import { Badge } from "@/components/ui/badge";
+import { Badge } from "@OpportunityComponents/ui/badge";
 
 const TableStatusBadge = ({ status }) => {
   const getStatusVariant = (status) => {
@@ -953,7 +953,7 @@ const TableStatusBadge = ({ status }) => {
 };
 
 // TableStageBadge.jsx
-import { Badge } from "@/components/ui/badge";
+import { Badge } from "@OpportunityComponents/ui/badge";
 
 const TableStageBadge = ({ stage }) => {
   const getStageVariant = (stage) => {
@@ -968,8 +968,8 @@ const TableStageBadge = ({ stage }) => {
 };
 
 // InfiniteScrollLoader.jsx
-import { Skeleton } from "@/components/ui/skeleton";
-import { TableRow, TableCell } from "@/components/ui/table";
+import { Skeleton } from "@OpportunityComponents/ui/skeleton";
+import { TableRow, TableCell } from "@OpportunityComponents/ui/table";
 
 const InfiniteScrollLoader = ({ columnCount = 14 }) => {
   return (
@@ -988,7 +988,7 @@ const InfiniteScrollLoader = ({ columnCount = 14 }) => {
 };
 
 // TableActionsPanel.jsx
-import { Button } from "@/components/ui/button";
+import { Button } from "@OpportunityComponents/ui/button";
 import { Download, Mail, Printer, Archive, Edit } from "lucide-react";
 
 const TableActionsPanel = ({ selectedCount, onExport, onBatchUpdate, onSendEmail }) => {

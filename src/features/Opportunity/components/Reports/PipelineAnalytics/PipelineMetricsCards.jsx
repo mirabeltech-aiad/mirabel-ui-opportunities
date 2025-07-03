@@ -1,7 +1,7 @@
 
 import React from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
+import { Card, CardContent, CardHeader, CardTitle } from '@OpportunityComponents/ui/card';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@OpportunityComponents/ui/tooltip';
 import { Info, DollarSign, TrendingUp, Users, Target } from 'lucide-react';
 import { useDesignSystem } from '@/hooks/useDesignSystem';
 

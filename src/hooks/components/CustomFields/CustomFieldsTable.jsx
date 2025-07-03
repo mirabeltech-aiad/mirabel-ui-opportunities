@@ -4,9 +4,9 @@ import {
   TableBody,
   TableCell,
   TableRow,
-} from "@/components/ui/table";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
+} from "@OpportunityComponents/ui/table";
+import { Button } from "@OpportunityComponents/ui/button";
+import { Badge } from "@OpportunityComponents/ui/badge";
 import { Edit2, ToggleLeft, ToggleRight, Type, Hash, Calendar, Mail, Phone, Link, FileText, CheckSquare, List, Percent, DollarSign, MapPin, Star } from "lucide-react";
 
 const CustomFieldsTable = ({ fields, getTypeLabel }) => {

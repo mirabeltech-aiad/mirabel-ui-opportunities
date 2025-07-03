@@ -2,7 +2,7 @@
 import React, { useEffect } from "react";
 import { useSearchParams } from "react-router-dom";
 import MainNavbar from "@OpportunityComponents/MainNavbar";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@OpportunityComponents/ui/card";
 import SearchHeader from "@/features/Opportunity/components/AdvancedSearch/SearchHeader";
 import AdvancedSearchTabs from "@/features/Opportunity/components/AdvancedSearch/AdvancedSearchTabs";
 import FloatingActionPanel from "@/features/Opportunity/components/AdvancedSearch/FloatingActionPanel";

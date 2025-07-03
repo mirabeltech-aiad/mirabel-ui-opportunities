@@ -1,5 +1,5 @@
 import React from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@OpportunityComponents/ui/card';
 import { Calendar, TrendingUp, TrendingDown, AlertTriangle, ArrowUp, ArrowDown, Minus } from 'lucide-react';
 import { useDesignSystem } from '@/hooks/useDesignSystem';
 

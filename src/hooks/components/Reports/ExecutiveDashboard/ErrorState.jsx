@@ -1,7 +1,7 @@
 
 import React from 'react';
-import { Card, CardContent } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
+import { Card, CardContent } from '@OpportunityComponents/ui/card';
+import { Button } from '@OpportunityComponents/ui/button';
 import { AlertCircle, RefreshCw, TrendingUp, Filter } from 'lucide-react';
 
 const ErrorState = ({ error, onRefresh }) => {

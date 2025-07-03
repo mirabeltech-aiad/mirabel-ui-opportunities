@@ -1,7 +1,7 @@
 
 import React from "react";
 import { useNavigate } from "react-router-dom";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@OpportunityComponents/ui/card";
 import { CheckCircle } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import MainNavbar from "@OpportunityComponents/MainNavbar";

@@ -1,6 +1,6 @@
 
 import React from "react";
-import { Button } from "@/components/ui/button";
+import { Button } from "@OpportunityComponents/ui/button";
 import { ArrowLeft, Save, X, Loader2 } from "lucide-react";
 
 const AddOpportunityHeader = ({ onCancel, onSave, isSaving }) => {

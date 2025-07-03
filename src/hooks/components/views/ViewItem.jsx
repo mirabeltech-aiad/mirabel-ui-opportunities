@@ -1,7 +1,7 @@
 
 import React from "react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import { Button } from "@OpportunityComponents/ui/button";
+import { Input } from "@OpportunityComponents/ui/input";
 import { Pencil, Trash2, Check, X, Copy, Save, Edit } from "lucide-react";
 import { getViewColor, getColumnCount } from "./utils/viewColorUtils";
 import { UserId, IsAdmin } from "@/features/Opportunity/constants/opportunityOptions";

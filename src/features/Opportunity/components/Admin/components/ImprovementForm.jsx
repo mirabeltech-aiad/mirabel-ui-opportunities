@@ -1,8 +1,8 @@
 
-import { Card, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
+import { Card, CardContent } from "@OpportunityComponents/ui/card";
+import { Button } from "@OpportunityComponents/ui/button";
+import { Input } from "@OpportunityComponents/ui/input";
+import { Textarea } from "@OpportunityComponents/ui/textarea";
 
 // Extracted for clarity - handles improvement form display and input
 const ImprovementForm = ({ 

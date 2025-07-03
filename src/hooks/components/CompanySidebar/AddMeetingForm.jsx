@@ -1,9 +1,9 @@
 
 import React from "react";
 import { Plus, Calendar } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Button } from "@OpportunityComponents/ui/button";
+import { Input } from "@OpportunityComponents/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@OpportunityComponents/ui/select";
 import { useQuery } from "@tanstack/react-query";
 import apiService from "../../services/apiService";
 import { userService } from "../../services/userService";

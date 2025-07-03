@@ -1,10 +1,10 @@
 
 import { useState, useEffect } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Badge } from "@/components/ui/badge";
+import { Card, CardContent, CardHeader, CardTitle } from "@OpportunityComponents/ui/card";
+import { Button } from "@OpportunityComponents/ui/button";
+import { Input } from "@OpportunityComponents/ui/input";
+import { Label } from "@OpportunityComponents/ui/label";
+import { Badge } from "@OpportunityComponents/ui/badge";
 import { toast } from "@/hooks/use-toast";
 import { Eye, Settings, TestTube, CheckCircle, XCircle } from "lucide-react";
 

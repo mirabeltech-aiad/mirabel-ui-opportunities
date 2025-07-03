@@ -1,8 +1,8 @@
 
 import React from "react";
 import { X, Building2 } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import { Button } from "@OpportunityComponents/ui/button";
+import { Input } from "@OpportunityComponents/ui/input";
 
 const CompanySidebarHeader = ({ 
   onClose, 

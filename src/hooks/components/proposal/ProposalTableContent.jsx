@@ -1,9 +1,9 @@
 import React from 'react';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Checkbox } from "@/components/ui/checkbox";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@OpportunityComponents/ui/table";
+import { Checkbox } from "@OpportunityComponents/ui/checkbox";
 import { ChevronUp, ChevronDown, Edit } from "lucide-react";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
+import { Badge } from "@OpportunityComponents/ui/badge";
+import { Button } from "@OpportunityComponents/ui/button";
 import { useNavigate } from "react-router-dom";
 import { renderCellContent } from '@OpportunityUtils/dynamicColumnMapper';
 import { IsAdmin } from '@/constants/opportunityOptions';

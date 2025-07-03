@@ -1,6 +1,6 @@
 
 import React from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@OpportunityComponents/ui/card";
 import { Clock, TrendingUp, Calendar } from "lucide-react";
 
 const StageTimingCard = ({ stageName, timeInStage, isCurrentStage, percentage }) => {

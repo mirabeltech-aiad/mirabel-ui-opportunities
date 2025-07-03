@@ -1,8 +1,8 @@
 
 import React, { useState, useMemo } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@OpportunityComponents/ui/card';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@OpportunityComponents/ui/tabs';
+import { Button } from '@OpportunityComponents/ui/button';
 import { Clock, Download, TrendingUp, Target, BarChart3, Users, DollarSign } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
 import exportService from '@/services/exportService';

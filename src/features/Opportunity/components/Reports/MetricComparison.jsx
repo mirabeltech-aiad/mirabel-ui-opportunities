@@ -1,8 +1,8 @@
 
 import React, { useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
+import { Card, CardContent, CardHeader, CardTitle } from '@OpportunityComponents/ui/card';
+import { Button } from '@OpportunityComponents/ui/button';
+import { Badge } from '@OpportunityComponents/ui/badge';
 import { TrendingUp, TrendingDown, BarChart3, PieChart } from 'lucide-react';
 
 const MetricComparison = ({ currentPeriod, previousPeriod, onPeriodChange }) => {

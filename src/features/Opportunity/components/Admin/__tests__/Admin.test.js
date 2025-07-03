@@ -4,23 +4,23 @@ import { describe, it, expect, vi } from 'vitest';
 import Admin from '@/pages/Admin';
 
 // Mock all the child components
-vi.mock('@/components/MainNavbar', () => ({
+vi.mock('@OpportunityComponents/MainNavbar', () => ({
   default: () => <div data-testid="main-navbar">MainNavbar</div>
 }));
 
-vi.mock('@/components/Admin/ApiKeysTab', () => ({
+vi.mock('@OpportunityComponents/Admin/ApiKeysTab', () => ({
   default: () => <div data-testid="api-keys-tab">ApiKeysTab</div>
 }));
 
-vi.mock('@/components/Admin/ArchitectNotesTab', () => ({
+vi.mock('@OpportunityComponents/Admin/ArchitectNotesTab', () => ({
   default: () => <div data-testid="architect-notes-tab">ArchitectNotesTab</div>
 }));
 
-vi.mock('@/components/Admin/ColorSettingsTab', () => ({
+vi.mock('@OpportunityComponents/Admin/ColorSettingsTab', () => ({
   default: () => <div data-testid="color-settings-tab">ColorSettingsTab</div>
 }));
 
-vi.mock('@/components/Admin/PlaceholderTab', () => ({
+vi.mock('@OpportunityComponents/Admin/PlaceholderTab', () => ({
   default: ({ title }) => <div data-testid="placeholder-tab">{title} Content</div>
 }));
 

@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import MainNavbar from "@OpportunityComponents/MainNavbar";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Card, CardContent, CardHeader, CardTitle } from "@OpportunityComponents/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@OpportunityComponents/ui/tabs";
 import ReportErrorBoundary from "@OpportunityComponents/Reports/ReportErrorBoundary";
 import ExecutiveDashboard from "@OpportunityComponents/Reports/ExecutiveDashboard";
 import RepPerformanceAnalysis from "@OpportunityComponents/Reports/RepPerformanceAnalysis";

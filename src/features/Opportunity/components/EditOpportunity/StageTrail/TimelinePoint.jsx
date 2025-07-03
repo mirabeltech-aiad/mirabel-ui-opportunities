@@ -1,6 +1,6 @@
 
 import React from "react";
-import { Badge } from "@/components/ui/badge";
+import { Badge } from "@OpportunityComponents/ui/badge";
 import { ArrowRight } from "lucide-react";
 import { getStageColor, formatDate, calculateDaysBetween } from "./stageTrailUtils";
 

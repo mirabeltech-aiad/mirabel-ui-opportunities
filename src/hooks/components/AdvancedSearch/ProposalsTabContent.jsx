@@ -1,6 +1,6 @@
 
 import React from "react";
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@OpportunityComponents/ui/accordion";
 import ProposalsBasicSearchFields from "../ProposalsAdvancedSearch/BasicSearchFields";
 import ProposalsOpportunityInfoFields from "../ProposalsAdvancedSearch/OpportunityInfoFields";
 import ProposalsContactAddressInfoFields from "../ProposalsAdvancedSearch/ContactAddressInfoFields";

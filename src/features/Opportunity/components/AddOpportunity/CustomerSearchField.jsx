@@ -1,9 +1,9 @@
 
 import React, { useState } from "react";
-import { Label } from "@/components/ui/label";
-import { Button } from "@/components/ui/button";
-import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem } from "@/components/ui/command";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Label } from "@OpportunityComponents/ui/label";
+import { Button } from "@OpportunityComponents/ui/button";
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem } from "@OpportunityComponents/ui/command";
+import { Popover, PopoverContent, PopoverTrigger } from "@OpportunityComponents/ui/popover";
 import { Check, ChevronsUpDown, Loader2, Search } from "lucide-react";
 import { cn } from "@/lib/utils";
 import apiService from "@/services/apiService";

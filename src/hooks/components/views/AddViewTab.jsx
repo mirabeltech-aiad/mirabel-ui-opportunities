@@ -1,12 +1,12 @@
 
 import React, { useState, useEffect } from "react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Checkbox } from "@/components/ui/checkbox";
+import { Button } from "@OpportunityComponents/ui/button";
+import { Input } from "@OpportunityComponents/ui/input";
+import { Label } from "@OpportunityComponents/ui/label";
+import { Checkbox } from "@OpportunityComponents/ui/checkbox";
 import { Info, X, CheckCircle2, Plus, Edit } from "lucide-react";
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
-import { ScrollArea } from "@/components/ui/scroll-area";
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@OpportunityComponents/ui/accordion";
+import { ScrollArea } from "@OpportunityComponents/ui/scroll-area";
 import { useAvailableColumns } from "@/hooks/useAvailableColumns";
 import apiService from "@/services/apiService";
 import { proposalService } from "@/services/proposalService";

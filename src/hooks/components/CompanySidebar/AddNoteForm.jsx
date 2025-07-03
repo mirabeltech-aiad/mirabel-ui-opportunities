@@ -1,8 +1,8 @@
 
 import React from "react";
-import { Button } from "@/components/ui/button";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Checkbox } from "@/components/ui/checkbox";
+import { Button } from "@OpportunityComponents/ui/button";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@OpportunityComponents/ui/select";
+import { Checkbox } from "@OpportunityComponents/ui/checkbox";
 import SpeechTextarea from "./SpeechTextarea";
 
 const AddNoteForm = ({

@@ -1,8 +1,8 @@
 import React from "react";
-import { TableCell, TableRow } from "@/components/ui/table";
-import { Checkbox } from "@/components/ui/checkbox";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
+import { TableCell, TableRow } from "@OpportunityComponents/ui/table";
+import { Checkbox } from "@OpportunityComponents/ui/checkbox";
+import { Badge } from "@OpportunityComponents/ui/badge";
+import { Button } from "@OpportunityComponents/ui/button";
 import { useNavigate } from "react-router-dom";
 import StageDropdown from "./StageDropdown";
 import TableStatusBadge from "./TableStatusBadge";

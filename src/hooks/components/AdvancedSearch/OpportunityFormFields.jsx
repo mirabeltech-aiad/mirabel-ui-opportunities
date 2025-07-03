@@ -1,9 +1,9 @@
 
 import React from "react";
-import FloatingLabelInput from "@/components/ui/FloatingLabelInput";
-import FloatingLabelSelect from "@/components/ui/FloatingLabelSelect";
-import { Textarea } from "@/components/ui/textarea";
-import { Label } from "@/components/ui/label";
+import FloatingLabelInput from "@OpportunityComponents/ui/FloatingLabelInput";
+import FloatingLabelSelect from "@OpportunityComponents/ui/FloatingLabelSelect";
+import { Textarea } from "@OpportunityComponents/ui/textarea";
+import { Label } from "@OpportunityComponents/ui/label";
 import { OPPORTUNITY_OPTIONS } from "@/constants/opportunityOptions";
 
 const OpportunityFormFields = ({ handleInputChange, handleSelectChange }) => {

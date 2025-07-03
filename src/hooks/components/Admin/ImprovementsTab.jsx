@@ -1,8 +1,8 @@
 
 import { useState } from "react";
-import { Card, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { ScrollArea } from "@/components/ui/scroll-area";
+import { Card, CardContent } from "@OpportunityComponents/ui/card";
+import { Button } from "@OpportunityComponents/ui/button";
+import { ScrollArea } from "@OpportunityComponents/ui/scroll-area";
 import { Plus } from "lucide-react";
 import { useImprovements } from "./hooks/useImprovements";
 import { sortImprovements } from "./utils/improvementUtils";

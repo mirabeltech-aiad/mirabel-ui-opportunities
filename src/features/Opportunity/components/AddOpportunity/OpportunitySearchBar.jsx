@@ -1,8 +1,8 @@
 import React, { useState } from "react";
 import { Search, Loader2 } from "lucide-react";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Input } from "@OpportunityComponents/ui/input";
+import { Button } from "@OpportunityComponents/ui/button";
+import { Popover, PopoverContent, PopoverTrigger } from "@OpportunityComponents/ui/popover";
 import { Check } from "lucide-react";
 import { cn } from "@/lib/utils";
 import apiService from "@/services/apiService";

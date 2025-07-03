@@ -1,6 +1,6 @@
 
 import React, { useState, useRef } from "react";
-import { Textarea } from "@/components/ui/textarea";
+import { Textarea } from "@OpportunityComponents/ui/textarea";
 import { Mic, MicOff } from "lucide-react";
 
 const SpeechTextarea = ({ 

@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect } from "react";
 import FloatingLabelInput from "../EditOpportunity/FloatingLabelInput";
-import FloatingLabelSelect from "@/components/ui/FloatingLabelSelect";
+import FloatingLabelSelect from "@OpportunityComponents/ui/FloatingLabelSelect";
 import { OPPORTUNITY_OPTIONS } from "@/constants/opportunityOptions";
 import { userService } from "../../services/userService";
 

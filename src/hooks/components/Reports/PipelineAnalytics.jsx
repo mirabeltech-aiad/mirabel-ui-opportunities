@@ -1,7 +1,7 @@
 
 import React, { useState, useMemo } from 'react';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Button } from '@/components/ui/button';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@OpportunityComponents/ui/tabs';
+import { Button } from '@OpportunityComponents/ui/button';
 import { Activity, Download, BarChart3, TrendingUp, Target, Layers, Loader2, AlertCircle } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
 import exportService from '@/services/exportService';

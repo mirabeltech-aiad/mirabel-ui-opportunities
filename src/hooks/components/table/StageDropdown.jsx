@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect } from "react";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@OpportunityComponents/ui/select";
 import { ChevronDown } from "lucide-react";
 import apiService from "@/services/apiService";
 

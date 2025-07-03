@@ -1,7 +1,7 @@
 
 import { useState } from "react";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@OpportunityComponents/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@OpportunityComponents/ui/card";
 import CustomFieldsTable from "../CustomFields/CustomFieldsTable";
 import NewFieldForm from "../CustomFields/NewFieldForm";
 

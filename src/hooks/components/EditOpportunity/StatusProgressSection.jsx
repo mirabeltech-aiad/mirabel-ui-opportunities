@@ -1,6 +1,6 @@
 import React from "react";
-import FloatingLabelInput from "@/components/ui/FloatingLabelInput";
-import FloatingLabelSelect from "@/components/ui/FloatingLabelSelect";
+import FloatingLabelInput from "@OpportunityComponents/ui/FloatingLabelInput";
+import FloatingLabelSelect from "@OpportunityComponents/ui/FloatingLabelSelect";
 
 const StatusProgressSection = ({ formData, handleInputChange, statusOptions, stageOptions }) => {
   return (

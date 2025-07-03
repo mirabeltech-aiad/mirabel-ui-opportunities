@@ -1,5 +1,5 @@
 
-import ColorCustomizer from "@/components/ColorCustomizer";
+import ColorCustomizer from "@OpportunityComponents/ColorCustomizer";
 
 const ColorSettingsTab = () => {
   return (

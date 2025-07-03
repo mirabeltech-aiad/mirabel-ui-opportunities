@@ -1,6 +1,6 @@
 
-import { Skeleton } from "@/components/ui/skeleton";
-import { TableRow, TableCell } from "@/components/ui/table";
+import { Skeleton } from "@OpportunityComponents/ui/skeleton";
+import { TableRow, TableCell } from "@OpportunityComponents/ui/table";
 import Loader from "@/features/Opportunity/components/ui/loader";
 
 const InfiniteScrollLoader = ({ columnCount = 14 }) => {

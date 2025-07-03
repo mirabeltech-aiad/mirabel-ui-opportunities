@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/features/Opportunity/components/ui/sheet";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@OpportunityComponents/ui/tabs";
 import SavedViewsTab from "./SavedViewsTab";
 import AddViewTab from "./AddViewTab";
 import DeleteConfirmationDialog from "./DeleteConfirmationDialog";

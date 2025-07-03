@@ -1,9 +1,9 @@
 
 import React from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Progress } from "@/components/ui/progress";
-import { ScrollArea } from "@/components/ui/scroll-area";
+import { Card, CardContent, CardHeader, CardTitle } from "@OpportunityComponents/ui/card";
+import { Badge } from "@OpportunityComponents/ui/badge";
+import { Progress } from "@OpportunityComponents/ui/progress";
+import { ScrollArea } from "@OpportunityComponents/ui/scroll-area";
 import { Folder, CheckCircle, Clock, AlertTriangle } from "lucide-react";
 
 /**

@@ -1,6 +1,6 @@
 
 import { useNavigate } from "react-router-dom";
-import { Button } from "@/components/ui/button";
+import { Button } from "@OpportunityComponents/ui/button";
 import { Settings } from "lucide-react";
 import apiService from "@/services/apiService";
 import NavbarLogo from "./navbar/NavbarLogo";

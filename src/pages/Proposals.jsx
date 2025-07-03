@@ -1,6 +1,6 @@
 import React, { useState, useMemo, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { Button } from "@/components/ui/button";
+import { Button } from "@OpportunityComponents/ui/button";
 import { X, Plus, Copy } from "lucide-react";
 import MainNavbar from "@OpportunityComponents/MainNavbar";
 import ProposalsTable from "@/features/Opportunity/components/ProposalsTable";

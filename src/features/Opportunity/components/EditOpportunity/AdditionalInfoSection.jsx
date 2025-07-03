@@ -1,14 +1,14 @@
 
 import React from "react";
 import FloatingLabelInput from "./FloatingLabelInput";
-import { Button } from "@/components/ui/button";
-import { Calendar } from "@/components/ui/calendar";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Button } from "@OpportunityComponents/ui/button";
+import { Calendar } from "@OpportunityComponents/ui/calendar";
+import { Popover, PopoverContent, PopoverTrigger } from "@OpportunityComponents/ui/popover";
 import { CalendarIcon } from "lucide-react";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
+import { Label } from "@OpportunityComponents/ui/label";
+import { Textarea } from "@OpportunityComponents/ui/textarea";
 
 const AdditionalInfoSection = ({ formData, handleInputChange, isAddMode = false }) => {
   const formatDateForInput = (dateString) => {

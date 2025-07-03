@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Button } from "@/components/ui/button";
+import { Button } from "@OpportunityComponents/ui/button";
 import { FileText, Edit, Mail, Printer, Download } from "lucide-react";
 
 const TableActionsPanel = ({ selectedCount, onExport, onBatchUpdate, onSendEmail, onPrint, onDownloadFiles }) => {

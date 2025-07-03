@@ -1,5 +1,5 @@
 
-import { Table, TableBody } from "@/components/ui/table";
+import { Table, TableBody } from "@OpportunityComponents/ui/table";
 import { ScrollArea } from "@OpportunityComponents/ui/scroll-area";
 import OpportunityTableHeader from "./OpportunityTableHeader";
 import OpportunityTableRow from "./OpportunityTableRow";

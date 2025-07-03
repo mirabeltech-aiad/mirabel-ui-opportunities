@@ -1,7 +1,7 @@
 
 import React from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
+import { Card, CardContent, CardHeader, CardTitle } from '@OpportunityComponents/ui/card';
+import { Badge } from '@OpportunityComponents/ui/badge';
 import { Target, Lightbulb } from 'lucide-react';
 import { useDesignSystem } from '@/hooks/useDesignSystem';
 

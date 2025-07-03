@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import { Button } from "@/components/ui/button";
+import { Button } from "@OpportunityComponents/ui/button";
 import { Plus } from "lucide-react";
 import MainNavbar from "@OpportunityComponents/MainNavbar";
 import OpportunityStatsCards from "@/features/Opportunity/components/OpportunityStatsCards";

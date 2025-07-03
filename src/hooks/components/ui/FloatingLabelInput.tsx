@@ -1,8 +1,8 @@
 
 import React, { useState } from "react";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
+import { Input } from "@OpportunityComponents/ui/input";
+import { Label } from "@OpportunityComponents/ui/label";
+import { Textarea } from "@OpportunityComponents/ui/textarea";
 import { cn } from "@/lib/utils";
 
 interface FloatingLabelInputProps {
