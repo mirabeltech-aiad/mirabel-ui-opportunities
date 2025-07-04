@@ -76,8 +76,6 @@ function App() {
     const isNotBlankPage = window.location.pathname !== "/ui60/blank";
 
     if (isDevelopmentMode()) {
-      console.log("🔧 Development mode detected - initializing...");
-
       // Initialize development environment FIRST
       initializeDevelopmentEnvironment();
 

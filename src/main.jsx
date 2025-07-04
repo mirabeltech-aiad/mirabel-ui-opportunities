@@ -9,13 +9,11 @@ initializeDesignSystem();
 
 // Listen for auth logout events from httpClient/axios interceptor (matches mirabel.mm.ui pattern)
 window.addEventListener("auth:logout", (event) => {
-  console.log("🔐 Main: Authentication logout event received:", event.detail);
 
   // Import session helpers dynamically to clear authentication data
   import("./utils/sessionHelpers.js").then(({ resetSession }) => {
     import("./utils/authHelpers.js").then(({ getMainLoginUrl }) => {
       import("./utils/developmentHelper.js").then(({ isDevelopmentMode }) => {
-        console.log("🧹 Main: Clearing session data");
         resetSession();
 
         // In development mode, don't redirect to login - just reload
