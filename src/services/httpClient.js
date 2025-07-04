@@ -387,6 +387,11 @@ export const userId = getCurrentUserId();
 // Debug utilities for authentication testing
 if (typeof window !== 'undefined') {
   window.debugAuth = {
+    quickDebug: async () => {
+      const { quickSessionDebug } = await import('../utils/sessionHelpers');
+      return quickSessionDebug();
+    },
+
     testAuthBehavior: async () => {
       const { debugAuthenticationBehavior } = await import('../utils/sessionHelpers');
       return debugAuthenticationBehavior();
@@ -482,6 +487,7 @@ if (typeof window !== 'undefined') {
   };
 
   console.log('🛠️ Authentication Debug Utilities Available:');
+  console.log('- window.debugAuth.quickDebug() - ⚡ QUICK session analysis (START HERE)');
   console.log('- window.debugAuth.testAuthBehavior() - Complete authentication test');
   console.log('- window.debugAuth.checkEnvironment() - Check environment detection');
   console.log('- window.debugAuth.simulateNoSession() - Test behavior without session');
