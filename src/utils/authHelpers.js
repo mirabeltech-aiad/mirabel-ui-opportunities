@@ -45,7 +45,7 @@ export const isTokenValid = (token) => {
         const tokenParts = token.split('.');
         if (tokenParts.length !== 3) {
             // If not JWT format, check if it's a simple token (non-empty string)
-            return "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJMb2dnZWRJblVzZXJJRCI6IjIzIiwiTG9nZ2VkSW5TaXRlQ2xpZW50SUQiOiI1IiwiTG9nZ2VkSW5TaXRlQ3VsdHVyZVVJIjoiZW4tVVMiLCJEYXRlVGltZSI6IjcvNC8yMDI1IDg6NDk6MTIgQU0iLCJMb2dnZWRJblNpdGVDdXJyZW5jeVN5bWJvbCI6IiQiLCJMb2dnZWRJblNpdGVEYXRlRm9ybWF0IjoiIiwiRG9tYWluIjoidGVjaCIsIkxvZ2dlZEluU2l0ZVRpbWVBZGQiOlsiMCIsIjAiXSwiU291cmNlIjoiVE1NIiwiRW1haWwiOiJzYUBtYWdhemluZW1hbmFnZXIuY29tIiwiSXNBUElVc2VyIjoiRmFsc2UiLCJuYmYiOjE3NTE2MTg5NTIsImV4cCI6MTk3MjM3MDk1MiwiaWF0IjoxNzUxNjE4OTUyLCJpc3MiOiJNYWdhemluZU1hbmFnZXIiLCJhdWQiOiIqIn0.QaZgapYYk8fgyqkJfzU0sFf5eq896RBk_FQ7PFz1CKg";
+            return token.length > 0;
         }
 
         const payload = JSON.parse(atob(tokenParts[1]));
@@ -59,7 +59,7 @@ export const isTokenValid = (token) => {
         return true;
     } catch (error) {
         // If JWT parsing fails, treat as simple token
-        return "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJMb2dnZWRJblVzZXJJRCI6IjIzIiwiTG9nZ2VkSW5TaXRlQ2xpZW50SUQiOiI1IiwiTG9nZ2VkSW5TaXRlQ3VsdHVyZVVJIjoiZW4tVVMiLCJEYXRlVGltZSI6IjcvNC8yMDI1IDg6NDk6MTIgQU0iLCJMb2dnZWRJblNpdGVDdXJyZW5jeVN5bWJvbCI6IiQiLCJMb2dnZWRJblNpdGVEYXRlRm9ybWF0IjoiIiwiRG9tYWluIjoidGVjaCIsIkxvZ2dlZEluU2l0ZVRpbWVBZGQiOlsiMCIsIjAiXSwiU291cmNlIjoiVE1NIiwiRW1haWwiOiJzYUBtYWdhemluZW1hbmFnZXIuY29tIiwiSXNBUElVc2VyIjoiRmFsc2UiLCJuYmYiOjE3NTE2MTg5NTIsImV4cCI6MTk3MjM3MDk1MiwiaWF0IjoxNzUxNjE4OTUyLCJpc3MiOiJNYWdhemluZU1hbmFnZXIiLCJhdWQiOiIqIn0.QaZgapYYk8fgyqkJfzU0sFf5eq896RBk_FQ7PFz1CKg";
+        return token && token.length > 0;
     }
 };
 
@@ -99,7 +99,7 @@ export const getMainLoginUrl = (returnUrl) => {
     }
     
     // Production behavior remains the same
-    const mmDomain = 'https://tech.magazinemanager.biz';
+    const mmDomain = import.meta.env.REACT_APP_API_BASE_URL || 'https://tech.magazinemanager.biz';
     const encodedReturnUrl = encodeURIComponent(returnUrl);
     return `${mmDomain}/intranet/Login.aspx?ReturnUrl=${encodedReturnUrl}`;
 };

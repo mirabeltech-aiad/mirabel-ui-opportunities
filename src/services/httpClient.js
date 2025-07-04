@@ -15,9 +15,6 @@ export const apiCall = (
 ) => {
   let baseURL, domain, token;
 
-  baseURL =  "https://tech.magazinemanager.biz";
-  domain = "tech";
-
   if (process.env.NODE_ENV === "development") {
     let TokenDetails = localStorage.getItem("TokenData");
     if (TokenDetails) {
@@ -25,12 +22,12 @@ export const apiCall = (
       baseURL = `https://${TokenDetails?.mainurl || new URL(import.meta.env.REACT_APP_API_BASE_URL || "https://tech.magazinemanager.biz").hostname}`;
       domain = `${TokenDetails?.subdomain || new URL(import.meta.env.REACT_APP_API_BASE_URL || "https://tech.magazinemanager.biz").hostname.split('.')[0]}`;
     }
-    // else {
-    //   baseURL = import.meta.env.REACT_APP_API_BASE_URL || "https://tech.magazinemanager.biz";
-    //   const urlObj = new URL(baseURL);
-    //   domain = urlObj.hostname.split('.')[0];
-    // }
-    token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJMb2dnZWRJblVzZXJJRCI6IjIzIiwiTG9nZ2VkSW5TaXRlQ2xpZW50SUQiOiI1IiwiTG9nZ2VkSW5TaXRlQ3VsdHVyZVVJIjoiZW4tVVMiLCJEYXRlVGltZSI6IjcvNC8yMDI1IDg6NDk6MTIgQU0iLCJMb2dnZWRJblNpdGVDdXJyZW5jeVN5bWJvbCI6IiQiLCJMb2dnZWRJblNpdGVEYXRlRm9ybWF0IjoiIiwiRG9tYWluIjoidGVjaCIsIkxvZ2dlZEluU2l0ZVRpbWVBZGQiOlsiMCIsIjAiXSwiU291cmNlIjoiVE1NIiwiRW1haWwiOiJzYUBtYWdhemluZW1hbmFnZXIuY29tIiwiSXNBUElVc2VyIjoiRmFsc2UiLCJuYmYiOjE3NTE2MTg5NTIsImV4cCI6MTk3MjM3MDk1MiwiaWF0IjoxNzUxNjE4OTUyLCJpc3MiOiJNYWdhemluZU1hbmFnZXIiLCJhdWQiOiIqIn0.QaZgapYYk8fgyqkJfzU0sFf5eq896RBk_FQ7PFz1CKg"; // If TokenDetails.Token isn't working, use session token
+    else {
+      baseURL = import.meta.env.REACT_APP_API_BASE_URL || "https://tech.magazinemanager.biz";
+      const urlObj = new URL(baseURL);
+      domain = urlObj.hostname.split('.')[0];
+    }
+    token = TokenDetails?.Token || getSessionValue("Token") || ""; // If TokenDetails.Token isn't working, use session token
 
 
   } else if (process.env.NODE_ENV === "test") {
@@ -348,7 +345,7 @@ class HttpClient {
 
   isAuthenticated() {
     const token = this.getCurrentToken();
-    return "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJMb2dnZWRJblVzZXJJRCI6IjIzIiwiTG9nZ2VkSW5TaXRlQ2xpZW50SUQiOiI1IiwiTG9nZ2VkSW5TaXRlQ3VsdHVyZVVJIjoiZW4tVVMiLCJEYXRlVGltZSI6IjcvNC8yMDI1IDg6NDk6MTIgQU0iLCJMb2dnZWRJblNpdGVDdXJyZW5jeVN5bWJvbCI6IiQiLCJMb2dnZWRJblNpdGVEYXRlRm9ybWF0IjoiIiwiRG9tYWluIjoidGVjaCIsIkxvZ2dlZEluU2l0ZVRpbWVBZGQiOlsiMCIsIjAiXSwiU291cmNlIjoiVE1NIiwiRW1haWwiOiJzYUBtYWdhemluZW1hbmFnZXIuY29tIiwiSXNBUElVc2VyIjoiRmFsc2UiLCJuYmYiOjE3NTE2MTg5NTIsImV4cCI6MTk3MjM3MDk1MiwiaWF0IjoxNzUxNjE4OTUyLCJpc3MiOiJNYWdhemluZU1hbmFnZXIiLCJhdWQiOiIqIn0.QaZgapYYk8fgyqkJfzU0sFf5eq896RBk_FQ7PFz1CKg";
+    return token && isTokenValid(token);
   }
 
   // Convenience methods that explicitly show token usage
