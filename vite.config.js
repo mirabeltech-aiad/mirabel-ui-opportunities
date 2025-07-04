@@ -9,6 +9,10 @@ export default defineConfig({
     port: 3000,
     historyApiFallback: true,
   },
+  optimizeDeps: {
+    include: ['react', 'react-dom'],
+    force: true
+  },
   resolve: {
     alias: {
       '@': path.resolve(__dirname, 'src'),
@@ -22,12 +26,14 @@ export default defineConfig({
   },
   build: {
     rollupOptions: {
+      external: [], // Ensure React is not externalized
       output: {
         // Manual chunk splitting
         manualChunks: (id) => {
           // Vendor chunks - Third party libraries
           if (id.includes('node_modules')) {
-            if (id.includes('react') && !id.includes('react-router')) {
+            // Bundle React and ReactDOM together to prevent createContext issues
+            if (id.includes('react') || id.includes('react-dom')) {
               return 'vendor-react';
             }
             if (id.includes('react-router')) {
