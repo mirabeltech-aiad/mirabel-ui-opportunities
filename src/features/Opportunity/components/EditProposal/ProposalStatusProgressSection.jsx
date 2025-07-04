@@ -1,7 +1,7 @@
 
 import React from "react";
-import FloatingLabelSelect from "../ui/FloatingLabelSelect";
-import FloatingLabelInput from "../ui/FloatingLabelInput";
+import FloatingLabelSelect from "../../../../components/ui/FloatingLabelSelect";
+import FloatingLabelInput from "../../../../components/ui/FloatingLabelInput";
 
 const ProposalStatusProgressSection = ({ 
   formData, 

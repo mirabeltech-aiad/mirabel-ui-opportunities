@@ -1,6 +1,6 @@
 // src/hooks/useApi.js
 import { useQuery, useMutation } from "@tanstack/react-query";
-import axiosInstance from "../services/axiosInstance";
+import axiosInstance from "../../../services/axiosInstance";
 
 // GET method
 export const useApiGet = (key, endpoint, options = {}) => {

@@ -39,7 +39,7 @@ describe('ArchitectNotesTab', () => {
   });
 
   it('allows adding new notes', async () => {
-    const { toast } = require('@/hooks/use-toast');
+    const { toast } = require('@/features/Opportunity/hooks/use-toast');
     render(<ArchitectNotesTab />);
     
     fireEvent.click(screen.getByText('Add New Note'));

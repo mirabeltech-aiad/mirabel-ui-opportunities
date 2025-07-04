@@ -1,5 +1,5 @@
 
-import { userService } from '@/services/userService';
+import { userService } from '@/features/Opportunity/Services/userService';
 
 export const periodOptions = [
   { value: "all", label: "All Time" },

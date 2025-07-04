@@ -1,11 +1,11 @@
 
 import React, { useState, useMemo, useEffect } from 'react';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@OpportunityComponents/ui/tabs';
-import { Button } from '@OpportunityComponents/ui/button';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Button } from '@/components/ui/button';
 import { Activity, Download, BarChart3, TrendingUp, Target, Layers, Loader2, AlertCircle } from 'lucide-react';
-import { toast } from '@/hooks/use-toast';
-import exportService from '@/services/exportService';
-import { useDesignSystem } from '@/hooks/useDesignSystem';
+import { toast } from '@/features/Opportunity/hooks/use-toast';
+import exportService from '@/features/Opportunity/Services/exportService';
+import { useDesignSystem } from '@/features/Opportunity/hooks/useDesignSystem';
 import MetricTooltip from './MetricTooltip';
 
 // Extracted components
@@ -18,7 +18,7 @@ import PipelineStageAnalysisTab from './PipelineAnalytics/PipelineStageAnalysisT
 
 // New API hook and stage service
 import { usePipelineAnalyticsData } from './PipelineAnalytics/hooks/usePipelineAnalyticsData';
-import stageService from '@/services/stageService';
+import stageService from '@/features/Opportunity/Services/stageService';
 
 const PipelineAnalytics = ({ opportunities = [] }) => {
   const [selectedPeriod, setSelectedPeriod] = useState('last-6-months');

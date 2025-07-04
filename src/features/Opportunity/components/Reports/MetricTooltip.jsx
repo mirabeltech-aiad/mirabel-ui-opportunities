@@ -1,5 +1,5 @@
 import React from "react";
-import { HoverCard, HoverCardContent, HoverCardTrigger } from "@OpportunityComponents/ui/hover-card";
+import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/components/ui/hover-card";
 import { Info } from "lucide-react";
 
 const MetricTooltip = ({ children, title, description, calculation, period, benchmarks }) => {

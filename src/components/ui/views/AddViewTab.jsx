@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -10,7 +9,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { useAvailableColumns } from "@/features/Opportunity/hooks/useAvailableColumns";
 import apiService from "@/features/Opportunity/Services/apiService";
 import { proposalService } from "@/features/Opportunity/Services/proposalService";
-import { userId } from "@/features/Opportunity/Services/httpClient";
+import { userId } from "@/services/httpClient";
 import Loader from "@/components/ui/loader";
 
 const AddViewTab = ({ 

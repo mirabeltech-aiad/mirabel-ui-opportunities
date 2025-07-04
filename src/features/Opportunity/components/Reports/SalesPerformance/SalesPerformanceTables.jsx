@@ -1,8 +1,8 @@
 
 import React from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@OpportunityComponents/ui/card';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@OpportunityComponents/ui/table';
-import { Badge } from '@OpportunityComponents/ui/badge';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { Badge } from '@/components/ui/badge';
 import UserAvatar from '@OpportunityComponents/table/UserAvatar';
 import MetricTooltip from '../MetricTooltip';
 import { Users, Filter, Target, DollarSign } from 'lucide-react';

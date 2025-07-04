@@ -1,6 +1,6 @@
 
 import { useMemo } from 'react';
-import benchmarksService from '@/services/benchmarksService';
+import benchmarksService from '@/features/Opportunity/Services/benchmarksService';
 
 export const useVelocityMetrics = (opportunities, selectedPeriod) => {
   return useMemo(() => {

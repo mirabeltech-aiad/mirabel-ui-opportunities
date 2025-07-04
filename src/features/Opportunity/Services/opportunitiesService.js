@@ -1,5 +1,5 @@
 import apiService from './apiService';
-import httpClient, { userId } from './httpClient';
+import httpClient, { userId } from '@/services/httpClient';
 
 // Utility functions for payload formatting
 export const getIcodeFromArray = (arr) => {

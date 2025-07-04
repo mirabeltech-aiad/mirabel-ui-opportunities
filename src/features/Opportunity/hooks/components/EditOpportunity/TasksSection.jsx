@@ -8,7 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Plus, Calendar, User } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import apiService from "@/features/Opportunity/Services/apiService";
-import { userId } from "@/features/Opportunity/Services/httpClient";
+import { userId } from "@/services/httpClient";
 
 const TasksSection = ({ companyId }) => {
   // Get customer ID from the opportunity (you may need to adjust this based on your data structure)

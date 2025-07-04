@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import apiService from "../Services/apiService";
-import { userId } from "../Services/httpClient";
+import { userId } from "@/services/httpClient";
 
 export const useCompanySidebar = (selectedCompany, opportunities) => {
   const [companyData, setCompanyData] = useState(null);

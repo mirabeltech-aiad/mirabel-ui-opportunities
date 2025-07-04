@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from "react";
 import TimelineContainer from "./StageTrail/TimelineContainer";
 import EmptyStageTrail from "./StageTrail/EmptyStageTrail";
-import apiService from "@/services/apiService";
+import apiService from "@/features/Opportunity/Services/apiService";
 
 /**
  * StageTrailSection Component

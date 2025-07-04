@@ -1,7 +1,7 @@
 
 import React from "react";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@OpportunityComponents/ui/tabs";
-import { Button } from "@OpportunityComponents/ui/button";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Button } from "@/components/ui/button";
 import EditProposalAccordion from "./EditProposalAccordion";
 import ProposalTasksSection from "./ProposalTasksSection";
 import ProposalTimelineSection from "./ProposalTimelineSection";

@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect } from "react";
-import { Button } from "@OpportunityComponents/ui/button";
-import { Checkbox } from "@OpportunityComponents/ui/checkbox";
+import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Search, ChevronDown, ChevronUp, X } from "lucide-react";
 
 const FloatingActionPanel = ({ searchParams, onSearch, onClear, openAccordions, onAccordionChange }) => {

@@ -1,7 +1,7 @@
 
 import React from "react";
-import { Label } from "@OpportunityComponents/ui/label";
-import { Textarea } from "@OpportunityComponents/ui/textarea";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 
 const NotesSection = ({ formData, handleInputChange, shouldDisableFields }) => {
   return (

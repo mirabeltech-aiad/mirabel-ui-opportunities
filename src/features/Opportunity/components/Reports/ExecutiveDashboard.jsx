@@ -1,6 +1,6 @@
 
 import React from "react";
-import DateRangePicker from "@OpportunityComponents/ui/DateRangePicker";
+import DateRangePicker from "@/components/ui/DateRangePicker";
 import MetricComparison from "./MetricComparison";
 import MetricDrillDown from "./MetricDrillDown";
 import TeamPerformanceTable from "./TeamPerformanceTable";

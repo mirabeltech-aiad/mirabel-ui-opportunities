@@ -1,11 +1,11 @@
 
 import React from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@OpportunityComponents/ui/card';
-import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@OpportunityComponents/ui/chart';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, ResponsiveContainer } from 'recharts';
-import { Tooltip, TooltipContent, TooltipTrigger } from '@OpportunityComponents/ui/tooltip';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { Info, DollarSign } from 'lucide-react';
-import { useDesignSystem } from '@/hooks/useDesignSystem';
+import { useDesignSystem } from '@/features/Opportunity/hooks/useDesignSystem';
 
 const RevenueChart = ({ data }) => {
   const { getTitleClass, chartColors } = useDesignSystem();

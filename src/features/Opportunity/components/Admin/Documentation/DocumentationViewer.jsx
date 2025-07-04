@@ -1,6 +1,6 @@
 
 import React from "react";
-import { ScrollArea } from "@OpportunityComponents/ui/scroll-area";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import { renderDocumentContent } from "./documentationContent";
 
 /**

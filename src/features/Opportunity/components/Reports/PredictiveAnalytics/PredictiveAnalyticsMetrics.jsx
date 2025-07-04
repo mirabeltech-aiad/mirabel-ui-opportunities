@@ -1,9 +1,9 @@
 
 import React from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@OpportunityComponents/ui/card';
-import { Badge } from '@OpportunityComponents/ui/badge';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
 import { DollarSign, Target, Activity, AlertTriangle, TrendingUp } from 'lucide-react';
-import { useDesignSystem } from '@/hooks/useDesignSystem';
+import { useDesignSystem } from '@/features/Opportunity/hooks/useDesignSystem';
 import MetricTooltip from '../MetricTooltip';
 
 const PredictiveAnalyticsMetrics = ({ predictiveMetrics, pipelineHealth, forecastPeriod }) => {

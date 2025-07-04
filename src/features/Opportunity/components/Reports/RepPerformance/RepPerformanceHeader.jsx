@@ -1,9 +1,9 @@
 
 import React from 'react';
 import { Users, Filter } from 'lucide-react';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@OpportunityComponents/ui/select';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import MetricTooltip from '../MetricTooltip';
-import { useDesignSystem } from '@/hooks/useDesignSystem';
+import { useDesignSystem } from '@/features/Opportunity/hooks/useDesignSystem';
 
 const RepPerformanceHeader = ({ selectedPeriod, onPeriodChange }) => {
   const { getTitleClass, getInteractiveButtonClass } = useDesignSystem();

@@ -1,8 +1,8 @@
 
 import React from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from "@OpportunityComponents/ui/card";
-import { Label } from "@OpportunityComponents/ui/label";
-import { Tooltip, TooltipContent, TooltipTrigger } from "@OpportunityComponents/ui/tooltip";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Label } from "@/components/ui/label";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { Target, Info } from 'lucide-react';
 import IndividualRepQuotas from '../IndividualRepQuotas';
 import CurrencyInput from '../CurrencyInput';

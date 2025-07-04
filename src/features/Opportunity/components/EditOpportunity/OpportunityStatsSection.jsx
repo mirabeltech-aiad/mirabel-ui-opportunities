@@ -1,6 +1,6 @@
 
 import React from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@OpportunityComponents/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { 
   Phone, 
   Mail, 
@@ -11,7 +11,7 @@ import {
   TrendingUp
 } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
-import apiService from "@/services/apiService";
+import apiService from "@/features/Opportunity/Services/apiService";
 
 const StatCard = ({ title, value, icon: Icon, description, color = "text-blue-600" }) => {
   return (

@@ -1,6 +1,6 @@
 
 import React from "react";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@OpportunityComponents/ui/tabs";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import AddCallForm from "./AddCallForm";
 import AddMeetingForm from "./AddMeetingForm";
 import AddNoteForm from "./AddNoteForm";

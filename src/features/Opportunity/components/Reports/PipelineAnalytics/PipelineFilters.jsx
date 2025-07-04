@@ -1,9 +1,9 @@
 
 import React, { useState, useEffect } from 'react';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@OpportunityComponents/ui/select';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Filter } from 'lucide-react';
-import { useDesignSystem } from '@/hooks/useDesignSystem';
-import { userService } from '@/services/userService';
+import { useDesignSystem } from '@/features/Opportunity/hooks/useDesignSystem';
+import { userService } from '@/features/Opportunity/Services/userService';
 
 const PipelineFilters = ({ 
   selectedPeriod, 

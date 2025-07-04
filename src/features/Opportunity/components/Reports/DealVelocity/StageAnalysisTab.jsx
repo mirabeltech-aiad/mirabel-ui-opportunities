@@ -1,10 +1,10 @@
 
 import React from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@OpportunityComponents/ui/card';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@OpportunityComponents/ui/table';
-import { Badge } from '@OpportunityComponents/ui/badge';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { Badge } from '@/components/ui/badge';
 import { BarChart3 } from 'lucide-react';
-import { useDesignSystem } from '@/hooks/useDesignSystem';
+import { useDesignSystem } from '@/features/Opportunity/hooks/useDesignSystem';
 
 const StageAnalysisTab = ({ velocityMetrics }) => {
   const { getTitleClass, getTableHeaderClass } = useDesignSystem();

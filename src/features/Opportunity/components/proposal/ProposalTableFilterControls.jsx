@@ -1,11 +1,11 @@
 
 import React, { useState, useEffect } from 'react';
-import { Button } from "@OpportunityComponents/ui/button";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@OpportunityComponents/ui/select";
+import { Button } from "@/components/ui/button";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Search, RefreshCw, Settings, ArrowUpDown, Table, LayoutGrid, PanelRight, ChevronLeft, ChevronRight } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import ProposalSortOptionsDropdown from "./ProposalSortOptionsDropdown";
-import { userService } from '@/services/userService';
+import { userService } from '@/features/Opportunity/Services/userService';
 
 const ProposalTableFilterControls = ({ 
   filters = {}, // Add default empty object

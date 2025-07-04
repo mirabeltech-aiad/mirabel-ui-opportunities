@@ -1,6 +1,6 @@
 
 import React from "react";
-import FloatingLabelInput from "../ui/FloatingLabelInput";
+import FloatingLabelInput from "../../../../components/ui/FloatingLabelInput";
 
 const ProposalAdditionalInfoSection = ({ formData, handleInputChange }) => {
   const handleFieldChange = (field) => (value) => {

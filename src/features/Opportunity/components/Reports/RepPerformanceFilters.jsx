@@ -1,10 +1,10 @@
 
 import React from 'react';
-import { Card, CardContent } from '@OpportunityComponents/ui/card';
-import { Button } from '@OpportunityComponents/ui/button';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@OpportunityComponents/ui/select';
-import { Input } from '@OpportunityComponents/ui/input';
-import { Label } from '@OpportunityComponents/ui/label';
+import { Card, CardContent } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import { Calendar, Download, RefreshCw } from 'lucide-react';
 
 const RepPerformanceFilters = ({ 

@@ -1,8 +1,8 @@
 import React from 'react';
 import { AlertTriangle, RefreshCw, Wifi } from 'lucide-react';
-import { Button } from '@OpportunityComponents/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@OpportunityComponents/ui/card';
-import { Alert, AlertDescription } from '@OpportunityComponents/ui/alert';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Alert, AlertDescription } from '@/components/ui/alert';
 
 const ApiErrorState = ({ 
   error, 

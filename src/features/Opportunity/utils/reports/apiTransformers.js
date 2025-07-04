@@ -1,6 +1,6 @@
 
 // API data transformation utilities for reports
-import benchmarksService from '@/services/benchmarksService';
+import benchmarksService from '@/features/Opportunity/Services/benchmarksService';
 
 // ===== EXECUTIVE DASHBOARD STORED PROCEDURE TRANSFORMERS =====
 

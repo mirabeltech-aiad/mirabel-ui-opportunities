@@ -1,6 +1,6 @@
 
 import React from "react";
-import FloatingLabelSelect from "../ui/FloatingLabelSelect";
+import FloatingLabelSelect from "../../../../components/ui/FloatingLabelSelect";
 
 const ProposalTeamAssignmentSection = ({ 
   formData, 

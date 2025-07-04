@@ -1,7 +1,7 @@
 
 import React from "react";
 import { User, Phone, Mail, Smartphone } from "lucide-react";
-import { Input } from "@OpportunityComponents/ui/input";
+import { Input } from "@/components/ui/input";
 
 const CompanyDetailsCard = ({ 
   editableCompanyData, 

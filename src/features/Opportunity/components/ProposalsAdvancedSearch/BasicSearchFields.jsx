@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
-import FloatingLabelInput from "@OpportunityComponents/ui/FloatingLabelInput";
-import FloatingLabelSelect from "@OpportunityComponents/ui/FloatingLabelSelect";
-import { userService } from "@/services/userService";
+import FloatingLabelInput from "@/components/ui/FloatingLabelInput";
+import FloatingLabelSelect from "@/components/ui/FloatingLabelSelect";
+import { userService } from "@/features/Opportunity/Services/userService";
 import { ChevronDown, ChevronUp } from "lucide-react";
 const BasicSearchFields = ({
   handleInputChange,

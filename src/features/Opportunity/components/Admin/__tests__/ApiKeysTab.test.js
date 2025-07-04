@@ -45,7 +45,7 @@ describe('ApiKeysTab', () => {
   });
 
   it('allows entering and saving API keys', async () => {
-    const { toast } = require('@/hooks/use-toast');
+    const { toast } = require('@/features/Opportunity/hooks/use-toast');
     render(<ApiKeysTab />);
     
     const openAIInput = screen.getByPlaceholderText('Enter your OpenAI API key');

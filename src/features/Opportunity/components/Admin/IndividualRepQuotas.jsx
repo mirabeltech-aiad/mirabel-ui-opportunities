@@ -1,10 +1,10 @@
 
 import React, { useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from "@OpportunityComponents/ui/card";
-import { Button } from "@OpportunityComponents/ui/button";
-import { Input } from "@OpportunityComponents/ui/input";
-import { Label } from "@OpportunityComponents/ui/label";
-import { Tooltip, TooltipContent, TooltipTrigger } from "@OpportunityComponents/ui/tooltip";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { Users, Plus, Trash2, Info } from 'lucide-react';
 import CurrencyInput from './CurrencyInput';
 

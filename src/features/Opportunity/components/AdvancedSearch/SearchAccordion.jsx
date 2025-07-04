@@ -4,8 +4,8 @@ import {
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
-} from "@OpportunityComponents/ui/accordion";
-import { Separator } from "@OpportunityComponents/ui/separator";
+} from "@/components/ui/accordion";
+import { Separator } from "@/components/ui/separator";
 import CustomerInfoFields from "./CustomerInfoFields";
 import FinancialDataFields from "./FinancialDataFields";
 import OpportunityDetailsFields from "./OpportunityDetailsFields";

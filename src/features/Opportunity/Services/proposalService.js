@@ -1,5 +1,5 @@
 import apiService from './apiService';
-import { userId } from './httpClient';
+import { userId } from '@/services/httpClient';
 
 // Utility function to format multi-select values similar to opportunities
 const formatMultiSelectValue = (value) => {

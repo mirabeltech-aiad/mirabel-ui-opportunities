@@ -1,12 +1,12 @@
 
 import React, { useState } from "react";
-import { Label } from "@OpportunityComponents/ui/label";
+import { Label } from "@/components/ui/label";
 import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
   DropdownMenuContent,
   DropdownMenuTrigger,
-} from "@OpportunityComponents/ui/dropdown-menu";
+} from "@/components/ui/dropdown-menu";
 import { ChevronDown } from "lucide-react";
 
 const StageSelector = ({ handleSelectChange }) => {

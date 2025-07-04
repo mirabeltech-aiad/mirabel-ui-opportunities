@@ -1,7 +1,7 @@
 
 import { render, screen } from '@testing-library/react';
 import { vi } from 'vitest';
-import OpportunityStatsCards from '../OpportunityStatsCards';
+import OpportunityStatsCards from '../../../../components/ui/OpportunityStatsCards';
 
 // Mock localStorage
 const mockLocalStorage = {

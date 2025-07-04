@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@OpportunityComponents/ui/card";
-import { ScrollArea } from "@OpportunityComponents/ui/scroll-area";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import { FileText, GitBranch, Code, Database } from "lucide-react";
 
 const ArchitectureTab = () => {

@@ -6,7 +6,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { Check } from "lucide-react";
 import { cn } from "@/lib/utils";
 import apiService from "@/features/Opportunity/Services/apiService";
-import { userId } from "@/features/Opportunity/Services/httpClient";
+import { userId } from "@/services/httpClient";
 
 const OpportunitySearchBar = ({ onSearch, onCustomerSelect, placeholder = "Search opportunities..." }) => {
   const [searchTerm, setSearchTerm] = useState("");

@@ -1,6 +1,6 @@
 
 import React from "react";
-import { Checkbox } from "@OpportunityComponents/ui/checkbox";
+import { Checkbox } from "@/components/ui/checkbox";
 
 const FormCheckboxes = ({ isPrivate, setIsPrivate, addToTaskList, setAddToTaskList }) => {
   return (

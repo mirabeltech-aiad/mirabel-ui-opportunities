@@ -1,10 +1,10 @@
 import React from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@OpportunityComponents/ui/card';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@OpportunityComponents/ui/table';
-import { Badge } from '@OpportunityComponents/ui/badge';
-import { Progress } from '@OpportunityComponents/ui/progress';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { Badge } from '@/components/ui/badge';
+import { Progress } from '@/components/ui/progress';
 import { Users, TrendingUp, DollarSign, Target, Award } from 'lucide-react';
-import { useDesignSystem } from '@/hooks/useDesignSystem';
+import { useDesignSystem } from '@/features/Opportunity/hooks/useDesignSystem';
 
 const RepPerformanceOverview = ({ teamData }) => {
   const { getTitleClass } = useDesignSystem();

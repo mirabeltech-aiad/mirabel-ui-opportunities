@@ -1,8 +1,8 @@
 
 import React from "react";
-import FloatingLabelInput from "../../ui/FloatingLabelInput";
-import FloatingLabelSelect from "../../ui/FloatingLabelSelect";
-import Loader from "@/features/Opportunity/components/ui/loader";
+import FloatingLabelInput from "../../../../../components/ui/FloatingLabelInput";
+import FloatingLabelSelect from "../../../../../components/ui/FloatingLabelSelect";
+import Loader from "@/components/ui/loader";
 
 const ContactSelectionGroup = ({ 
   formData, 

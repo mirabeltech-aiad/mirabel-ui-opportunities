@@ -1,6 +1,6 @@
 
 import { useState, useEffect } from "react";
-import { toast } from "@/hooks/use-toast";
+import { toast } from "@/features/Opportunity/hooks/use-toast";
 
 // Extracted for clarity - manages improvements state and operations
 export const useImprovements = () => {

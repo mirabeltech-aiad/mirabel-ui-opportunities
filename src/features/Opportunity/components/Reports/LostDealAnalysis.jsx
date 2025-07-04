@@ -1,12 +1,12 @@
 
 import React, { useState, useMemo } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@OpportunityComponents/ui/card';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@OpportunityComponents/ui/tabs';
-import { Button } from '@OpportunityComponents/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Button } from '@/components/ui/button';
 import { AlertTriangle, Download, TrendingDown, Users, Target, BarChart3 } from 'lucide-react';
-import { toast } from '@/hooks/use-toast';
-import exportService from '@/services/exportService';
-import { useDesignSystem } from '@/hooks/useDesignSystem';
+import { toast } from '@/features/Opportunity/hooks/use-toast';
+import exportService from '@/features/Opportunity/Services/exportService';
+import { useDesignSystem } from '@/features/Opportunity/hooks/useDesignSystem';
 
 // Extracted components
 import LostDealMetricsCards from './LostDealAnalysis/LostDealMetricsCards';

@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from "react";
 import FloatingLabelInput from "../EditOpportunity/FloatingLabelInput";
-import FloatingLabelSelect from "@OpportunityComponents/ui/FloatingLabelSelect";
+import FloatingLabelSelect from "@/components/ui/FloatingLabelSelect";
 import StageSelector from "./StageSelector";
-import { Textarea } from "@OpportunityComponents/ui/textarea";
-import { Label } from "@OpportunityComponents/ui/label";
-import Loader from "@/features/Opportunity/components/ui/loader";
+import { Textarea } from "@/components/ui/textarea";
+import { Label } from "@/components/ui/label";
+import Loader from "@/components/ui/loader";
 import { OPPORTUNITY_OPTIONS } from "@OpportunityConstants/opportunityOptions";
-import { userService } from "@/services/userService";
+import { userService } from "@/features/Opportunity/Services/userService";
 
 const OpportunityDetailsFields = ({ handleInputChange, handleSelectChange, searchParams = {} }) => {
   const [stages, setStages] = useState([]);

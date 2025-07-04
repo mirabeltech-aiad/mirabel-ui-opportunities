@@ -1,6 +1,6 @@
 
 import React from "react";
-import { Toggle } from "@OpportunityComponents/ui/toggle";
+import { Toggle } from "@/components/ui/toggle";
 import { Maximize2, Minimize2 } from "lucide-react";
 
 const AccordionControls = ({ onExpandAll, onCollapseAll, isExpanded, onToggle }) => {

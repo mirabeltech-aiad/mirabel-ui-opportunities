@@ -1,8 +1,8 @@
 
-import { Button } from "@OpportunityComponents/ui/button";
-import { Input } from "@OpportunityComponents/ui/input";
-import { Checkbox } from "@OpportunityComponents/ui/checkbox";
-import { Label } from "@OpportunityComponents/ui/label";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Label } from "@/components/ui/label";
 import { 
   Select,
   SelectContent,
@@ -11,7 +11,7 @@ import {
   SelectLabel,
   SelectTrigger,
   SelectValue,
-} from "@OpportunityComponents/ui/select";
+} from "@/components/ui/select";
 import { Plus } from "lucide-react";
 
 const NewFieldForm = ({ newField, setNewField, handleAddField, fieldTypes }) => {

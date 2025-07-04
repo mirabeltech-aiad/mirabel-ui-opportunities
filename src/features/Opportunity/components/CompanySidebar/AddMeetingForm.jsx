@@ -1,15 +1,15 @@
 
 import React from "react";
 import { Plus, Calendar } from "lucide-react";
-import { Button } from "@OpportunityComponents/ui/button";
-import { Input } from "@OpportunityComponents/ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@OpportunityComponents/ui/select";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useQuery } from "@tanstack/react-query";
-import apiService from "@/services/apiService";
-import { userService } from "@/services/userService";
+import apiService from "@/features/Opportunity/Services/apiService";
+import { userService } from "@/features/Opportunity/Services/userService";
 import SpeechTextarea from "./SpeechTextarea";
 import FormCheckboxes from "./FormCheckboxes";
-import TimeSelector from "../TimeSelector";
+import TimeSelector from "../../../../components/ui/TimeSelector";
 
 const AddMeetingForm = ({ 
   meetingForm, 

@@ -1,11 +1,11 @@
 
 import { useState, useEffect } from "react";
-import { Card, CardContent } from "@OpportunityComponents/ui/card";
-import { Button } from "@OpportunityComponents/ui/button";
-import { Input } from "@OpportunityComponents/ui/input";
-import { Textarea } from "@OpportunityComponents/ui/textarea";
-import { ScrollArea } from "@OpportunityComponents/ui/scroll-area";
-import { toast } from "@/hooks/use-toast";
+import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { toast } from "@/features/Opportunity/hooks/use-toast";
 import { Plus, Edit, Trash2, Calendar } from "lucide-react";
 
 const DeveloperNotesTab = () => {

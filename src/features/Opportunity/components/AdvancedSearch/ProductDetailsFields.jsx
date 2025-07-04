@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from "react";
 import FloatingLabelInput from "../EditOpportunity/FloatingLabelInput";
 import FloatingLabelSelect from "../EditOpportunity/FloatingLabelSelect";
-import { Textarea } from "@OpportunityComponents/ui/textarea";
-import { Label } from "@OpportunityComponents/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { Label } from "@/components/ui/label";
 import { OPPORTUNITY_OPTIONS } from "@OpportunityConstants/opportunityOptions";
-import { userService } from "@/services/userService";
+import { userService } from "@/features/Opportunity/Services/userService";
 
 const ProductDetailsFields = ({ handleInputChange, handleSelectChange, searchParams = {} }) => {
   const [products, setProducts] = useState([]);

@@ -1,6 +1,6 @@
 
 import { useState, useEffect } from "react";
-import { toast } from "@/hooks/use-toast";
+import { toast } from "@/features/Opportunity/hooks/use-toast";
 import MappingStatus from "./FieldMapping/MappingStatus";
 import MappingTable from "./FieldMapping/MappingTable";
 import EmptyState from "./FieldMapping/EmptyState";

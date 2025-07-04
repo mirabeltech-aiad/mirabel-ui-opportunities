@@ -1,7 +1,7 @@
 
 import React from "react";
 import { Droppable } from "react-beautiful-dnd";
-import { Badge } from "@OpportunityComponents/ui/badge";
+import { Badge } from "@/components/ui/badge";
 import KanbanCard from "./KanbanCard";
 
 const KanbanColumn = ({ column, opportunities }) => {

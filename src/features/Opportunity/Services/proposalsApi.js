@@ -1,5 +1,4 @@
-
-import httpClient from './httpClient';
+import httpClient from '@/services/httpClient';
 
 class ProposalsApi {
   // Method for fetching linked proposals with parameters

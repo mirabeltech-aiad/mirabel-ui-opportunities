@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import apiService from "@/services/apiService";
+import apiService from "@/features/Opportunity/Services/apiService";
 
 export const useBasicInfoData = (formData, isAddMode) => {
   const [contactOptions, setContactOptions] = useState([]);

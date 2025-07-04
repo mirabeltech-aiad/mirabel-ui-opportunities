@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from "react";
 import { Clock, User, ArrowRight, Plus, Edit, UserCheck } from "lucide-react";
 import { getFieldDisplayName, formatValue } from "@OpportunityUtils/auditTrail";
-import apiService from "@/services/apiService";
+import apiService from "@/features/Opportunity/Services/apiService";
 
 const AuditTrailSection = ({ auditEntries, opportunityId }) => {
   const [historyData, setHistoryData] = useState([]);

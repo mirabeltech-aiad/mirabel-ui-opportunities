@@ -1,9 +1,9 @@
 
 import React, { useState } from 'react';
-import { Button } from "@OpportunityComponents/ui/button";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@OpportunityComponents/ui/tabs";
-import { TooltipProvider } from "@OpportunityComponents/ui/tooltip";
-import benchmarksService from '@/services/benchmarksService';
+import { Button } from "@/components/ui/button";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { TooltipProvider } from "@/components/ui/tooltip";
+import benchmarksService from '@/features/Opportunity/Services/benchmarksService';
 import QuotasTabContent from './Benchmarks/QuotasTabContent';
 import PerformanceTabContent from './Benchmarks/PerformanceTabContent';
 import ActivitiesTabContent from './Benchmarks/ActivitiesTabContent';

@@ -1,13 +1,13 @@
 
 import React, { useState } from "react";
-import { Label } from "@OpportunityComponents/ui/label";
+import { Label } from "@/components/ui/label";
 import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
   DropdownMenuContent,
   DropdownMenuTrigger,
-} from "@OpportunityComponents/ui/dropdown-menu";
-import { Badge } from "@OpportunityComponents/ui/badge";
+} from "@/components/ui/dropdown-menu";
+import { Badge } from "@/components/ui/badge";
 import { ChevronDown, X } from "lucide-react";
 
 // Extracted constant for clarity

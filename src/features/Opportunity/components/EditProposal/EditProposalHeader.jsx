@@ -1,6 +1,6 @@
 
 import React from "react";
-import { Button } from "@OpportunityComponents/ui/button";
+import { Button } from "@/components/ui/button";
 import { ArrowLeft, Save, X } from "lucide-react";
 
 const EditProposalHeader = ({ proposalId, onCancel, onSave }) => {

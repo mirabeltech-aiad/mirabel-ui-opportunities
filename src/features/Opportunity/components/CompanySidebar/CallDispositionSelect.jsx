@@ -1,8 +1,8 @@
 
 import React from "react";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@OpportunityComponents/ui/select";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useQuery } from "@tanstack/react-query";
-import apiService from "@/services/apiService";
+import apiService from "@/features/Opportunity/Services/apiService";
 
 const CallDispositionSelect = ({ value, onChange, className = "" }) => {
   // Fetch call disposition options from the API

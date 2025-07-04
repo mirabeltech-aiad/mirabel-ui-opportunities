@@ -1,6 +1,6 @@
 
 import { useMemo, useState, useEffect } from 'react';
-import repPerformanceService from '@/services/repPerformanceService';
+import repPerformanceService from '@/features/Opportunity/Services/repPerformanceService';
 
 export const useOperationalAnalyticsData = (timeRange, selectedRep, selectedProduct, selectedBusinessUnit) => {
   const [apiData, setApiData] = useState(null);

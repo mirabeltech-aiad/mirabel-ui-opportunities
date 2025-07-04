@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect } from 'react';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@OpportunityComponents/ui/select';
-import { userService } from '@/services/userService';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { userService } from '@/features/Opportunity/Services/userService';
 
 const SalesRepFilter = ({ selectedRep, onRepChange, selectedPeriod, compact = false }) => {
   const [salesReps, setSalesReps] = useState([]);

@@ -1,5 +1,5 @@
 
-import { Badge } from "@OpportunityComponents/ui/badge";
+import { Badge } from "@/components/ui/badge";
 
 const TableStageBadge = ({ stage }) => {
   if (stage.includes("1st Demo")) {

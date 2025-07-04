@@ -1,4 +1,4 @@
-import httpClient from './httpClient';
+import httpClient from '@/services/httpClient';
 import { getCurrentUserId, getCurrentUserInfo } from '../../../utils/userUtils';
 import { isActiveSession } from '../../../utils/sessionHelpers';
 import opportunitiesApi from './opportunitiesApi';

@@ -1,11 +1,11 @@
 
 import React, { useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@OpportunityComponents/ui/card';
-import { Badge } from '@OpportunityComponents/ui/badge';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@OpportunityComponents/ui/table';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { TrendingDown, Users, ArrowDown, AlertTriangle, TrendingUp, Loader2 } from 'lucide-react';
-import { useDesignSystem } from '@/hooks/useDesignSystem';
-import { toast } from '@/hooks/use-toast';
+import { useDesignSystem } from '@/features/Opportunity/hooks/useDesignSystem';
+import { toast } from '@/features/Opportunity/hooks/use-toast';
 import PipelineConversionFunnelFilterBar from './PipelineConversionFunnelFilterBar';
 
 // New API hook

@@ -1,9 +1,9 @@
 import { useState, useEffect } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@OpportunityComponents/ui/card";
-import { Button } from "@OpportunityComponents/ui/button";
-import { Badge } from "@OpportunityComponents/ui/badge";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@OpportunityComponents/ui/table";
-import { toast } from "@/hooks/use-toast";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { toast } from "@/features/Opportunity/hooks/use-toast";
 import { Clock, CheckCircle, XCircle, Play, History } from "lucide-react";
 
 const SyncManagementTab = () => {

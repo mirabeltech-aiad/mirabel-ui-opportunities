@@ -1,7 +1,7 @@
 
 import React from 'react';
-import ErrorBoundary from '../ErrorBoundary';
-import { toast } from '@/hooks/use-toast';
+import ErrorBoundary from '../../../../components/ui/ErrorBoundary';
+import { toast } from '@/features/Opportunity/hooks/use-toast';
 
 /**
  * Specialized error boundary for report sections with enhanced error handling

@@ -1,5 +1,5 @@
 
-import { Avatar, AvatarFallback } from "@OpportunityComponents/ui/avatar";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 
 /**
  * UserAvatar Component

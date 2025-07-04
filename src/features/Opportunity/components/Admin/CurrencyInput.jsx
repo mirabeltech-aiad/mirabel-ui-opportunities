@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Input } from "@OpportunityComponents/ui/input";
+import { Input } from "@/components/ui/input";
 
 const CurrencyInput = ({ value, onChange, className, ...props }) => {
   const formatCurrency = (num) => {

@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect } from "react";
-import { Button } from "@OpportunityComponents/ui/button";
-import { Toggle } from "../ui/toggle";
+import { Button } from "@/components/ui/button";
+import { Toggle } from "../../../../components/ui/toggle";
 import { Search, Maximize2, Minimize2 } from "lucide-react";
 
 const SearchHeader = ({ onSearch, isExpanded, onToggle, activeTab = "opportunities" }) => {

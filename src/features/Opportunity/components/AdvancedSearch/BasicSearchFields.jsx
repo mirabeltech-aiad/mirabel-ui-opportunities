@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from "react";
 import FloatingLabelInput from "../EditOpportunity/FloatingLabelInput";
 import FloatingLabelSelect from "../EditOpportunity/FloatingLabelSelect";
-import { userService } from "@/services/userService";
+import { userService } from "@/features/Opportunity/Services/userService";
 
 const BasicSearchFields = ({ handleInputChange, handleSelectChange, searchParams = {} }) => {
   const [opportunityCreators, setOpportunityCreators] = useState([]);

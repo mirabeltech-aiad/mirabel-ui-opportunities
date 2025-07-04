@@ -1,7 +1,7 @@
 
 import { render, screen } from '@testing-library/react';
 import { describe, it, expect, vi } from 'vitest';
-import Admin from '@/pages/Admin';
+import Admin from '@/pages/Opportunity/Admin';
 
 // Mock all the child components
 vi.mock('@OpportunityComponents/MainNavbar', () => ({

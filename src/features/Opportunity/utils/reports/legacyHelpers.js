@@ -1,6 +1,6 @@
 
 // Legacy/backward compatibility functions for reports
-import benchmarksService from '@/services/benchmarksService';
+import benchmarksService from '@/features/Opportunity/Services/benchmarksService';
 import { filterOpportunitiesByPeriod, getPreviousPeriod } from './periodHelpers';
 import { getDaysLeftInPeriod } from './apiTransformers';
 

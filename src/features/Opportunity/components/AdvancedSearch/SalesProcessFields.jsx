@@ -1,9 +1,9 @@
 
 import React, { useState, useEffect } from "react";
 import FloatingLabelInput from "../EditOpportunity/FloatingLabelInput";
-import FloatingLabelSelect from "@OpportunityComponents/ui/FloatingLabelSelect";
+import FloatingLabelSelect from "@/components/ui/FloatingLabelSelect";
 import { OPPORTUNITY_OPTIONS } from "@OpportunityConstants/opportunityOptions";
-import { userService } from "@/services/userService";
+import { userService } from "@/features/Opportunity/Services/userService";
 
 const SalesProcessFields = ({ handleInputChange, handleSelectChange, searchParams = {} }) => {
   const [leadSources, setLeadSources] = useState([]);

@@ -139,7 +139,7 @@ export const buildExecutiveDashboardParams = (
   
   // Set dynamic UserID from httpClient with better error handling
   try {
-    const { userId } = require('../httpClient');
+    const { userId } = require('@/services/httpClient');
     defaultParams.UserID = userId || 23; // Use default from httpClient
     console.log('Using UserID:', defaultParams.UserID);
   } catch (error) {

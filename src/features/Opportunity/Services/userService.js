@@ -1,5 +1,5 @@
 import apiService from './apiService';
-import { userId } from './httpClient';
+import { userId } from '@/services/httpClient';
 
 export const userService = {
   async getUsersForDropdown() {

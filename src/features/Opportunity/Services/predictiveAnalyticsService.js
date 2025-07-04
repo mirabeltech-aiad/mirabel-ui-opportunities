@@ -1,5 +1,4 @@
-
-import httpClient, { userId } from './httpClient';
+import httpClient, { userId } from '@/services/httpClient';
 
 class PredictiveAnalyticsService {
   constructor() {

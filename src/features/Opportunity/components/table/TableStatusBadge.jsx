@@ -1,5 +1,5 @@
 
-import { Badge } from "@OpportunityComponents/ui/badge";
+import { Badge } from "@/components/ui/badge";
 
 const TableStatusBadge = ({ status }) => {
   const getStatusVariant = (status) => {

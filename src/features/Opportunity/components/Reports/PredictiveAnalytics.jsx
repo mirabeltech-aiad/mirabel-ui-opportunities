@@ -1,10 +1,10 @@
 
 import React, { useState, useMemo } from 'react';
-import { usePredictiveAnalytics } from '@/hooks/usePredictiveAnalytics';
+import { usePredictiveAnalytics } from '@/features/Opportunity/hooks/usePredictiveAnalytics';
 import { transformPredictiveAnalyticsData } from '@OpportunityUtils/predictive/apiTransformer';
-import { useDesignSystem } from '@/hooks/useDesignSystem';
-import { toast } from '@/hooks/use-toast';
-import Loader from '@/features/Opportunity/components/ui/loader';
+import { useDesignSystem } from '@/features/Opportunity/hooks/useDesignSystem';
+import { toast } from '@/features/Opportunity/hooks/use-toast';
+import Loader from '@/components/ui/loader';
 import PredictiveAnalyticsHeader from './PredictiveAnalytics/PredictiveAnalyticsHeader';
 import PredictiveAnalyticsFilterBar from './PredictiveAnalytics/PredictiveAnalyticsFilterBar';
 import PredictiveAnalyticsMetrics from './PredictiveAnalytics/PredictiveAnalyticsMetrics';

@@ -1,5 +1,4 @@
-
-import httpClient from './httpClient';
+import httpClient from '@/services/httpClient';
 
 class ContactsApi {
   // Method for fetching company details

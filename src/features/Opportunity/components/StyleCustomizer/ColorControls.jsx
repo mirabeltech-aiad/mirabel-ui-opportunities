@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Input } from "@OpportunityComponents/ui/input";
+import { Input } from "@/components/ui/input";
 
 /**
  * ColorControls provides an interface for customizing color scheme settings.

@@ -1,6 +1,6 @@
 
-import { Card, CardContent } from "@OpportunityComponents/ui/card";
-import { Button } from "@OpportunityComponents/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import { Edit, Trash2, Calendar } from "lucide-react";
 import { formatDate, getPriorityColor, formatPriorityLabel } from "../utils/improvementUtils";
 

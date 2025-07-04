@@ -1,8 +1,8 @@
 
 import React, { useState } from 'react';
-import { Button } from "@OpportunityComponents/ui/button";
-import { Popover, PopoverContent, PopoverTrigger } from "@OpportunityComponents/ui/popover";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@OpportunityComponents/ui/select";
+import { Button } from "@/components/ui/button";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { ChevronUp, ChevronDown } from "lucide-react";
 
 const ProposalSortOptionsDropdown = ({ sortConfig, onSort, children }) => {

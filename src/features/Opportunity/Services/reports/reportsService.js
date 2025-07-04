@@ -1,5 +1,4 @@
-
-import httpClient from '../httpClient';
+import httpClient from '@/services/httpClient';
 import { getDefaultApiParams, buildExecutiveDashboardParams } from './apiHelpers';
 
 class ReportsService {

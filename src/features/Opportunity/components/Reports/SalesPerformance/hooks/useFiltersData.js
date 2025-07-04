@@ -1,6 +1,6 @@
 
 import { useState, useEffect } from 'react';
-import { userService } from '@/services/userService';
+import { userService } from '@/features/Opportunity/Services/userService';
 
 export const useFiltersData = () => {
   const [salesReps, setSalesReps] = useState([]);

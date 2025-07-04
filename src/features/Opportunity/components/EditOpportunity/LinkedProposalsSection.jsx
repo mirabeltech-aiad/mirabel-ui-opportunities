@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from "react";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@OpportunityComponents/ui/table";
-import { Card, CardContent, CardHeader, CardTitle } from "@OpportunityComponents/ui/card";
-import { Badge } from "@OpportunityComponents/ui/badge";
-import Loader from "@/features/Opportunity/components/ui/loader";
-import apiService from "@/services/apiService";
-import { Button } from "@OpportunityComponents/ui/button";
-import { Checkbox } from "@OpportunityComponents/ui/checkbox";
-import { toast } from "@/hooks/use-toast";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import Loader from "@/components/ui/loader";
+import apiService from "@/features/Opportunity/Services/apiService";
+import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
+import { toast } from "@/features/Opportunity/hooks/use-toast";
 
 const LinkedProposalsSection = ({ opportunityId, opportunityData = {}, companyDetails = {}, onProposalLinked }) => {
   const [proposals, setProposals] = useState([]);

@@ -1,11 +1,11 @@
 import React, { useState } from "react";
 import { Search, Loader2 } from "lucide-react";
-import { Input } from "@OpportunityComponents/ui/input";
-import { Button } from "@OpportunityComponents/ui/button";
-import { Popover, PopoverContent, PopoverTrigger } from "@OpportunityComponents/ui/popover";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Check } from "lucide-react";
 import { cn } from "@/lib/utils";
-import apiService from "@/services/apiService";
+import apiService from "@/features/Opportunity/Services/apiService";
 import { userId } from "@/services/httpClient";
 
 const OpportunitySearchBar = ({ onSearch, onCustomerSelect, placeholder = "Search opportunities..." }) => {

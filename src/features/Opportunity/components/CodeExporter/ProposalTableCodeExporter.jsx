@@ -1,9 +1,9 @@
 
 import React, { useState } from 'react';
-import { Button } from '@OpportunityComponents/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@OpportunityComponents/ui/card';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Copy, Check, Download } from 'lucide-react';
-import { ScrollArea } from '@OpportunityComponents/ui/scroll-area';
+import { ScrollArea } from '@/components/ui/scroll-area';
 
 const ProposalTableCodeExporter = () => {
   const [copied, setCopied] = useState(false);

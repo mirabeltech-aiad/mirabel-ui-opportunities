@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@OpportunityComponents/ui/card';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { CheckCircle, AlertTriangle, XCircle, Wifi, Database, Zap, Clock } from 'lucide-react';
-import { Badge } from '@OpportunityComponents/ui/badge';
-import stageService from '@/services/stageService';
-import reportsService from '@/services/reports/reportsService';
+import { Badge } from '@/components/ui/badge';
+import stageService from '@/features/Opportunity/Services/stageService';
+import reportsService from '@/features/Opportunity/Services/reports/reportsService';
 import { userId } from '@/services/httpClient';
 
 const SystemStatus = () => {

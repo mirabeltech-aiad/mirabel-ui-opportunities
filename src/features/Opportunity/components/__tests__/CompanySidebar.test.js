@@ -2,7 +2,7 @@
 import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import '@testing-library/jest-dom';
-import CompanySidebar from '../CompanySidebar';
+import CompanySidebar from '../../../../components/ui/CompanySidebar';
 
 // Mock the custom hook
 jest.mock('@/hooks/useCompanyData', () => ({

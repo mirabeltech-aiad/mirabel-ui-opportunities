@@ -1,9 +1,9 @@
 
 import React, { useState, useMemo } from 'react';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@OpportunityComponents/ui/tabs';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Users, TrendingUp, Calendar, Target, Loader2, AlertCircle } from 'lucide-react';
-import { Button } from '@OpportunityComponents/ui/button';
-import { toast } from '@/hooks/use-toast';
+import { Button } from '@/components/ui/button';
+import { toast } from '@/features/Opportunity/hooks/use-toast';
 import { useRepPerformanceData } from './RepPerformance/hooks/useRepPerformanceData';
 import RepPerformanceHeader from './RepPerformance/RepPerformanceHeader';
 import RepPerformanceMetrics from './RepPerformance/RepPerformanceMetrics';
@@ -12,7 +12,7 @@ import RepMonthlyActivity from './RepPerformance/RepMonthlyActivity';
 import RepQuotaAnalysis from './RepPerformance/RepQuotaAnalysis';
 import RepPerformanceFilterBar from './RepPerformance/RepPerformanceFilterBar';
 import MetricTooltip from './MetricTooltip';
-import { useDesignSystem } from '@/hooks/useDesignSystem';
+import { useDesignSystem } from '@/features/Opportunity/hooks/useDesignSystem';
 
 const RepPerformanceAnalysis = ({ opportunities = [] }) => {
   // Initialize with default values matching API requirements

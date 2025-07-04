@@ -1,8 +1,8 @@
 
 import React from 'react';
-import { TableCell, TableRow } from "@OpportunityComponents/ui/table";
-import { Checkbox } from "@OpportunityComponents/ui/checkbox";
-import { Button } from "@OpportunityComponents/ui/button";
+import { TableCell, TableRow } from "@/components/ui/table";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import ProposalTableBadges from './ProposalTableBadges';
 

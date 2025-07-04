@@ -1,12 +1,12 @@
 
-import { Button } from "@OpportunityComponents/ui/button";
-import { Tooltip, TooltipContent, TooltipTrigger, TooltipProvider } from "@OpportunityComponents/ui/tooltip";
-import { ContextMenu, ContextMenuContent, ContextMenuItem, ContextMenuTrigger } from "@OpportunityComponents/ui/context-menu";
+import { Button } from "@/components/ui/button";
+import { Tooltip, TooltipContent, TooltipTrigger, TooltipProvider } from "@/components/ui/tooltip";
+import { ContextMenu, ContextMenuContent, ContextMenuItem, ContextMenuTrigger } from "@/components/ui/context-menu";
 import { ChevronLeft, ChevronRight, Settings, RefreshCw, Search, LayoutGrid, List, Kanban, PanelRight, ArrowUpDown } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import React, { useState } from "react";
 import SortOptionsDropdown from "./SortOptionsDropdown";
-import SettingsPanel from "../SettingsPanel";
+import SettingsPanel from "../../../../components/ui/SettingsPanel";
 
 const TableFilterControls = ({
   filters,

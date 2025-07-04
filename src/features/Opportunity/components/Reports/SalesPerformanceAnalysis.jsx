@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@OpportunityComponents/ui/tabs';
-import { Button } from '@OpportunityComponents/ui/button';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Button } from '@/components/ui/button';
 import { TrendingUp, Target, Users, Filter, Download, Loader2, AlertCircle } from 'lucide-react';
-import { toast } from '@/hooks/use-toast';
-import exportService from '@/services/exportService';
+import { toast } from '@/features/Opportunity/hooks/use-toast';
+import exportService from '@/features/Opportunity/Services/exportService';
 import { useSalesPerformanceData } from './SalesPerformance/hooks/useSalesPerformanceData';
 import SalesPerformanceKPICards from './SalesPerformance/SalesPerformanceKPICards';
 import SalesPerformanceFilterBar from './SalesPerformance/SalesPerformanceFilterBar';
@@ -11,7 +11,7 @@ import SalesPerformanceCharts from './SalesPerformance/SalesPerformanceCharts';
 import SalesPerformanceTables from './SalesPerformance/SalesPerformanceTables';
 import SalesPerformanceDetailedView from './SalesPerformance/SalesPerformanceDetailedView';
 import MetricTooltip from './MetricTooltip';
-import { useDesignSystem } from '@/hooks/useDesignSystem';
+import { useDesignSystem } from '@/features/Opportunity/hooks/useDesignSystem';
 
 const SalesPerformanceAnalysis = ({ opportunities = [] }) => {
   // Initialize with default values matching API requirements

@@ -2,7 +2,7 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom';
-import ActivityList from '../ActivityList';
+import ActivityList from '../../../../components/ui/ActivityList';
 import { Phone } from 'lucide-react';
 
 describe('ActivityList', () => {

@@ -9,7 +9,7 @@ import {
   CommandEmpty,
   CommandGroup,
   CommandItem,
-} from "@OpportunityComponents/ui/command";
+} from "@/components/ui/command";
 
 const NavbarSearch = ({ navItems }) => {
   const [open, setOpen] = useState(false);

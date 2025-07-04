@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from "react";
-import { Button } from "@OpportunityComponents/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@OpportunityComponents/ui/card";
-import { Input } from "@OpportunityComponents/ui/input";
-import { Textarea } from "@OpportunityComponents/ui/textarea";
-import { Badge } from "@OpportunityComponents/ui/badge";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@OpportunityComponents/ui/select";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Badge } from "@/components/ui/badge";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Plus, Calendar, User } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
-import apiService from "@/services/apiService";
+import apiService from "@/features/Opportunity/Services/apiService";
 import { userId } from "@/services/httpClient";
 
 const TasksSection = ({ companyId }) => {

@@ -2,20 +2,18 @@
 import { lazy } from 'react';
 
 const WelcomePage = lazy(() => import('../pages/Welcome'));
-const SiteWideSettingsPage = lazy(() => import('../pages/SiteWideSettingsPage'));
-const ReportsDashboardPage = lazy(() => import('../pages/ReportsDashboard'));
-const Pipeline = lazy(() => import('../pages/Pipeline'));
-const AdvancedSearch = lazy(() => import('../pages/AdvancedSearch'));
-const AddOpportunity = lazy(() => import('../pages/AddOpportunity'));
-const EditOpportunity = lazy(() => import('../pages/EditOpportunity'));
-const EditProposal = lazy(() => import('../pages/EditProposal'));
-const Proposals = lazy(() => import('../pages/Proposals'));
-const LinkedProposals = lazy(() => import('../pages/LinkedProposals'));
-const ProposalCodeExport = lazy(() => import('../pages/ProposalCodeExport'));
-const Reports = lazy(() => import('../pages/Reports'));
-const Admin = lazy(() => import('../pages/Admin'));
-const Settings = lazy(() => import('../pages/Settings'));
-const NotFound = lazy(() => import('../pages/NotFound'));
+const Pipeline = lazy(() => import('../pages/Opportunity/Pipeline'));
+const AdvancedSearch = lazy(() => import('../pages/Opportunity/AdvancedSearch'));
+const AddOpportunity = lazy(() => import('../pages/Opportunity/AddOpportunity'));
+const EditOpportunity = lazy(() => import('../pages/Opportunity/EditOpportunity'));
+const EditProposal = lazy(() => import('../pages/Opportunity/EditProposal'));
+const Proposals = lazy(() => import('../pages/Opportunity/Proposals'));
+const LinkedProposals = lazy(() => import('../pages/Opportunity/LinkedProposals'));
+const ProposalCodeExport = lazy(() => import('../pages/Opportunity/ProposalCodeExport'));
+const Reports = lazy(() => import('../pages/Opportunity/Reports'));
+const Admin = lazy(() => import('../pages/Opportunity/Admin'));
+const Settings = lazy(() => import('../pages/Opportunity/Settings'));
+const NotFound = lazy(() => import('../pages/Opportunity/NotFound'));
 
 export const routes = [
   {

@@ -1,8 +1,8 @@
 
 import React from "react";
-import { Switch } from "@OpportunityComponents/ui/switch";
-import { Label } from "@OpportunityComponents/ui/label";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@OpportunityComponents/ui/card";
+import { Switch } from "@/components/ui/switch";
+import { Label } from "@/components/ui/label";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useEditMode } from "@/contexts/EditModeContext";
 
 // Comprehensive list of all fields in the application

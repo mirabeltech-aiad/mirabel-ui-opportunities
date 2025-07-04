@@ -6,7 +6,7 @@ import AddViewTab from "./AddViewTab";
 import DeleteConfirmationDialog from "./DeleteConfirmationDialog";
 import { useSavedViews } from "@/features/Opportunity/hooks/useSavedViews";
 import { UserId } from "@/features/Opportunity/constants/opportunityOptions";
-import { userId } from "@/features/Opportunity/Services/httpClient";
+import { userId } from "@/services/httpClient";
 
 import { mapApiColumnsToTableColumns, getDefaultColumnOrder } from "@/features/Opportunity/utils/columnMapping";
 import apiService from "@/features/Opportunity/Services/apiService";

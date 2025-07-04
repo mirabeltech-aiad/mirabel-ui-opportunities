@@ -1,8 +1,8 @@
 
 import { useState, useEffect } from 'react';
-import { toast } from '@/hooks/use-toast';
-import { useRealtimeReports } from '@/hooks/useRealtimeReports';
-import exportService from '@/services/exportService';
+import { toast } from '@/features/Opportunity/hooks/use-toast';
+import { useRealtimeReports } from '@/features/Opportunity/hooks/useRealtimeReports';
+import exportService from '@/features/Opportunity/Services/exportService';
 import { periodOptions, getProductOptions, getBusinessUnitOptions } from './dashboardConstants';
 
 export const useExecutiveDashboard = () => {

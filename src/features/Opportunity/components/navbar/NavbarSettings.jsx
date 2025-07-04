@@ -1,6 +1,6 @@
 
 import { useNavigate } from "react-router-dom";
-import { Button } from "@OpportunityComponents/ui/button";
+import { Button } from "@/components/ui/button";
 import { Settings } from "lucide-react";
 
 const NavbarSettings = () => {

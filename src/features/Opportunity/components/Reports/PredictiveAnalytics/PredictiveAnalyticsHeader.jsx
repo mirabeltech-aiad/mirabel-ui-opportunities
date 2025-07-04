@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Brain, Zap } from 'lucide-react';
-import { useDesignSystem } from '@/hooks/useDesignSystem';
+import { useDesignSystem } from '@/features/Opportunity/hooks/useDesignSystem';
 
 const PredictiveAnalyticsHeader = () => {
   const { getTitleClass } = useDesignSystem();

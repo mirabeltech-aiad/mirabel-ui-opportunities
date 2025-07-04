@@ -1,8 +1,8 @@
 
 import React, { useState, useEffect } from "react";
-import { Card, CardContent } from "@OpportunityComponents/ui/card";
-import { Badge } from "@OpportunityComponents/ui/badge";
-import { Button } from "@OpportunityComponents/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { 
   Calendar, 
   Phone, 
@@ -15,7 +15,7 @@ import {
   ArrowRight,
   Filter
 } from "lucide-react";
-import apiService from "@/services/apiService";
+import apiService from "@/features/Opportunity/Services/apiService";
 
 const TimelineSection = ({ opportunityId }) => {
   const [filter, setFilter] = useState("all");
