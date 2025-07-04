@@ -9,7 +9,6 @@ export const getSessionValue = function (key) {
 
         // In development mode, if the value is not found, use direct fallback
         if (isDevelopmentMode() && (!MMClientVars[key] || MMClientVars[key] === "")) {
-            console.log(`🔍 Development: Using fallback value for ${key}`);
 
             // Direct fallback values for development
             const devFallbacks = {
@@ -26,9 +25,7 @@ export const getSessionValue = function (key) {
 
         return MMClientVars[key] || "";
     } catch (error) {
-        console.error("Error getting session value:", error);
         if (isDevelopmentMode()) {
-            console.log(`🔍 Development: Using fallback value after error for ${key}`);
             // Basic fallback for Email in development
             if (key === "Email") {
                 return "techsupport@magazinemanager.com";
@@ -57,15 +54,12 @@ export const getSessionDetails = () => {
         // In development mode, merge with devHelper values for missing properties
         if (isDevelopmentMode()) {
             const mergedSession = { ...sessionValues, ...storedSession };
-            console.log('🔍 Development: Using merged session values');
             return mergedSession;
         }
 
         return storedSession;
     } catch (error) {
-        console.error("Error getting session details:", error);
         if (isDevelopmentMode()) {
-            console.log('🔍 Development: Using fallback session values after error');
             return sessionValues;
         }
         return {};
@@ -86,7 +80,6 @@ export const resetSession = () => {
     try {
         localStorage.removeItem("MMClientVars");
         sessionStorage.removeItem("ClientID");
-        console.log("Session reset successfully");
     } catch (error) {
         console.error("Error resetting session:", error);
     }
@@ -107,17 +100,6 @@ export const isActiveSession = () => {
 
         const isAuthenticated = hasExplicitAuth || hasEssentialAuthData;
         const isSame = isSameSession();
-
-        // Debug logging
-        console.log('🔍 Session Check:', {
-            hasExplicitAuth,
-            hasEssentialAuthData,
-            IsAuthenticated: isAuthenticated,
-            IsSameSession: isSame,
-            MMClientVarsExists: !!localStorage.getItem("MMClientVars"),
-            SessionClientID: sessionStorage.getItem("ClientID"),
-            LocalStorageClientID: MMClientVars.ClientID
-        });
 
         return isAuthenticated && isSame;
     } catch (error) {
@@ -152,29 +134,10 @@ export const initializeSessionStorage = () => {
     }
 };
 
-// Debug function to log session state
-export const logSessionState = () => {
-    try {
-        const MMClientVars = JSON.parse(localStorage.getItem("MMClientVars") || "{}");
-        console.log('📊 Session State:', {
-            MMClientVars: MMClientVars,
-            SessionClientID: sessionStorage.getItem("ClientID"),
-            IsAuthenticated: MMClientVars.IsAuthenticated,
-            Token: MMClientVars.Token ? `${MMClientVars.Token.substring(0, 10)}...` : 'None',
-            ClientID: MMClientVars.ClientID,
-            UserID: MMClientVars.UserID,
-            Domain: MMClientVars.Domain
-        });
-    } catch (error) {
-        console.error("Error logging session state:", error);
-    }
-};
-
 // Check if user should be redirected to login (production only)
 export const shouldRedirectToLogin = () => {
     // Never redirect in development mode
     if (isDevelopmentMode()) {
-        console.log('🔧 Development: Login redirect skipped (development mode)');
         return false;
     }
 
@@ -183,65 +146,27 @@ export const shouldRedirectToLogin = () => {
 
         // If no MMClientVars at all, redirect to login
         if (!MMClientVars) {
-            console.log('🔐 Production: No MMClientVars found, redirecting to login');
             return true;
         }
-
         const sessionData = JSON.parse(MMClientVars);
 
-        // Enhanced debugging for session validation
-        console.log('🔍 Production: Validating session data:', {
-            hasIsAuthenticated: 'IsAuthenticated' in sessionData,
-            IsAuthenticated: sessionData.IsAuthenticated,
-            IsAuthenticatedType: typeof sessionData.IsAuthenticated,
-            hasEmail: !!sessionData.Email,
-            Email: sessionData.Email,
-            hasToken: !!sessionData.Token,
-            TokenLength: sessionData.Token ? sessionData.Token.length : 0,
-            hasClientID: !!sessionData.ClientID,
-            ClientID: sessionData.ClientID
-        });
-
-        // More flexible authentication check - handle both explicit IsAuthenticated and inferred from essential data
         const hasExplicitAuth = sessionData.IsAuthenticated === true ||
             sessionData.IsAuthenticated === 'true' ||
             sessionData.IsAuthenticated === 1;
 
-        // If no explicit IsAuthenticated field, check if we have essential auth indicators
         const hasEssentialAuthData = sessionData.Email && sessionData.Token && sessionData.UserID;
 
         const isAuthenticated = hasExplicitAuth || hasEssentialAuthData;
 
-        console.log('🔍 Production: Authentication check details:', {
-            hasExplicitAuth,
-            hasEssentialAuthData,
-            isAuthenticated,
-            IsAuthenticatedField: sessionData.IsAuthenticated,
-            hasEmail: !!sessionData.Email,
-            hasToken: !!sessionData.Token,
-            hasUserID: !!sessionData.UserID
-        });
-
         if (!isAuthenticated) {
-            console.log('🔐 Production: Not authenticated - missing both IsAuthenticated field and essential auth data');
-            console.log('🔐 IsAuthenticated field:', sessionData.IsAuthenticated, typeof sessionData.IsAuthenticated);
-            console.log('🔐 Essential data check:', {
-                Email: !!sessionData.Email,
-                Token: !!sessionData.Token,
-                UserID: !!sessionData.UserID
-            });
             return true;
         }
 
-        console.log('✅ Production: Authentication validated using', hasExplicitAuth ? 'explicit IsAuthenticated field' : 'essential auth data (Email, Token, UserID)');
-
         if (!sessionData.Email) {
-            console.log('🔐 Production: Missing Email, redirecting to login');
             return true;
         }
 
         if (!sessionData.Token) {
-            console.log('🔐 Production: Missing Token, redirecting to login');
             return true;
         }
 
@@ -249,28 +174,16 @@ export const shouldRedirectToLogin = () => {
         const sessionClientID = sessionStorage.getItem("ClientID");
         const localStorageClientID = sessionData.ClientID;
 
-        console.log('🔍 Production: Cross-tab validation:', {
-            sessionStorageClientID: sessionClientID,
-            localStorageClientID: localStorageClientID,
-            match: sessionClientID === localStorageClientID
-        });
-
         // If ClientID doesn't match, try to fix it instead of redirecting immediately
         if (sessionClientID !== localStorageClientID) {
             if (localStorageClientID) {
-                console.log('🔧 Production: Fixing ClientID mismatch by updating sessionStorage');
                 sessionStorage.setItem("ClientID", localStorageClientID);
             } else {
-                console.log('🔐 Production: ClientID missing from localStorage, redirecting to login');
                 return true;
             }
         }
-
-        console.log('✅ Production: Session validation passed, staying authenticated');
         return false;
     } catch (error) {
-        console.error('❌ Production: Error checking authentication status:', error);
-        console.log('🔐 Production: Error checking session, redirecting to login');
         return true;
     }
 };
@@ -279,15 +192,13 @@ export const shouldRedirectToLogin = () => {
 export const performLoginRedirect = (returnUrl = null) => {
     // Never redirect in development mode
     if (isDevelopmentMode()) {
-        console.log('🔧 Development: Login redirect skipped');
         return;
     }
 
-    const currentUrl = returnUrl || window.location.href;
-    const baseUrl = import.meta.env.REACT_APP_API_BASE_URL || window.location.origin;
+    const currentUrl = window.location.href;
+    const baseUrl = window.location.origin;
     const loginUrl = `${baseUrl}/intranet/Login.aspx?ReturnUrl=${encodeURIComponent(currentUrl)}`;
 
-    console.log('🔐 Production: Redirecting to login:', loginUrl);
     window.location.href = loginUrl;
 };
 
@@ -295,17 +206,14 @@ export const performLoginRedirect = (returnUrl = null) => {
 export const checkAuthenticationStatus = () => {
     if (isDevelopmentMode()) {
         // In development, always ensure session is available
-        console.log('🔧 Development: Ensuring session is available');
         const existingSession = localStorage.getItem("MMClientVars");
         if (!existingSession) {
-            console.log('🔧 Development: Setting up development session');
             setClientSession(sessionValues);
             sessionStorage.setItem("ClientID", sessionValues.ClientID);
         }
         return { authenticated: true, shouldRedirect: false, environment: 'development' };
     } else {
         // In production, check for valid authentication
-        console.log('🏭 Production: Checking authentication status');
         const shouldRedirect = shouldRedirectToLogin();
         const result = {
             authenticated: !shouldRedirect,
@@ -313,160 +221,7 @@ export const checkAuthenticationStatus = () => {
             environment: 'production',
             hasMMClientVars: !!localStorage.getItem("MMClientVars")
         };
-        console.log('🏭 Production: Authentication check result:', result);
         return result;
-    }
-};
-
-// Debug function to test authentication behavior in different environments
-export const debugAuthenticationBehavior = () => {
-    console.log('🧪 TESTING AUTHENTICATION BEHAVIOR');
-    console.log('=====================================');
-
-    // Step 1: Environment Detection
-    const envResult = isDevelopmentMode();
-    console.log('🌍 Environment Detection:');
-    console.log('- isDevelopmentMode():', envResult);
-    console.log('- Should use dev helpers:', envResult ? 'YES' : 'NO');
-    console.log('- Should redirect to login:', envResult ? 'NO' : 'YES');
-
-    // Step 2: Current Session Status
-    console.log('\n📊 Current Session Status:');
-    const hasMMClientVars = !!localStorage.getItem('MMClientVars');
-    console.log('- MMClientVars exists:', hasMMClientVars);
-
-    if (hasMMClientVars) {
-        try {
-            const sessionData = JSON.parse(localStorage.getItem('MMClientVars'));
-            console.log('- IsAuthenticated:', sessionData.IsAuthenticated);
-            console.log('- Has Email:', !!sessionData.Email);
-            console.log('- Has Token:', !!sessionData.Token);
-        } catch (e) {
-            console.log('- Session data corrupted:', e.message);
-        }
-    }
-
-    // Step 3: Test Authentication Check
-    console.log('\n🔍 Authentication Check Test:');
-    const authStatus = checkAuthenticationStatus();
-    console.log('- checkAuthenticationStatus():', authStatus);
-
-    // Step 4: Test Redirect Check
-    console.log('\n🔄 Redirect Check Test:');
-    const shouldRedirect = shouldRedirectToLogin();
-    console.log('- shouldRedirectToLogin():', shouldRedirect);
-
-    // Step 5: Simulate Missing Session (SAFE TEST)
-    console.log('\n🚫 Testing Missing Session (simulated):');
-    const originalSession = localStorage.getItem('MMClientVars');
-    localStorage.removeItem('MMClientVars');
-
-    const authStatusNoSession = checkAuthenticationStatus();
-    const shouldRedirectNoSession = shouldRedirectToLogin();
-
-    console.log('- Without session - checkAuthenticationStatus():', authStatusNoSession);
-    console.log('- Without session - shouldRedirectToLogin():', shouldRedirectNoSession);
-
-    // Restore session
-    if (originalSession) {
-        localStorage.setItem('MMClientVars', originalSession);
-    }
-
-    // Step 6: Summary and Recommendations
-    console.log('\n📋 SUMMARY:');
-    console.log('- Environment:', envResult ? '🔧 DEVELOPMENT' : '🏭 PRODUCTION/STAGING');
-    console.log('- Current behavior correct:',
-        envResult ?
-            (authStatus.authenticated ? '✅ PASS' : '❌ FAIL') :
-            (!shouldRedirect ? '✅ PASS' : '⚠️ Would redirect to login (correct)')
-    );
-
-    if (!envResult && hasMMClientVars && !shouldRedirect) {
-        console.log('✅ PRODUCTION/STAGING: Authentication working correctly');
-    } else if (!envResult && (!hasMMClientVars || shouldRedirect)) {
-        console.log('🔄 PRODUCTION/STAGING: Would redirect to login (correct behavior)');
-    } else if (envResult && authStatus.authenticated) {
-        console.log('✅ DEVELOPMENT: Development session working correctly');
-    } else {
-        console.log('❌ UNEXPECTED BEHAVIOR - Check configuration');
-    }
-
-    return {
-        environment: envResult ? 'development' : 'production',
-        hasSession: hasMMClientVars,
-        isAuthenticated: authStatus.authenticated,
-        shouldRedirect: shouldRedirect,
-        behaviorCorrect: envResult ? authStatus.authenticated : (shouldRedirect || !hasMMClientVars)
-    };
-};
-
-// Quick session debug utility for immediate troubleshooting
-export const quickSessionDebug = () => {
-    console.log('🚀 QUICK SESSION DEBUG');
-    console.log('======================');
-
-    const isDev = isDevelopmentMode();
-    const hasMMClientVars = !!localStorage.getItem('MMClientVars');
-
-    console.log('🌍 Environment:', isDev ? 'DEVELOPMENT' : 'PRODUCTION/STAGING');
-    console.log('💾 Has MMClientVars:', hasMMClientVars);
-
-    if (hasMMClientVars) {
-        try {
-            const sessionData = JSON.parse(localStorage.getItem('MMClientVars'));
-            console.log('📊 Session Data Analysis:');
-            console.log('- IsAuthenticated field:', sessionData.IsAuthenticated, `(${typeof sessionData.IsAuthenticated})`);
-            console.log('- Email:', sessionData.Email ? '✅ Present' : '❌ Missing');
-            console.log('- Token:', sessionData.Token ? `✅ Present (${sessionData.Token.length} chars)` : '❌ Missing');
-            console.log('- UserID:', sessionData.UserID ? '✅ Present' : '❌ Missing');
-            console.log('- ClientID:', sessionData.ClientID ? '✅ Present' : '❌ Missing');
-
-            // Test the flexible authentication logic
-            const hasExplicitAuth = sessionData.IsAuthenticated === true ||
-                sessionData.IsAuthenticated === 'true' ||
-                sessionData.IsAuthenticated === 1;
-
-            const hasEssentialAuthData = sessionData.Email && sessionData.Token && sessionData.UserID;
-            const isAuthenticated = hasExplicitAuth || hasEssentialAuthData;
-
-            console.log('🔍 Authentication Logic Test:');
-            console.log('- Has explicit IsAuthenticated:', hasExplicitAuth);
-            console.log('- Has essential auth data (Email+Token+UserID):', hasEssentialAuthData);
-            console.log('- Final authentication status:', isAuthenticated ? '✅ AUTHENTICATED' : '❌ NOT AUTHENTICATED');
-
-            const sessionStorageClientID = sessionStorage.getItem('ClientID');
-            console.log('🔗 Cross-tab validation:');
-            console.log('- SessionStorage ClientID:', sessionStorageClientID);
-            console.log('- LocalStorage ClientID:', sessionData.ClientID);
-            console.log('- Match:', sessionStorageClientID === sessionData.ClientID ? '✅' : '❌');
-
-            if (!isDev) {
-                const shouldRedirect = shouldRedirectToLogin();
-                console.log('🔄 Redirect Decision:', shouldRedirect ? '❌ WILL REDIRECT' : '✅ WILL NOT REDIRECT');
-
-                if (shouldRedirect) {
-                    console.log('💡 Redirect Reason: Check the logs above for specific validation failures');
-                }
-            }
-        } catch (e) {
-            console.error('❌ Error parsing session data:', e);
-        }
-    } else {
-        console.log('📭 No session data found');
-        if (!isDev) {
-            console.log('🔄 Will redirect to login (no session in production)');
-        }
-    }
-
-    console.log('\n🎯 QUICK FIX SUGGESTIONS:');
-    if (!isDev && hasMMClientVars) {
-        console.log('1. Check the validation logs above');
-        console.log('2. If IsAuthenticated field is missing, ensure Email+Token+UserID are present');
-        console.log('3. If ClientID mismatch, run: sessionStorage.setItem("ClientID", localStorage.getItem("MMClientVars").ClientID)');
-        console.log('4. For quick fix, use: window.debugAuth.quickFix()');
-    } else if (!hasMMClientVars) {
-        console.log('1. Login again to set proper session');
-        console.log('2. Check if session is being cleared somewhere');
     }
 };
 
@@ -494,7 +249,6 @@ export const getUserInfo = () => {
     } catch (error) {
         console.error("Error getting user info:", error);
         if (isDevelopmentMode()) {
-            console.log('🔍 Development: Using fallback user info after error');
             return {
                 userId: sessionValues.UserID || null,
                 email: sessionValues.Email || null,

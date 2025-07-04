@@ -53,15 +53,6 @@ export const apiCall = (
     fullUrl = baseUrlToUse.replace(/\/$/, '') + '/' + endpoint;
   }
 
-  // Debug logging for URL construction
-  if (import.meta.env.DEV) {
-    console.log('🔗 URL Construction:', {
-      baseURL: baseUrlToUse,
-      endpoint: endpoint,
-      fullUrl: fullUrl
-    });
-  }
-
   let _headers = new Headers({
     Accept: "application/json",
     "Content-Type": "application/json",
