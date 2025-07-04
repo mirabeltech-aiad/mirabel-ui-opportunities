@@ -1,21 +1,22 @@
-
 import { useMemo } from 'react';
 
 export const usePipelineMetrics = (filteredOpportunities) => {
   return useMemo(() => {
     if (!filteredOpportunities || filteredOpportunities.length === 0) {
-      // MOCK DATA: Only when no opportunities available
+      // Return empty metrics structure instead of mock data
+      console.warn('No opportunities data available for pipeline metrics');
       return {
-        total: 15,
-        totalValue: 2500000,
-        avgDealSize: 166667,
-        openDeals: 8,
-        wonDeals: 5,
-        lostDeals: 2,
-        winRate: 71.4,
-        pipelineValue: 1800000,
-        wonValue: 750000,
-        avgVelocity: 45
+        total: 0,
+        totalValue: 0,
+        avgDealSize: 0,
+        openDeals: 0,
+        wonDeals: 0,
+        lostDeals: 0,
+        winRate: 0,
+        pipelineValue: 0,
+        wonValue: 0,
+        avgVelocity: 0,
+        apiError: 'No opportunities data available'
       };
     }
 
@@ -36,7 +37,7 @@ export const usePipelineMetrics = (filteredOpportunities) => {
     );
     
     const winRate = (wonOpps.length + lostOpps.length) > 0 ? 
-      (wonOpps.length / (wonOpps.length + lostOpps.length)) * 100 : 0;
+      parseFloat(((wonOpps.length / (wonOpps.length + lostOpps.length)) * 100).toFixed(2)) : 0;
     
     const pipelineValue = openOpps.reduce((sum, opp) => sum + (opp.amount || opp.Amount || opp.Total || 0), 0);
     const wonValue = wonOpps.reduce((sum, opp) => sum + (opp.amount || opp.Amount || opp.Total || 0), 0);

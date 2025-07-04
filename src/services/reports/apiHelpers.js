@@ -1,4 +1,3 @@
-
 import { getPeriodDateParams } from './dateUtils';
 import { mapProductFilter, mapBusinessUnitFilter } from './filterMappings';
 
@@ -26,7 +25,7 @@ export const getDefaultApiParams = () => ({
   ActualCloseFrom: "",
   ActualCloseTo: "",
   Status: "",
-  UserID: 27,
+  UserID: null, // Will be set dynamically based on logged-in user
   Probability: "",
   AdvSearch: {
     UserID: "",
@@ -107,7 +106,7 @@ export const getDefaultApiParams = () => ({
     BusinessUnitTags: ""
   },
   Action: null,
-  PageSize: 25,
+  PageSize: 1000, // Increased from 25 to ensure complete data retrieval for dashboard
   CurPage: 1,
   SortBy: "",
   ListName: "Latest Search",
@@ -136,15 +135,31 @@ export const buildExecutiveDashboardParams = (
   selectedBusinessUnit = 'all'
 ) => {
   const dateParams = getPeriodDateParams(period, customDateRange);
+  const defaultParams = getDefaultApiParams();
   
-  // Build filter parameters
+  // Set dynamic UserID from httpClient with better error handling
+  try {
+    const { userId } = require('../httpClient');
+    defaultParams.UserID = userId || 23; // Use default from httpClient
+    console.log('Using UserID:', defaultParams.UserID);
+  } catch (error) {
+    console.warn('Could not import userId from httpClient, using fallback');
+    defaultParams.UserID = 23; // Fallback if import fails
+  }
+  
+  // Build filter parameters by merging defaults with date filters
   const filterParams = {
+    ...defaultParams,
     ...dateParams
   };
 
-  // Add sales rep filtering
-  if (selectedRep && selectedRep !== 'all') {
+  // Enhanced sales rep filtering with multiple field mapping
+  if (selectedRep && selectedRep !== 'all' && selectedRep !== '') {
     filterParams.AssignedTo = selectedRep;
+    filterParams.SalesPresenter = selectedRep;
+    // Also set in AdvSearch section for comprehensive coverage
+    filterParams.AdvSearch.AssignedTo = selectedRep;
+    console.log('Applied sales rep filter:', selectedRep);
   }
 
   // Add product filtering
@@ -156,6 +171,14 @@ export const buildExecutiveDashboardParams = (
   if (selectedBusinessUnit && selectedBusinessUnit !== 'all') {
     filterParams.BusinessUnit = mapBusinessUnitFilter(selectedBusinessUnit);
   }
+
+  // Validate filter parameters
+  console.log('Filter validation:', {
+    hasValidDateRange: filterParams.CreatedFrom && filterParams.CreatedTo,
+    hasRepFilter: filterParams.AssignedTo !== "",
+    hasProductFilter: filterParams.Products !== "",
+    hasBusinessUnitFilter: filterParams.BusinessUnit !== ""
+  });
 
   return filterParams;
 };

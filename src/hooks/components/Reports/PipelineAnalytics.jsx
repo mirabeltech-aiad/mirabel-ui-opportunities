@@ -1,5 +1,5 @@
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@OpportunityComponents/ui/tabs';
 import { Button } from '@OpportunityComponents/ui/button';
 import { Activity, Download, BarChart3, TrendingUp, Target, Layers, Loader2, AlertCircle } from 'lucide-react';

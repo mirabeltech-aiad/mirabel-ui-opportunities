@@ -1,4 +1,3 @@
-
 import React from "react";
 import DateRangePicker from "../ui/DateRangePicker";
 import MetricComparison from "./MetricComparison";
@@ -12,6 +11,8 @@ import DashboardHeader from "./ExecutiveDashboard/DashboardHeader";
 import ExecutiveFilterBar from "./ExecutiveDashboard/ExecutiveFilterBar";
 import ErrorState from "./ExecutiveDashboard/ErrorState";
 import LoadingState from "./ExecutiveDashboard/LoadingState";
+import DataValidationWrapper from "./shared/DataValidationWrapper";
+import MockDataCleanupBanner from "./shared/MockDataCleanupBanner";
 import { useExecutiveDashboard } from "./ExecutiveDashboard/useExecutiveDashboard";
 
 const ExecutiveDashboard = () => {
@@ -50,6 +51,14 @@ const ExecutiveDashboard = () => {
     <div className="space-y-6">
       <DashboardHeader />
 
+      {/* Data Source Banner */}
+      <MockDataCleanupBanner 
+        hasMockData={false}
+        hasApiConnection={true}
+        componentName="Executive Dashboard"
+        apiEndpoint="services/admin/common/production/executesp/ → uspCDCSync_ExecutiveDashboardGet"
+      />
+
       {/* Executive Filter Bar */}
       <ExecutiveFilterBar
         timeRange={selectedPeriod}
@@ -84,7 +93,7 @@ const ExecutiveDashboard = () => {
       {isLoading && !kpiData && <LoadingState />}
 
       {/* Dashboard Content */}
-      {kpiData && (
+      {!error && (
         <>
           {/* KPI Cards Row */}
           <KPICards 

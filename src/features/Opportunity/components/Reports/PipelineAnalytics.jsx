@@ -1,5 +1,5 @@
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@OpportunityComponents/ui/tabs';
 import { Button } from '@OpportunityComponents/ui/button';
 import { Activity, Download, BarChart3, TrendingUp, Target, Layers, Loader2, AlertCircle } from 'lucide-react';
@@ -16,8 +16,9 @@ import PipelineTrendsTab from './PipelineAnalytics/PipelineTrendsTab';
 import PipelineForecastTab from './PipelineAnalytics/PipelineForecastTab';
 import PipelineStageAnalysisTab from './PipelineAnalytics/PipelineStageAnalysisTab';
 
-// New API hook
+// New API hook and stage service
 import { usePipelineAnalyticsData } from './PipelineAnalytics/hooks/usePipelineAnalyticsData';
+import stageService from '@/services/stageService';
 
 const PipelineAnalytics = ({ opportunities = [] }) => {
   const [selectedPeriod, setSelectedPeriod] = useState('last-6-months');
@@ -42,14 +43,37 @@ const PipelineAnalytics = ({ opportunities = [] }) => {
 
   // Get unique values for filters from legacy opportunities data (fallback)
   const salesReps = useMemo(() => {
-    return [...new Set(opportunities
+    // Try to get from API data first, fallback to legacy data
+    const apiReps = stageDistribution?.repList || [];
+    const legacyReps = [...new Set(opportunities
       .filter(opp => opp.assignedRep)
       .map(opp => opp.assignedRep)
     )];
-  }, [opportunities]);
+    
+    return apiReps.length > 0 ? apiReps : legacyReps;
+  }, [opportunities, stageDistribution]);
 
-  const stages = useMemo(() => {
-    return [...new Set(opportunities.map(opp => opp.stage))];
+  // Use live stages from API
+  const [liveStages, setLiveStages] = useState([]);
+  
+  useEffect(() => {
+    const fetchLiveStages = async () => {
+      try {
+        const stages = await stageService.getLiveStages();
+        setLiveStages(stages);
+      } catch (error) {
+        console.error('Failed to fetch live stages:', error);
+        // Fallback to legacy stages from opportunities
+        const legacyStages = [...new Set(opportunities.map(opp => opp.stage))];
+        setLiveStages(legacyStages.map((stage, index) => ({ 
+          id: index, 
+          name: stage, 
+          value: stage 
+        })));
+      }
+    };
+    
+    fetchLiveStages();
   }, [opportunities]);
 
   const handleExport = () => {

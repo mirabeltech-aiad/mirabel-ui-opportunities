@@ -1,42 +1,62 @@
-
-import { useMemo } from 'react';
+import { useMemo, useState, useEffect } from 'react';
+import adminApi from '@/services/adminApi';
+import { mapStageToStandard } from '@OpportunityUtils/reports/stageMapping';
 
 export const usePipelineData = (filteredOpportunities) => {
+  const [liveStages, setLiveStages] = useState(null);
+
+  // Fetch live stages on component mount
+  useEffect(() => {
+    const fetchStages = async () => {
+      try {
+        const stagesResponse = await adminApi.getOpportunityStages();
+        setLiveStages(stagesResponse?.content?.Data || []);
+        console.log('Live stages fetched for pipeline data:', stagesResponse);
+      } catch (error) {
+        console.error('Error fetching live stages:', error);
+        setLiveStages([]);
+      }
+    };
+
+    fetchStages();
+  }, []);
   const stageDistribution = useMemo(() => {
     if (!filteredOpportunities || filteredOpportunities.length === 0) {
-      // MOCK DATA: Only when no opportunities available
-      return [
-        { stage: '1st Demo', count: 8, value: 420000 },
-        { stage: 'Discovery', count: 12, value: 680000 },
-        { stage: 'Proposal', count: 6, value: 890000 },
-        { stage: 'Negotiation', count: 4, value: 720000 }
-      ];
+      // Return empty data structure instead of mock data
+      console.warn('No opportunities data available for stage distribution');
+      return [];
     }
 
-    // Use real API data to calculate stage distribution
+    // Use real API data to calculate stage distribution with live stages
     const stageGroups = {};
     
     filteredOpportunities.forEach(opp => {
-      const stage = opp.stage || opp.Stage || 'Unknown';
-      if (!stageGroups[stage]) {
-        stageGroups[stage] = { stage, count: 0, value: 0 };
+      const apiStage = opp.stage || opp.Stage || 'Unknown';
+      
+      // Map to live stage or use standard mapping
+      let standardStage = apiStage;
+      if (liveStages && liveStages.length > 0) {
+        const liveStage = liveStages.find(ls => ls.name === apiStage || ls.StageName === apiStage);
+        standardStage = liveStage ? (liveStage.name || liveStage.StageName) : mapStageToStandard(apiStage);
+      } else {
+        standardStage = mapStageToStandard(apiStage);
       }
-      stageGroups[stage].count += 1;
-      stageGroups[stage].value += (opp.amount || opp.Amount || opp.Total || 0);
+      
+      if (!stageGroups[standardStage]) {
+        stageGroups[standardStage] = { stage: standardStage, count: 0, value: 0 };
+      }
+      stageGroups[standardStage].count += 1;
+      stageGroups[standardStage].value += (opp.amount || opp.Amount || opp.Total || 0);
     });
 
     return Object.values(stageGroups);
-  }, [filteredOpportunities]);
+  }, [filteredOpportunities, liveStages]);
 
   const pipelineTrend = useMemo(() => {
     if (!filteredOpportunities || filteredOpportunities.length === 0) {
-      // MOCK DATA: Only when no opportunities available for trend analysis
-      const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'];
-      return months.map(month => ({
-        month,
-        pipeline: Math.floor(Math.random() * 2000000) + 1000000,
-        closed: Math.floor(Math.random() * 500000) + 200000
-      }));
+      // Return empty data structure instead of mock data
+      console.warn('No opportunities data available for trend analysis');
+      return [];
     }
 
     // Calculate actual pipeline trends from API data
@@ -69,13 +89,9 @@ export const usePipelineData = (filteredOpportunities) => {
 
   const forecastData = useMemo(() => {
     if (!filteredOpportunities || filteredOpportunities.length === 0) {
-      // MOCK DATA: Only when no opportunities available for forecasting
-      const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'];
-      return months.map(month => ({
-        month,
-        forecast: Math.floor(Math.random() * 800000) + 400000,
-        actual: Math.floor(Math.random() * 600000) + 300000
-      }));
+      // Return empty data structure instead of mock data
+      console.warn('No opportunities data available for forecasting');
+      return [];
     }
 
     // Calculate forecast based on actual pipeline data and historical conversion rates

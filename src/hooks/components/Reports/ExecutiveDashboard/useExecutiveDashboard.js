@@ -1,8 +1,7 @@
-
 import { useState, useEffect } from 'react';
 import { toast } from '@/hooks/use-toast';
-import { useRealtimeReports } from '../../../hooks/useRealtimeReports';
-import exportService from '../../../services/exportService';
+import { useRealtimeReports } from '../../../../useRealtimeReports';
+import exportService from '@opportunitiesService/exportService';
 import { periodOptions, getProductOptions, getBusinessUnitOptions } from './dashboardConstants';
 
 export const useExecutiveDashboard = () => {
@@ -16,7 +15,7 @@ export const useExecutiveDashboard = () => {
   const [productOptions, setProductOptions] = useState([]);
   const [businessUnitOptions, setBusinessUnitOptions] = useState([]);
   
-  // Use real-time data hook with all filters including product and business unit
+  // Use real-time data hook with stored procedure integration
   const {
     kpiData,
     pipelineHealth,
@@ -28,6 +27,13 @@ export const useExecutiveDashboard = () => {
     lastUpdated,
     refresh
   } = useRealtimeReports(selectedPeriod, selectedRep, true, customDateRange, selectedProduct, selectedBusinessUnit);
+
+  // Log stored procedure data source
+  useEffect(() => {
+    if (kpiData && kpiData.source) {
+      console.log('Executive Dashboard using stored procedure:', kpiData.source);
+    }
+  }, [kpiData]);
 
   // Fetch product options when component mounts
   useEffect(() => {
@@ -63,19 +69,12 @@ export const useExecutiveDashboard = () => {
 
   const handleRefresh = () => {
     refresh();
-    toast({
-      title: "Dashboard Refreshed",
-      description: "All data has been updated with the latest information."
-    });
   };
 
   const handleExport = () => {
     try {
       exportService.exportDashboard(selectedPeriod);
-      toast({
-        title: "Export Successful",
-        description: "Dashboard data has been exported successfully."
-      });
+      
     } catch (error) {
       toast({
         title: "Export Failed",
@@ -119,32 +118,14 @@ export const useExecutiveDashboard = () => {
 
   const handleRepChange = (repValue) => {
     setSelectedRep(repValue);
-    toast({
-      title: "Filter Applied",
-      description: repValue === 'all' ? 
-        "Showing data for all sales representatives" : 
-        `Showing data for ${repValue}`
-    });
   };
 
   const handleProductChange = (productValue) => {
     setSelectedProduct(productValue);
-    toast({
-      title: "Product Filter Applied",
-      description: productValue === 'all' ? 
-        "Showing data for all products" : 
-        `Filtered by ${productOptions.find(p => p.value === productValue)?.label}`
-    });
   };
 
   const handleBusinessUnitChange = (unitValue) => {
     setSelectedBusinessUnit(unitValue);
-    toast({
-      title: "Business Unit Filter Applied",
-      description: unitValue === 'all' ? 
-        "Showing data for all business units" : 
-        `Filtered by ${businessUnitOptions.find(u => u.value === unitValue)?.label}`
-    });
   };
 
   return {
