@@ -35,7 +35,7 @@ export const apiCall = (
   } else {
     baseURL = "";
     domain = getSessionValue("Domain") || window.location.hostname;
-    token = getSessionValue("Token");
+      token = getSessionValue("Token");
   }
 
   // Ensure proper URL construction with slash handling
@@ -483,11 +483,112 @@ if (typeof window !== 'undefined') {
         shouldRedirect,
         testPassed: !isDev
       };
+    },
+
+    quickFix: async () => {
+      console.log('🔧 QUICK FIX: Attempting to fix common session issues');
+
+      const { shouldRedirectToLogin } = await import('../utils/sessionHelpers');
+
+      try {
+        const session = JSON.parse(localStorage.getItem('MMClientVars') || '{}');
+        let fixesApplied = [];
+
+        // Fix 1: Add IsAuthenticated field if missing but we have essential auth data
+        if (!session.IsAuthenticated && session.Email && session.Token && session.UserID) {
+          console.log('🔧 Fix 1: Adding missing IsAuthenticated field');
+          session.IsAuthenticated = true;
+          fixesApplied.push('Added IsAuthenticated=true');
+        }
+
+        // Fix 2: Fix ClientID mismatch
+        const sessionStorageClientID = sessionStorage.getItem('ClientID');
+        if (session.ClientID && session.ClientID !== sessionStorageClientID) {
+          console.log('🔧 Fix 2: Fixing ClientID mismatch');
+          sessionStorage.setItem('ClientID', session.ClientID);
+          fixesApplied.push('Fixed ClientID mismatch');
+        }
+
+        // Fix 3: Save updated session
+        if (fixesApplied.length > 0) {
+          localStorage.setItem('MMClientVars', JSON.stringify(session));
+          console.log('✅ Applied fixes:', fixesApplied);
+
+          // Test if the fix worked
+          const shouldRedirect = shouldRedirectToLogin();
+          console.log('🧪 Test after fix - shouldRedirectToLogin():', shouldRedirect);
+
+          if (!shouldRedirect) {
+            console.log('🎉 SUCCESS: Session is now valid!');
+            return { success: true, fixes: fixesApplied };
+          } else {
+            console.log('⚠️ PARTIAL: Fixes applied but still need to check validation');
+            return { success: false, fixes: fixesApplied, message: 'Applied fixes but validation still failing' };
+          }
+        } else {
+          console.log('ℹ️ No fixes needed - session appears valid');
+          return { success: true, fixes: [], message: 'No fixes needed' };
+        }
+      } catch (e) {
+        console.error('❌ Error applying quick fix:', e);
+        return { success: false, error: e.message };
+      }
+    },
+
+    // Advanced fix for specific cases
+    forceValidSession: async (sessionData) => {
+      console.log('🔧 FORCE VALID SESSION: Setting session with provided data');
+
+      const { shouldRedirectToLogin } = await import('../utils/sessionHelpers');
+
+      // Ensure IsAuthenticated is set
+      if (!sessionData.IsAuthenticated) {
+        sessionData.IsAuthenticated = true;
+      }
+
+      try {
+        localStorage.setItem('MMClientVars', JSON.stringify(sessionData));
+        if (sessionData.ClientID) {
+          sessionStorage.setItem('ClientID', sessionData.ClientID);
+        }
+
+        console.log('✅ Session forced to valid state');
+        const shouldRedirect = shouldRedirectToLogin();
+        console.log('🧪 Test after force - shouldRedirectToLogin():', shouldRedirect);
+
+        return { success: !shouldRedirect, shouldRedirect };
+      } catch (e) {
+        console.error('❌ Error forcing valid session:', e);
+        return { success: false, error: e.message };
+      }
+    },
+
+    // Show session in readable format for debugging
+    showSession: () => {
+      console.log('🔍 Debug: Current session state');
+      console.log('MMClientVars:', localStorage.getItem('MMClientVars'));
+      console.log('SessionStorage ClientID:', sessionStorage.getItem('ClientID'));
+
+      try {
+        const session = JSON.parse(localStorage.getItem('MMClientVars') || '{}');
+        console.log('📊 Parsed session analysis:');
+        console.log('- IsAuthenticated:', session.IsAuthenticated, `(${typeof session.IsAuthenticated})`);
+        console.log('- Email:', session.Email ? '✅ Present' : '❌ Missing');
+        console.log('- Token:', session.Token ? `✅ Present (${session.Token.length} chars)` : '❌ Missing');
+        console.log('- UserID:', session.UserID ? '✅ Present' : '❌ Missing');
+        console.log('- ClientID:', session.ClientID ? '✅ Present' : '❌ Missing');
+        return session;
+      } catch (e) {
+        console.error('Error parsing session:', e);
+        return null;
+      }
     }
   };
 
   console.log('🛠️ Authentication Debug Utilities Available:');
   console.log('- window.debugAuth.quickDebug() - ⚡ QUICK session analysis (START HERE)');
+  console.log('- window.debugAuth.quickFix() - 🔧 AUTO-FIX common session issues');
+  console.log('- window.debugAuth.showSession() - 📊 Show current session data');
   console.log('- window.debugAuth.testAuthBehavior() - Complete authentication test');
   console.log('- window.debugAuth.checkEnvironment() - Check environment detection');
   console.log('- window.debugAuth.simulateNoSession() - Test behavior without session');

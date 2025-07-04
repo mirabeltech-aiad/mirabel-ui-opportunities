@@ -96,11 +96,22 @@ export const resetSession = () => {
 export const isActiveSession = () => {
     try {
         const MMClientVars = JSON.parse(localStorage.getItem("MMClientVars") || "{}");
-        const isAuthenticated = MMClientVars.IsAuthenticated === true;
+
+        // Use same flexible authentication check as shouldRedirectToLogin
+        const hasExplicitAuth = MMClientVars.IsAuthenticated === true ||
+            MMClientVars.IsAuthenticated === 'true' ||
+            MMClientVars.IsAuthenticated === 1;
+
+        // If no explicit IsAuthenticated field, check if we have essential auth indicators
+        const hasEssentialAuthData = MMClientVars.Email && MMClientVars.Token && MMClientVars.UserID;
+
+        const isAuthenticated = hasExplicitAuth || hasEssentialAuthData;
         const isSame = isSameSession();
 
         // Debug logging
         console.log('🔍 Session Check:', {
+            hasExplicitAuth,
+            hasEssentialAuthData,
             IsAuthenticated: isAuthenticated,
             IsSameSession: isSame,
             MMClientVarsExists: !!localStorage.getItem("MMClientVars"),
@@ -172,7 +183,6 @@ export const shouldRedirectToLogin = () => {
 
         // If no MMClientVars at all, redirect to login
         if (!MMClientVars) {
-            debugger;
             console.log('🔐 Production: No MMClientVars found, redirecting to login');
             return true;
         }
@@ -192,16 +202,38 @@ export const shouldRedirectToLogin = () => {
             ClientID: sessionData.ClientID
         });
 
-        // More flexible authentication check
-        const isAuthenticated = sessionData.IsAuthenticated === true ||
+        // More flexible authentication check - handle both explicit IsAuthenticated and inferred from essential data
+        const hasExplicitAuth = sessionData.IsAuthenticated === true ||
             sessionData.IsAuthenticated === 'true' ||
             sessionData.IsAuthenticated === 1;
 
+        // If no explicit IsAuthenticated field, check if we have essential auth indicators
+        const hasEssentialAuthData = sessionData.Email && sessionData.Token && sessionData.UserID;
+
+        const isAuthenticated = hasExplicitAuth || hasEssentialAuthData;
+
+        console.log('🔍 Production: Authentication check details:', {
+            hasExplicitAuth,
+            hasEssentialAuthData,
+            isAuthenticated,
+            IsAuthenticatedField: sessionData.IsAuthenticated,
+            hasEmail: !!sessionData.Email,
+            hasToken: !!sessionData.Token,
+            hasUserID: !!sessionData.UserID
+        });
+
         if (!isAuthenticated) {
-            console.log('🔐 Production: Not authenticated, redirecting to login');
-            console.log('🔐 IsAuthenticated value:', sessionData.IsAuthenticated, typeof sessionData.IsAuthenticated);
+            console.log('🔐 Production: Not authenticated - missing both IsAuthenticated field and essential auth data');
+            console.log('🔐 IsAuthenticated field:', sessionData.IsAuthenticated, typeof sessionData.IsAuthenticated);
+            console.log('🔐 Essential data check:', {
+                Email: !!sessionData.Email,
+                Token: !!sessionData.Token,
+                UserID: !!sessionData.UserID
+            });
             return true;
         }
+
+        console.log('✅ Production: Authentication validated using', hasExplicitAuth ? 'explicit IsAuthenticated field' : 'essential auth data (Email, Token, UserID)');
 
         if (!sessionData.Email) {
             console.log('🔐 Production: Missing Email, redirecting to login');
@@ -383,10 +415,24 @@ export const quickSessionDebug = () => {
         try {
             const sessionData = JSON.parse(localStorage.getItem('MMClientVars'));
             console.log('📊 Session Data Analysis:');
-            console.log('- IsAuthenticated:', sessionData.IsAuthenticated, `(${typeof sessionData.IsAuthenticated})`);
+            console.log('- IsAuthenticated field:', sessionData.IsAuthenticated, `(${typeof sessionData.IsAuthenticated})`);
             console.log('- Email:', sessionData.Email ? '✅ Present' : '❌ Missing');
             console.log('- Token:', sessionData.Token ? `✅ Present (${sessionData.Token.length} chars)` : '❌ Missing');
+            console.log('- UserID:', sessionData.UserID ? '✅ Present' : '❌ Missing');
             console.log('- ClientID:', sessionData.ClientID ? '✅ Present' : '❌ Missing');
+
+            // Test the flexible authentication logic
+            const hasExplicitAuth = sessionData.IsAuthenticated === true ||
+                sessionData.IsAuthenticated === 'true' ||
+                sessionData.IsAuthenticated === 1;
+
+            const hasEssentialAuthData = sessionData.Email && sessionData.Token && sessionData.UserID;
+            const isAuthenticated = hasExplicitAuth || hasEssentialAuthData;
+
+            console.log('🔍 Authentication Logic Test:');
+            console.log('- Has explicit IsAuthenticated:', hasExplicitAuth);
+            console.log('- Has essential auth data (Email+Token+UserID):', hasEssentialAuthData);
+            console.log('- Final authentication status:', isAuthenticated ? '✅ AUTHENTICATED' : '❌ NOT AUTHENTICATED');
 
             const sessionStorageClientID = sessionStorage.getItem('ClientID');
             console.log('🔗 Cross-tab validation:');
@@ -415,9 +461,9 @@ export const quickSessionDebug = () => {
     console.log('\n🎯 QUICK FIX SUGGESTIONS:');
     if (!isDev && hasMMClientVars) {
         console.log('1. Check the validation logs above');
-        console.log('2. Ensure IsAuthenticated is exactly true (boolean)');
-        console.log('3. Ensure Email and Token are present');
-        console.log('4. Check ClientID match between localStorage and sessionStorage');
+        console.log('2. If IsAuthenticated field is missing, ensure Email+Token+UserID are present');
+        console.log('3. If ClientID mismatch, run: sessionStorage.setItem("ClientID", localStorage.getItem("MMClientVars").ClientID)');
+        console.log('4. For quick fix, use: window.debugAuth.quickFix()');
     } else if (!hasMMClientVars) {
         console.log('1. Login again to set proper session');
         console.log('2. Check if session is being cleared somewhere');
