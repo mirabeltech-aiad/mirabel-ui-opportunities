@@ -1,75 +1,489 @@
+import { getSessionValue } from '../utils/sessionHelpers';
+import { isTokenValid } from '../utils/authHelpers';
+import { getCurrentUserId } from '../utils/userUtils';
 
-const API_BASE_URL = 'https://tech.magazinemanager.biz/';
+export const apiCall = (
+  endpoint,
+  method = "GET",
+  data = {},
+  headers = {},
+  cache = "no-cache",
+  mode = "cors",
+  options = {},
+  apiOptions = false,
+  dynamicBaseURL
+) => {
+  let baseURL, domain, token;
 
-// IMPORTANT: Replace this with your fresh JWT token from your authentication system
-// Please get a new token from https://tech.magazinemanager.biz/ and replace the value below
-const AUTH_TOKEN = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJMb2dnZWRJblVzZXJJRCI6IjIzIiwiTG9nZ2VkSW5TaXRlQ2xpZW50SUQiOiI1IiwiTG9nZ2VkSW5TaXRlQ3VsdHVyZVVJIjoiZW4tVVMiLCJEYXRlVGltZSI6IjcvMS8yMDI1IDk6MDY6NDcgQU0iLCJMb2dnZWRJblNpdGVDdXJyZW5jeVN5bWJvbCI6IiQiLCJMb2dnZWRJblNpdGVEYXRlRm9ybWF0IjoiIiwiRG9tYWluIjoidGVjaCIsIkxvZ2dlZEluU2l0ZVRpbWVBZGQiOlsiMCIsIjAiXSwiU291cmNlIjoiVE1NIiwiRW1haWwiOiJzYUBtYWdhemluZW1hbmFnZXIuY29tIiwiSXNBUElVc2VyIjoiRmFsc2UiLCJuYmYiOjE3NTEzNjA4MDcsImV4cCI6MTk3MjExMjgwNywiaWF0IjoxNzUxMzYwODA3LCJpc3MiOiJNYWdhemluZU1hbmFnZXIiLCJhdWQiOiIqIn0.8UvRE9oH8-lNc_vpyhdciSLh5lvSDZYJ64dQExxRbcs';
+  if (process.env.NODE_ENV === "development") {
+    let TokenDetails = localStorage.getItem("TokenData");
+    if (TokenDetails) {
+      TokenDetails = JSON.parse(TokenDetails)
+      baseURL = `https://${TokenDetails?.mainurl || new URL(import.meta.env.REACT_APP_API_BASE_URL || "https://tech.magazinemanager.biz").hostname}`;
+      domain = `${TokenDetails?.subdomain || new URL(import.meta.env.REACT_APP_API_BASE_URL || "https://tech.magazinemanager.biz").hostname.split('.')[0]}`;
+    }
+    else {
+      baseURL = import.meta.env.REACT_APP_API_BASE_URL || "https://tech.magazinemanager.biz";
+      const urlObj = new URL(baseURL);
+      domain = urlObj.hostname.split('.')[0];
+    }
+    token = TokenDetails?.Token || getSessionValue("Token") || ""; // If TokenDetails.Token isn't working, use session token
 
-export const userId = 23;
 
+  } else if (process.env.NODE_ENV === "test") {
+    baseURL = "";
+  } else {
+    baseURL = "";
+    domain = getSessionValue("Domain") || window.location.hostname;
+    token = getSessionValue("Token");
+  }
+
+  // Ensure proper URL construction with slash handling
+  const baseUrlToUse = dynamicBaseURL ? dynamicBaseURL : baseURL;
+  let fullUrl;
+
+  if (endpoint.startsWith('http://') || endpoint.startsWith('https://')) {
+    // Endpoint is a full URL
+    fullUrl = endpoint;
+  } else if (endpoint.startsWith('/')) {
+    // Endpoint starts with slash, ensure baseURL doesn't end with slash
+    fullUrl = baseUrlToUse.replace(/\/$/, '') + endpoint;
+  } else {
+    // Endpoint doesn't start with slash, ensure baseURL ends with slash
+    fullUrl = baseUrlToUse.replace(/\/$/, '') + '/' + endpoint;
+  }
+
+  // Debug logging for URL construction
+  if (import.meta.env.DEV) {
+    console.log('🔗 URL Construction:', {
+      baseURL: baseUrlToUse,
+      endpoint: endpoint,
+      fullUrl: fullUrl
+    });
+  }
+
+  let _headers = new Headers({
+    Accept: "application/json",
+    "Content-Type": "application/json",
+    domain,
+    Authorization: token ? `Bearer ${token}` : '',
+  });
+
+  Object.keys(headers).forEach((key) => {
+    _headers.append(key, headers[key]);
+  });
+
+  let request = {};
+
+  if (method !== "GET") {
+    request = new Request(fullUrl, {
+      method: method,
+      mode: mode,
+      cache: cache,
+      headers: _headers,
+      body: JSON.stringify(data),
+    });
+  } else {
+    request = new Request(fullUrl, {
+      method: method,
+      mode: mode,
+      cache: cache,
+      headers: _headers,
+    });
+  }
+
+  return fetch(request, options)
+    .then((res) => {
+      if (!res.ok) {
+        console.log("Response is not  OK", res);
+        let ErrorID = "";
+        res
+          .clone()
+          .json()
+          .then((response) => {
+            ErrorID = response.ErrorID;
+            if (ErrorID) {
+              console.error("API Error ID:", ErrorID);
+              return;
+            }
+          })
+          .catch(() => {
+            // Ignore JSON parsing errors for non-JSON responses
+          });
+
+        if (res.status === 301) {
+          window.location.href = "/sessionout";
+          return Promise.reject(res);
+        } else if (res.status === 401) {
+          var promise = new Promise(function (resolve, reject) {
+            //generating access token using refresh token when refresh token expiry or invalid
+            // Use web method for token refresh (not CP product)
+            generateTokenWithOutPassingRefreshToken(
+              {
+                endpoint,
+                method,
+                data,
+                headers,
+                cache,
+                mode,
+                options,
+                apiOptions,
+              },
+              resolve,
+              reject
+            );
+          });
+          return promise;
+        } else if (res.status === 403) {
+          return Promise.reject(res);
+        }
+      }
+      return res.json();
+    })
+    .catch((error) => {
+      if (error.name === "Abort Error" || error.name === "AbortError") {
+        return;
+      }
+
+      console.log("API call Error : ", error);
+      if (apiOptions) {
+        if (error.status === 403) {
+          const element = document.querySelector(apiOptions);
+          if (element) {
+            element.innerHTML = '<div>You don\'t have access to this contact!!!</div>';
+          }
+        }
+      }
+      throw new Error(error.status === 403 ? "Access Denied" : (error.message || " Network request failed"));
+    });
+};
+
+export const webMethodCall = (
+  endpoint,
+  method = "GET",
+  data = {},
+  headers = {},
+  cache = "no-cache",
+  mode = "cors",
+  options = {}
+) => {
+  if (process.env.NODE_ENV === "development") {
+    const promise = new Promise(async (resolve) => {
+      const { promises, getValue, devURL } = await import(
+        "../utils/developmentHelper"
+      );
+      const dataToPost = {
+        isReactCall: true,
+        datajson: data,
+        requestId: getValue(),
+        url: endpoint.startsWith("http") ? endpoint : devURL + (endpoint.startsWith('/') ? endpoint : '/' + endpoint),
+        methodType: method,
+      };
+      const mmdeviframe = document.querySelector("#mmdeviframe");
+      if (mmdeviframe) {
+        mmdeviframe.contentWindow.postMessage(dataToPost, "*");
+        promises[dataToPost.requestId] = resolve;
+      }
+    });
+    return promise;
+  } else {
+    const fullUrl = endpoint;
+    let _headers = new Headers({
+      Accept: "application/json",
+      "Content-Type": "application/json",
+    });
+    Object.keys(headers).forEach((key) => {
+      _headers.append(key, headers[key]);
+    });
+    let request = {};
+
+    if (method !== "GET") {
+      request = new Request(fullUrl, {
+        method: method,
+        mode: mode,
+        cache: cache,
+        headers: _headers,
+        body: JSON.stringify(data),
+      });
+    } else {
+      request = new Request(fullUrl, {
+        method: method,
+        mode: mode,
+        cache: cache,
+        headers: _headers,
+      });
+    }
+    return fetch(request, options)
+      .then((res) => {
+        if (!res.ok) {
+          console.log("Response is not  OK");
+          if (res.status === 301) {
+            window.location.href = "/sessionout";
+          }
+          return Promise.reject(res);
+        }
+        return res.json();
+      })
+      .catch((error) => {
+        if (error.name === "Abort Error") {
+          return;
+        }
+        console.log("API call Error : ", error);
+        throw new Error(error.message || " Network request failed");
+      });
+  }
+};
+
+// Token refresh using web method (like mirabel.mm.ui)
+const generateTokenWithOutPassingRefreshToken = (params, resolve, reject) => {
+  webMethodCall(
+    "/intranet/Members/Home/Home.aspx/GenerateTokenByRefreshToken",
+    "POST"
+  )
+    .then((resp) => {
+      if (resp.d.Status === 200) {
+        var MMClientVars = JSON.parse(
+          window.localStorage.getItem("MMClientVars")
+        );
+        MMClientVars.Token = resp.d.Data.AccessToken;
+        MMClientVars.UserId = 23;
+        window.localStorage.setItem(
+          "MMClientVars",
+          JSON.stringify(MMClientVars)
+        );
+        resolve(
+          apiCall(
+            params.endpoint,
+            params.method,
+            params.data,
+            params.headers,
+            params.cache,
+            params.mode,
+            params.options,
+            params.apiOptions
+          )
+        );
+      }
+    })
+    .catch((error) => {
+      console.log("error while adding call:" + error);
+      if (window.location.pathname.startsWith(`/ui60/ce/`)) {
+        reject(error);
+      }
+    });
+};
+
+// Class-based wrapper for backward compatibility
 class HttpClient {
   constructor() {
-    this.baseURL = API_BASE_URL;
-    this.authToken = AUTH_TOKEN;
+    this.updateConfiguration();
+  }
+
+  updateConfiguration() {
+    this.baseURL = getSessionValue("Host") || window.location.origin;
+    this.domain = getSessionValue("Domain") || window.location.hostname;
+    this.authToken = getSessionValue("Token") || '';
+  }
+
+  getCurrentToken() {
+    return getSessionValue("Token") || '';
+  }
+
+  getCurrentUserId() {
+    return getCurrentUserId();
   }
 
   async request(endpoint, options = {}) {
-    // Ensure proper URL construction
-    const cleanEndpoint = endpoint.startsWith('/') ? endpoint.slice(1) : endpoint;
-    const url = `${this.baseURL}${cleanEndpoint}`;
-    
-    const config = {
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${this.authToken}`,
-        ...options.headers,
-      },
-      ...options,
-    };
+    const method = options.method || 'GET';
+    const data = options.body ? JSON.parse(options.body) : {};
+    const headers = options.headers || {};
+    const cache = options.cache || "no-cache";
+    const mode = options.mode || "cors";
 
-    try {
-      console.log(`Making API request to: ${url}`);
-      
-      if (this.authToken === 'YOUR_FRESH_JWT_TOKEN_HERE') {
-        throw new Error('Please replace YOUR_FRESH_JWT_TOKEN_HERE with a valid JWT token from your authentication system');
-      }
-      
-      const response = await fetch(url, config);
-      
-      if (!response.ok) {
-        if (response.status === 401) {
-          console.error('Authentication token expired. Please update the token in httpClient.js');
-          throw new Error(`Authentication failed: Token expired (status: ${response.status})`);
-        }
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-      
-      const data = await response.json();
-      return data;
-    } catch (error) {
-      console.error(`API request failed for ${cleanEndpoint}:`, error);
-      throw error;
-    }
+    return apiCall(endpoint, method, data, headers, cache, mode, options);
   }
 
-  async get(endpoint, params = {}) {
+  async get(endpoint, params = {}, headers = {}, options = {}) {
     const queryString = new URLSearchParams(params).toString();
     const url = queryString ? `${endpoint}?${queryString}` : endpoint;
-    return this.request(url);
+    const cache = options.cache || "no-cache";
+    const mode = options.mode || "cors";
+
+    return apiCall(url, 'GET', {}, headers, cache, mode, options);
   }
 
-  async post(endpoint, data = {}) {
-    return this.request(endpoint, {
-      method: 'POST',
-      body: JSON.stringify(data),
-    });
+  async post(endpoint, data = {}, headers = {}, options = {}) {
+    const cache = options.cache || "no-cache";
+    const mode = options.mode || "cors";
+
+    return apiCall(endpoint, 'POST', data, headers, cache, mode, options);
   }
 
-  async delete(endpoint) {
-    return this.request(endpoint, {
-      method: 'DELETE',
-    });
+  async put(endpoint, data = {}, headers = {}, options = {}) {
+    const cache = options.cache || "no-cache";
+    const mode = options.mode || "cors";
+
+    return apiCall(endpoint, 'PUT', data, headers, cache, mode, options);
+  }
+
+  async delete(endpoint, headers = {}, options = {}) {
+    const cache = options.cache || "no-cache";
+    const mode = options.mode || "cors";
+
+    return apiCall(endpoint, 'DELETE', {}, headers, cache, mode, options);
+  }
+
+  getBaseURL() {
+    this.updateConfiguration();
+    return this.baseURL;
+  }
+
+  getDomain() {
+    this.updateConfiguration();
+    return this.domain;
+  }
+
+  isAuthenticated() {
+    const token = this.getCurrentToken();
+    return token && isTokenValid(token);
+  }
+
+  // Convenience methods that explicitly show token usage
+  async getWithToken(endpoint, params = {}, additionalHeaders = {}) {
+    const token = this.getCurrentToken();
+    console.log(`Making GET request to: ${endpoint} with token: ${token ? 'Present' : 'Missing'}`);
+
+    return this.get(endpoint, params, additionalHeaders);
+  }
+
+  async postWithToken(endpoint, data = {}, additionalHeaders = {}) {
+    const token = this.getCurrentToken();
+    console.log(`Making POST request to: ${endpoint} with token: ${token ? 'Present' : 'Missing'}`);
+
+    return this.post(endpoint, data, additionalHeaders);
+  }
+
+  // Debug method to show current configuration
+  getDebugInfo() {
+    return {
+      baseURL: this.getBaseURL(),
+      domain: this.getDomain(),
+      hasToken: !!this.getCurrentToken(),
+      tokenLength: this.getCurrentToken()?.length || 0,
+      userId: this.getCurrentUserId(),
+      isAuthenticated: this.isAuthenticated()
+    };
   }
 }
 
-export default new HttpClient();
+// Create singleton instance
+const httpClientInstance = new HttpClient();
+
+// Export for backward compatibility
+export default httpClientInstance;
+export const getUserId = getCurrentUserId;
+export const userId = getCurrentUserId();
+
+// Debug utilities for authentication testing
+if (typeof window !== 'undefined') {
+  window.debugAuth = {
+    testAuthBehavior: async () => {
+      const { debugAuthenticationBehavior } = await import('../utils/sessionHelpers');
+      return debugAuthenticationBehavior();
+    },
+
+    checkEnvironment: () => {
+      return import('../utils/developmentHelper').then(({ isDevelopmentMode }) => {
+        const isDev = isDevelopmentMode();
+        console.log('🌍 Environment Check Result:', {
+          isDevelopmentMode: isDev,
+          hostname: window.location.hostname,
+          environment: isDev ? 'DEVELOPMENT' : 'PRODUCTION/STAGING',
+          behaviorExpected: isDev ? 'Dev helpers, no login redirect' : 'Login redirect if no session'
+        });
+        return { isDevelopmentMode: isDev, environment: isDev ? 'development' : 'production' };
+      });
+    },
+
+    simulateNoSession: async () => {
+      console.log('🚫 SIMULATING NO SESSION TEST');
+      const originalSession = localStorage.getItem('MMClientVars');
+      localStorage.removeItem('MMClientVars');
+
+      const { checkAuthenticationStatus, shouldRedirectToLogin } = await import('../utils/sessionHelpers');
+      const { isDevelopmentMode } = await import('../utils/developmentHelper');
+
+      const isDev = isDevelopmentMode();
+      const authStatus = checkAuthenticationStatus();
+      const shouldRedirect = shouldRedirectToLogin();
+
+      console.log('Results without session:');
+      console.log('- Environment:', isDev ? 'DEVELOPMENT' : 'PRODUCTION/STAGING');
+      console.log('- Should redirect:', shouldRedirect);
+      console.log('- Auth status:', authStatus);
+      console.log('- Expected behavior:', isDev ? 'Set dev session' : 'Redirect to login');
+      console.log('- Actual behavior:', isDev ? (authStatus.authenticated ? 'CORRECT' : 'ERROR') : (shouldRedirect ? 'CORRECT' : 'ERROR'));
+
+      // Restore session
+      if (originalSession) {
+        localStorage.setItem('MMClientVars', originalSession);
+        console.log('✅ Session restored');
+      }
+
+      return {
+        environment: isDev ? 'development' : 'production',
+        shouldRedirect,
+        authStatus,
+        behaviorCorrect: isDev ? authStatus.authenticated : shouldRedirect
+      };
+    },
+
+    forceProductionTest: async () => {
+      console.log('🏭 FORCE PRODUCTION BEHAVIOR TEST');
+      console.log('This temporarily simulates production environment for testing');
+
+      // Temporarily override environment detection
+      const originalHostname = window.location.hostname;
+
+      // Mock a production hostname
+      Object.defineProperty(window.location, 'hostname', {
+        writable: true,
+        value: 'myapp.mirabeltechnologies.com'
+      });
+
+      const { shouldRedirectToLogin, checkAuthenticationStatus } = await import('../utils/sessionHelpers');
+      const { isDevelopmentMode } = await import('../utils/developmentHelper');
+
+      const isDev = isDevelopmentMode();
+      const shouldRedirect = shouldRedirectToLogin();
+      const authStatus = checkAuthenticationStatus();
+
+      console.log('Forced Production Test Results:');
+      console.log('- Mocked hostname:', window.location.hostname);
+      console.log('- isDevelopmentMode:', isDev);
+      console.log('- shouldRedirectToLogin:', shouldRedirect);
+      console.log('- checkAuthenticationStatus:', authStatus);
+      console.log('- Expected: Should be treated as production');
+
+      // Restore original hostname
+      Object.defineProperty(window.location, 'hostname', {
+        writable: true,
+        value: originalHostname
+      });
+
+      console.log('✅ Hostname restored to:', window.location.hostname);
+
+      return {
+        wasTreatedAsProduction: !isDev,
+        shouldRedirect,
+        testPassed: !isDev
+      };
+    }
+  };
+
+  console.log('🛠️ Authentication Debug Utilities Available:');
+  console.log('- window.debugAuth.testAuthBehavior() - Complete authentication test');
+  console.log('- window.debugAuth.checkEnvironment() - Check environment detection');
+  console.log('- window.debugAuth.simulateNoSession() - Test behavior without session');
+  console.log('- window.debugAuth.forceProductionTest() - Force test production behavior');
+}

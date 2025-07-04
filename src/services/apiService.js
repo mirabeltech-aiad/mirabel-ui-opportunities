@@ -1,4 +1,6 @@
 import httpClient from './httpClient';
+import { getCurrentUserId, getCurrentUserInfo } from '../utils/userUtils';
+import { isActiveSession } from '../utils/sessionHelpers';
 import opportunitiesApi from './opportunitiesApi';
 import contactsApi from './contactsApi';
 import activitiesApi from './activitiesApi';
@@ -8,21 +10,49 @@ import viewsApi from './viewsApi';
 
 class ApiService {
   constructor() {
-    this.baseURL = httpClient.baseURL;
-    this.authToken = httpClient.authToken;
+    this.httpClient = httpClient;
+  }
+
+  // Dynamic getters for current auth state
+  get baseURL() {
+    return this.httpClient.getBaseURL();
+  }
+
+  get authToken() {
+    return this.httpClient.getCurrentToken();
+  }
+
+  get userId() {
+    return getCurrentUserId();
+  }
+
+  get userInfo() {
+    return getCurrentUserInfo();
+  }
+
+  get isAuthenticated() {
+    return isActiveSession();
   }
 
   // Base HTTP methods
   async request(endpoint, options = {}) {
-    return httpClient.request(endpoint, options);
+    return this.httpClient.request(endpoint, options);
   }
 
   async get(endpoint, params = {}) {
-    return httpClient.get(endpoint, params);
+    return this.httpClient.get(endpoint, params);
   }
 
   async post(endpoint, data = {}) {
-    return httpClient.post(endpoint, data);
+    return this.httpClient.post(endpoint, data);
+  }
+
+  async put(endpoint, data = {}) {
+    return this.httpClient.put(endpoint, data);
+  }
+
+  async delete(endpoint) {
+    return this.httpClient.delete(endpoint);
   }
 
   // Opportunities methods
@@ -148,12 +178,30 @@ class ApiService {
   }
 
   // Settings methods
-  async getReportSettings(userId, viewId = -1) {
-    return this.get(`Reports/Settings/${userId}/${viewId}`);
+  async getReportSettings(userId = null, viewId = -1) {
+    const currentUserId = userId || this.userId;
+    return this.get(`Reports/Settings/${currentUserId}/${viewId}`);
   }
 
   async updateReportSettings(payload) {
     return this.post('Reports/Settings/', payload);
+  }
+
+  // Utility methods
+  getApiInfo() {
+    return {
+      baseURL: this.baseURL,
+      isAuthenticated: this.isAuthenticated,
+      userId: this.userId,
+      userInfo: this.userInfo,
+      domain: this.httpClient.getDomain()
+    };
+  }
+
+  // Force refresh authentication state
+  refreshAuth() {
+    // This will force httpClient to update its configuration
+    this.httpClient.updateConfiguration();
   }
 }
 
