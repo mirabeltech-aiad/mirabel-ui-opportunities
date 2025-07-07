@@ -194,10 +194,8 @@ export const performLoginRedirect = (returnUrl = null) => {
     if (isDevelopmentMode()) {
         return;
     }
-
-    const currentUrl = window.location.href;
     const baseUrl = window.location.origin;
-    const loginUrl = `${baseUrl}/intranet/Login.aspx?ReturnUrl=${encodeURIComponent(currentUrl)}`;
+    const loginUrl = `${baseUrl}/intranet/Login.aspx`;
 
     window.location.href = loginUrl;
 };
