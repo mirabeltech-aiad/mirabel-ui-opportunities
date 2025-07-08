@@ -1,5 +1,6 @@
 // src/Routers/routeTree.js
 import { lazy } from 'react';
+import { NavigationFeature } from '../features/Navbar';
 
 const WelcomePage = lazy(() => import('../pages/Welcome'));
 const Pipeline = lazy(() => import('../pages/Opportunity/Pipeline'));
@@ -14,6 +15,7 @@ const Reports = lazy(() => import('../pages/Opportunity/Reports'));
 const Admin = lazy(() => import('../pages/Opportunity/Admin'));
 const Settings = lazy(() => import('../pages/Opportunity/Settings'));
 const NotFound = lazy(() => import('../pages/Opportunity/NotFound'));
+const Navbar = lazy(() => import('../features/Navbar/components/Navbar/Navbar'));
 
 export const routes = [
   {
@@ -74,6 +76,11 @@ export const routes = [
   {
     path: '/custom-fields',
     component: Settings,
+    exact: true,
+  },
+  {
+    path: '/navbar',
+    component: NavigationFeature,
     exact: true,
   },
   // {

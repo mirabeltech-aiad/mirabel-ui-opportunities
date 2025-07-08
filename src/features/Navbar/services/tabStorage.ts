@@ -1,0 +1,1 @@
+export const TAB_STORAGE_KEY = 'tab_state';
