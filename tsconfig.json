@@ -14,7 +14,11 @@
       "noEmit": true,                   // avoids emitting .js files
       "forceConsistentCasingInFileNames": true,
       "strict": true,                   // strict type checking
-      "skipLibCheck": true              // faster builds by skipping lib checks
+      "skipLibCheck": true,              // faster builds by skipping lib checks
+      "baseUrl": ".",
+      "paths": {
+        "@/*": ["src/*"]
+      }
     },
     "include": ["src"],
     "exclude": ["node_modules", "dist"]
