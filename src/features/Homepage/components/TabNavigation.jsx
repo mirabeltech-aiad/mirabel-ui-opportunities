@@ -31,6 +31,7 @@ const TabNavigation = () => {
 
   const handleTabClose = (e, tabId) => {
     e.stopPropagation();
+    e.preventDefault();
     actions.removeTab(tabId);
   };
 
@@ -39,7 +40,8 @@ const TabNavigation = () => {
       title: 'New Tab',
       component: 'NewTab',
       type: 'component',
-      icon: '📄'
+      icon: '📄',
+      closable: true
     });
   };
 
@@ -70,37 +72,47 @@ const TabNavigation = () => {
                         <div
                           ref={provided.innerRef}
                           {...provided.draggableProps}
-                          {...provided.dragHandleProps}
+                          className={`flex items-center rounded-t-lg transition-all duration-200 ${
+                            activeTabId === tab.id
+                              ? 'bg-white border-t-2 border-blue-500 text-blue-600 shadow-sm'
+                              : 'bg-gray-100 hover:bg-gray-200 text-gray-700'
+                          } ${snapshot.isDragging ? 'opacity-50' : ''}`}
                         >
                           {tab.id === 'dashboard' ? (
-                            <DashboardTab
-                              tab={tab}
-                              isActive={activeTabId === tab.id}
-                              onClick={handleTabClick}
-                              isDragging={snapshot.isDragging}
-                            />
+                            <div {...provided.dragHandleProps}>
+                              <DashboardTab
+                                tab={tab}
+                                isActive={activeTabId === tab.id}
+                                onClick={handleTabClick}
+                                isDragging={snapshot.isDragging}
+                              />
+                            </div>
                           ) : (
-                            <div
-                              className={`flex items-center px-3 py-2 rounded-t-lg cursor-pointer transition-all duration-200 ${
-                                activeTabId === tab.id
-                                  ? 'bg-white border-t-2 border-blue-500 text-blue-600 shadow-sm'
-                                  : 'bg-gray-100 hover:bg-gray-200 text-gray-700'
-                              } ${snapshot.isDragging ? 'opacity-50' : ''}`}
-                              onClick={() => handleTabClick(tab.id)}
-                            >
-                              <span className="mr-2 text-sm">{tab.icon}</span>
-                              <span className="text-sm font-medium truncate max-w-32">
-                                {tab.title}
-                              </span>
-                              {tab.closable && (
+                            <>
+                              {/* Draggable area (excludes close button) */}
+                              <div
+                                {...provided.dragHandleProps}
+                                className="flex items-center px-3 py-2 cursor-pointer flex-1"
+                                onClick={() => handleTabClick(tab.id)}
+                              >
+                                <span className="mr-2 text-sm">{tab.icon}</span>
+                                <span className="text-sm font-medium truncate max-w-32">
+                                  {tab.title}
+                                </span>
+                              </div>
+                              
+                              {/* Close button (not draggable) */}
+                              {tab.closable !== false && (
                                 <button
                                   onClick={(e) => handleTabClose(e, tab.id)}
-                                  className="ml-2 p-1 rounded hover:bg-gray-300 transition-colors"
+                                  className="mr-2 p-1 rounded hover:bg-gray-300 transition-colors flex-shrink-0"
+                                  title="Close tab"
+                                  type="button"
                                 >
                                   <X className="h-3 w-3" />
                                 </button>
                               )}
-                            </div>
+                            </>
                           )}
                         </div>
                       )}
@@ -134,13 +146,15 @@ const TabNavigation = () => {
                       <span className="mr-2">{tab.icon}</span>
                       <span className="truncate">{tab.title}</span>
                     </div>
-                    {tab.closable && (
+                    {tab.closable !== false && (
                       <button
                         onClick={(e) => {
                           e.stopPropagation();
+                          e.preventDefault();
                           handleTabClose(e, tab.id);
                         }}
                         className="ml-2 p-1 rounded hover:bg-gray-200"
+                        type="button"
                       >
                         <X className="h-3 w-3" />
                       </button>
@@ -156,6 +170,7 @@ const TabNavigation = () => {
             onClick={addNewTab}
             className="ml-2 p-2 rounded hover:bg-gray-200 transition-colors"
             title="Add new tab"
+            type="button"
           >
             <Plus className="h-4 w-4" />
           </button>

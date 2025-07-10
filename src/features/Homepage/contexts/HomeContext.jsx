@@ -154,7 +154,12 @@ export const HomeProvider = ({ children }) => {
         const tabs = JSON.parse(savedTabs);
         tabs.forEach(tab => {
           if (tab.id !== 'dashboard') {
-            dispatch({ type: ACTIONS.ADD_TAB, payload: tab });
+            // Ensure closable property is set correctly for restored tabs
+            const restoredTab = {
+              ...tab,
+              closable: tab.closable !== false // Default to true unless explicitly false
+            };
+            dispatch({ type: ACTIONS.ADD_TAB, payload: restoredTab });
           }
         });
       } catch (error) {
