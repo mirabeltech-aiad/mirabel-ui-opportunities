@@ -1,5 +1,6 @@
 // src/Routers/routeTree.js
 import { lazy } from 'react';
+import Home from '../features/Homepage';
 import { NavigationFeature } from '../features/Navbar';
 
 const WelcomePage = lazy(() => import('../pages/Welcome'));
@@ -81,6 +82,11 @@ export const routes = [
   {
     path: '/navbar',
     component: NavigationFeature,
+    exact: true,
+  },
+  {
+    path: '/home',
+    component: Home,
     exact: true,
   },
   // {

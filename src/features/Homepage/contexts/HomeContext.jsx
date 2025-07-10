@@ -1,0 +1,236 @@
+import React, { createContext, useContext, useReducer, useEffect } from 'react';
+import { useToast } from '@/features/Opportunity/hooks/use-toast';
+
+const HomeContext = createContext();
+
+// Action types
+const ACTIONS = {
+  ADD_TAB: 'ADD_TAB',
+  REMOVE_TAB: 'REMOVE_TAB',
+  REORDER_TABS: 'REORDER_TABS',
+  SET_ACTIVE_TAB: 'SET_ACTIVE_TAB',
+  UPDATE_TAB: 'UPDATE_TAB',
+  TOGGLE_HELP: 'TOGGLE_HELP',
+  SET_HELP_POSITION: 'SET_HELP_POSITION',
+  SET_SESSION_DATA: 'SET_SESSION_DATA',
+  CLEAR_SESSION: 'CLEAR_SESSION'
+};
+
+// Initial state
+const initialState = {
+  tabs: [
+    {
+      id: 'dashboard',
+      title: 'Dashboard',
+      component: 'Dashboard',
+      type: 'component',
+      closable: false,
+      icon: '📊'
+    }
+  ],
+  activeTabId: 'dashboard',
+  helpVisible: false,
+  helpPosition: { x: 20, y: 20 },
+  sessionData: null,
+  isAuthenticated: false
+};
+
+// Reducer
+const homeReducer = (state, action) => {
+  switch (action.type) {
+    case ACTIONS.ADD_TAB:
+      return {
+        ...state,
+        tabs: [...state.tabs, action.payload],
+        activeTabId: action.payload.id
+      };
+    
+    case ACTIONS.REMOVE_TAB:
+      const filteredTabs = state.tabs.filter(tab => tab.id !== action.payload);
+      const newActiveTab = state.activeTabId === action.payload 
+        ? (filteredTabs[filteredTabs.length - 1]?.id || 'dashboard')
+        : state.activeTabId;
+      
+      return {
+        ...state,
+        tabs: filteredTabs,
+        activeTabId: newActiveTab
+      };
+    
+    case ACTIONS.REORDER_TABS:
+      return {
+        ...state,
+        tabs: action.payload
+      };
+    
+    case ACTIONS.SET_ACTIVE_TAB:
+      return {
+        ...state,
+        activeTabId: action.payload
+      };
+    
+    case ACTIONS.UPDATE_TAB:
+      return {
+        ...state,
+        tabs: state.tabs.map(tab => 
+          tab.id === action.payload.id ? { ...tab, ...action.payload } : tab
+        )
+      };
+    
+    case ACTIONS.TOGGLE_HELP:
+      return {
+        ...state,
+        helpVisible: !state.helpVisible
+      };
+    
+    case ACTIONS.SET_HELP_POSITION:
+      return {
+        ...state,
+        helpPosition: action.payload
+      };
+    
+    case ACTIONS.SET_SESSION_DATA:
+      return {
+        ...state,
+        sessionData: action.payload,
+        isAuthenticated: true
+      };
+    
+    case ACTIONS.CLEAR_SESSION:
+      return {
+        ...state,
+        sessionData: null,
+        isAuthenticated: false
+      };
+    
+    default:
+      return state;
+  }
+};
+
+// Provider component
+export const HomeProvider = ({ children }) => {
+  const [state, dispatch] = useReducer(homeReducer, initialState);
+  const { toast } = useToast();
+
+  // Load tabs from localStorage on mount
+  useEffect(() => {
+    const savedTabs = localStorage.getItem('home-tabs');
+    const savedActiveTab = localStorage.getItem('home-active-tab');
+    
+    if (savedTabs) {
+      try {
+        const tabs = JSON.parse(savedTabs);
+        tabs.forEach(tab => {
+          if (tab.id !== 'dashboard') {
+            dispatch({ type: ACTIONS.ADD_TAB, payload: tab });
+          }
+        });
+      } catch (error) {
+        console.error('Error loading saved tabs:', error);
+      }
+    }
+    
+    if (savedActiveTab) {
+      dispatch({ type: ACTIONS.SET_ACTIVE_TAB, payload: savedActiveTab });
+    }
+  }, []);
+
+  // Save tabs to localStorage when they change
+  useEffect(() => {
+    localStorage.setItem('home-tabs', JSON.stringify(state.tabs));
+    localStorage.setItem('home-active-tab', state.activeTabId);
+  }, [state.tabs, state.activeTabId]);
+
+  // Actions
+  const addTab = (tabData) => {
+    const newTab = {
+      id: `${tabData.type}-${Date.now()}`,
+      title: tabData.title,
+      component: tabData.component,
+      type: tabData.type || 'component',
+      closable: tabData.closable !== false,
+      icon: tabData.icon || '📄',
+      url: tabData.url,
+      content: tabData.content
+    };
+    
+    dispatch({ type: ACTIONS.ADD_TAB, payload: newTab });
+    toast({
+      title: "Tab Added",
+      description: `Added "${newTab.title}" tab`,
+      variant: "default",
+    });
+  };
+
+  const removeTab = (tabId) => {
+    const tab = state.tabs.find(t => t.id === tabId);
+    dispatch({ type: ACTIONS.REMOVE_TAB, payload: tabId });
+    
+    if (tab) {
+      toast({
+        title: "Tab Removed",
+        description: `Removed "${tab.title}" tab`,
+        variant: "default",
+      });
+    }
+  };
+
+  const reorderTabs = (newOrder) => {
+    dispatch({ type: ACTIONS.REORDER_TABS, payload: newOrder });
+  };
+
+  const setActiveTab = (tabId) => {
+    dispatch({ type: ACTIONS.SET_ACTIVE_TAB, payload: tabId });
+  };
+
+  const updateTab = (tabId, updates) => {
+    dispatch({ type: ACTIONS.UPDATE_TAB, payload: { id: tabId, ...updates } });
+  };
+
+  const toggleHelp = () => {
+    dispatch({ type: ACTIONS.TOGGLE_HELP });
+  };
+
+  const setHelpPosition = (position) => {
+    dispatch({ type: ACTIONS.SET_HELP_POSITION, payload: position });
+  };
+
+  const setSessionData = (data) => {
+    dispatch({ type: ACTIONS.SET_SESSION_DATA, payload: data });
+  };
+
+  const clearSession = () => {
+    dispatch({ type: ACTIONS.CLEAR_SESSION });
+  };
+
+  const value = {
+    ...state,
+    actions: {
+      addTab,
+      removeTab,
+      reorderTabs,
+      setActiveTab,
+      updateTab,
+      toggleHelp,
+      setHelpPosition,
+      setSessionData,
+      clearSession
+    }
+  };
+
+  return (
+    <HomeContext.Provider value={value}>
+      {children}
+    </HomeContext.Provider>
+  );
+};
+
+// Custom hook
+export const useHome = () => {
+  const context = useContext(HomeContext);
+  if (!context) {
+    throw new Error('useHome must be used within a HomeProvider');
+  }
+  return context;
+}; 
