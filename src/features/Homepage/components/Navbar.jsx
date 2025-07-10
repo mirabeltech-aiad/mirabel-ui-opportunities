@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useHome } from '../contexts/HomeContext';
+import navigationService from '../services/navigationService';
 import {
   Search,
   User,
@@ -8,6 +9,7 @@ import {
   Bell,
   ChevronDown,
   HelpCircle,
+  Loader2,
 } from 'lucide-react';
 import {
   DropdownMenu,
@@ -20,66 +22,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 
-// Mock menu data matching the screenshot
-const topMenus = [
-  {
-    title: 'Management',
-    url: 'https://app.example.com/management',
-    submenu: [
-      { title: 'Overview', url: 'https://app.example.com/management/overview' },
-      { title: 'Users', url: 'https://app.example.com/management/users' },
-    ],
-  },
-  {
-    title: 'Customers',
-    url: 'https://app.example.com/customers',
-    submenu: [
-      { title: 'All Customers', url: 'https://app.example.com/customers/all' },
-      { title: 'Segments', url: 'https://app.example.com/customers/segments' },
-    ],
-  },
-  {
-    title: 'Reports',
-    url: 'https://app.example.com/reports',
-    submenu: [
-      { title: 'Sales', url: 'https://app.example.com/reports/sales' },
-      { title: 'Performance', url: 'https://app.example.com/reports/performance' },
-    ],
-  },
-  {
-    title: 'ChargebBrite',
-    url: 'https://app.example.com/chargebbrite',
-    submenu: [
-      { title: 'Billing', url: 'https://app.example.com/chargebbrite/billing' },
-      { title: 'Invoices', url: 'https://app.example.com/chargebbrite/invoices' },
-    ],
-  },
-  {
-    title: 'Production',
-    url: 'https://app.example.com/production',
-    submenu: [
-      { title: 'Orders', url: 'https://app.example.com/production/orders' },
-      { title: 'Inventory', url: 'https://app.example.com/production/inventory' },
-    ],
-  },
-  {
-    title: 'Tools',
-    url: 'https://app.example.com/tools',
-    submenu: [
-      { title: 'Integrations', url: 'https://app.example.com/tools/integrations' },
-      { title: 'API', url: 'https://app.example.com/tools/api' },
-    ],
-  },
-  {
-    title: 'Marketing',
-    url: 'https://app.example.com/marketing',
-    submenu: [
-      { title: 'Campaigns', url: 'https://app.example.com/marketing/campaigns' },
-      { title: 'Leads', url: 'https://app.example.com/marketing/leads' },
-    ],
-  },
-];
-
+// Profile menu items (static for now)
 const profileMenus = [
   { title: 'Profile', url: 'https://app.example.com/profile', icon: User },
   { title: 'Settings', url: 'https://app.example.com/settings', icon: Settings },
@@ -89,7 +32,7 @@ const profileMenus = [
 ];
 
 const Navbar = () => {
-  const { actions, tabs } = useHome();
+  const { actions, tabs, navigationMenus, navigationLoading } = useHome();
   const [searchQuery, setSearchQuery] = useState('');
   const [notifications, setNotifications] = useState(3);
 
@@ -106,13 +49,16 @@ const Navbar = () => {
   }, []);
 
   const openTabByUrl = (title, url) => {
-    const existingTab = tabs.find(tab => tab.url === url);
+    if (!url) return;
+    
+    const fullUrl = navigationService.getFullUrl(url);
+    const existingTab = tabs.find(tab => tab.url === fullUrl);
     if (existingTab) {
       actions.setActiveTab(existingTab.id);
     } else {
       actions.addTab({
         title,
-        url,
+        url: fullUrl,
         type: 'iframe',
         icon: '🌐',
         closable: true,
@@ -145,26 +91,44 @@ const Navbar = () => {
             </div>
             {/* Top Menus */}
             <div className="ml-8 flex items-center space-x-1">
-              {topMenus.map((menu) => (
-                <DropdownMenu key={menu.title}>
-                  <DropdownMenuTrigger asChild>
-                    <button className="px-3 py-2 rounded-md font-semibold text-white hover:bg-ocean-700 focus:bg-ocean-800 transition flex items-center text-base outline-none border-none">
-                      <span>{menu.title}</span>
-                      {menu.submenu && <ChevronDown className="h-4 w-4 ml-1" />}
-                    </button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="start" className="w-56 mt-2 rounded-lg shadow-lg bg-white border border-gray-100 p-1">
-                    <DropdownMenuItem onClick={() => openTabByUrl(menu.title, menu.url)} className="rounded-md text-gray-800 font-medium hover:bg-ocean-100 hover:text-ocean-700 cursor-pointer">
-                      <span>{menu.title} Home</span>
-                    </DropdownMenuItem>
-                    {menu.submenu && menu.submenu.map((item) => (
-                      <DropdownMenuItem key={item.title} onClick={() => openTabByUrl(item.title, item.url)} className="rounded-md text-gray-800 font-medium hover:bg-ocean-100 hover:text-ocean-700 cursor-pointer">
-                        <span>{item.title}</span>
-                      </DropdownMenuItem>
-                    ))}
-                  </DropdownMenuContent>
-                </DropdownMenu>
-              ))}
+              {navigationLoading ? (
+                <div className="flex items-center space-x-2">
+                  <Loader2 className="h-4 w-4 animate-spin text-white" />
+                  <span className="text-white text-sm">Loading menus...</span>
+                </div>
+              ) : (
+                navigationMenus.map((menu) => (
+                  <DropdownMenu key={menu.id}>
+                    <DropdownMenuTrigger asChild>
+                      <button className="px-3 py-2 rounded-md font-semibold text-white hover:bg-ocean-700 focus:bg-ocean-800 transition flex items-center text-base outline-none border-none">
+                        <span>{menu.title}</span>
+                        {menu.submenu && menu.submenu.length > 0 && <ChevronDown className="h-4 w-4 ml-1" />}
+                      </button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="start" className="w-56 mt-2 rounded-lg shadow-lg bg-white border border-gray-100 p-1">
+                      {menu.url && (
+                        <DropdownMenuItem onClick={() => openTabByUrl(menu.title, menu.url)} className="rounded-md text-gray-800 font-medium hover:bg-ocean-100 hover:text-ocean-700 cursor-pointer">
+                          <span>{menu.title} Home</span>
+                        </DropdownMenuItem>
+                      )}
+                      {menu.submenu && menu.submenu.map((item) => (
+                        <DropdownMenuItem 
+                          key={item.id} 
+                          onClick={() => openTabByUrl(item.title, item.url)}
+                          className="rounded-md text-gray-800 font-medium hover:bg-ocean-100 hover:text-ocean-700 cursor-pointer"
+                        >
+                          <span>{item.title}</span>
+                          {item.icon && (
+                            <Badge className="ml-2 text-xs" variant="secondary">
+                              {item.icon}
+                            </Badge>
+                          )}
+                        </DropdownMenuItem>
+                      ))}
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                ))
+              )}
             </div>
           </div>
 

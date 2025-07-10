@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useReducer, useEffect } from 'react';
 import { useToast } from '@/features/Opportunity/hooks/use-toast';
 import dashboardService from '../services/dashboardService';
+import navigationService from '../services/navigationService';
 
 const HomeContext = createContext();
 
@@ -17,7 +18,9 @@ const ACTIONS = {
   CLEAR_SESSION: 'CLEAR_SESSION',
   SET_DASHBOARDS: 'SET_DASHBOARDS',
   SET_SELECTED_DASHBOARD: 'SET_SELECTED_DASHBOARD',
-  SET_DASHBOARDS_LOADING: 'SET_DASHBOARDS_LOADING'
+  SET_DASHBOARDS_LOADING: 'SET_DASHBOARDS_LOADING',
+  SET_NAVIGATION_MENUS: 'SET_NAVIGATION_MENUS',
+  SET_NAVIGATION_LOADING: 'SET_NAVIGATION_LOADING'
 };
 
 // Initial state
@@ -39,7 +42,9 @@ const initialState = {
   isAuthenticated: false,
   dashboards: [],
   selectedDashboard: null,
-  dashboardsLoading: false
+  dashboardsLoading: false,
+  navigationMenus: [],
+  navigationLoading: false
 };
 
 // Reducer
@@ -132,6 +137,18 @@ const homeReducer = (state, action) => {
       return {
         ...state,
         dashboardsLoading: action.payload
+      };
+    
+    case ACTIONS.SET_NAVIGATION_MENUS:
+      return {
+        ...state,
+        navigationMenus: action.payload
+      };
+    
+    case ACTIONS.SET_NAVIGATION_LOADING:
+      return {
+        ...state,
+        navigationLoading: action.payload
       };
     
     default:
@@ -252,6 +269,14 @@ export const HomeProvider = ({ children }) => {
     dispatch({ type: ACTIONS.SET_DASHBOARDS_LOADING, payload: loading });
   };
 
+  const setNavigationMenus = (menus) => {
+    dispatch({ type: ACTIONS.SET_NAVIGATION_MENUS, payload: menus });
+  };
+
+  const setNavigationLoading = (loading) => {
+    dispatch({ type: ACTIONS.SET_NAVIGATION_LOADING, payload: loading });
+  };
+
   // Load dashboards on mount
   useEffect(() => {
     const loadDashboards = async () => {
@@ -281,6 +306,28 @@ export const HomeProvider = ({ children }) => {
     loadDashboards();
   }, [toast]);
 
+  // Load navigation menus on mount
+  useEffect(() => {
+    const loadNavigationMenus = async () => {
+      try {
+        setNavigationLoading(true);
+        const menus = await navigationService.fetchNavigationData();
+        setNavigationMenus(menus);
+      } catch (error) {
+        console.error('Error loading navigation menus:', error);
+        toast({
+          title: "Error",
+          description: "Failed to load navigation menus",
+          variant: "destructive",
+        });
+      } finally {
+        setNavigationLoading(false);
+      }
+    };
+
+    loadNavigationMenus();
+  }, [toast]);
+
   const value = {
     ...state,
     actions: {
@@ -295,7 +342,9 @@ export const HomeProvider = ({ children }) => {
       clearSession,
       setDashboards,
       setSelectedDashboard,
-      setDashboardsLoading
+      setDashboardsLoading,
+      setNavigationMenus,
+      setNavigationLoading
     }
   };
 

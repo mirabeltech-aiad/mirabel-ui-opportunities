@@ -19,6 +19,7 @@ The feature uses React Context with useReducer for state management:
 - Tab state (creation, removal, reordering, persistence)
 - Help system state (visibility, position)
 - Authentication state (session management)
+- **Navigation state** (dynamic menu loading, API integration)
 
 ### Tab System Features
 - **Dynamic Tab Creation**: Support for React components, iframes, and custom content
@@ -36,19 +37,20 @@ The feature uses React Context with useReducer for state management:
 ### Dashboard & Iframe Integration
 - **Dynamic Dashboard Loading**: API-driven dashboard selection with dropdown interface
 - **IframeContainer**: Common reusable component for loading external URLs
-- **Base Domain Integration**: Automatic URL construction with `https://smoke-feature16.magazinemanager.com`
+- **Base Domain Integration**: Automatic URL construction with `https://smoke-feature13.magazinemanager.com`
 - **Error Handling**: Loading states, error recovery, and retry functionality
 - **External Link Support**: Open in new tab and refresh capabilities
-- **Menu Integration Ready**: Designed for future menu system implementation
+- **Dynamic Navigation Integration**: Real-time menu loading from API with hierarchical structure
 
 ## Key Features
 
 ### 1. Navigation System
 - Ocean blue themed navbar with gradient background
 - Command palette (Cmd+K) integration
-- Dynamic menu with quick actions
+- **Dynamic API-driven navigation** with real-time menu loading
 - User account dropdown with session management
 - Responsive design for all screen sizes
+- **Loading states** with spinner for menu initialization
 
 ### 2. Tab Management
 - **Dashboard Tab**: Special tab with dropdown for API-driven dashboard selection
@@ -74,6 +76,15 @@ The feature uses React Context with useReducer for state management:
 - Multi-tab communication
 - Token handling
 - Session conflict resolution
+
+### 5. Dynamic Navigation Features
+- **API Integration**: Real-time menu loading from `/services/admin/navigations/users/1/0`
+- **Bearer Token Authentication**: Secure API access with JWT token
+- **Hierarchical Menu Structure**: Parent-child menu relationships with proper sorting
+- **Loading States**: Visual feedback during menu initialization
+- **Icon Support**: Menu items with optional icons and badges
+- **URL Processing**: Automatic full URL construction for relative paths
+- **Error Handling**: Graceful fallback for API failures
 
 ## Styling
 
@@ -166,17 +177,52 @@ console.log(selectedDashboard.DashBoardName); // "Sales Dashboard"
 console.log(selectedDashboard.URL); // "/ui/User/AnalyticsDashboard?Id=123"
 ```
 
-### Future Menu Integration Pattern
+### Dynamic Navigation Integration Pattern
 ```jsx
-// For menu items with URLs (future implementation)
-<IframeContainer 
-  url={menuItem.URL}  // From menu API response
-  title={menuItem.Name}
-  className="h-full"
-/>
+// Navigation service usage
+import navigationService from '../services/navigationService';
 
-// The base domain https://smoke-feature16.magazinemanager.com 
-// is automatically prepended to all URLs
+// Fetch navigation data
+const menus = await navigationService.fetchNavigationData(userId, siteId);
+
+// Get full URL for menu items
+const fullUrl = navigationService.getFullUrl(menuItem.url);
+
+// In Navbar component
+const { navigationMenus, navigationLoading } = useHome();
+
+// Render dynamic menus with loading state
+{navigationLoading ? (
+  <Loader2 className="h-4 w-4 animate-spin" />
+) : (
+  navigationMenus.map(menu => (
+    <DropdownMenu key={menu.id}>
+      {/* Menu content */}
+    </DropdownMenu>
+  ))
+)}
+```
+
+### Navigation API Response Structure
+```json
+{
+  "content": {
+    "List": [
+      {
+        "ID": 1,
+        "ParentID": -1,
+        "Caption": "Management",
+        "URL": "",
+        "SortOrder": 8,
+        "IsAdmin": true,
+        "IsNewWindow": false,
+        "IsVisible": false,
+        "Icon": "",
+        "ToolTip": ""
+      }
+    ]
+  }
+}
 ```
 
 ## File Structure
@@ -185,12 +231,13 @@ src/features/Homepage/
 ├── index.jsx                    # Main entry point
 ├── context.md                  # This documentation
 ├── contexts/
-│   └── HomeContext.jsx         # State management with dashboard integration
+│   └── HomeContext.jsx         # State management with dashboard & navigation integration
 ├── services/
-│   └── dashboardService.js     # Dashboard API integration
+│   ├── dashboardService.js     # Dashboard API integration
+│   └── navigationService.js    # Navigation API integration
 ├── components/
 │   ├── TabNavigation.jsx       # Main navigation
-│   ├── Navbar.jsx             # Top navigation bar
+│   ├── Navbar.jsx             # Top navigation bar with dynamic menus
 │   ├── TabContent.jsx         # Content renderer
 │   ├── IframeContainer.jsx    # Reusable iframe component
 │   ├── DashboardTab.jsx       # Dashboard tab with dropdown
