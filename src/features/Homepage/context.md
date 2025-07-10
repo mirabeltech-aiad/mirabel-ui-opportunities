@@ -6,11 +6,13 @@ The Home feature is a comprehensive post-login page that provides a modern tab n
 ## Architecture
 
 ### Core Components
-- **HomeProvider**: Context provider managing global state for tabs, help system, and authentication
+- **HomeProvider**: Context provider managing global state for tabs, help system, authentication, and dashboard management
 - **TabNavigation**: Main navigation component with draggable tabs and content area
 - **Navbar**: Top navigation bar with ocean blue theme, search, and user menu
 - **HelpSystem**: Draggable help button and comprehensive help panel
 - **TabContent**: Dynamic content renderer for different tab types
+- **IframeContainer**: Reusable iframe component for loading dashboard and menu URLs
+- **DashboardTab**: Special tab component with dropdown for dashboard selection
 
 ### State Management
 The feature uses React Context with useReducer for state management:
@@ -31,6 +33,14 @@ The feature uses React Context with useReducer for state management:
 - **JIRA Integration**: Ticket creation form with project selection
 - **Contact Forms**: Consultant contact and support forms
 
+### Dashboard & Iframe Integration
+- **Dynamic Dashboard Loading**: API-driven dashboard selection with dropdown interface
+- **IframeContainer**: Common reusable component for loading external URLs
+- **Base Domain Integration**: Automatic URL construction with `https://smoke-feature16.magazinemanager.com`
+- **Error Handling**: Loading states, error recovery, and retry functionality
+- **External Link Support**: Open in new tab and refresh capabilities
+- **Menu Integration Ready**: Designed for future menu system implementation
+
 ## Key Features
 
 ### 1. Navigation System
@@ -41,7 +51,11 @@ The feature uses React Context with useReducer for state management:
 - Responsive design for all screen sizes
 
 ### 2. Tab Management
-- **Dashboard**: Default tab with welcome message and quick actions
+- **Dashboard Tab**: Special tab with dropdown for API-driven dashboard selection
+  - Fetches dashboards from `/services/User/Dashboards/false`
+  - Shows selected dashboard name in tab
+  - Loads dashboard URL in iframe when selected
+  - Falls back to default dashboard content when no selection
 - **New Tab**: Placeholder for creating new tabs
 - **Opportunity Form**: Basic opportunity creation form
 - **Reports**: Analytics and reporting interface
@@ -121,27 +135,75 @@ actions.toggleHelp();
 actions.setHelpPosition({ x: 100, y: 100 });
 ```
 
+### Dashboard & Iframe Usage
+```jsx
+// IframeContainer component (reusable for dashboards and menus)
+import IframeContainer from '@/features/Homepage/components/IframeContainer';
+
+// Basic usage
+<IframeContainer 
+  url="/ui/User/AnalyticsDashboard?Id=123"
+  title="Sales Dashboard"
+  className="h-full"
+/>
+
+// With event handlers
+<IframeContainer 
+  url="/DashBoard.aspx?ISMKM=1"
+  title="Audience Dashboard"
+  onLoad={() => console.log('Loaded')}
+  onError={() => console.log('Error')}
+/>
+
+// Dashboard state management
+const { selectedDashboard, dashboards, actions } = useHome();
+
+// Set selected dashboard
+actions.setSelectedDashboard(dashboardObject);
+
+// Access dashboard data
+console.log(selectedDashboard.DashBoardName); // "Sales Dashboard"
+console.log(selectedDashboard.URL); // "/ui/User/AnalyticsDashboard?Id=123"
+```
+
+### Future Menu Integration Pattern
+```jsx
+// For menu items with URLs (future implementation)
+<IframeContainer 
+  url={menuItem.URL}  // From menu API response
+  title={menuItem.Name}
+  className="h-full"
+/>
+
+// The base domain https://smoke-feature16.magazinemanager.com 
+// is automatically prepended to all URLs
+```
+
 ## File Structure
 ```
-src/features/Home/
-├── index.jsx                 # Main entry point
-├── context.md               # This documentation
+src/features/Homepage/
+├── index.jsx                    # Main entry point
+├── context.md                  # This documentation
 ├── contexts/
-│   └── HomeContext.jsx      # State management
+│   └── HomeContext.jsx         # State management with dashboard integration
+├── services/
+│   └── dashboardService.js     # Dashboard API integration
 ├── components/
-│   ├── TabNavigation.jsx    # Main navigation
-│   ├── Navbar.jsx          # Top navigation bar
-│   ├── TabContent.jsx      # Content renderer
-│   ├── HelpSystem.jsx      # Help system
-│   ├── JiraTicketForm.jsx  # JIRA integration
+│   ├── TabNavigation.jsx       # Main navigation
+│   ├── Navbar.jsx             # Top navigation bar
+│   ├── TabContent.jsx         # Content renderer
+│   ├── IframeContainer.jsx    # Reusable iframe component
+│   ├── DashboardTab.jsx       # Dashboard tab with dropdown
+│   ├── HelpSystem.jsx         # Help system
+│   ├── JiraTicketForm.jsx     # JIRA integration
 │   ├── ContactConsultantForm.jsx # Contact form
-│   ├── Dashboard.jsx       # Default dashboard
-│   ├── NewTab.jsx          # New tab placeholder
-│   ├── OpportunityForm.jsx # Opportunity form
-│   ├── Reports.jsx         # Reports interface
-│   └── Settings.jsx        # Settings interface
+│   ├── Dashboard.jsx          # Dashboard with iframe integration
+│   ├── NewTab.jsx             # New tab placeholder
+│   ├── OpportunityForm.jsx    # Opportunity form
+│   ├── Reports.jsx            # Reports interface
+│   └── Settings.jsx           # Settings interface
 └── styles/
-    └── ocean-theme.css     # Ocean theme styles
+    └── ocean-theme.css        # Ocean theme styles
 ```
 
 ## Dependencies

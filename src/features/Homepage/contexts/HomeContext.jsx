@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useReducer, useEffect } from 'react';
 import { useToast } from '@/features/Opportunity/hooks/use-toast';
+import dashboardService from '../services/dashboardService';
 
 const HomeContext = createContext();
 
@@ -13,7 +14,10 @@ const ACTIONS = {
   TOGGLE_HELP: 'TOGGLE_HELP',
   SET_HELP_POSITION: 'SET_HELP_POSITION',
   SET_SESSION_DATA: 'SET_SESSION_DATA',
-  CLEAR_SESSION: 'CLEAR_SESSION'
+  CLEAR_SESSION: 'CLEAR_SESSION',
+  SET_DASHBOARDS: 'SET_DASHBOARDS',
+  SET_SELECTED_DASHBOARD: 'SET_SELECTED_DASHBOARD',
+  SET_DASHBOARDS_LOADING: 'SET_DASHBOARDS_LOADING'
 };
 
 // Initial state
@@ -32,7 +36,10 @@ const initialState = {
   helpVisible: false,
   helpPosition: { x: 20, y: 20 },
   sessionData: null,
-  isAuthenticated: false
+  isAuthenticated: false,
+  dashboards: [],
+  selectedDashboard: null,
+  dashboardsLoading: false
 };
 
 // Reducer
@@ -101,6 +108,30 @@ const homeReducer = (state, action) => {
         ...state,
         sessionData: null,
         isAuthenticated: false
+      };
+    
+    case ACTIONS.SET_DASHBOARDS:
+      return {
+        ...state,
+        dashboards: action.payload
+      };
+    
+    case ACTIONS.SET_SELECTED_DASHBOARD:
+      const selectedDashboard = action.payload;
+      return {
+        ...state,
+        selectedDashboard,
+        tabs: state.tabs.map(tab => 
+          tab.id === 'dashboard' 
+            ? { ...tab, title: selectedDashboard?.DashBoardName || 'Dashboard' }
+            : tab
+        )
+      };
+    
+    case ACTIONS.SET_DASHBOARDS_LOADING:
+      return {
+        ...state,
+        dashboardsLoading: action.payload
       };
     
     default:
@@ -204,6 +235,47 @@ export const HomeProvider = ({ children }) => {
     dispatch({ type: ACTIONS.CLEAR_SESSION });
   };
 
+  const setDashboards = (dashboards) => {
+    dispatch({ type: ACTIONS.SET_DASHBOARDS, payload: dashboards });
+  };
+
+  const setSelectedDashboard = (dashboard) => {
+    dispatch({ type: ACTIONS.SET_SELECTED_DASHBOARD, payload: dashboard });
+  };
+
+  const setDashboardsLoading = (loading) => {
+    dispatch({ type: ACTIONS.SET_DASHBOARDS_LOADING, payload: loading });
+  };
+
+  // Load dashboards on mount
+  useEffect(() => {
+    const loadDashboards = async () => {
+      try {
+        setDashboardsLoading(true);
+        const dashboards = await dashboardService.getDashboards();
+        const activeDashboards = dashboardService.getActiveDashboards(dashboards);
+        setDashboards(activeDashboards);
+        
+        // Set default dashboard
+        const defaultDashboard = dashboardService.getDefaultDashboard(activeDashboards);
+        if (defaultDashboard) {
+          setSelectedDashboard(defaultDashboard);
+        }
+      } catch (error) {
+        console.error('Failed to load dashboards:', error);
+        toast({
+          title: "Error",
+          description: "Failed to load dashboards",
+          variant: "destructive",
+        });
+      } finally {
+        setDashboardsLoading(false);
+      }
+    };
+
+    loadDashboards();
+  }, [toast]);
+
   const value = {
     ...state,
     actions: {
@@ -215,7 +287,10 @@ export const HomeProvider = ({ children }) => {
       toggleHelp,
       setHelpPosition,
       setSessionData,
-      clearSession
+      clearSession,
+      setDashboards,
+      setSelectedDashboard,
+      setDashboardsLoading
     }
   };
 

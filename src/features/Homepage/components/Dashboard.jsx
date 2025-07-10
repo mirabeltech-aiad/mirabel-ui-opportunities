@@ -1,5 +1,6 @@
 import React from 'react';
 import { useHome } from '../contexts/HomeContext';
+import IframeContainer from './IframeContainer';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { 
@@ -14,7 +15,18 @@ import {
 } from 'lucide-react';
 
 const Dashboard = () => {
-  const { actions } = useHome();
+  const { actions, selectedDashboard } = useHome();
+
+  // If a dashboard is selected and has a URL, show it in iframe
+  if (selectedDashboard && selectedDashboard.URL) {
+    return (
+      <IframeContainer 
+        url={selectedDashboard.URL}
+        title={selectedDashboard.DashBoardName}
+        className="h-full"
+      />
+    );
+  }
 
   const quickActions = [
     {
@@ -82,6 +94,7 @@ const Dashboard = () => {
     }
   ];
 
+  // Default dashboard content (shown when no specific dashboard is selected)
   return (
     <div className="p-6 space-y-6">
       {/* Welcome Header */}

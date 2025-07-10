@@ -3,6 +3,7 @@ import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import { useHome } from '../contexts/HomeContext';
 import Navbar from './Navbar';
 import TabContent from './TabContent';
+import DashboardTab from './DashboardTab';
 import { Plus, X, ChevronDown } from 'lucide-react';
 import {
   DropdownMenu,
@@ -70,24 +71,36 @@ const TabNavigation = () => {
                           ref={provided.innerRef}
                           {...provided.draggableProps}
                           {...provided.dragHandleProps}
-                          className={`flex items-center px-3 py-2 rounded-t-lg cursor-pointer transition-all duration-200 ${
-                            activeTabId === tab.id
-                              ? 'bg-white border-t-2 border-blue-500 text-blue-600 shadow-sm'
-                              : 'bg-gray-100 hover:bg-gray-200 text-gray-700'
-                          } ${snapshot.isDragging ? 'opacity-50' : ''}`}
-                          onClick={() => handleTabClick(tab.id)}
                         >
-                          <span className="mr-2 text-sm">{tab.icon}</span>
-                          <span className="text-sm font-medium truncate max-w-32">
-                            {tab.title}
-                          </span>
-                          {tab.closable && (
-                            <button
-                              onClick={(e) => handleTabClose(e, tab.id)}
-                              className="ml-2 p-1 rounded hover:bg-gray-300 transition-colors"
+                          {tab.id === 'dashboard' ? (
+                            <DashboardTab
+                              tab={tab}
+                              isActive={activeTabId === tab.id}
+                              onClick={handleTabClick}
+                              isDragging={snapshot.isDragging}
+                            />
+                          ) : (
+                            <div
+                              className={`flex items-center px-3 py-2 rounded-t-lg cursor-pointer transition-all duration-200 ${
+                                activeTabId === tab.id
+                                  ? 'bg-white border-t-2 border-blue-500 text-blue-600 shadow-sm'
+                                  : 'bg-gray-100 hover:bg-gray-200 text-gray-700'
+                              } ${snapshot.isDragging ? 'opacity-50' : ''}`}
+                              onClick={() => handleTabClick(tab.id)}
                             >
-                              <X className="h-3 w-3" />
-                            </button>
+                              <span className="mr-2 text-sm">{tab.icon}</span>
+                              <span className="text-sm font-medium truncate max-w-32">
+                                {tab.title}
+                              </span>
+                              {tab.closable && (
+                                <button
+                                  onClick={(e) => handleTabClose(e, tab.id)}
+                                  className="ml-2 p-1 rounded hover:bg-gray-300 transition-colors"
+                                >
+                                  <X className="h-3 w-3" />
+                                </button>
+                              )}
+                            </div>
                           )}
                         </div>
                       )}
