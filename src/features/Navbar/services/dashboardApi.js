@@ -36,7 +36,7 @@ export const fetchDashboards = async () => {
 };
 
 // Base domain for dashboard URLs - later this will come from localStorage or config
-const DASHBOARD_BASE_DOMAIN = 'https://smoke-feature16.magazinemanager.com';
+const DASHBOARD_BASE_DOMAIN = 'https://smoke-feature13.magazinemanager.com';
 
 /**
  * Navigate to a dashboard URL in a new tab with iframe

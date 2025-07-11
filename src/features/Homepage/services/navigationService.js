@@ -52,7 +52,7 @@ export const navigationService = {
   loadSessionDetails: async () => {
     try {
       console.log('Loading session details...');
-      const response = await AxiosService.get('https://tier1-feature13.magazinemanager.com/services/admin/common/SessionDetailsGet');
+      const response = await AxiosService.get('https://smoke-feature13.magazinemanager.com/services/admin/common/SessionDetailsGet');
       
       // Store response in localStorage with key 'MMnewclientvars'
       const sessionData = response.data || response;

@@ -24,7 +24,7 @@ const IframeContainer = ({
   const [refreshKey, setRefreshKey] = useState(0);
 
   // Base domain for all iframe URLs
-  const BASE_DOMAIN = 'https://smoke-feature16.magazinemanager.com';
+  const BASE_DOMAIN = 'https://smoke-feature13.magazinemanager.com';
 
   // Construct full URL by combining base domain with relative URL
   const fullUrl = url ? `${BASE_DOMAIN}${url.startsWith('/') ? '' : '/'}${url}` : '';
