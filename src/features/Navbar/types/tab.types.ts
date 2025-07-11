@@ -18,6 +18,9 @@ export interface Tab {
   iframeUrl?: string;
   isCloseable: boolean;
   isActive: boolean;
+  // Dashboard-specific properties
+  dashboardId?: string | number;
+  dashboardData?: any;
 }
 
 export interface TabContextType {
@@ -42,4 +45,31 @@ export interface TabState {
   activeTabId: string;
   tabOrder: string[];
   timestamp: number;
+}
+
+// Dashboard-specific types
+export interface DashboardItem {
+  ID: string | number;
+  DashBoardName: string;
+  URL: string;
+  IsDefault: boolean;
+  isProcessedMKM?: boolean;
+  isMKMSpecial?: boolean;
+}
+
+export interface DashboardSetup {
+  dashboards: DashboardItem[];
+  processedDashboards: DashboardItem[];
+  selectedDashboard: DashboardItem | null;
+  additionalMenuItems: DashboardItem[];
+  mkmDomain: string;
+  packageType: string | null;
+  isAdmin: boolean;
+  hasToken: boolean;
+  setup: {
+    totalDashboards: number;
+    mkmDashboards: number;
+    defaultSelected: boolean;
+    error?: string;
+  };
 }
