@@ -1,107 +1,266 @@
-const API_BASE_URL = 'https://smoke-feature13.magazinemanager.com';
-const BEARER_TOKEN = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJMb2dnZWRJblVzZXJJRCI6IjEiLCJMb2dnZWRJblNpdGVDbGllbnRJRCI6IjEwMDA3IiwiTG9nZ2VkSW5TaXRlQ3VsdHVyZVVJIjoiZW4tVVMiLCJEYXRlVGltZSI6IjcvMTEvMjAyNSA4OjMyOjA5IEFNIiwiTG9nZ2VkSW5TaXRlQ3VycmVuY3lTeW1ib2wiOiIiLCJMb2dnZWRJblNpdGVEYXRlRm9ybWF0IjoiIiwiRG9tYWluIjoic21va2UtZmVhdHVyZTEzIiwiTG9nZ2VkSW5TaXRlVGltZUFkZCI6WyIwIiwiMCJdLCJTb3VyY2UiOiJUTU0iLCJFbWFpbCI6InNhQG1hZ2F6aW5lbWFuYWdlci5jb20iLCJJc0FQSVVzZXIiOiJGYWxzZSIsIm5iZiI6MTc1MjIyMjcyOSwiZXhwIjoxNzU1MjIyNzI5LCJpYXQiOjE3NTIyMjI3MjksImlzcyI6Ik1hZ2F6aW5lTWFuYWdlciIsImF1ZCI6IioifQ.rw8UiRrkZqv0Axe2HtPXjLNELWJ9Bw81LnshJgTxiXc';
+import AxiosService from '@/services/AxiosService';
 
-class NavigationService {
-  constructor() {
-    this.baseUrl = API_BASE_URL;
-    this.token = BEARER_TOKEN;
-  }
+/**
+ * Navigation service for fetching dynamic navigation menus from the API
+ */
+export const navigationService = {
+  /**
+   * Base domain for navigation URLs
+   */
+  BASE_DOMAIN: 'https://smoke-feature13.magazinemanager.com',
 
-  async fetchNavigationData(userId = 1, siteId = 0) {
+  /**
+   * Fetch navigation data from the API
+   * @param {number} userId - User ID (default: 1)
+   * @param {number} siteId - Site ID (default: 0)
+   * @returns {Promise<Array>} Array of navigation menu objects
+   */
+  fetchNavigationData: async (userId = 1, siteId = 0) => {
     try {
-      const response = await fetch(
-        `${this.baseUrl}/services/admin/navigations/users/${userId}/${siteId}`,
-        {
-          method: 'GET',
-          headers: {
-            'Authorization': `Bearer ${this.token}`,
-            'Content-Type': 'application/json',
-          },
-        }
-      );
+      // First, load session details and store in localStorage
+      await navigationService.loadSessionDetails();
 
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-
-      const data = await response.json();
+      // Then fetch navigation menus
+      const response = await AxiosService.get(`/services/admin/navigations/users/${userId}/${siteId}`);
       
-      if (data.content?.Status === 'Success' && data.content?.List) {
-        return this.processNavigationData(data.content.List);
-      } else {
-        throw new Error('Invalid response format');
+      // Check if response has the expected structure
+      if (response?.content?.List) {
+        const menus = response.content.List;
+        return navigationService.processNavigationMenus(menus);
       }
+      
+      // Fallback: check if data is directly in response.data
+      if (response?.data?.content?.List) {
+        const menus = response.data.content.List;
+        return navigationService.processNavigationMenus(menus);
+      }
+      
+      console.warn('Unexpected navigation API response structure:', response);
+      return [];
     } catch (error) {
       console.error('Error fetching navigation data:', error);
+      
+      // Return mock navigation data for development/fallback
+      return navigationService.getMockNavigationData();
+    }
+  },
+
+  /**
+   * Load session details and store in localStorage
+   * @returns {Promise<Object>} Session details response
+   */
+  loadSessionDetails: async () => {
+    try {
+      console.log('Loading session details...');
+      const response = await AxiosService.get('https://tier1-feature13.magazinemanager.com/services/admin/common/SessionDetailsGet');
+      
+      // Store response in localStorage with key 'MMnewclientvars'
+      const sessionData = response.data || response;
+      localStorage.setItem('MMnewclientvars', JSON.stringify(sessionData));
+      console.log('Session details loaded and stored in localStorage');
+      
+      return sessionData;
+    } catch (error) {
+      console.error('Failed to load session details:', error);
       throw error;
     }
-  }
+  },
 
-  processNavigationData(navigationList) {
-    // Create a map of all navigation items by ID
-    const navigationMap = new Map();
-    navigationList.forEach(item => {
-      navigationMap.set(item.ID, {
-        id: item.ID,
-        parentId: item.ParentID,
-        title: item.Caption,
-        url: item.URL,
-        sortOrder: item.SortOrder,
-        isAdmin: item.IsAdmin,
-        isNewWindow: item.IsNewWindow,
-        isVisible: item.IsVisible,
-        icon: item.Icon,
-        toolTip: item.ToolTip,
-        accessLevel: item.AccessLevel,
-        moveLevel: item.MoveLevel,
-        urlSource: item.URLSource
-      });
-    });
+  /**
+   * Process and organize navigation menus into hierarchical structure
+   * @param {Array} menus - Raw menu data from API
+   * @returns {Array} Processed menu structure
+   */
+  processNavigationMenus: (menus) => {
+    if (!Array.isArray(menus)) {
+      return [];
+    }
 
-    // Build hierarchical structure
-    const topLevelMenus = [];
-    const subMenus = new Map();
+    // Sort menus by SortOrder
+    const sortedMenus = menus.sort((a, b) => (a.SortOrder || 0) - (b.SortOrder || 0));
 
-    navigationList.forEach(item => {
-      const menuItem = navigationMap.get(item.ID);
-      
-      if (item.ParentID === -1) {
-        // Top level menu
-        topLevelMenus.push(menuItem);
-      } else {
-        // Sub menu
-        if (!subMenus.has(item.ParentID)) {
-          subMenus.set(item.ParentID, []);
-        }
-        subMenus.get(item.ParentID).push(menuItem);
-      }
-    });
+    // Separate parent and child menus
+    const parentMenus = sortedMenus.filter(menu => menu.ParentID === -1 || menu.ParentID === null);
+    const childMenus = sortedMenus.filter(menu => menu.ParentID !== -1 && menu.ParentID !== null);
 
-    // Sort top level menus by SortOrder
-    topLevelMenus.sort((a, b) => a.sortOrder - b.sortOrder);
+    // Attach children to their parents
+    const processedMenus = parentMenus.map(parent => ({
+      ...parent,
+      children: childMenus
+        .filter(child => child.ParentID === parent.ID)
+        .map(child => ({
+          ...child,
+          fullUrl: navigationService.getFullUrl(child.URL)
+        })),
+      fullUrl: navigationService.getFullUrl(parent.URL)
+    }));
 
-    // Add submenus to their parent menus
-    topLevelMenus.forEach(menu => {
-      if (subMenus.has(menu.id)) {
-        menu.submenu = subMenus.get(menu.id).sort((a, b) => a.sortOrder - b.sortOrder);
-      }
-    });
+    return processedMenus;
+  },
 
-    return topLevelMenus;
-  }
-
-  // Helper method to get full URL for navigation items
-  getFullUrl(relativeUrl) {
-    if (!relativeUrl) return '';
+  /**
+   * Get full URL by combining base domain with relative URL
+   * @param {string} relativeUrl - Relative URL from API
+   * @returns {string} Full URL
+   */
+  getFullUrl: (relativeUrl) => {
+    if (!relativeUrl || relativeUrl === '') {
+      return '';
+    }
     
-    // If it's already a full URL, return as is
+    // If already a full URL, return as is
     if (relativeUrl.startsWith('http://') || relativeUrl.startsWith('https://')) {
       return relativeUrl;
     }
     
-    // Otherwise, prepend the base URL
-    return `${this.baseUrl}${relativeUrl}`;
-  }
-}
+    // Combine with base domain
+    const baseUrl = navigationService.BASE_DOMAIN;
+    const url = relativeUrl.startsWith('/') ? relativeUrl : `/${relativeUrl}`;
+    return `${baseUrl}${url}`;
+  },
 
-export default new NavigationService(); 
+  /**
+   * Get mock navigation data for development/fallback
+   * @returns {Array} Mock navigation menu structure
+   */
+  getMockNavigationData: () => {
+    return [
+      {
+        ID: 1,
+        ParentID: -1,
+        Caption: 'Management',
+        URL: '',
+        SortOrder: 1,
+        IsAdmin: true,
+        IsNewWindow: false,
+        IsVisible: true,
+        Icon: '⚙️',
+        ToolTip: 'Management tools and settings',
+        children: [
+          {
+            ID: 11,
+            ParentID: 1,
+            Caption: 'User Management',
+            URL: '/admin/users',
+            SortOrder: 1,
+            IsAdmin: true,
+            IsNewWindow: false,
+            IsVisible: true,
+            Icon: '👥',
+            ToolTip: 'Manage users',
+            fullUrl: `${navigationService.BASE_DOMAIN}/admin/users`
+          },
+          {
+            ID: 12,
+            ParentID: 1,
+            Caption: 'System Settings',
+            URL: '/admin/settings',
+            SortOrder: 2,
+            IsAdmin: true,
+            IsNewWindow: false,
+            IsVisible: true,
+            Icon: '🔧',
+            ToolTip: 'System configuration',
+            fullUrl: `${navigationService.BASE_DOMAIN}/admin/settings`
+          }
+        ],
+        fullUrl: ''
+      },
+      {
+        ID: 2,
+        ParentID: -1,
+        Caption: 'Reports',
+        URL: '/reports',
+        SortOrder: 2,
+        IsAdmin: false,
+        IsNewWindow: false,
+        IsVisible: true,
+        Icon: '📊',
+        ToolTip: 'View reports and analytics',
+        children: [
+          {
+            ID: 21,
+            ParentID: 2,
+            Caption: 'Sales Reports',
+            URL: '/reports/sales',
+            SortOrder: 1,
+            IsAdmin: false,
+            IsNewWindow: false,
+            IsVisible: true,
+            Icon: '💰',
+            ToolTip: 'Sales analytics',
+            fullUrl: `${navigationService.BASE_DOMAIN}/reports/sales`
+          },
+          {
+            ID: 22,
+            ParentID: 2,
+            Caption: 'User Analytics',
+            URL: '/reports/users',
+            SortOrder: 2,
+            IsAdmin: false,
+            IsNewWindow: false,
+            IsVisible: true,
+            Icon: '📈',
+            ToolTip: 'User behavior analytics',
+            fullUrl: `${navigationService.BASE_DOMAIN}/reports/users`
+          }
+        ],
+        fullUrl: `${navigationService.BASE_DOMAIN}/reports`
+      },
+      {
+        ID: 3,
+        ParentID: -1,
+        Caption: 'Tools',
+        URL: '/tools',
+        SortOrder: 3,
+        IsAdmin: false,
+        IsNewWindow: false,
+        IsVisible: true,
+        Icon: '🛠️',
+        ToolTip: 'Utility tools',
+        children: [],
+        fullUrl: `${navigationService.BASE_DOMAIN}/tools`
+      }
+    ];
+  },
+
+  /**
+   * Filter visible menus based on user permissions
+   * @param {Array} menus - Navigation menus
+   * @param {boolean} isAdmin - Whether user is admin
+   * @returns {Array} Filtered menus
+   */
+  filterVisibleMenus: (menus, isAdmin = false) => {
+    return menus.filter(menu => {
+      if (!menu.IsVisible) return false;
+      if (menu.IsAdmin && !isAdmin) return false;
+      
+      // Filter children as well
+      if (menu.children) {
+        menu.children = menu.children.filter(child => {
+          if (!child.IsVisible) return false;
+          if (child.IsAdmin && !isAdmin) return false;
+          return true;
+        });
+      }
+      
+      return true;
+    });
+  },
+
+  /**
+   * Get session details from localStorage
+   * @returns {Object|null} Session details or null
+   */
+  getSessionDetails: () => {
+    try {
+      const sessionData = localStorage.getItem('MMnewclientvars');
+      return sessionData ? JSON.parse(sessionData) : null;
+    } catch (error) {
+      console.error('Error parsing session data:', error);
+      return null;
+    }
+  }
+};
+
+export default navigationService; 
