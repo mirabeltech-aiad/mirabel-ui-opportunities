@@ -152,7 +152,7 @@ export const navigationService = {
       const transformedData = navigationService.transformSessionData(response);
       
       // Store transformed data in localStorage with key 'MMnewclientvars'
-      localStorage.setItem('MMnewclientvars', JSON.stringify(transformedData));
+      localStorage.setItem('MMClientVars', JSON.stringify(transformedData));
       console.log('✅ Session details transformed and stored in localStorage as MMnewclientvars');
       console.log('📝 Stored data:', transformedData);
       
@@ -179,7 +179,7 @@ export const navigationService = {
       
       // Store fallback data
       const fallbackData = navigationService.transformSessionData({});
-      localStorage.setItem('MMnewclientvars', JSON.stringify(fallbackData));
+      localStorage.setItem('MMClientVars', JSON.stringify(fallbackData));
       console.log('🔄 Stored fallback session data');
       
       throw error;
@@ -383,7 +383,7 @@ export const navigationService = {
    */
   getSessionDetails: () => {
     try {
-      const sessionData = localStorage.getItem('MMnewclientvars');
+      const sessionData = localStorage.getItem('MMClientVars');
       return sessionData ? JSON.parse(sessionData) : null;
     } catch (error) {
       console.error('Error parsing session data:', error);
@@ -400,7 +400,7 @@ export const navigationService = {
     try {
       const existing = navigationService.getSessionDetails() || {};
       const updated = { ...existing, ...updates };
-      localStorage.setItem('MMnewclientvars', JSON.stringify(updated));
+      localStorage.setItem('MMClientVars', JSON.stringify(updated));
       
       // Also update MMClientVars for backward compatibility
       localStorage.setItem('MMClientVars', JSON.stringify(updated));
