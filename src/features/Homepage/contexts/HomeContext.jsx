@@ -326,7 +326,7 @@ export const HomeProvider = ({ children }) => {
     };
 
     loadNavigationMenus();
-  }, [toast]);
+  }, []);
 
   const value = {
     ...state,
