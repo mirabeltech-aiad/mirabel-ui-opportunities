@@ -10,7 +10,6 @@ const Home = () => {
       <div className="min-h-screen bg-gray-50">
         <TabNavigation />
         <HelpSystem />
-        <Toaster />
       </div>
     </HomeProvider>
   );

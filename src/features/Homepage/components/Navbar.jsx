@@ -161,7 +161,6 @@ const Navbar = () => {
               <DropdownMenuTrigger asChild>
                 <button className="flex items-center px-4 py-1 rounded-full bg-ocean-600 hover:bg-ocean-700 text-white font-semibold shadow border border-ocean-700 focus:outline-none focus:ring-2 focus:ring-ocean-400 transition h-8 min-h-0">
                   <User className="h-4 w-4 mr-2" />
-                  Welcome
                   <ChevronDown className="h-4 w-4 ml-1" />
                 </button>
               </DropdownMenuTrigger>

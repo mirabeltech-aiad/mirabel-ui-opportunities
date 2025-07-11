@@ -78,40 +78,27 @@ const TabNavigation = () => {
                               : 'bg-gray-100 hover:bg-gray-200 text-gray-700'
                           } ${snapshot.isDragging ? 'opacity-50' : ''}`}
                         >
-                          {tab.id === 'dashboard' ? (
-                            <div {...provided.dragHandleProps}>
-                              <DashboardTab
-                                tab={tab}
-                                isActive={activeTabId === tab.id}
-                                onClick={handleTabClick}
-                                isDragging={snapshot.isDragging}
-                              />
-                            </div>
-                          ) : (
-                            <>
-                              {/* Draggable area (excludes close button) */}
-                              <div
-                                {...provided.dragHandleProps}
-                                className="flex items-center px-1 py-0 cursor-pointer flex-1 h-7 min-h-0"
-                                onClick={() => handleTabClick(tab.id)}
-                              >
-                                <span className="mr-1 text-xs flex items-center">{tab.icon}</span>
-                                <span className="text-xs font-medium truncate max-w-32 flex items-center">
-                                  {tab.title}
-                                </span>
-                              </div>
-                              {/* Close button (not draggable) */}
-                              {tab.closable !== false && (
-                                <button
-                                  onClick={(e) => handleTabClose(e, tab.id)}
-                                  className="mr-1 p-0 rounded hover:bg-gray-300 transition-colors flex-shrink-0 h-5 w-5 min-h-0 flex items-center justify-center"
-                                  title="Close tab"
-                                  type="button"
-                                >
-                                  <X className="h-3 w-3" />
-                                </button>
-                              )}
-                            </>
+                          {/* Unified tab rendering for all tabs */}
+                          <div
+                            {...provided.dragHandleProps}
+                            className="flex items-center px-1 py-0 cursor-pointer flex-1 h-7 min-h-0"
+                            onClick={() => handleTabClick(tab.id)}
+                          >
+                            <span className="mr-1 text-xs flex items-center">{tab.icon}</span>
+                            <span className="text-xs font-medium truncate max-w-32 flex items-center">
+                              {tab.title}
+                            </span>
+                          </div>
+                          {/* Close button (not draggable) */}
+                          {tab.closable !== false && (
+                            <button
+                              onClick={(e) => handleTabClose(e, tab.id)}
+                              className="mr-1 p-0 rounded hover:bg-gray-300 transition-colors flex-shrink-0 h-5 w-5 min-h-0 flex items-center justify-center"
+                              title="Close tab"
+                              type="button"
+                            >
+                              <X className="h-3 w-3" />
+                            </button>
                           )}
                         </div>
                       )}
