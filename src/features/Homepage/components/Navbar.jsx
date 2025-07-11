@@ -76,21 +76,21 @@ const Navbar = () => {
   };
 
   return (
-    <nav className="bg-ocean-gradient shadow-md">
-      <div className="max-w-full px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-16">
+    <nav className="bg-ocean-gradient shadow-md h-12">
+      <div className="max-w-full px-2 sm:px-4 lg:px-6">
+        <div className="flex items-center justify-between h-12 min-h-0">
           {/* Logo */}
-          <div className="flex items-center">
+          <div className="flex items-center min-h-0">
             <div className="flex-shrink-0">
               <div className="flex items-center">
-                <div className="w-8 h-8 bg-white rounded-lg flex items-center justify-center mr-3">
+                <div className="w-8 h-8 bg-white rounded-lg flex items-center justify-center mr-2">
                   <span className="text-ocean-600 font-bold text-lg">M</span>
                 </div>
-                <span className="text-xl font-bold text-white">Mirabel Manager</span>
+                <span className="text-lg font-bold text-white leading-none">Mirabel Manager</span>
               </div>
             </div>
             {/* Top Menus */}
-            <div className="ml-8 flex items-center space-x-1">
+            <div className="ml-4 flex items-center space-x-1 min-h-0">
               {navigationLoading ? (
                 <div className="flex items-center space-x-2">
                   <Loader2 className="h-4 w-4 animate-spin text-white" />
@@ -100,7 +100,7 @@ const Navbar = () => {
                 navigationMenus.map((menu) => (
                   <DropdownMenu key={menu.id}>
                     <DropdownMenuTrigger asChild>
-                      <button className="px-3 py-2 rounded-md font-semibold text-white hover:bg-ocean-700 focus:bg-ocean-800 transition flex items-center text-base outline-none border-none">
+                      <button className="px-2 py-1 rounded-md font-semibold text-white hover:bg-ocean-700 focus:bg-ocean-800 transition flex items-center text-base outline-none border-none h-8 min-h-0">
                         <span>{menu.title}</span>
                         {menu.submenu && menu.submenu.length > 0 && <ChevronDown className="h-4 w-4 ml-1" />}
                       </button>
@@ -133,30 +133,29 @@ const Navbar = () => {
           </div>
 
           {/* Search Bar */}
-          <div className="flex-1 max-w-lg mx-8">
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-ocean-100 h-4 w-4" />
-              <Input
-                type="text"
-                placeholder="Search..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-10 pr-4 py-2 bg-ocean-700/30 border border-ocean-200 text-white placeholder-ocean-100 focus:bg-ocean-700/50 focus:border-ocean-300 rounded-lg"
-                style={{ boxShadow: '0 0 0 2px rgba(14,165,233,0.1)' }}
-              />
-              <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
-                <kbd className="px-2 py-1 text-xs bg-ocean-700/30 rounded border border-ocean-200 text-white">⌘K</kbd>
+          {!navigationLoading && (
+            <div className="mx-4" style={{ width: '180px' }}>
+              <div className="relative h-8">
+                <Input
+                  type="text"
+                  placeholder="Search"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="pl-8 pr-2 py-1 bg-ocean-700/30 border border-ocean-200 text-white placeholder-ocean-100 focus:bg-ocean-700/50 focus:border-ocean-300 rounded-full h-8 text-base w-full min-h-0"
+                  style={{ boxShadow: 'none' }}
+                />
+                <Search className="absolute left-2 top-1/2 transform -translate-y-1/2 text-ocean-100 h-5 w-5" />
               </div>
             </div>
-          </div>
+          )}
 
           {/* Right Side */}
-          <div className="flex items-center space-x-3">
+          <div className="flex items-center space-x-2 min-h-0">
             {/* Notifications */}
-            <Button variant="ghost" size="sm" className="text-white hover:bg-ocean-700 relative rounded-full">
-              <Bell className="h-4 w-4" />
+            <Button variant="ghost" size="icon" className="text-white hover:bg-ocean-700 relative rounded-full h-8 w-8 p-0 min-h-0">
+              <Bell className="h-5 w-5" />
               {notifications > 0 && (
-                <Badge className="absolute -top-1 -right-1 h-5 w-5 rounded-full p-0 text-xs bg-red-600 text-white">
+                <Badge className="absolute -top-1 -right-1 h-5 w-5 rounded-full p-0 text-xs bg-red-600 text-white flex items-center justify-center">
                   {notifications}
                 </Badge>
               )}
@@ -165,7 +164,7 @@ const Navbar = () => {
             {/* User Menu */}
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <button className="flex items-center px-4 py-2 rounded-lg bg-ocean-600 hover:bg-ocean-700 text-white font-semibold shadow border border-ocean-700 focus:outline-none focus:ring-2 focus:ring-ocean-400 transition">
+                <button className="flex items-center px-4 py-1 rounded-full bg-ocean-600 hover:bg-ocean-700 text-white font-semibold shadow border border-ocean-700 focus:outline-none focus:ring-2 focus:ring-ocean-400 transition h-8 min-h-0">
                   <User className="h-4 w-4 mr-2" />
                   Welcome
                   <ChevronDown className="h-4 w-4 ml-1" />
