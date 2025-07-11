@@ -55,7 +55,7 @@ export const navigationService = {
       const response = await AxiosService.get('https://smoke-feature13.magazinemanager.com/services/admin/common/SessionDetailsGet');
       
       // Store response in localStorage with key 'MMnewclientvars'
-      const sessionData = response.data || response;
+      const sessionData = response.content || response;
       localStorage.setItem('MMnewclientvars', JSON.stringify(sessionData));
       console.log('Session details loaded and stored in localStorage');
       
