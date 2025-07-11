@@ -86,20 +86,13 @@ const Navbar = () => {
                 <div className="w-8 h-8 bg-white rounded-lg flex items-center justify-center mr-2">
                   <span className="text-ocean-600 font-bold text-lg">M</span>
                 </div>
-                <span className="text-lg font-bold text-white leading-none">Mirabel Manager</span>
               </div>
             </div>
             {/* Top Menus */}
             <div className="ml-4 flex items-center space-x-1 min-h-0">
-              {navigationLoading ? (
-                <div className="flex items-center space-x-2">
-                  <Loader2 className="h-4 w-4 animate-spin text-white" />
-                  <span className="text-white text-sm">Loading menus...</span>
-                </div>
-              ) : (
-                navigationMenus.map((menu) => (
-                  <DropdownMenu key={menu.id}>
-                    <DropdownMenuTrigger asChild>
+              {navigationMenus.map((menu) => (
+                <DropdownMenu key={menu.id}>
+                  <DropdownMenuTrigger asChild>
                     <button className="px-2 py-1 rounded-md font-semibold text-white hover:bg-ocean-700 focus:bg-ocean-800 transition flex items-center text-base outline-none border-none h-8 min-h-0">
                         <span>{menu.title}</span>
                         {menu.submenu && menu.submenu.length > 0 && <ChevronDown className="h-4 w-4 ml-1" />}
@@ -127,8 +120,7 @@ const Navbar = () => {
                       ))}
                     </DropdownMenuContent>
                   </DropdownMenu>
-                ))
-              )}
+                ))}
             </div>
           </div>
 
