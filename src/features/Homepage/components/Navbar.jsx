@@ -100,7 +100,7 @@ const Navbar = () => {
                 navigationMenus.map((menu) => (
                   <DropdownMenu key={menu.id}>
                     <DropdownMenuTrigger asChild>
-                      <button className="px-2 py-1 rounded-md font-semibold text-white hover:bg-ocean-700 focus:bg-ocean-800 transition flex items-center text-base outline-none border-none h-8 min-h-0">
+                    <button className="px-2 py-1 rounded-md font-semibold text-white hover:bg-ocean-700 focus:bg-ocean-800 transition flex items-center text-base outline-none border-none h-8 min-h-0">
                         <span>{menu.title}</span>
                         {menu.submenu && menu.submenu.length > 0 && <ChevronDown className="h-4 w-4 ml-1" />}
                       </button>
@@ -132,25 +132,24 @@ const Navbar = () => {
             </div>
           </div>
 
-          {/* Search Bar */}
-          {!navigationLoading && (
-            <div className="mx-4" style={{ width: '180px' }}>
-              <div className="relative h-8">
-                <Input
-                  type="text"
-                  placeholder="Search"
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="pl-8 pr-2 py-1 bg-ocean-700/30 border border-ocean-200 text-white placeholder-ocean-100 focus:bg-ocean-700/50 focus:border-ocean-300 rounded-full h-8 text-base w-full min-h-0"
-                  style={{ boxShadow: 'none' }}
-                />
-                <Search className="absolute left-2 top-1/2 transform -translate-y-1/2 text-ocean-100 h-5 w-5" />
-              </div>
-            </div>
-          )}
-
           {/* Right Side */}
           <div className="flex items-center space-x-2 min-h-0">
+            {/* Search Bar (moved here) */}
+            {!navigationLoading && (
+              <div className="mr-0" style={{ width: '180px' }}>
+                <div className="relative h-8">
+                  <Input
+                    type="text"
+                    placeholder="Search"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="pl-8 pr-2 py-1 bg-ocean-700/30 border border-ocean-200 text-white placeholder-ocean-100 focus:bg-ocean-700/50 focus:border-ocean-300 rounded-full h-8 text-base w-full min-h-0"
+                    style={{ boxShadow: 'none' }}
+                  />
+                  <Search className="absolute left-2 top-1/2 transform -translate-y-1/2 text-ocean-100 h-5 w-5" />
+                </div>
+              </div>
+            )}
             {/* Notifications */}
             <Button variant="ghost" size="icon" className="text-white hover:bg-ocean-700 relative rounded-full h-8 w-8 p-0 min-h-0">
               <Bell className="h-5 w-5" />
