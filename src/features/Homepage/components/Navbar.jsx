@@ -108,18 +108,45 @@ const Navbar = () => {
                         </DropdownMenuItem>
                       )}
                       {menu.children && menu.children.map((item) => (
-                        <DropdownMenuItem 
-                          key={item.id} 
-                          onClick={() => openTabByUrl(item.title, item.url)}
-                          className="rounded-md text-gray-800 font-medium hover:bg-ocean-100 hover:text-ocean-700 cursor-pointer"
-                        >
-                          <span>{item.title}</span>
-                          {item.icon && (
-                            <Badge className="ml-2 text-xs" variant="secondary">
-                              {item.icon}
-                            </Badge>
-                          )}
-                        </DropdownMenuItem>
+                        item.children && item.children.length > 0 ? (
+                          <DropdownMenu key={item.id}>
+                            <DropdownMenuTrigger asChild>
+                              <DropdownMenuItem className="rounded-md text-gray-800 font-medium hover:bg-ocean-100 hover:text-ocean-700 cursor-pointer flex justify-between items-center">
+                                <span>{item.title}</span>
+                                <ChevronDown className="h-4 w-4 ml-1" />
+                              </DropdownMenuItem>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end" className="w-56 ml-2 rounded-lg shadow-lg bg-white border border-gray-100 p-1">
+                              {item.children.map((subitem) => (
+                                <DropdownMenuItem
+                                  key={subitem.id}
+                                  onClick={() => openTabByUrl(subitem.title, subitem.url)}
+                                  className="rounded-md text-gray-800 font-medium hover:bg-ocean-100 hover:text-ocean-700 cursor-pointer"
+                                >
+                                  <span>{subitem.title}</span>
+                                  {subitem.icon && (
+                                    <Badge className="ml-2 text-xs" variant="secondary">
+                                      {subitem.icon}
+                                    </Badge>
+                                  )}
+                                </DropdownMenuItem>
+                              ))}
+                            </DropdownMenuContent>
+                          </DropdownMenu>
+                        ) : (
+                          <DropdownMenuItem 
+                            key={item.id} 
+                            onClick={() => openTabByUrl(item.title, item.url)}
+                            className="rounded-md text-gray-800 font-medium hover:bg-ocean-100 hover:text-ocean-700 cursor-pointer"
+                          >
+                            <span>{item.title}</span>
+                            {item.icon && (
+                              <Badge className="ml-2 text-xs" variant="secondary">
+                                {item.icon}
+                              </Badge>
+                            )}
+                          </DropdownMenuItem>
+                        )
                       ))}
                     </DropdownMenuContent>
                   </DropdownMenu>
