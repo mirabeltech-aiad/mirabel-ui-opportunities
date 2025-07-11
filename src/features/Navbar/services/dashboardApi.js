@@ -10,6 +10,30 @@ const PACKAGE_TYPES = {
 };
 
 /**
+ * Get session data from MMnewclientvars (new format) with fallback to MMClientVars
+ * @param {string} key - The key to retrieve
+ * @returns {string} The session value
+ */
+const getSessionData = (key) => {
+  try {
+    // First try the new MMnewclientvars format
+    const newSessionData = localStorage.getItem('MMnewclientvars');
+    if (newSessionData) {
+      const parsed = JSON.parse(newSessionData);
+      if (parsed[key] !== undefined) {
+        return parsed[key];
+      }
+    }
+    
+    // Fallback to old MMClientVars format
+    return getSessionValue(key);
+  } catch (error) {
+    console.warn(`⚠️ Error getting session data for key ${key}:`, error);
+    return getSessionValue(key); // Fallback to old method
+  }
+};
+
+/**
  * Get Marketing Manager URL domain based on server configuration
  * This matches the .NET Connection.GetMarketingManagerURL method
  * @returns {string} The MKM domain URL
@@ -20,9 +44,13 @@ const getMarketingManagerURL = () => {
     return 'https://smoke-feature13.magazinemanager.com';
   }
 
-  // Get domain from session - this would match the server variable logic in .NET
-  const sessionData = getUserInfo();
-  const domain = sessionData.domain || getSessionValue('Domain');
+  // Get domain from session - try new format first, then old format
+  const domain = getSessionData('Domain') || getSessionData('domain');
+  const host = getSessionData('Host') || getSessionData('host');
+  
+  if (host && host.includes('.magazinemanager.com')) {
+    return `https://${host}`;
+  }
   
   if (domain) {
     return `https://${domain}.magazinemanager.com`;
@@ -66,7 +94,7 @@ export const setupDashboard = async () => {
     console.log('📊 Raw dashboards fetched:', dashboards.length);
 
     // Step 3: Process MKM URLs - Update URLs with MKMDomain for MKM URLs and add access token
-    const sessionToken = getSessionValue('Token');
+    const sessionToken = getSessionData('Token') || getSessionData('token');
     console.log('🔑 Session token available:', !!sessionToken);
 
     const processedDashboards = dashboards.map(dashboard => {
@@ -116,14 +144,14 @@ export const setupDashboard = async () => {
 
     // Step 5: Handle CRM_Int package type - Add MKM Dashboard/Settings
     const additionalMenuItems = [];
-    const packageTypeID = getSessionValue('PackageTypeID') || getSessionValue('ProductType');
-    const isAdmin = getSessionValue('IsAdmin') === 'true' || getSessionValue('IsAdmin') === true;
+    const packageTypeID = getSessionData('PackageTypeID') || getSessionData('ProductType') || getSessionData('packageTypeID');
+    const isAdmin = getSessionData('IsAdmin') === 'true' || getSessionData('IsAdmin') === true || getSessionData('isAdmin') === true;
     
     console.log('📦 Package Type ID:', packageTypeID);
     console.log('👑 Is Admin:', isAdmin);
 
     // Check if package type is CRM_Int (matching .NET logic)
-    if (packageTypeID === PACKAGE_TYPES.CRM_INT || packageTypeID === '10178') { // 10178 might be the numeric ID
+    if (packageTypeID === PACKAGE_TYPES.CRM_INT || packageTypeID === '10178' || packageTypeID === 10178) {
       console.log('🔧 Adding CRM_Int specific menu items...');
       
       const mkmSetupUrl = isAdmin 

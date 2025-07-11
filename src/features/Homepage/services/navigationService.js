@@ -8,7 +8,96 @@ export const navigationService = {
   /**
    * Base domain for navigation URLs
    */
-  BASE_DOMAIN: 'http://localhost',
+  BASE_DOMAIN: 'https://smoke-feature13.magazinemanager.com',
+
+  /**
+   * Transform API response data into MMnewclientvars format
+   * @param {Object} apiResponse - The raw API response
+   * @returns {Object} Transformed data in the desired format
+   */
+  transformSessionData: (apiResponse) => {
+    try {
+      const content = apiResponse.data?.content || apiResponse.content || apiResponse;
+      
+      // Extract data from various nested objects
+      const sessionDetails = content.SessionDetails || {};
+      const authInfo = content.AuthenticationInfo || {};
+      const claims = authInfo.Claims || {};
+      const clientDetails = sessionDetails.ClientsDetails?.[0] || {};
+      const clientInfo = clientDetails.ClientInformation || {};
+      const dataPackDetails = clientDetails.DataPackDetails || {};
+      const tokenInfo = sessionDetails.Token || {};
+      
+      // Extract user ID - try multiple sources
+      const userId = content.UserId || claims.LoggedInUserID || clientDetails.EmployeeId || 1;
+      
+      // Extract email - try multiple sources
+      const email = sessionDetails.UserName || claims.Email || "sa@magazinemanager.com";
+      
+      // Extract domain information
+      const domain = claims.Domain || clientInfo.ClientSubDomain || "smoke-feature13";
+      const host = clientInfo.ClientAddress || `${domain}.magazinemanager.com`;
+      
+      // Extract token information
+      const accessToken = tokenInfo.AccessToken || "";
+      const tokenExpiry = tokenInfo.AccessTokenExpiredTime || "";
+      
+      // Extract client information
+      const clientId = content.ClientId || claims.LoggedInSiteClientID || clientInfo.ClientID || "10007";
+      const companyName = clientInfo.Name || "Mirabel Development | Home Page Migration to ReactJs | Test site";
+      
+      // Extract package information
+      const packageTypeId = dataPackDetails.PackageTypeID || 1;
+      const isMKMEnabled = dataPackDetails.IsMKMEnabled || false;
+      
+      // Determine admin status - could be derived from various sources
+      // For now, we'll default to true for SA users, false otherwise
+      const isAdmin = email.toLowerCase().includes('sa@') || email.toLowerCase().includes('admin');
+      const isSA = isAdmin ? "true" : "false";
+      
+      // Create the transformed data object
+      const transformedData = {
+        "UserID": userId,
+        "Email": email,
+        "IsAdmin": isAdmin,
+        "IsAuthenticated": true, // Add this for compatibility
+        "Token": accessToken,
+        "IsSA": isSA,
+        "UserName": isAdmin ? "Administrator System" : "User",
+        "DisplayName": isAdmin ? "Administrator,System" : "User,Name",
+        "UserNameID": isAdmin ? "sadministrator" : "user",
+        "ClientID": clientId.toString(),
+        "Host": host,
+        "Domain": domain,
+        "ContentVersion": Date.now().toString(), // Use current timestamp
+        "AccessTokenTimeOut": tokenExpiry,
+        "IsMKMEnabled": isMKMEnabled ? "True" : "False",
+        "CompanyName": companyName,
+        "ProductType": packageTypeId === 1 ? "10178" : packageTypeId.toString(),
+        "PackageTypeID": packageTypeId.toString(), // Add this for dashboard logic
+        "TimeAdd": (clientInfo.TimeAdd || 0).toString(),
+        "PageList": "", // Default empty
+        "HelpSite": "https://helpwp.emailnow.info",
+        "FullName": isAdmin ? "System Administrator" : "User Name",
+        "DepartmentID": "1",
+        "PASubProductTypeId": "0",
+        "PASubProductTypeName": "",
+        "BSASubProductTypeId": "21",
+        "BSASubProductTypeName": "Broadstreet",
+        "CustomerPortalUrl": "http://tier1-portal.mirabeltechnologies.com",
+        "CanSendCRMEmail": "true"
+      };
+      
+      console.log('🔄 Transformed session data:', transformedData);
+      return transformedData;
+      
+    } catch (error) {
+      console.error('❌ Error transforming session data:', error);
+      
+      // Return fallback data structure
+     
+    }
+  },
 
   /**
    * Fetch navigation data from the API
@@ -49,22 +138,50 @@ export const navigationService = {
   },
 
   /**
-   * Load session details and store in localStorage
+   * Load session details and store in localStorage with transformed format
    * @returns {Promise<Object>} Session details response
    */
   loadSessionDetails: async () => {
     try {
-      console.log('Loading session details...');
-        const response = await AxiosService.get('https://smoke-feature13.magazinemanager.com/services/admin/common/SessionDetailsGet');
+      console.log('🔄 Loading session details...');
+      const response = await AxiosService.get('https://smoke-feature13.magazinemanager.com/services/admin/common/SessionDetailsGet');
       
-      // Store response in localStorage with key 'MMnewclientvars'
-      const sessionData = response.content || response;
-      localStorage.setItem('MMnewclientvars', JSON.stringify(sessionData));
-      console.log('Session details loaded and stored in localStorage');
+      console.log('📊 Raw session API response:', response);
       
-      return sessionData;
+      // Transform the response data into the desired format
+      const transformedData = navigationService.transformSessionData(response);
+      
+      // Store transformed data in localStorage with key 'MMnewclientvars'
+      localStorage.setItem('MMnewclientvars', JSON.stringify(transformedData));
+      console.log('✅ Session details transformed and stored in localStorage as MMnewclientvars');
+      console.log('📝 Stored data:', transformedData);
+      
+      // Also update the existing MMClientVars for backward compatibility
+      const existingClientVars = localStorage.getItem('MMClientVars');
+      if (existingClientVars) {
+        try {
+          const existing = JSON.parse(existingClientVars);
+          const updatedClientVars = { ...existing, ...transformedData };
+          localStorage.setItem('MMClientVars', JSON.stringify(updatedClientVars));
+          console.log('🔄 Updated MMClientVars for backward compatibility');
+        } catch (e) {
+          console.warn('⚠️ Could not update MMClientVars:', e);
+        }
+      } else {
+        // Create MMClientVars if it doesn't exist
+        localStorage.setItem('MMClientVars', JSON.stringify(transformedData));
+        console.log('➕ Created MMClientVars with transformed data');
+      }
+      
+      return transformedData;
     } catch (error) {
-      console.error('Failed to load session details:', error);
+      console.error('❌ Failed to load session details:', error);
+      
+      // Store fallback data
+      const fallbackData = navigationService.transformSessionData({});
+      localStorage.setItem('MMnewclientvars', JSON.stringify(fallbackData));
+      console.log('🔄 Stored fallback session data');
+      
       throw error;
     }
   },
@@ -261,7 +378,7 @@ export const navigationService = {
   },
 
   /**
-   * Get session details from localStorage
+   * Get session details from localStorage (MMnewclientvars)
    * @returns {Object|null} Session details or null
    */
   getSessionDetails: () => {
@@ -270,6 +387,28 @@ export const navigationService = {
       return sessionData ? JSON.parse(sessionData) : null;
     } catch (error) {
       console.error('Error parsing session data:', error);
+      return null;
+    }
+  },
+
+  /**
+   * Update session data in localStorage
+   * @param {Object} updates - Updates to apply to session data
+   * @returns {Object} Updated session data
+   */
+  updateSessionData: (updates) => {
+    try {
+      const existing = navigationService.getSessionDetails() || {};
+      const updated = { ...existing, ...updates };
+      localStorage.setItem('MMnewclientvars', JSON.stringify(updated));
+      
+      // Also update MMClientVars for backward compatibility
+      localStorage.setItem('MMClientVars', JSON.stringify(updated));
+      
+      console.log('✅ Session data updated:', updated);
+      return updated;
+    } catch (error) {
+      console.error('❌ Error updating session data:', error);
       return null;
     }
   }
