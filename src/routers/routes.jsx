@@ -29,7 +29,7 @@ export default function AppRoutes() {
         <Route path="/auth/callback" element={<AuthCallback />} />
 
         {/* Default redirect to opportunities */}
-        <Route path="/" element={<Navigate to="/opportunities" replace />} />
+        {/* <Route path="/" element={<Navigate to="/opportunities" replace />} /> */}
 
         {/* Application routes */}
         <Route
