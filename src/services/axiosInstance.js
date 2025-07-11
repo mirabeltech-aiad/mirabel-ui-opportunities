@@ -11,6 +11,7 @@ const axiosInstance = axios.create({
     "Content-Type": "application/json",
   },
   timeout: 30000, // 30 seconds timeout
+  withCredentials: true, // Include cookies with every request
   mode: "cors",
   cache: "no-cache",
 });
@@ -59,6 +60,9 @@ axiosInstance.interceptors.request.use((config) => {
   config.headers.Authorization = token ? `Bearer ${token}` : '';
   config.headers.domain = domain;
   config.headers['X-Requested-With'] = 'XMLHttpRequest';
+  
+  // Ensure cookies are included with every request
+  config.withCredentials = true;
 
   // Add request timestamp for debugging
   config.metadata = { startTime: new Date() };
@@ -67,7 +71,8 @@ axiosInstance.interceptors.request.use((config) => {
     baseURL,
     domain,
     hasToken: !!token,
-    tokenValid: token ? isTokenValid(token) : false
+    tokenValid: token ? isTokenValid(token) : false,
+    withCredentials: config.withCredentials
   });
 
   return config;
@@ -191,6 +196,7 @@ export async function refreshTokenWithWebMethodCall() {
         headers: {
           'Content-Type': 'application/json',
         },
+        withCredentials: true, // Include cookies for token refresh as well
         timeout: 10000 // 10 second timeout for refresh
       }
     );
@@ -224,6 +230,7 @@ if (import.meta.env.MODE === "development") {
     (config) => {
       console.group(`🚀 API Request: ${config.method?.toUpperCase()} ${config.url}`);
       console.log("Config:", config);
+      console.log("Cookies enabled:", config.withCredentials);
       console.groupEnd();
       return config;
     },
@@ -257,6 +264,7 @@ export const createAuthenticatedRequest = (token) => {
       "Content-Type": "application/json",
       Authorization: `Bearer ${token}`,
     },
+    withCredentials: true, // Include cookies for authenticated requests too
     timeout: 30000,
   });
 };
