@@ -56,7 +56,7 @@ const TabNavigation = () => {
       <Navbar />
       
       {/* Tab Bar */}
-      <div className="bg-white border-b border-gray-200 flex items-center justify-between px-4 py-2">
+      <div className="bg-white border-b border-gray-200 flex items-center px-2 py-0 h-8 min-h-0">
         <div className="flex items-center flex-1 min-w-0">
           <DragDropContext onDragEnd={handleDragEnd}>
             <Droppable droppableId="tabs" direction="horizontal">
@@ -72,7 +72,7 @@ const TabNavigation = () => {
                         <div
                           ref={provided.innerRef}
                           {...provided.draggableProps}
-                          className={`flex items-center rounded-t-lg transition-all duration-200 ${
+                          className={`flex items-center rounded-t-lg transition-all duration-200 h-7 min-h-0 px-2 text-xs ${
                             activeTabId === tab.id
                               ? 'bg-white border-t-2 border-blue-500 text-blue-600 shadow-sm'
                               : 'bg-gray-100 hover:bg-gray-200 text-gray-700'
@@ -92,20 +92,19 @@ const TabNavigation = () => {
                               {/* Draggable area (excludes close button) */}
                               <div
                                 {...provided.dragHandleProps}
-                                className="flex items-center px-3 py-2 cursor-pointer flex-1"
+                                className="flex items-center px-1 py-0 cursor-pointer flex-1 h-7 min-h-0"
                                 onClick={() => handleTabClick(tab.id)}
                               >
-                                <span className="mr-2 text-sm">{tab.icon}</span>
-                                <span className="text-sm font-medium truncate max-w-32">
+                                <span className="mr-1 text-xs flex items-center">{tab.icon}</span>
+                                <span className="text-xs font-medium truncate max-w-32 flex items-center">
                                   {tab.title}
                                 </span>
                               </div>
-                              
                               {/* Close button (not draggable) */}
                               {tab.closable !== false && (
                                 <button
                                   onClick={(e) => handleTabClose(e, tab.id)}
-                                  className="mr-2 p-1 rounded hover:bg-gray-300 transition-colors flex-shrink-0"
+                                  className="mr-1 p-0 rounded hover:bg-gray-300 transition-colors flex-shrink-0 h-5 w-5 min-h-0 flex items-center justify-center"
                                   title="Close tab"
                                   type="button"
                                 >
@@ -164,16 +163,6 @@ const TabNavigation = () => {
               </DropdownMenuContent>
             </DropdownMenu>
           )}
-
-          {/* Add Tab Button */}
-          <button
-            onClick={addNewTab}
-            className="ml-2 p-2 rounded hover:bg-gray-200 transition-colors"
-            title="Add new tab"
-            type="button"
-          >
-            <Plus className="h-4 w-4" />
-          </button>
         </div>
       </div>
 

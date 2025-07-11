@@ -140,13 +140,23 @@ const HelpSystem = () => {
       {/* Draggable Help Button */}
       <div
         ref={buttonRef}
-        style={{
-          position: 'fixed',
-          left: helpPosition.x,
-          top: helpPosition.y,
-          zIndex: 1000,
-          cursor: isDragging ? 'grabbing' : 'grab'
-        }}
+        style={
+          isDragging
+            ? {
+                position: 'fixed',
+                left: helpPosition.x,
+                top: helpPosition.y,
+                zIndex: 1000,
+                cursor: 'grabbing',
+              }
+            : {
+                position: 'fixed',
+                right: 32,
+                bottom: 32,
+                zIndex: 1000,
+                cursor: 'grab',
+              }
+        }
         onMouseDown={handleMouseDown}
         className="group"
       >
