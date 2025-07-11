@@ -19,7 +19,7 @@ export const navigationService = {
   fetchNavigationData: async (userId = 1, siteId = 0) => {
     try {
         //// First, load session details and store in localStorage
-        //await navigationService.loadSessionDetails();
+        await navigationService.loadSessionDetails();
       
       // Then fetch navigation menus
       const response = await apiCall(`/services/admin/navigations/users/${userId}/${siteId}`, 'GET');     
