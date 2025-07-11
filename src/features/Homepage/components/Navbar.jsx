@@ -90,12 +90,15 @@ const Navbar = () => {
             </div>
             {/* Top Menus */}
             <div className="ml-4 flex items-center space-x-1 min-h-0">
-              {navigationMenus.map((menu) => (
-                <DropdownMenu key={menu.id}>
-                  <DropdownMenuTrigger asChild>
-                    <button className="px-2 py-1 rounded-md font-semibold text-white hover:bg-ocean-700 focus:bg-ocean-800 transition flex items-center text-base outline-none border-none h-8 min-h-0">
+              {navigationLoading ? (
+                <Loader2 className="h-4 w-4 animate-spin text-white" />
+              ) : (
+                navigationMenus.map((menu) => (
+                  <DropdownMenu key={menu.id}>
+                    <DropdownMenuTrigger asChild>
+                      <button className="px-2 py-1 rounded-md font-semibold text-white hover:bg-ocean-700 focus:bg-ocean-800 transition flex items-center text-base outline-none border-none h-8 min-h-0">
                         <span>{menu.title}</span>
-                        {menu.submenu && menu.submenu.length > 0 && <ChevronDown className="h-4 w-4 ml-1" />}
+                        {menu.children && menu.children.length > 0 && <ChevronDown className="h-4 w-4 ml-1" />}
                       </button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="start" className="w-56 mt-2 rounded-lg shadow-lg bg-white border border-gray-100 p-1">
@@ -104,7 +107,7 @@ const Navbar = () => {
                           <span>{menu.title} Home</span>
                         </DropdownMenuItem>
                       )}
-                      {menu.submenu && menu.submenu.map((item) => (
+                      {menu.children && menu.children.map((item) => (
                         <DropdownMenuItem 
                           key={item.id} 
                           onClick={() => openTabByUrl(item.title, item.url)}
@@ -120,7 +123,8 @@ const Navbar = () => {
                       ))}
                     </DropdownMenuContent>
                   </DropdownMenu>
-                ))}
+                ))
+              )}
             </div>
           </div>
 

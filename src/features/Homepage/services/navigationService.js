@@ -1,4 +1,5 @@
 import AxiosService from '@/services/AxiosService';
+import { apiCall } from '@/services/httpClient';
 
 /**
  * Navigation service for fetching dynamic navigation menus from the API
@@ -7,7 +8,7 @@ export const navigationService = {
   /**
    * Base domain for navigation URLs
    */
-  BASE_DOMAIN: 'https://smoke-feature13.magazinemanager.com',
+  BASE_DOMAIN: 'http://localhost',
 
   /**
    * Fetch navigation data from the API
@@ -17,12 +18,11 @@ export const navigationService = {
    */
   fetchNavigationData: async (userId = 1, siteId = 0) => {
     try {
-      // First, load session details and store in localStorage
-      await navigationService.loadSessionDetails();
-
-      // Then fetch navigation menus
-      const response = await AxiosService.get(`/services/admin/navigations/users/${userId}/${siteId}`);
+        //// First, load session details and store in localStorage
+        //await navigationService.loadSessionDetails();
       
+      // Then fetch navigation menus
+      const response = await apiCall(`/services/admin/navigations/users/${userId}/${siteId}`, 'GET');     
       // Check if response has the expected structure
       if (response?.content?.List) {
         const menus = response.content.List;
@@ -35,7 +35,10 @@ export const navigationService = {
         return navigationService.processNavigationMenus(menus);
       }
       
-      console.warn('Unexpected navigation API response structure:', response);
+      // Additional fallback: check if response is directly an array
+      if (Array.isArray(response)) {
+        return navigationService.processNavigationMenus(response);
+      }
       return [];
     } catch (error) {
       console.error('Error fetching navigation data:', error);
@@ -52,7 +55,7 @@ export const navigationService = {
   loadSessionDetails: async () => {
     try {
       console.log('Loading session details...');
-      const response = await AxiosService.get('https://smoke-feature13.magazinemanager.com/services/admin/common/SessionDetailsGet');
+        const response = await AxiosService.get('https://smoke-feature13.magazinemanager.com/services/admin/common/SessionDetailsGet');
       
       // Store response in localStorage with key 'MMnewclientvars'
       const sessionData = response.content || response;
@@ -83,13 +86,29 @@ export const navigationService = {
     const parentMenus = sortedMenus.filter(menu => menu.ParentID === -1 || menu.ParentID === null);
     const childMenus = sortedMenus.filter(menu => menu.ParentID !== -1 && menu.ParentID !== null);
 
-    // Attach children to their parents
+    // Transform and attach children to their parents
     const processedMenus = parentMenus.map(parent => ({
-      ...parent,
+      id: parent.ID,
+      title: parent.Caption,
+      url: parent.URL,
+      sortOrder: parent.SortOrder,
+      isAdmin: parent.IsAdmin,
+      isNewWindow: parent.IsNewWindow,
+      isVisible: parent.IsVisible,
+      icon: parent.Icon,
+      toolTip: parent.ToolTip,
       children: childMenus
         .filter(child => child.ParentID === parent.ID)
         .map(child => ({
-          ...child,
+          id: child.ID,
+          title: child.Caption,
+          url: child.URL,
+          sortOrder: child.SortOrder,
+          isAdmin: child.IsAdmin,
+          isNewWindow: child.IsNewWindow,
+          isVisible: child.IsVisible,
+          icon: child.Icon,
+          toolTip: child.ToolTip,
           fullUrl: navigationService.getFullUrl(child.URL)
         })),
       fullUrl: navigationService.getFullUrl(parent.URL)
@@ -126,98 +145,91 @@ export const navigationService = {
   getMockNavigationData: () => {
     return [
       {
-        ID: 1,
-        ParentID: -1,
-        Caption: 'Management',
-        URL: '',
-        SortOrder: 1,
-        IsAdmin: true,
-        IsNewWindow: false,
-        IsVisible: true,
-        Icon: '⚙️',
-        ToolTip: 'Management tools and settings',
+        id: 1,
+        title: 'Management',
+        url: '',
+        sortOrder: 1,
+        isAdmin: true,
+        isNewWindow: false,
+        isVisible: true,
+        icon: '⚙️',
+        toolTip: 'Management tools and settings',
         children: [
           {
-            ID: 11,
-            ParentID: 1,
-            Caption: 'User Management',
-            URL: '/admin/users',
-            SortOrder: 1,
-            IsAdmin: true,
-            IsNewWindow: false,
-            IsVisible: true,
-            Icon: '👥',
-            ToolTip: 'Manage users',
+            id: 11,
+            title: 'User Management',
+            url: '/admin/users',
+            sortOrder: 1,
+            isAdmin: true,
+            isNewWindow: false,
+            isVisible: true,
+            icon: '👥',
+            toolTip: 'Manage users',
             fullUrl: `${navigationService.BASE_DOMAIN}/admin/users`
           },
           {
-            ID: 12,
-            ParentID: 1,
-            Caption: 'System Settings',
-            URL: '/admin/settings',
-            SortOrder: 2,
-            IsAdmin: true,
-            IsNewWindow: false,
-            IsVisible: true,
-            Icon: '🔧',
-            ToolTip: 'System configuration',
+            id: 12,
+            title: 'System Settings',
+            url: '/admin/settings',
+            sortOrder: 2,
+            isAdmin: true,
+            isNewWindow: false,
+            isVisible: true,
+            icon: '🔧',
+            toolTip: 'System configuration',
             fullUrl: `${navigationService.BASE_DOMAIN}/admin/settings`
           }
         ],
         fullUrl: ''
       },
       {
-        ID: 2,
-        ParentID: -1,
-        Caption: 'Reports',
-        URL: '/reports',
-        SortOrder: 2,
-        IsAdmin: false,
-        IsNewWindow: false,
-        IsVisible: true,
-        Icon: '📊',
-        ToolTip: 'View reports and analytics',
+        id: 2,
+        title: 'Reports',
+        url: '/reports',
+        sortOrder: 2,
+        isAdmin: false,
+        isNewWindow: false,
+        isVisible: true,
+        icon: '📊',
+        toolTip: 'View reports and analytics',
         children: [
           {
-            ID: 21,
-            ParentID: 2,
-            Caption: 'Sales Reports',
-            URL: '/reports/sales',
-            SortOrder: 1,
-            IsAdmin: false,
-            IsNewWindow: false,
-            IsVisible: true,
-            Icon: '💰',
-            ToolTip: 'Sales analytics',
+            id: 21,
+            title: 'Sales Reports',
+            url: '/reports/sales',
+            sortOrder: 1,
+            isAdmin: false,
+            isNewWindow: false,
+            isVisible: true,
+            icon: '💰',
+            toolTip: 'Sales analytics',
             fullUrl: `${navigationService.BASE_DOMAIN}/reports/sales`
           },
           {
-            ID: 22,
-            ParentID: 2,
-            Caption: 'User Analytics',
-            URL: '/reports/users',
-            SortOrder: 2,
-            IsAdmin: false,
-            IsNewWindow: false,
-            IsVisible: true,
-            Icon: '📈',
-            ToolTip: 'User behavior analytics',
+            id: 22,
+            title: 'User Analytics',
+            url: '/reports/users',
+            sortOrder: 2,
+            isAdmin: false,
+            isNewWindow: false,
+            isVisible: true,
+            icon: '📈',
+            toolTip: 'User behavior analytics',
             fullUrl: `${navigationService.BASE_DOMAIN}/reports/users`
           }
         ],
         fullUrl: `${navigationService.BASE_DOMAIN}/reports`
       },
       {
-        ID: 3,
-        ParentID: -1,
-        Caption: 'Tools',
-        URL: '/tools',
-        SortOrder: 3,
-        IsAdmin: false,
-        IsNewWindow: false,
-        IsVisible: true,
-        Icon: '🛠️',
-        ToolTip: 'Utility tools',
+        id: 3,
+        title: 'Tools',
+        url: '/tools',
+        sortOrder: 3,
+        isAdmin: false,
+        isNewWindow: false,
+        isVisible: true,
+        icon: '🛠️',
+        toolTip: 'Utility tools',
         children: [],
         fullUrl: `${navigationService.BASE_DOMAIN}/tools`
       }
