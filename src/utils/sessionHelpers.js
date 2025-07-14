@@ -222,7 +222,7 @@ export const checkAuthenticationStatus = async () => {
         return { authenticated: true, shouldRedirect: false, environment: 'development' };
     } else {
         // In production, check for valid authentication
-     //   const shouldRedirect = shouldRedirectToLogin();
+       const shouldRedirect = shouldRedirectToLogin();
         const result = {
             authenticated: !shouldRedirect,
             shouldRedirect,
