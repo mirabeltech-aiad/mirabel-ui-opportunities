@@ -144,7 +144,7 @@ export const navigationService = {
   loadSessionDetails: async () => {
     try {
       console.log('🔄 Loading session details...');
-      const response = await apiCall('https://smoke-feature13.magazinemanager.com/services/admin/common/SessionDetailsGet','GET');
+      const response = await apiCall('/services/admin/common/SessionDetailsGet','GET');
       
       console.log('📊 Raw session API response:', response);
       
