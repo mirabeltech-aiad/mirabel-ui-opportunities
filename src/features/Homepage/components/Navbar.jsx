@@ -17,6 +17,9 @@ import {
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
+  DropdownMenuSub,
+  DropdownMenuSubTrigger,
+  DropdownMenuSubContent,
 } from '@/components/ui/dropdown-menu';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -30,6 +33,44 @@ const profileMenus = [
   { separator: true },
   { title: 'Sign Out', url: '/Login.aspx', icon: LogOut, signout: true },
 ];
+
+// Recursive menu renderer
+const renderMenuItems = (items, openTabByUrl) => {
+  return items.map((item) => {
+    if (item.children && item.children.length > 0) {
+      return (
+        <DropdownMenuSub key={item.id}>
+          <DropdownMenuSubTrigger className="rounded-md text-gray-800 font-medium hover:bg-ocean-100 hover:text-ocean-700 cursor-pointer flex items-center">
+            <span>{item.title}</span>
+            {item.icon && (
+              <Badge className="ml-2 text-xs" variant="secondary">
+                {item.icon}
+              </Badge>
+            )}
+          </DropdownMenuSubTrigger>
+          <DropdownMenuSubContent className="w-56 mt-2 rounded-lg shadow-lg bg-ocean-gradient border border-gray-100 p-1 max-h-96 overflow-y-auto scrollbar-thin scrollbar-thumb-ocean-400 scrollbar-track-ocean-100">
+            {renderMenuItems(item.children, openTabByUrl)}
+          </DropdownMenuSubContent>
+        </DropdownMenuSub>
+      );
+    } else {
+      return (
+        <DropdownMenuItem
+          key={item.id}
+          onClick={() => openTabByUrl(item.title, item.url)}
+          className="rounded-md text-gray-800 font-medium hover:bg-ocean-100 hover:text-ocean-700 cursor-pointer flex items-center"
+        >
+          <span>{item.title}</span>
+          {item.icon && (
+            <Badge className="ml-2 text-xs" variant="secondary">
+              {item.icon}
+            </Badge>
+          )}
+        </DropdownMenuItem>
+      );
+    }
+  });
+};
 
 const Navbar = () => {
   const { actions, tabs, navigationMenus, navigationLoading } = useHome();
@@ -101,26 +142,13 @@ const Navbar = () => {
                         {menu.children && menu.children.length > 0 && <ChevronDown className="h-4 w-4 ml-1" />}
                       </button>
                     </DropdownMenuTrigger>
-                    <DropdownMenuContent align="start" className="w-56 mt-2 rounded-lg shadow-lg bg-white border border-gray-100 p-1">
+                    <DropdownMenuContent align="start" className="w-56 mt-2 rounded-lg shadow-lg bg-ocean-gradient border border-gray-100 p-1 max-h-96 overflow-y-auto scrollbar-thin scrollbar-thumb-ocean-400 scrollbar-track-ocean-100">
                       {menu.url && (
                         <DropdownMenuItem onClick={() => openTabByUrl(menu.title, menu.url)} className="rounded-md text-gray-800 font-medium hover:bg-ocean-100 hover:text-ocean-700 cursor-pointer">
                           <span>{menu.title} Home</span>
                         </DropdownMenuItem>
                       )}
-                      {menu.children && menu.children.map((item) => (
-                        <DropdownMenuItem 
-                          key={item.id} 
-                          onClick={() => openTabByUrl(item.title, item.url)}
-                          className="rounded-md text-gray-800 font-medium hover:bg-ocean-100 hover:text-ocean-700 cursor-pointer"
-                        >
-                          <span>{item.title}</span>
-                          {item.icon && (
-                            <Badge className="ml-2 text-xs" variant="secondary">
-                              {item.icon}
-                            </Badge>
-                          )}
-                        </DropdownMenuItem>
-                      ))}
+                      {menu.children && renderMenuItems(menu.children, openTabByUrl)}
                     </DropdownMenuContent>
                   </DropdownMenu>
                 ))

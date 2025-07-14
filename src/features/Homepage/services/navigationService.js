@@ -187,9 +187,7 @@ export const navigationService = {
   },
 
   /**
-   * Process and organize navigation menus into hierarchical structure
-   * @param {Array} menus - Raw menu data from API
-   * @returns {Array} Processed menu structure
+   * Recursively build menu tree for unlimited depth
    */
   processNavigationMenus: (menus) => {
     if (!Array.isArray(menus)) {
@@ -199,39 +197,27 @@ export const navigationService = {
     // Sort menus by SortOrder
     const sortedMenus = menus.sort((a, b) => (a.SortOrder || 0) - (b.SortOrder || 0));
 
-    // Separate parent and child menus
-    const parentMenus = sortedMenus.filter(menu => menu.ParentID === -1 || menu.ParentID === null);
-    const childMenus = sortedMenus.filter(menu => menu.ParentID !== -1 && menu.ParentID !== null);
+    // Helper: recursively build children
+    function buildMenuTree(parentId) {
+      return sortedMenus
+        .filter(menu => menu.ParentID === parentId)
+        .map(menu => ({
+          id: menu.ID,
+          title: menu.Caption,
+          url: menu.URL,
+          sortOrder: menu.SortOrder,
+          isAdmin: menu.IsAdmin,
+          isNewWindow: menu.IsNewWindow,
+          isVisible: menu.IsVisible,
+          icon: menu.Icon,
+          toolTip: menu.ToolTip,
+          children: buildMenuTree(menu.ID),
+          fullUrl: navigationService.getFullUrl(menu.URL)
+        }));
+    }
 
-    // Transform and attach children to their parents
-    const processedMenus = parentMenus.map(parent => ({
-      id: parent.ID,
-      title: parent.Caption,
-      url: parent.URL,
-      sortOrder: parent.SortOrder,
-      isAdmin: parent.IsAdmin,
-      isNewWindow: parent.IsNewWindow,
-      isVisible: parent.IsVisible,
-      icon: parent.Icon,
-      toolTip: parent.ToolTip,
-      children: childMenus
-        .filter(child => child.ParentID === parent.ID)
-        .map(child => ({
-          id: child.ID,
-          title: child.Caption,
-          url: child.URL,
-          sortOrder: child.SortOrder,
-          isAdmin: child.IsAdmin,
-          isNewWindow: child.IsNewWindow,
-          isVisible: child.IsVisible,
-          icon: child.Icon,
-          toolTip: child.ToolTip,
-          fullUrl: navigationService.getFullUrl(child.URL)
-        })),
-      fullUrl: navigationService.getFullUrl(parent.URL)
-    }));
-
-    return processedMenus;
+    // Top-level menus have ParentID === -1 or null
+    return buildMenuTree(-1).concat(buildMenuTree(null));
   },
 
   /**
