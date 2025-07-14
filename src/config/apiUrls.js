@@ -9,3 +9,14 @@ export const API_SAVE_SITEWIDE_SETTINGS = '/services/Admin/SiteSettings/DetailsS
 // Reports Dashboard.
 export const API_REPORTS_DASHBOARD = '/services/Report/Categories';
 
+// Consultant APIs
+export const API_CONSULTANT_INFO_GET = '/services/CRM/consultants/';
+export const HELPDESK_API_CONSULTANT_CREATEEMAIL = '/services/helpdesk/contactconsultant/createemail/';
+
+// Tech Support APIs
+export const HELPDESK_API_ERROR_CATEGORY = '/services/helpdesk/techsupport/errorcategory';
+export const HELPDESK_API_TECHSUPPORT_CREATEREQUEST = '/services/helpdesk/techsupport/create/';
+export const HELPDESK_API_ATTACHTEMPORARY_FILE = '/services/helpdesk/techsupport/attachtemporaryfile';
+export const HELPDESK_API_SALESREP_CREATEREQUEST = '/services/helpdesk/salesrep/create/';
+export const API_SALESREP_LIST_GET = '/services/CRM/salesreps/';
+

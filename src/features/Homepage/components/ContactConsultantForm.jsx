@@ -1,60 +1,78 @@
-import React, { useState } from 'react';
-import { X, Send, AlertCircle, User, Mail, MessageSquare } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { X, Send, Upload, User, Mail, FileText, MessageSquare } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { useToast } from '@/features/Opportunity/hooks/use-toast';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
+import { Label } from '@/components/ui/label';
+import { Badge } from '@/components/ui/badge';
+import { consultantService } from '../services/consultantService';
+import { getSessionValue } from '../../../utils/sessionHelpers';
 
-const ContactConsultantForm = ({ onClose }) => {
-  const { toast } = useToast();
+const ContactConsultantForm = ({ isOpen, onClose, consultantInfo }) => {
   const [formData, setFormData] = useState({
-    name: '',
-    email: '',
     subject: '',
-    message: ''
+    question: '',
+    cc: ''
   });
+  const [attachments, setAttachments] = useState([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errors, setErrors] = useState({});
 
-  const subjects = [
-    'General Inquiry',
-    'Technical Support',
-    'Feature Request',
-    'Training Request',
-    'Account Management',
-    'Billing Question',
-    'Integration Help',
-    'Other'
-  ];
+  // Get user session data
+  const userEmail = getSessionValue('Email');
+  const userName = getSessionValue('FullName');
+
+  useEffect(() => {
+    if (isOpen) {
+      // Reset form when opening
+      setFormData({
+        subject: '',
+        question: '',
+        cc: ''
+      });
+      setAttachments([]);
+      setErrors({});
+    }
+  }, [isOpen]);
+
+  const handleInputChange = (field, value) => {
+    setFormData(prev => ({
+      ...prev,
+      [field]: value
+    }));
+    
+    // Clear error when user starts typing
+    if (errors[field]) {
+      setErrors(prev => ({
+        ...prev,
+        [field]: ''
+      }));
+    }
+  };
+
+  const handleFileChange = (event) => {
+    const files = Array.from(event.target.files);
+    setAttachments(files);
+  };
 
   const validateForm = () => {
     const newErrors = {};
 
-    if (!formData.name.trim()) {
-      newErrors.name = 'Name is required';
+    if (!formData.subject.trim()) {
+      newErrors.subject = 'Subject field is required!';
     }
 
-    if (!formData.email.trim()) {
-      newErrors.email = 'Email is required';
-    } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
-      newErrors.email = 'Please enter a valid email address';
+    if (!formData.question.trim()) {
+      newErrors.question = 'Question field is required!';
     }
 
-    if (!formData.subject) {
-      newErrors.subject = 'Subject is required';
-    }
-
-    if (!formData.message.trim()) {
-      newErrors.message = 'Message is required';
+    // Validate CC emails
+    if (formData.cc.trim()) {
+      const emailValidation = consultantService.validateEmails(formData.cc);
+      if (!emailValidation.isValid) {
+        newErrors.cc = emailValidation.error;
+      }
     }
 
     setErrors(newErrors);
@@ -63,7 +81,7 @@ const ContactConsultantForm = ({ onClose }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
+    
     if (!validateForm()) {
       return;
     }
@@ -71,183 +89,193 @@ const ContactConsultantForm = ({ onClose }) => {
     setIsSubmitting(true);
 
     try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 2000));
+      // Process attachments
+      const processedAttachments = await consultantService.processAttachments(attachments);
 
-      toast({
-        title: "Message Sent Successfully",
-        description: "Your consultant will get back to you within 24 hours.",
-        variant: "default",
-      });
+      // Prepare email data
+      const emailData = {
+        ToEmail: [consultantInfo?.Data?.Email || ''],
+        Subject: formData.subject,
+        BodyText: consultantService.formatEmailBody(formData.question, userName),
+        FromEmail: userEmail,
+        FromName: userName,
+        Attachments: processedAttachments
+      };
 
+      // Add CC if provided
+      if (formData.cc.trim()) {
+        const emailValidation = consultantService.validateEmails(formData.cc);
+        if (emailValidation.isValid && emailValidation.emails.length > 0) {
+          emailData.CcEmail = emailValidation.emails.join(',');
+        }
+      }
+
+      // Send email
+      await consultantService.sendConsultantEmail(emailData);
+
+      // Show success message
+      alert('Your Software Consultant will respond back to you shortly.');
+      
+      // Close form
       onClose();
+      
     } catch (error) {
-      toast({
-        title: "Error Sending Message",
-        description: "Failed to send message. Please try again.",
-        variant: "destructive",
-      });
+      console.error('Error sending consultant email:', error);
+      alert(error.message || 'Unable to send message');
     } finally {
       setIsSubmitting(false);
     }
   };
 
-  const handleInputChange = (field, value) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
-    if (errors[field]) {
-      setErrors(prev => ({ ...prev, [field]: '' }));
-    }
-  };
+  if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-      <Card className="w-full max-w-2xl max-h-[90vh] overflow-hidden">
-        <CardHeader className="bg-gradient-to-r from-purple-600 to-purple-700 text-white">
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+      <Card className="w-full max-w-4xl max-h-[90vh] overflow-y-auto">
+        <CardHeader className="bg-blue-600 text-white">
           <div className="flex items-center justify-between">
-            <CardTitle className="flex items-center">
-              <User className="h-5 w-5 mr-2" />
-              Contact Your Consultant
+            <CardTitle className="text-xl font-semibold">
+              Contact your Software Consultant
             </CardTitle>
             <Button
               variant="ghost"
               size="sm"
               onClick={onClose}
-              className="text-white hover:bg-white/20"
+              className="text-white hover:bg-blue-700"
             >
-              <X className="h-4 w-4" />
+              <X className="h-5 w-5" />
             </Button>
           </div>
         </CardHeader>
-
-        <CardContent className="p-6 overflow-y-auto max-h-[calc(90vh-80px)]">
+        
+        <CardContent className="p-6">
           <form onSubmit={handleSubmit} className="space-y-6">
-            {/* Name and Email */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {/* From/To Information */}
+            <div className="bg-gray-50 p-4 rounded-lg">
               <div className="space-y-2">
-                <Label htmlFor="name">Name *</Label>
-                <div className="relative">
-                  <User className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
-                  <Input
-                    id="name"
-                    value={formData.name}
-                    onChange={(e) => handleInputChange('name', e.target.value)}
-                    placeholder="Your full name"
-                    className={`pl-10 ${errors.name ? 'border-red-500' : ''}`}
-                  />
+                <div className="flex items-center gap-2">
+                  <User className="h-4 w-4 text-gray-600" />
+                  <span className="font-medium">From:</span>
+                  <span>{userName} &lt;{userEmail}&gt;</span>
                 </div>
-                {errors.name && (
-                  <div className="flex items-center text-red-600 text-sm">
-                    <AlertCircle className="h-4 w-4 mr-1" />
-                    {errors.name}
-                  </div>
-                )}
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="email">Email *</Label>
-                <div className="relative">
-                  <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
-                  <Input
-                    id="email"
-                    type="email"
-                    value={formData.email}
-                    onChange={(e) => handleInputChange('email', e.target.value)}
-                    placeholder="your.email@company.com"
-                    className={`pl-10 ${errors.email ? 'border-red-500' : ''}`}
-                  />
-                </div>
-                {errors.email && (
-                  <div className="flex items-center text-red-600 text-sm">
-                    <AlertCircle className="h-4 w-4 mr-1" />
-                    {errors.email}
+                {consultantInfo?.Data && (
+                  <div className="flex items-center gap-2">
+                    <Mail className="h-4 w-4 text-gray-600" />
+                    <span className="font-medium">To:</span>
+                    <span>{consultantInfo.Data.Name} &lt;{consultantInfo.Data.Email}&gt;</span>
                   </div>
                 )}
               </div>
             </div>
 
-            {/* Subject */}
+            {/* CC Field */}
             <div className="space-y-2">
-              <Label htmlFor="subject">Subject *</Label>
-              <Select
+              <Label htmlFor="cc" className="text-sm font-medium">
+                CC
+              </Label>
+              <Input
+                id="cc"
+                type="text"
+                placeholder="email1@example.com, email2@example.com"
+                value={formData.cc}
+                onChange={(e) => handleInputChange('cc', e.target.value)}
+                className={errors.cc ? 'border-red-500' : ''}
+              />
+              {errors.cc && (
+                <p className="text-red-500 text-sm">{errors.cc}</p>
+              )}
+            </div>
+
+            {/* Subject Field */}
+            <div className="space-y-2">
+              <Label htmlFor="subject" className="text-sm font-medium">
+                Subject <span className="text-red-500">*</span>
+              </Label>
+              <Input
+                id="subject"
+                type="text"
+                placeholder="Enter subject"
                 value={formData.subject}
-                onValueChange={(value) => handleInputChange('subject', value)}
-              >
-                <SelectTrigger className={errors.subject ? 'border-red-500' : ''}>
-                  <SelectValue placeholder="Select a subject" />
-                </SelectTrigger>
-                <SelectContent>
-                  {subjects.map((subject) => (
-                    <SelectItem key={subject} value={subject}>
-                      {subject}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+                onChange={(e) => handleInputChange('subject', e.target.value)}
+                className={errors.subject ? 'border-red-500' : ''}
+                required
+              />
               {errors.subject && (
-                <div className="flex items-center text-red-600 text-sm">
-                  <AlertCircle className="h-4 w-4 mr-1" />
-                  {errors.subject}
-                </div>
+                <p className="text-red-500 text-sm">{errors.subject}</p>
               )}
             </div>
 
-            {/* Message */}
+            {/* Question Field */}
             <div className="space-y-2">
-              <Label htmlFor="message">Message *</Label>
-              <div className="relative">
-                <MessageSquare className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
-                <Textarea
-                  id="message"
-                  value={formData.message}
-                  onChange={(e) => handleInputChange('message', e.target.value)}
-                  placeholder="Describe your inquiry or request in detail..."
-                  rows={6}
-                  className={`pl-10 ${errors.message ? 'border-red-500' : ''}`}
-                />
-              </div>
-              {errors.message && (
-                <div className="flex items-center text-red-600 text-sm">
-                  <AlertCircle className="h-4 w-4 mr-1" />
-                  {errors.message}
+              <Label htmlFor="question" className="text-sm font-medium">
+                Question <span className="text-red-500">*</span>
+              </Label>
+              <Textarea
+                id="question"
+                placeholder="Enter your question or request"
+                value={formData.question}
+                onChange={(e) => handleInputChange('question', e.target.value)}
+                className={`min-h-[200px] ${errors.question ? 'border-red-500' : ''}`}
+                required
+              />
+              {errors.question && (
+                <p className="text-red-500 text-sm">{errors.question}</p>
+              )}
+            </div>
+
+            {/* File Attachments */}
+            <div className="space-y-2">
+              <Label htmlFor="attachments" className="text-sm font-medium flex items-center gap-2">
+                <Upload className="h-4 w-4" />
+                Attach File:
+              </Label>
+              <Input
+                id="attachments"
+                type="file"
+                multiple
+                onChange={handleFileChange}
+                className="cursor-pointer"
+              />
+              {attachments.length > 0 && (
+                <div className="space-y-2">
+                  <p className="text-sm text-gray-600">Selected files:</p>
+                  <div className="flex flex-wrap gap-2">
+                    {attachments.map((file, index) => (
+                      <Badge key={index} variant="secondary" className="flex items-center gap-1">
+                        <FileText className="h-3 w-3" />
+                        {file.name}
+                      </Badge>
+                    ))}
+                  </div>
                 </div>
               )}
             </div>
 
-            {/* Additional Info */}
-            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-              <h4 className="font-medium text-blue-900 mb-2">What to expect:</h4>
-              <ul className="text-sm text-blue-800 space-y-1">
-                <li>• Your consultant will respond within 24 hours</li>
-                <li>• You'll receive a confirmation email</li>
-                <li>• For urgent matters, please call our support line</li>
-              </ul>
-            </div>
-
-            {/* Form Actions */}
-            <div className="flex justify-end space-x-3 pt-4 border-t">
+            {/* Action Buttons */}
+            <div className="flex justify-end gap-3 pt-4 border-t">
               <Button
                 type="button"
                 variant="outline"
                 onClick={onClose}
                 disabled={isSubmitting}
               >
-                Cancel
+                Close
               </Button>
               <Button
                 type="submit"
                 disabled={isSubmitting}
-                className="bg-purple-600 hover:bg-purple-700"
+                className="bg-blue-600 hover:bg-blue-700"
               >
                 {isSubmitting ? (
-                  <>
-                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                  <div className="flex items-center gap-2">
+                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
                     Sending...
-                  </>
+                  </div>
                 ) : (
-                  <>
-                    <Send className="h-4 w-4 mr-2" />
-                    Send Message
-                  </>
+                  <div className="flex items-center gap-2">
+                    <Send className="h-4 w-4" />
+                    Submit
+                  </div>
                 )}
               </Button>
             </div>
