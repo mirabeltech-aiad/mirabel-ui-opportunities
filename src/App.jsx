@@ -97,22 +97,26 @@ function App() {
       };
     } else {
       // Production mode - check authentication and redirect if needed
-      if (!isAuthCallback && !isBlankPage) {
-        const authStatus = checkAuthenticationStatus();
-        if (authStatus.shouldRedirect) {
-          performLoginRedirect();
-          return;
+      const handleProductionMode = async () => {
+        if (!isAuthCallback && !isBlankPage) {
+          const authStatus = await checkAuthenticationStatus();
+          if (authStatus.shouldRedirect) {
+            performLoginRedirect();
+            return;
+          }
         }
-      }
 
-      // Production mode - load from current domain
-      if (isNotBlankPage) {
-        const currentDomain =
-          import.meta.env.REACT_APP_API_BASE_URL || window.location.origin;
-        loadMessageLocalizerWrapper(currentDomain);
-      } else {
-        setIsLoaded(true);
-      }
+        // Production mode - load from current domain
+        if (isNotBlankPage) {
+          const currentDomain =
+            import.meta.env.REACT_APP_API_BASE_URL || window.location.origin;
+          loadMessageLocalizerWrapper(currentDomain);
+        } else {
+          setIsLoaded(true);
+        }
+      };
+
+      handleProductionMode();
     }
   }, []);
 

@@ -201,9 +201,20 @@ export const performLoginRedirect = (returnUrl = null) => {
 };
 
 // Enhanced authentication check that handles both development and production
-export const checkAuthenticationStatus = () => {
+export const checkAuthenticationStatus = async () => {
+  
+
     if (isDevelopmentMode()) {
         // In development, always ensure session is available
+        try {
+            // Import navigationService dynamically to avoid circular dependencies
+            const { navigationService } = await import('../features/Homepage/services/navigationService');
+            await navigationService.loadSessionDetails();
+            console.log('✅ Session details loaded in development mode');
+        } catch (error) {
+            console.warn('⚠️ Could not load session details in development mode:', error);
+        }
+        
         const existingSession = localStorage.getItem("MMClientVars");
         if (!existingSession) {
             setClientSession(sessionValues);
@@ -212,12 +223,12 @@ export const checkAuthenticationStatus = () => {
         return { authenticated: true, shouldRedirect: false, environment: 'development' };
     } else {
         // In production, check for valid authentication
-        const shouldRedirect = shouldRedirectToLogin();
+     //   const shouldRedirect = shouldRedirectToLogin();
         const result = {
             authenticated: !shouldRedirect,
             shouldRedirect,
             environment: 'production',
-            hasMMClientVars: !!localStorage.getItem("MMClientVars")
+            hasMMClientVars: localStorage.getItem("MMClientVars")
         };
         return result;
     }
