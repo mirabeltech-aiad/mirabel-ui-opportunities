@@ -20,3 +20,7 @@ export const HELPDESK_API_ATTACHTEMPORARY_FILE = '/services/helpdesk/techsupport
 export const HELPDESK_API_SALESREP_CREATEREQUEST = '/services/helpdesk/salesrep/create/';
 export const API_SALESREP_LIST_GET = '/services/CRM/salesreps/';
 
+// Terms and Conditions APIs
+export const API_MM_AGREEMENTS_BYUSER_GET = '/services/mm/agreements/';
+export const API_MM_AGREEMENTS_ACCEPT_POST = '/services/mm/agreements/accept/';
+
