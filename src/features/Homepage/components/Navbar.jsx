@@ -48,7 +48,7 @@ const renderMenuItems = (items, openTabByUrl) => {
               </Badge>
             )}
           </DropdownMenuSubTrigger>
-          <DropdownMenuSubContent className="w-56 mt-2 rounded-lg shadow-lg bg-ocean-gradient border border-gray-100 p-1 max-h-96 overflow-y-auto scrollbar-thin scrollbar-thumb-ocean-400 scrollbar-track-ocean-100">
+          <DropdownMenuSubContent className="w-56 mt-2 rounded-lg shadow-lg bg-ocean-gradient border border-gray-100 p-1 max-h-96 overflow-y-auto scrollbar-thin scrollbar-thumb-ocean-400 scrollbar-track-ocean-100 text-white">
             {renderMenuItems(item.children, openTabByUrl)}
           </DropdownMenuSubContent>
         </DropdownMenuSub>
@@ -58,7 +58,7 @@ const renderMenuItems = (items, openTabByUrl) => {
         <DropdownMenuItem
           key={item.id}
           onClick={() => openTabByUrl(item.title, item.url)}
-          className="rounded-md text-gray-800 font-medium hover:bg-ocean-100 hover:text-ocean-700 cursor-pointer flex items-center"
+          className="rounded-md font-medium hover:bg-ocean-100 hover:text-ocean-700 cursor-pointer flex items-center text-white"
         >
           <span>{item.title}</span>
           {item.icon && (
@@ -142,9 +142,9 @@ const Navbar = () => {
                         {menu.children && menu.children.length > 0 && <ChevronDown className="h-4 w-4 ml-1" />}
                       </button>
                     </DropdownMenuTrigger>
-                    <DropdownMenuContent align="start" className="w-56 mt-2 rounded-lg shadow-lg bg-ocean-gradient border border-gray-100 p-1 max-h-96 overflow-y-auto scrollbar-thin scrollbar-thumb-ocean-400 scrollbar-track-ocean-100">
+                    <DropdownMenuContent align="start" className="w-56 mt-2 rounded-lg shadow-lg bg-ocean-gradient border border-gray-100 p-1 max-h-96 overflow-y-auto scrollbar-thin scrollbar-thumb-ocean-400 scrollbar-track-ocean-100 text-white">
                       {menu.url && (
-                        <DropdownMenuItem onClick={() => openTabByUrl(menu.title, menu.url)} className="rounded-md text-gray-800 font-medium hover:bg-ocean-100 hover:text-ocean-700 cursor-pointer">
+                        <DropdownMenuItem onClick={() => openTabByUrl(menu.title, menu.url)} className="rounded-md font-medium hover:bg-ocean-100 hover:text-ocean-700 cursor-pointer text-white">
                           <span>{menu.title} Home</span>
                         </DropdownMenuItem>
                       )}
