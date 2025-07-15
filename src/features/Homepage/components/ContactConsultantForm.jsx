@@ -25,8 +25,15 @@ const ContactConsultantForm = ({ isOpen, onClose, consultantInfo }) => {
   const userEmail = getSessionValue('Email');
   const userName = getSessionValue('FullName');
 
+  // Debug consultant info
+  useEffect(() => {
+    console.log('🔧 ContactConsultantForm: Consultant info received:', consultantInfo);
+    console.log('🔧 ContactConsultantForm: Consultant info.Data:', consultantInfo?.Data);
+  }, [consultantInfo]);
+
   useEffect(() => {
     if (isOpen) {
+      console.log('🔧 ContactConsultantForm: Form opened with consultantInfo:', consultantInfo);
       // Reset form when opening
       setFormData({
         subject: '',
@@ -36,7 +43,7 @@ const ContactConsultantForm = ({ isOpen, onClose, consultantInfo }) => {
       setAttachments([]);
       setErrors({});
     }
-  }, [isOpen]);
+  }, [isOpen, consultantInfo]);
 
   const handleInputChange = (field, value) => {
     setFormData(prev => ({
@@ -55,7 +62,22 @@ const ContactConsultantForm = ({ isOpen, onClose, consultantInfo }) => {
 
   const handleFileChange = (event) => {
     const files = Array.from(event.target.files);
-    setAttachments(files);
+    
+    // Validate file sizes
+    const validFiles = [];
+    for (const file of files) {
+      if (file.size > 10 * 1024 * 1024) { // 10MB limit
+        toast({
+          title: "File too large",
+          description: `${file.name} is larger than 10MB. Please select a smaller file.`,
+          variant: "destructive",
+        });
+        continue;
+      }
+      validFiles.push(file);
+    }
+    
+    setAttachments(validFiles);
   };
 
   const validateForm = () => {
@@ -67,6 +89,10 @@ const ContactConsultantForm = ({ isOpen, onClose, consultantInfo }) => {
 
     if (!formData.question.trim()) {
       newErrors.question = 'Question field is required!';
+    }
+
+    if (!consultantInfo?.Data?.Email) {
+      newErrors.general = 'Consultant information is not available. Please try again.';
     }
 
     // Validate CC emails
@@ -91,12 +117,25 @@ const ContactConsultantForm = ({ isOpen, onClose, consultantInfo }) => {
     setIsSubmitting(true);
 
     try {
-      // Process attachments
-      const processedAttachments = await consultantService.processAttachments(attachments);
+      // Process attachments with better error handling
+      let processedAttachments = [];
+      if (attachments.length > 0) {
+        try {
+          processedAttachments = await consultantService.processAttachments(attachments);
+        } catch (attachmentError) {
+          console.error('Error processing attachments:', attachmentError);
+          toast({
+            title: "Attachment Error",
+            description: attachmentError.message || 'Error processing attachments. Please try again.',
+            variant: "destructive",
+          });
+          return;
+        }
+      }
 
       // Prepare email data
       const emailData = {
-        ToEmail: [consultantInfo?.Data?.Email || ''],
+        ToEmail: consultantInfo?.Data?.Email ? [consultantInfo.Data.Email] : ['consultant@mirabeltechnologies.com'], // Use actual consultant email if available
         Subject: formData.subject,
         BodyText: consultantService.formatEmailBody(formData.question, userName),
         FromEmail: userEmail,
@@ -112,6 +151,8 @@ const ContactConsultantForm = ({ isOpen, onClose, consultantInfo }) => {
         }
       }
 
+      console.log('Sending consultant email:', { emailData });
+
       // Send email
       await consultantService.sendConsultantEmail(emailData);
 
@@ -126,9 +167,23 @@ const ContactConsultantForm = ({ isOpen, onClose, consultantInfo }) => {
       
     } catch (error) {
       console.error('Error sending consultant email:', error);
+      console.error('Error response data:', error.response?.data);
+      console.error('Error response status:', error.response?.status);
+      console.error('Error response headers:', error.response?.headers);
+      
+      // Extract specific error message from backend response
+      let errorMessage = 'Unable to send message. Please try again.';
+      if (error.response?.data?.content?.Message) {
+        errorMessage = error.response.data.content.Message;
+      } else if (error.response?.data?.content?.Status === 'Error') {
+        errorMessage = 'Backend validation error. Please check your input.';
+      } else if (error.message) {
+        errorMessage = error.message;
+      }
+      
       toast({
         title: "Error sending message",
-        description: error.message || 'Unable to send message. Please try again.',
+        description: errorMessage,
         variant: "destructive",
       });
     } finally {
@@ -167,14 +222,27 @@ const ContactConsultantForm = ({ isOpen, onClose, consultantInfo }) => {
                   <span className="font-medium">From:</span>
                   <span>{userName} &lt;{userEmail}&gt;</span>
                 </div>
-                {consultantInfo?.Data && (
-                  <div className="flex items-center gap-2">
-                    <Mail className="h-4 w-4 text-gray-600" />
-                    <span className="font-medium">To:</span>
-                    <span>{consultantInfo.Data.Name} &lt;{consultantInfo.Data.Email}&gt;</span>
-                  </div>
-                )}
+                <div className="flex items-center gap-2">
+                  <Mail className="h-4 w-4 text-gray-600" />
+                  <span className="font-medium">To:</span>
+                  {(() => {
+                    console.log('🔧 ContactConsultantForm: Rendering To field with consultantInfo:', consultantInfo);
+                    console.log('🔧 ContactConsultantForm: consultantInfo?.Data:', consultantInfo?.Data);
+                    if (consultantInfo?.Data) {
+                      console.log('🔧 ContactConsultantForm: Showing consultant:', consultantInfo.Data.Name, consultantInfo.Data.Email);
+                      return <span>{consultantInfo.Data.Name} &lt;{consultantInfo.Data.Email}&gt;</span>;
+                    } else {
+                      console.log('🔧 ContactConsultantForm: No consultant data, showing loading message');
+                      return <span className="text-gray-600">Loading consultant information...</span>;
+                    }
+                  })()}
+                </div>
               </div>
+              {errors.general && (
+                <div className="mt-2 p-2 bg-red-50 border border-red-200 rounded">
+                  <p className="text-red-600 text-sm">{errors.general}</p>
+                </div>
+              )}
             </div>
 
             {/* CC Field */}

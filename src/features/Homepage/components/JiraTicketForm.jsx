@@ -14,7 +14,7 @@ import {
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/features/Opportunity/hooks/use-toast';
-import { getUserInfo } from '@/utils/sessionHelpers';
+import { getUserInfo, getSessionValue } from '@/utils/sessionHelpers';
 import httpClient, { apiCall } from '@/services/httpClient';
 import {
   HELPDESK_API_ERROR_CATEGORY,
@@ -42,6 +42,17 @@ const JiraTicketForm = ({ onClose }) => {
   useEffect(() => {
     fetchCategories();
   }, []);
+
+  // Update form data when user info becomes available
+  useEffect(() => {
+    if (user && (user.fullName || user.email)) {
+      setFormData(prev => ({
+        ...prev,
+        name: user.fullName || prev.name,
+        email: user.email || prev.email,
+      }));
+    }
+  }, [user]);
 
   const fetchCategories = async () => {
     try {
@@ -130,8 +141,6 @@ const JiraTicketForm = ({ onClose }) => {
         throw new Error('Invalid response format from upload endpoint');
       }
     } catch (error) {
-      console.error('File upload error:', error);
-      
       // Mark temp attachments as errored
       setAttachments(prev => prev.map(a => 
         a.uploading ? { ...a, uploading: false, error: true } : a
@@ -153,35 +162,71 @@ const JiraTicketForm = ({ onClose }) => {
   };
 
   const handleSubmit = async (e) => {
+    debugger;
     e.preventDefault();
-    if (!validateForm()) return;
+    
+    // Debug: Log form data and validation
+    console.log('Form submission started:', { formData, user });
+    
+    if (!validateForm()) {
+      console.log('Form validation failed:', errors);
+      return;
+    }
+    
+    console.log('Form validation passed, checking authentication...');
+    
+    // Check authentication before submitting
+    const token = getSessionValue("Token");
+    const isAuthenticated = getSessionValue("IsAuthenticated");
+    
+    console.log('Authentication check:', { hasToken: !!token, isAuthenticated });
+    
+    if (!token || !isAuthenticated) {
+      toast({ 
+        title: 'Authentication Error', 
+        description: 'Please log in again to submit a support ticket.', 
+        variant: 'destructive' 
+      });
+      return;
+    }
+    
     setIsSubmitting(true);
     
     try {
-      // Prepare request payload matching backend expectations
+      // Get user data from session
+      const userInfo = getUserInfo();
+      const clientId = getSessionValue("ClientID");
+      const companyName = getSessionValue("CompanyName") || userInfo.companyName || '';
+      const productType = getSessionValue("ProductType") || userInfo.clientId || '';
+      
+      console.log('User data for request:', { userInfo, clientId, companyName, productType });
+      
+      // Prepare request payload matching backend expectations exactly
       const request = {
         serviceDeskId: 4, // as per legacy
         requestTypeId: 39, // as per legacy
         attachmentFile: attachments.map(a => a.temporaryAttachmentId),
         requestFieldValues: {
-          summary: formData.summary,
+          summary: formData.summary, // Backend expects lowercase 'summary'
           description: formData.description,
           customfield_10054: { value: formData.category },
           customfield_10057: window.location.hostname,
-          customfield_10055: user.companyName || '',
+          customfield_10055: companyName,
           customfield_10059: formData.name,
           customfield_10060: formData.email,
-          customfield_10066: { id: user.clientId }
+          customfield_10066: { id: productType }
         }
       };
       
-      const reporterName = encodeURIComponent(user.fullName || '');
-      const reporterEmail = encodeURIComponent(user.email || '');
+      const reporterName = encodeURIComponent(formData.name || userInfo.fullName || '');
+      const reporterEmail = encodeURIComponent(formData.email || userInfo.email || '');
       const endpoint = `${HELPDESK_API_TECHSUPPORT_CREATEREQUEST}${reporterName}/${reporterEmail}`;
       
-      console.log('Submitting tech support ticket:', { endpoint, request });
+      console.log('Making API call:', { endpoint, request });
       
       const res = await apiCall(endpoint, 'POST', request);
+      
+      console.log('API response:', res);
       
       if (res && res.content && res.content.Data && res.content.Data.issueKey) {
         toast({
@@ -206,10 +251,22 @@ const JiraTicketForm = ({ onClose }) => {
         throw new Error('No issue key returned from API');
       }
     } catch (error) {
-      console.error('Error creating tech support ticket:', error);
+      console.error('Error in handleSubmit:', error);
+      
+      // Handle specific error cases
+      let errorMessage = 'Failed to create ticket. Please try again.';
+      
+      if (error.message && error.message.includes('Unexpected character encountered while parsing value')) {
+        errorMessage = 'Authentication error. Please refresh the page and try again.';
+      } else if (error.isHtmlResponse) {
+        errorMessage = 'Server returned an error page. Please check your authentication and try again.';
+      } else if (error.message) {
+        errorMessage = error.message;
+      }
+      
       toast({ 
         title: 'Error Creating Ticket', 
-        description: error.message || 'Failed to create ticket. Please try again.', 
+        description: errorMessage, 
         variant: 'destructive' 
       });
     } finally {
