@@ -24,3 +24,19 @@ export const API_SALESREP_LIST_GET = '/services/CRM/salesreps/';
 export const API_MM_AGREEMENTS_BYUSER_GET = '/services/mm/agreements/';
 export const API_MM_AGREEMENTS_ACCEPT_POST = '/services/mm/agreements/accept/';
 
+// User Management APIs
+export const API_USER_ACCOUNT_GET = '/services/User/Account/';
+export const API_USER_ACCOUNT_UPDATE = '/services/User/Account/Update';
+export const API_USER_LIST_GET = '/services/Admin/Users/';
+export const API_USER_CREATE = '/services/Admin/Users/Create';
+export const API_USER_UPDATE = '/services/Admin/Users/Update';
+export const API_USER_DELETE = '/services/Admin/Users/Delete/';
+
+// Navigation Setup APIs
+export const API_NAVIGATION_SETUP_GET = '/services/Admin/Navigation/Setup/';
+export const API_NAVIGATION_SETUP_UPDATE = '/services/Admin/Navigation/Setup/Update';
+
+// Website Setup APIs
+export const API_WEBSITE_SETUP_GET = '/services/Admin/Website/Setup/';
+export const API_WEBSITE_SETUP_UPDATE = '/services/Admin/Website/Setup/Update';
+

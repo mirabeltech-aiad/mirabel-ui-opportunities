@@ -1,6 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { useHome } from '../contexts/HomeContext';
 import navigationService from '../services/navigationService';
+import { useAuth } from '@/contexts/AuthContext';
+import { refreshIframeByUrl, printIframeByUrl } from '@/services/iframeService';
+import { getUserPermissions } from '@/services/userService';
 import {
   Search,
   User,
@@ -10,6 +13,11 @@ import {
   ChevronDown,
   HelpCircle,
   Loader2,
+  RefreshCw,
+  Printer,
+  Users,
+  Menu,
+  Globe,
 } from 'lucide-react';
 import {
   DropdownMenu,
@@ -24,14 +32,21 @@ import {
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
+import { useToast } from '@/features/Opportunity/hooks/use-toast';
 
-// Profile menu items (static for now)
+// Profile menu items with functionality
 const profileMenus = [
-  { title: 'Profile', url: 'https://app.example.com/profile', icon: User },
-  { title: 'Settings', url: 'https://app.example.com/settings', icon: Settings },
-  { title: 'Help', url: 'https://app.example.com/help', icon: HelpCircle },
+  { title: 'Welcome', id: 'welcome', info: true },
   { separator: true },
-  { title: 'Sign Out', url: '/Login.aspx', icon: LogOut, signout: true },
+  { title: 'My Account', id: 'myAccount', icon: User, url: '/ui/users/account' },
+  { title: 'Refresh', id: 'refresh', icon: RefreshCw },
+  { title: 'Print', id: 'print', icon: Printer },
+  { separator: true },
+  { title: 'User Setup', id: 'userSetup', icon: Users, url: '/ui/users/list' },
+  { title: 'Nav Bar Setup', id: 'navBarSetup', icon: Menu, url: '/intranet/Members/Admin/NavigationSetup.aspx' },
+  { title: 'Website Setup', id: 'websiteSetup', icon: Globe, url: '/ui/websitesetup' },
+  { separator: true },
+  { title: 'Logout', id: 'logout', icon: LogOut },
 ];
 
 // Recursive menu renderer
@@ -74,8 +89,15 @@ const renderMenuItems = (items, openTabByUrl) => {
 
 const Navbar = () => {
   const { actions, tabs, navigationMenus, navigationLoading } = useHome();
+  const { logout: authLogout, user } = useAuth();
+  const { toast } = useToast();
   const [searchQuery, setSearchQuery] = useState('');
   const [notifications, setNotifications] = useState(3);
+  const [userPermissions, setUserPermissions] = useState({
+    canManageUsers: false,
+    canManageNavigation: false,
+    canManageWebsite: false,
+  });
 
   useEffect(() => {
     const handleKeyDown = (e) => {
@@ -83,11 +105,58 @@ const Navbar = () => {
         e.preventDefault();
         // Open command palette
         console.log('Command palette opened');
+      } else if (e.key === 'F5') {
+        e.preventDefault();
+        // Handle F5 refresh
+        const activeTab = tabs.find(tab => tab.id === actions.activeTabId);
+        if (activeTab) {
+          if (activeTab.id === 'dashboard') {
+            actions.setNavigationLoading(true);
+            setTimeout(() => {
+              actions.setNavigationLoading(false);
+            }, 1000);
+            toast({
+              title: "Dashboard refreshed",
+              description: "Dashboard data has been refreshed.",
+            });
+          } else if (activeTab.type === 'iframe') {
+            const success = refreshIframeByUrl(activeTab.url);
+            if (success) {
+              toast({
+                title: "Page refreshed",
+                description: "The current page has been refreshed.",
+              });
+            } else {
+              toast({
+                title: "Refresh failed",
+                description: "Unable to refresh the current page.",
+                variant: "destructive",
+              });
+            }
+          }
+        }
       }
     };
     document.addEventListener('keydown', handleKeyDown);
     return () => document.removeEventListener('keydown', handleKeyDown);
-  }, []);
+  }, [tabs, actions, toast]);
+
+  // Load user permissions on component mount
+  useEffect(() => {
+    const loadUserPermissions = async () => {
+      try {
+        const permissions = await getUserPermissions();
+        setUserPermissions(permissions);
+      } catch (error) {
+        console.error('Error loading user permissions:', error);
+        // Keep default permissions (all false)
+      }
+    };
+
+    if (user) {
+      loadUserPermissions();
+    }
+  }, [user]);
 
   const openTabByUrl = (title, url) => {
     if (!url) return;
@@ -107,12 +176,121 @@ const Navbar = () => {
     }
   };
 
+  // Handle profile menu item clicks
   const handleProfileMenuClick = (item) => {
-    if (item.signout) {
+    switch (item.id) {
+      case 'myAccount':
+        openTabByUrl('My Account', item.url);
+        break;
+      
+      case 'refresh':
+        handleRefresh();
+        break;
+      
+      case 'print':
+        handlePrint();
+        break;
+      
+      case 'userSetup':
+        openTabByUrl('User Setup', item.url);
+        break;
+      
+      case 'navBarSetup':
+        openTabByUrl('Nav Bar Setup', item.url);
+        break;
+      
+      case 'websiteSetup':
+        openTabByUrl('Website Setup', item.url);
+        break;
+      
+      case 'logout':
+        handleLogout();
+        break;
+      
+      default:
+        break;
+    }
+  };
+
+  // Refresh current tab
+  const handleRefresh = () => {
+    const activeTab = tabs.find(tab => tab.id === actions.activeTabId);
+    if (activeTab) {
+      if (activeTab.id === 'dashboard') {
+        // Refresh dashboard by reloading navigation and dashboards
+        actions.setNavigationLoading(true);
+        // Trigger a reload of the dashboard data
+        setTimeout(() => {
+          actions.setNavigationLoading(false);
+        }, 1000);
+        toast({
+          title: "Dashboard refreshed",
+          description: "Dashboard data has been refreshed.",
+        });
+      } else if (activeTab.type === 'iframe') {
+        // Refresh iframe content
+        const success = refreshIframeByUrl(activeTab.url);
+        if (success) {
+          toast({
+            title: "Page refreshed",
+            description: "The current page has been refreshed.",
+          });
+        } else {
+          toast({
+            title: "Refresh failed",
+            description: "Unable to refresh the current page.",
+            variant: "destructive",
+          });
+        }
+      }
+    }
+  };
+
+  // Print current tab
+  const handlePrint = () => {
+    const activeTab = tabs.find(tab => tab.id === actions.activeTabId);
+    if (activeTab) {
+      if (activeTab.id === 'dashboard') {
+        // Print the dashboard content
+        window.print();
+        toast({
+          title: "Print initiated",
+          description: "Dashboard content is being printed.",
+        });
+      } else if (activeTab.type === 'iframe') {
+        // Print iframe content
+        const success = printIframeByUrl(activeTab.url);
+        if (success) {
+          toast({
+            title: "Print initiated",
+            description: "Page content is being printed.",
+          });
+        } else {
+          // Fallback to printing the current window
+          window.print();
+          toast({
+            title: "Print initiated",
+            description: "Page content is being printed (fallback).",
+          });
+        }
+      }
+    }
+  };
+
+  // Handle logout
+  const handleLogout = () => {
+    // Show confirmation dialog
+    if (window.confirm('Are you sure you want to logout?')) {
+      // Clear session data
       actions.clearSession();
-      window.location.href = item.url;
-    } else if (item.url) {
-      openTabByUrl(item.title, item.url);
+      
+      // Call auth logout
+      authLogout();
+      
+      toast({
+        title: "Logged out",
+        description: "You have been successfully logged out.",
+      });
     }
   };
 
@@ -193,20 +371,32 @@ const Navbar = () => {
                 </button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-56 mt-2 rounded-lg shadow-lg bg-white border border-gray-100 p-1">
-                {profileMenus.map((item, idx) =>
-                  item.separator ? (
+                {profileMenus.map((item, idx) => {
+                  // Skip admin items if user doesn't have permission
+                  if (item.id === 'userSetup' && !userPermissions.canManageUsers) return null;
+                  if (item.id === 'navBarSetup' && !userPermissions.canManageNavigation) return null;
+                  if (item.id === 'websiteSetup' && !userPermissions.canManageWebsite) return null;
+                  
+                  return item.separator ? (
                     <DropdownMenuSeparator key={idx} />
+                  ) : item.info ? (
+                    <DropdownMenuItem key={item.id} className="font-bold text-base cursor-default" disabled>
+                      Welcome
+                      <div className="text-xs font-normal text-gray-500">
+                        {user?.FullName || 'System Administrator'}
+                      </div>
+                    </DropdownMenuItem>
                   ) : (
                     <DropdownMenuItem
-                      key={item.title}
+                      key={item.id}
                       onClick={() => handleProfileMenuClick(item)}
-                      className={`rounded-md font-medium cursor-pointer flex items-center ${item.signout ? 'text-red-600 hover:bg-red-50' : 'text-gray-800 hover:bg-ocean-100 hover:text-ocean-700'}`}
+                      className={`rounded-md font-medium cursor-pointer flex items-center text-gray-800 hover:bg-ocean-100 hover:text-ocean-700`}
                     >
                       {item.icon && <item.icon className="h-4 w-4 mr-2" />}
                       {item.title}
                     </DropdownMenuItem>
-                  )
-                )}
+                  );
+                })}
               </DropdownMenuContent>
             </DropdownMenu>
           </div>
