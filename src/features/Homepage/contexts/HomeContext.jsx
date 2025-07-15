@@ -340,6 +340,34 @@ export const HomeProvider = ({ children }) => {
   useEffect(() => {
     const loadNavigationMenus = async () => {
       try {
+      const clientDetails = localStorage.getItem("MMClientVars");
+      let cultureUI = "en-US"; // Default value
+      let siteType = "TMM"; // Default value
+      let navBarType = 0; // Default to General
+      let userId = 1; // Default to General
+      
+      if (clientDetails) {
+        try {
+          const clientVars = JSON.parse(clientDetails);
+          cultureUI = clientVars.cultureUI || cultureUI;
+          siteType = clientVars.siteType || siteType;
+          userId = clientVars.UserID || userId;
+          
+          // Determine NavBarType based on culture and site type
+          if (cultureUI === "de-DE" && siteType === "CRM") {
+            navBarType = 3; // GermanCRM
+          } else if (siteType === "CRM") {
+            navBarType = 1; // CRM
+          } else if (cultureUI === "de-DE") {
+            navBarType = 2; // German
+          } else {
+            navBarType = 0; // General
+          }
+          
+        } catch (error) {
+          console.error("Error parsing client variables:", error);
+        }
+      }
         const menus = await navigationService.fetchNavigationData();
         setNavigationMenus(menus);
       } catch (error) {
