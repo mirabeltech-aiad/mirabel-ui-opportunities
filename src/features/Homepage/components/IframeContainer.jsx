@@ -70,11 +70,7 @@ const IframeContainer = ({
       {/* Loading overlay */}
       {loading && (
         <div className="absolute inset-0 bg-white flex items-center justify-center z-10">
-          <div className="text-center">
-            <Loader2 className="mx-auto mb-4 animate-spin text-blue-600" size={32} />
-            <p className="text-gray-600">Loading {title}...</p>
-            <p className="text-sm text-gray-500 mt-1">{fullUrl}</p>
-          </div>
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-ocean-600"></div>
         </div>
       )}
 

@@ -15,7 +15,16 @@ import {
 } from 'lucide-react';
 
 const Dashboard = () => {
-  const { actions, selectedDashboard } = useHome();
+  const { actions, selectedDashboard, dashboardsLoading } = useHome();
+
+  // Show loading state while dashboards are being fetched
+  if (dashboardsLoading) {
+    return (
+      <div className="flex items-center justify-center h-full bg-gray-50">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-ocean-600"></div>
+      </div>
+    );
+  }
 
   // If a dashboard is selected and has a URL, show it in iframe
   if (selectedDashboard && selectedDashboard.URL) {

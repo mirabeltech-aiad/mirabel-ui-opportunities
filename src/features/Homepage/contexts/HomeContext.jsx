@@ -45,7 +45,7 @@ const initialState = {
   isAuthenticated: false,
   dashboards: [],
   selectedDashboard: null,
-  dashboardsLoading: false,
+  dashboardsLoading: true, // Start with loading true to prevent showing dummy dashboard
   navigationMenus: [],
   navigationLoading: false,
   showTermsModal: false
@@ -340,7 +340,6 @@ export const HomeProvider = ({ children }) => {
   useEffect(() => {
     const loadNavigationMenus = async () => {
       try {
-        setNavigationLoading(true);
         const menus = await navigationService.fetchNavigationData();
         setNavigationMenus(menus);
       } catch (error) {
