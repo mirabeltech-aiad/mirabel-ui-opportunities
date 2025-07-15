@@ -2,6 +2,7 @@ import React, { createContext, useContext, useReducer, useEffect } from 'react';
 import { useToast } from '@/features/Opportunity/hooks/use-toast';
 import dashboardService from '../services/dashboardService';
 import navigationService from '../services/navigationService';
+import { termsAndConditionsService } from '@/services/termsAndConditionsService';
 
 const HomeContext = createContext();
 
@@ -20,7 +21,9 @@ const ACTIONS = {
   SET_SELECTED_DASHBOARD: 'SET_SELECTED_DASHBOARD',
   SET_DASHBOARDS_LOADING: 'SET_DASHBOARDS_LOADING',
   SET_NAVIGATION_MENUS: 'SET_NAVIGATION_MENUS',
-  SET_NAVIGATION_LOADING: 'SET_NAVIGATION_LOADING'
+  SET_NAVIGATION_LOADING: 'SET_NAVIGATION_LOADING',
+  SHOW_TERMS_MODAL: 'SHOW_TERMS_MODAL',
+  HIDE_TERMS_MODAL: 'HIDE_TERMS_MODAL'
 };
 
 // Initial state
@@ -37,14 +40,15 @@ const initialState = {
   ],
   activeTabId: 'dashboard',
   helpVisible: false,
-  helpPosition: { x: 20, y: 20 },
+  helpPosition: { x: typeof window !== 'undefined' ? window.innerWidth - 100 : 1320, y: typeof window !== 'undefined' ? window.innerHeight - 100 : 620 },
   sessionData: null,
   isAuthenticated: false,
   dashboards: [],
   selectedDashboard: null,
   dashboardsLoading: false,
   navigationMenus: [],
-  navigationLoading: false
+  navigationLoading: false,
+  showTermsModal: false
 };
 
 // Reducer
@@ -149,6 +153,18 @@ const homeReducer = (state, action) => {
       return {
         ...state,
         navigationLoading: action.payload
+      };
+    
+    case ACTIONS.SHOW_TERMS_MODAL:
+      return {
+        ...state,
+        showTermsModal: true
+      };
+    
+    case ACTIONS.HIDE_TERMS_MODAL:
+      return {
+        ...state,
+        showTermsModal: false
       };
     
     default:
@@ -283,6 +299,14 @@ export const HomeProvider = ({ children }) => {
     dispatch({ type: ACTIONS.SET_NAVIGATION_LOADING, payload: loading });
   };
 
+  const showTermsModal = () => {
+    dispatch({ type: ACTIONS.SHOW_TERMS_MODAL });
+  };
+
+  const hideTermsModal = () => {
+    dispatch({ type: ACTIONS.HIDE_TERMS_MODAL });
+  };
+
   // Load dashboards on mount
   useEffect(() => {
     const loadDashboards = async () => {
@@ -328,6 +352,23 @@ export const HomeProvider = ({ children }) => {
       loadNavigationMenus();
   }, []);
 
+  // Check for Terms and Conditions on mount
+  useEffect(() => {
+    const checkTermsAndConditions = async () => {
+      try {
+        const agreementText = await termsAndConditionsService.getAgreementText();
+        if (agreementText && agreementText.trim()) {
+          showTermsModal();
+        }
+      } catch (error) {
+        console.error('Error checking Terms and Conditions:', error);
+        // Don't show error toast for this - it's expected if user has already accepted
+      }
+    };
+
+    checkTermsAndConditions();
+  }, []);
+
   const value = {
     ...state,
     actions: {
@@ -344,7 +385,9 @@ export const HomeProvider = ({ children }) => {
       setSelectedDashboard,
       setDashboardsLoading,
       setNavigationMenus,
-      setNavigationLoading
+      setNavigationLoading,
+      showTermsModal,
+      hideTermsModal
     }
   };
 
