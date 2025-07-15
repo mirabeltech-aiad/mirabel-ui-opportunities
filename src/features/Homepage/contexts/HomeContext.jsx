@@ -158,12 +158,6 @@ const homeReducer = (state, action) => {
 
 // Provider component
 export const HomeProvider = ({ children }) => {
-  // Clear tabs from localStorage on every page load (refresh)
-  React.useEffect(() => {
-    localStorage.removeItem('home-tabs');
-    localStorage.removeItem('home-active-tab');
-  }, []);
-
   const [state, dispatch] = useReducer(homeReducer, initialState);
   const { toast } = useToast();
 
