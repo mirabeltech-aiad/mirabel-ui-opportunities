@@ -68,51 +68,80 @@ const JiraTicketForm = ({ onClose }) => {
   const handleFileChange = async (e) => {
     const files = Array.from(e.target.files);
     let validFiles = [];
+    
+    // Validate file sizes
     for (let file of files) {
       if (file.size > 10 * 1024 * 1024) {
-        toast({ title: 'File too big', description: `${file.name} is larger than 10MB.`, variant: 'destructive' });
+        toast({ 
+          title: 'File too big', 
+          description: `${file.name} is larger than 10MB.`, 
+          variant: 'destructive' 
+        });
         continue;
       }
       validFiles.push(file);
     }
+    
     if (validFiles.length === 0) return;
+    
     setIsUploading(true);
+    
     // Optimistically add files to UI with a temporary ID
     const tempAttachments = validFiles.map(f => ({
       temporaryAttachmentId: `temp-${f.name}-${Date.now()}`,
       fileName: f.name,
       uploading: true
     }));
+    
     setAttachments(prev => [...prev, ...tempAttachments]);
+    
     try {
       const formDataObj = new FormData();
       validFiles.forEach(f => formDataObj.append('fileInput', f));
+      
       const baseUrl = httpClient.getBaseURL();
       const uploadUrl = baseUrl.replace(/\/$/, '') + HELPDESK_API_ATTACHTEMPORARY_FILE;
-      const headers = {
-        'Authorization': `Bearer ${user.token}`,
-        'domain': window.location.hostname
-      };
+      
+      // Use proper headers for file upload
       const res = await fetch(uploadUrl, {
         method: 'POST',
-        headers,
-        body: formDataObj
+        body: formDataObj // Don't set Content-Type header, let browser set it with boundary
       });
+      
+      if (!res.ok) {
+        throw new Error(`Upload failed with status: ${res.status}`);
+      }
+      
       const data = await res.json();
+      
       if (data && data.content && data.content.Data && data.content.Data.temporaryAttachments) {
-        // Remove only the temp files that match the uploaded ones
+        // Replace temp attachments with actual uploaded ones
         setAttachments(prev => [
           ...prev.filter(a => !a.uploading),
           ...data.content.Data.temporaryAttachments
         ]);
+        
+        toast({ 
+          title: 'Files uploaded successfully', 
+          description: `${validFiles.length} file(s) uploaded.`, 
+          variant: 'default' 
+        });
       } else {
-        // Mark temp attachments as errored
-        setAttachments(prev => prev.map(a => a.uploading ? { ...a, uploading: false, error: true } : a));
-        toast({ title: 'Attachment Error', description: 'Could not upload file(s).', variant: 'destructive' });
+        throw new Error('Invalid response format from upload endpoint');
       }
-    } catch (e) {
-      setAttachments(prev => prev.map(a => a.uploading ? { ...a, uploading: false, error: true } : a));
-      toast({ title: 'Attachment Error', description: 'Could not upload file(s).', variant: 'destructive' });
+    } catch (error) {
+      console.error('File upload error:', error);
+      
+      // Mark temp attachments as errored
+      setAttachments(prev => prev.map(a => 
+        a.uploading ? { ...a, uploading: false, error: true } : a
+      ));
+      
+      toast({ 
+        title: 'Upload Failed', 
+        description: error.message || 'Could not upload file(s). Please try again.', 
+        variant: 'destructive' 
+      });
     } finally {
       setIsUploading(false);
       if (fileInputRef.current) fileInputRef.current.value = '';
@@ -127,7 +156,9 @@ const JiraTicketForm = ({ onClose }) => {
     e.preventDefault();
     if (!validateForm()) return;
     setIsSubmitting(true);
+    
     try {
+      // Prepare request payload matching backend expectations
       const request = {
         serviceDeskId: 4, // as per legacy
         requestTypeId: 39, // as per legacy
@@ -143,27 +174,44 @@ const JiraTicketForm = ({ onClose }) => {
           customfield_10066: { id: user.clientId }
         }
       };
+      
       const reporterName = encodeURIComponent(user.fullName || '');
       const reporterEmail = encodeURIComponent(user.email || '');
       const endpoint = `${HELPDESK_API_TECHSUPPORT_CREATEREQUEST}${reporterName}/${reporterEmail}`;
+      
+      console.log('Submitting tech support ticket:', { endpoint, request });
+      
       const res = await apiCall(endpoint, 'POST', request);
+      
       if (res && res.content && res.content.Data && res.content.Data.issueKey) {
         toast({
           title: 'Ticket Created Successfully',
           description: (
             <div>
               <p>Your request {res.content.Data.issueKey} has been created.</p>
-              <a href={`https://mirabel.atlassian.net/browse/${res.content.Data.issueKey}`} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">View Ticket</a>
+              <a 
+                href={`https://mirabel.atlassian.net/browse/${res.content.Data.issueKey}`} 
+                target="_blank" 
+                rel="noopener noreferrer" 
+                className="text-blue-600 hover:underline"
+              >
+                View Ticket
+              </a>
             </div>
           ),
           variant: 'default',
         });
         onClose();
       } else {
-        throw new Error('No issue key returned');
+        throw new Error('No issue key returned from API');
       }
     } catch (error) {
-      toast({ title: 'Error Creating Ticket', description: 'Failed to create ticket. Please try again.', variant: 'destructive' });
+      console.error('Error creating tech support ticket:', error);
+      toast({ 
+        title: 'Error Creating Ticket', 
+        description: error.message || 'Failed to create ticket. Please try again.', 
+        variant: 'destructive' 
+      });
     } finally {
       setIsSubmitting(false);
     }
@@ -228,7 +276,7 @@ const JiraTicketForm = ({ onClose }) => {
                 <Label htmlFor="email">Your Email *</Label>
                 <Input id="email" value={formData.email} onChange={e => handleInputChange('email', e.target.value)} className={errors.email ? 'border-red-500' : ''} />
                 {errors.email && <div className="flex items-center text-red-600 text-sm"><AlertCircle className="h-4 w-4 mr-1" />{errors.email}</div>}
-              </div>
+                </div>
             </div>
             {/* Attachments */}
             <div className="space-y-2">

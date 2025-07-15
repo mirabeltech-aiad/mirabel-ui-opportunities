@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { X, Calendar, Users, ExternalLink } from 'lucide-react';
+import React, { useState, useEffect, useRef } from 'react';
+import { X, Calendar, Users, ExternalLink, ChevronDown } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -14,12 +14,38 @@ const ScheduleTrainingForm = ({ isOpen, onClose }) => {
   const [otherConsultants, setOtherConsultants] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [showScrollToBottom, setShowScrollToBottom] = useState(false);
+  const contentRef = useRef(null);
+  const footerRef = useRef(null);
 
   useEffect(() => {
     if (isOpen) {
       loadConsultantInfo();
     }
   }, [isOpen]);
+
+  // Handle scroll events to show/hide scroll to bottom button
+  useEffect(() => {
+    const handleScroll = () => {
+      if (contentRef.current) {
+        const { scrollTop, scrollHeight, clientHeight } = contentRef.current;
+        const isNearBottom = scrollHeight - scrollTop - clientHeight < 100;
+        setShowScrollToBottom(!isNearBottom);
+      }
+    };
+
+    const contentElement = contentRef.current;
+    if (contentElement) {
+      contentElement.addEventListener('scroll', handleScroll);
+      return () => contentElement.removeEventListener('scroll', handleScroll);
+    }
+  }, [loading, error, consultantInfo, otherConsultants]);
+
+  const scrollToBottom = () => {
+    if (footerRef.current) {
+      footerRef.current.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
 
   const loadConsultantInfo = async () => {
     try {
@@ -71,26 +97,42 @@ const ScheduleTrainingForm = ({ isOpen, onClose }) => {
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-      <Card className="w-full max-w-4xl max-h-[90vh] overflow-hidden">
+    <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-1 sm:p-4">
+      <Card className="w-full max-w-4xl max-h-[95vh] sm:max-h-[85vh] overflow-hidden flex flex-col">
         <CardHeader className="bg-gradient-to-r from-ocean-600 to-ocean-700 text-white">
-          <div className="flex items-center justify-between">
-            <CardTitle className="flex items-center">
-              <Calendar className="h-5 w-5 mr-2" />
-              Schedule Training
+          <div className="flex items-center justify-between gap-2">
+            <CardTitle className="flex items-center min-w-0 flex-1">
+              <Calendar className="h-5 w-5 mr-2 flex-shrink-0" />
+              <span className="truncate">Schedule Training</span>
             </CardTitle>
             <Button
               variant="ghost"
               size="sm"
               onClick={onClose}
-              className="text-white hover:bg-white/20"
+              className="text-white hover:bg-white/20 flex-shrink-0 rounded-full w-8 h-8 p-0 border border-white/20 hover:border-white/40"
+              aria-label="Close Schedule Training"
             >
               <X className="h-4 w-4" />
             </Button>
           </div>
+          
+          {/* Additional close button for very small screens */}
+          <div className="flex justify-center mt-2 sm:hidden">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={onClose}
+              className="text-white border-white/30 hover:bg-white/10 text-xs"
+            >
+              Close
+            </Button>
+          </div>
         </CardHeader>
         
-        <CardContent className="p-6 overflow-y-auto max-h-[calc(90vh-80px)]">
+        <CardContent 
+          ref={contentRef}
+          className="p-3 sm:p-6 overflow-y-auto flex-1 relative"
+        >
           {loading ? (
             <div className="flex items-center justify-center py-8">
               <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-ocean-600"></div>
@@ -104,9 +146,9 @@ const ScheduleTrainingForm = ({ isOpen, onClose }) => {
               </Button>
             </div>
           ) : (
-            <div className="space-y-6">
+            <div className="space-y-4">
               {/* Primary Consultant Section */}
-              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+              <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 sm:p-4">
                 <h3 className="text-lg font-semibold text-gray-900 mb-3 flex items-center">
                   <Users className="h-5 w-5 mr-2 text-blue-600" />
                   Primary Consultant
@@ -146,22 +188,22 @@ const ScheduleTrainingForm = ({ isOpen, onClose }) => {
               </div>
 
               {/* Divider */}
-              <div className="border-t border-gray-200 my-6"></div>
+              <div className="border-t border-gray-200 my-4"></div>
 
               {/* Other Consultants Section */}
               <div>
-                <h3 className="text-lg font-semibold text-gray-900 mb-4">
+                <h3 className="text-lg font-semibold text-gray-900 mb-3">
                   Other Software Consultants
                 </h3>
-                <p className="text-sm text-gray-600 mb-4">
+                <p className="text-sm text-gray-600 mb-3">
                   If your primary software consultant is not available by the next day, 
                   please feel free to schedule a training with one of our other software consultants.
                 </p>
                 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                   {otherConsultants.map((consultant, index) => (
                     <Card key={index} className="hover:shadow-md transition-shadow">
-                      <CardContent className="p-4">
+                      <CardContent className="p-3">
                         <div className="flex items-start space-x-3">
                           <div className="flex-shrink-0">
                             <img
@@ -203,14 +245,31 @@ const ScheduleTrainingForm = ({ isOpen, onClose }) => {
               </div>
             </div>
           )}
+          
+          {/* Scroll to bottom button - only visible on small screens when not near bottom */}
+          {showScrollToBottom && (
+            <div className="absolute bottom-4 right-4 sm:hidden">
+              <Button
+                onClick={scrollToBottom}
+                className="bg-ocean-600 hover:bg-ocean-700 text-white rounded-full w-10 h-10 p-0 shadow-lg"
+                aria-label="Scroll to bottom"
+              >
+                <ChevronDown className="h-5 w-5" />
+              </Button>
+            </div>
+          )}
+          
+
+          
+
         </CardContent>
         
-        <div className="border-t border-gray-200 p-4 bg-gray-50">
-          <div className="flex justify-end">
+        <div ref={footerRef} className="border-t border-gray-200 p-3 sm:p-4 bg-gray-50 flex-shrink-0">
+          <div className="flex justify-center sm:justify-end">
             <Button
               variant="outline"
               onClick={onClose}
-              className="text-ocean-600 border-ocean-600 hover:bg-ocean-50"
+              className="text-ocean-600 border-ocean-600 hover:bg-ocean-50 w-full sm:w-auto text-sm sm:text-base py-2 sm:py-2 shadow-sm"
             >
               Close
             </Button>

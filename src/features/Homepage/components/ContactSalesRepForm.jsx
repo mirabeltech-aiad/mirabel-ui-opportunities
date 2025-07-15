@@ -13,8 +13,10 @@ import {
   HELPDESK_API_ATTACHTEMPORARY_FILE
 } from '@/config/apiUrls';
 import { getUserInfo } from '@/utils/sessionHelpers';
+import { useToast } from '@/features/Opportunity/hooks/use-toast';
 
 const ContactSalesRepForm = ({ isOpen, onClose }) => {
+  const { toast } = useToast();
   const [formData, setFormData] = useState({
     to: '',
     cc: '',
@@ -105,18 +107,29 @@ const ContactSalesRepForm = ({ isOpen, onClose }) => {
     try {
       const formDataObj = new FormData();
       attachments.forEach(f => formDataObj.append('fileInput', f));
-      const res = await fetch(HELPDESK_API_ATTACHTEMPORARY_FILE, {
+      
+      const baseUrl = window.location.origin;
+      const uploadUrl = baseUrl + HELPDESK_API_ATTACHTEMPORARY_FILE;
+      
+      const res = await fetch(uploadUrl, {
         method: 'POST',
-        headers: { 'Authorization': `Bearer ${user.token}`, 'domain': window.location.hostname },
-        body: formDataObj
+        body: formDataObj // Don't set Content-Type header, let browser set it with boundary
       });
+      
+      if (!res.ok) {
+        throw new Error(`Upload failed with status: ${res.status}`);
+      }
+      
       const data = await res.json();
       if (data && data.content && data.content.Data && data.content.Data.temporaryAttachments) {
         setUploadedFiles(data.content.Data.temporaryAttachments);
         return data.content.Data.temporaryAttachments;
       } else {
-        throw new Error('Could not upload file(s).');
+        throw new Error('Invalid response format from upload endpoint');
       }
+    } catch (error) {
+      console.error('File upload error:', error);
+      throw new Error('Could not upload file(s). Please try again.');
     } finally {
       setIsUploading(false);
     }
@@ -126,27 +139,55 @@ const ContactSalesRepForm = ({ isOpen, onClose }) => {
     e.preventDefault();
     if (!validateForm()) return;
     setIsSubmitting(true);
+    
     try {
       const uploaded = await uploadAttachments();
+      
+      // Prepare request payload matching backend expectations for JIRA ticket creation
       const request = {
-        toEmail: [formData.to],
-        ccEmail: formData.cc,
-        subject: formData.subject,
-        bodyText: formData.question,
-        fromEmail: user.email,
-        fromName: user.fullName,
-        attachmentFile: uploaded.map(f => f.temporaryAttachmentId)
+        serviceDeskId: 4, // as per legacy
+        requestTypeId: 39, // as per legacy
+        attachmentFile: uploaded.map(f => f.temporaryAttachmentId),
+        requestFieldValues: {
+          summary: formData.subject,
+          description: formData.question,
+          customfield_10054: { value: "Sales Rep Contact" },
+          customfield_10057: window.location.hostname,
+          customfield_10055: user.companyName || '',
+          customfield_10059: user.fullName || '',
+          customfield_10060: user.email || '',
+          customfield_10066: { id: user.clientId }
+        }
       };
-      const endpoint = HELPDESK_API_SALESREP_CREATEREQUEST + encodeURIComponent(user.fullName || '') + '/' + encodeURIComponent(user.email || '') + '/' + encodeURIComponent(formData.to) + '/' + encodeURIComponent(formData.to);
+      
+      const reporterName = encodeURIComponent(user.fullName || '');
+      const reporterEmail = encodeURIComponent(user.email || '');
+      const assigneeName = encodeURIComponent(formData.to.split('@')[0] || ''); // Extract name from email
+      const assigneeEmail = encodeURIComponent(formData.to);
+      
+      const endpoint = `${HELPDESK_API_SALESREP_CREATEREQUEST}${reporterName}/${reporterEmail}/${assigneeName}/${assigneeEmail}`;
+      
+      console.log('Submitting sales rep contact:', { endpoint, request });
+      
       const res = await apiCall(endpoint, 'POST', request);
-      if (res && res.content && res.content.Status === 'Success') {
-        alert('Your Sales Rep will respond back to you shortly.');
+      
+      if (res && res.content && res.content.Data && res.content.Data.issueKey) {
+        toast({
+          title: 'Request Created Successfully',
+          description: `Your request ${res.content.Data.issueKey} has been created. Your Sales Rep will respond back to you shortly.`,
+          variant: 'default',
+        });
         onClose();
       } else {
-        throw new Error('Unable to send message');
+        throw new Error('No issue key returned from API');
       }
     } catch (error) {
-      alert(error.message || 'Unable to send message');
+      console.error('Error creating sales rep contact:', error);
+      toast({
+        title: 'Error Creating Request',
+        description: error.message || 'Unable to send message. Please try again.',
+        variant: 'destructive',
+      });
     } finally {
       setIsSubmitting(false);
     }

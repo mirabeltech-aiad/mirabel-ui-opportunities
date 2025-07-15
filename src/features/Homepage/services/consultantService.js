@@ -29,14 +29,14 @@ export const consultantService = {
 
   /**
    * Send email to consultant
-   * @param {Object} emailData - Email data object
+   * @param {Object} emailData - Email data object matching ContactYourConsultantDTO
    * @param {Array} emailData.ToEmail - Array of recipient emails
    * @param {string} emailData.Subject - Email subject
    * @param {string} emailData.BodyText - Email body (HTML formatted)
    * @param {string} emailData.FromEmail - Sender email
    * @param {string} emailData.FromName - Sender name
    * @param {string} emailData.CcEmail - CC emails (comma-separated)
-   * @param {Array} emailData.Attachments - Array of attachment objects
+   * @param {Array} emailData.Attachments - Array of AttachmentDTO objects
    * @returns {Promise} Email send response
    */
   sendConsultantEmail: async (emailData) => {
@@ -46,9 +46,21 @@ export const consultantService = {
         throw new Error('Client ID not found in session');
       }
 
+      // Ensure payload matches ContactYourConsultantDTO structure
+      const payload = {
+        FromEmail: emailData.FromEmail,
+        FromName: emailData.FromName,
+        ToEmail: emailData.ToEmail,
+        CcEmail: emailData.CcEmail || '',
+        Subject: emailData.Subject,
+        BodyText: emailData.BodyText,
+        Attachments: emailData.Attachments || [],
+        EmailType: 'smtp' // Required field for backend
+      };
+
       const response = await httpClient.post(
         `${HELPDESK_API_CONSULTANT_CREATEEMAIL}${clientID}/softwareconsultant`,
-        emailData
+        payload
       );
       
       console.log('🔧 ConsultantService: Email sent successfully');
