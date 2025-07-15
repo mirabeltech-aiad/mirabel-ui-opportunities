@@ -368,8 +368,9 @@ export const HomeProvider = ({ children }) => {
           console.error("Error parsing client variables:", error);
         }
       }
-        const menus = await navigationService.fetchNavigationData();
+        const menus = await navigationService.fetchNavigationData(userId, navBarType);
         setNavigationMenus(menus);
+        checkTermsAndConditions();
       } catch (error) {
         console.error('Error loading navigation menus:', error);
       } finally {
@@ -380,7 +381,6 @@ export const HomeProvider = ({ children }) => {
   }, []);
 
   // Check for Terms and Conditions on mount
-  useEffect(() => {
     const checkTermsAndConditions = async () => {
       try {
         const agreementText = await termsAndConditionsService.getAgreementText();
@@ -392,9 +392,6 @@ export const HomeProvider = ({ children }) => {
         // Don't show error toast for this - it's expected if user has already accepted
       }
     };
-
-    checkTermsAndConditions();
-  }, []);
 
   const value = {
     ...state,
