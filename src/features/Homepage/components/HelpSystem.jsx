@@ -24,6 +24,7 @@ import { helpService } from '../services/helpService';
 import { chatService } from '../services/chatService';
 import { consultantService } from '../services/consultantService';
 import { getUserInfo } from '@/utils/sessionHelpers';
+import { useToast } from '@/components/ui/use-toast';
 
 const HelpSystem = () => {
   const { helpVisible, helpPosition, actions } = useHome();
@@ -32,12 +33,21 @@ const HelpSystem = () => {
   const [showTicketForm, setShowTicketForm] = useState(false);
   const [showContactForm, setShowContactForm] = useState(false);
   const [showTrainingForm, setShowTrainingForm] = useState(false);
-  const [consultantInfo, setConsultantInfo] = useState(null);
   const [isContactConsultantOpen, setIsContactConsultantOpen] = useState(false);
   const buttonRef = useRef(null);
   const [showLivePhoneModal, setShowLivePhoneModal] = useState(false);
   const [showSalesRepForm, setShowSalesRepForm] = useState(false);
   const { isAdmin } = getUserInfo();
+  const [consultantInfo, setConsultantInfo] = useState(null);
+  const { toast } = useToast();
+
+  // Watch for consultant info changes and open form when available
+  useEffect(() => {
+    if (consultantInfo && consultantInfo.Data) {
+      console.log('🔧 HelpSystem: Consultant info available, opening form');
+      setIsContactConsultantOpen(true);
+    }
+  }, [consultantInfo]);
 
   const defaultHelpPosition = { x: typeof window !== 'undefined' ? window.innerWidth - 100 : 1320, y: typeof window !== 'undefined' ? window.innerHeight - 100 : 620 };
 
@@ -65,12 +75,29 @@ const HelpSystem = () => {
       icon: Users,
       action: async () => {
         try {
+          console.log('🔧 HelpSystem: Fetching consultant info...');
           const consultantData = await consultantService.getConsultantInfo();
-          setConsultantInfo(consultantData);
-          setIsContactConsultantOpen(true);
+          console.log('🔧 HelpSystem: Consultant data received:', consultantData);
+          
+          if (consultantData?.content?.Status === 'Success') {
+            console.log('🔧 HelpSystem: Setting consultant info:', consultantData.content);
+            setConsultantInfo(consultantData.content);
+            // Form will be opened by useEffect when consultant info is set
+          } else {
+            console.error('🔧 HelpSystem: Consultant data status not success:', consultantData);
+            toast({
+              title: "Error loading consultant information",
+              description: "Unable to load consultant details. Please try again.",
+              variant: "destructive",
+            });
+          }
         } catch (error) {
           console.error('Error getting consultant info:', error);
-          alert('Unable to load consultant information. Please try again.');
+          toast({
+            title: "Error loading consultant information",
+            description: "Unable to load consultant details. Please try again.",
+            variant: "destructive",
+          });
         }
       },
       color: 'bg-purple-500'
@@ -253,11 +280,17 @@ const HelpSystem = () => {
 
       {/* Contact Consultant Form Modal */}
       {isContactConsultantOpen && (
-        <ContactConsultantForm
-          isOpen={isContactConsultantOpen}
-          onClose={() => setIsContactConsultantOpen(false)}
-          consultantInfo={consultantInfo}
-        />
+        <>
+          {console.log('🔧 HelpSystem: Rendering ContactConsultantForm with consultantInfo:', consultantInfo)}
+          <ContactConsultantForm
+            isOpen={isContactConsultantOpen}
+            onClose={() => {
+              setIsContactConsultantOpen(false);
+              setConsultantInfo(null); // Reset consultant info when form is closed
+            }}
+            consultantInfo={consultantInfo}
+          />
+        </>
       )}
 
       {/* Schedule Training Form Modal */}

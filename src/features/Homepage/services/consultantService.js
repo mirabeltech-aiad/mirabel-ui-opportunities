@@ -5,20 +5,30 @@ import { getSessionValue } from '../../../utils/sessionHelpers';
 /**
  * Consultant service for handling consultant-related API calls
  * Matches the backend logic for consultant info and email functionality
+ * Note: Consultant assignment for Contact Consultant is handled automatically by the backend based on client ID
  */
 export const consultantService = {
   /**
    * Get consultant information for the current client
-   * @returns {Promise} Consultant information
+   * Used by ScheduleTrainingForm and ContactSalesRepForm
+   * @returns {Promise} Consultant information including primary consultant, other consultants, and sales reps
    */
   getConsultantInfo: async () => {
     try {
       const clientID = getSessionValue('ClientID');
+      console.log('🔧 ConsultantService: ClientID from session:', clientID);
+      
       if (!clientID) {
         throw new Error('Client ID not found in session');
       }
 
-      const response = await httpClient.get(`${API_CONSULTANT_INFO_GET}${clientID}`);
+      const endpoint = `${API_CONSULTANT_INFO_GET}${clientID}`;
+      console.log('🔧 ConsultantService: Calling endpoint:', endpoint);
+      
+      const response = await httpClient.get(endpoint);
+      console.log('🔧 ConsultantService: Raw response:', response);
+      console.log('🔧 ConsultantService: Response content:', response?.content);
+      console.log('🔧 ConsultantService: Response content.Data:', response?.content?.Data);
       console.log('🔧 ConsultantService: Consultant info retrieved successfully');
       return response;
     } catch (error) {
@@ -26,11 +36,10 @@ export const consultantService = {
       throw error;
     }
   },
-
   /**
    * Send email to consultant
    * @param {Object} emailData - Email data object matching ContactYourConsultantDTO
-   * @param {Array} emailData.ToEmail - Array of recipient emails
+   * @param {Array} emailData.ToEmail - Array of recipient emails (backend will assign consultant)
    * @param {string} emailData.Subject - Email subject
    * @param {string} emailData.BodyText - Email body (HTML formatted)
    * @param {string} emailData.FromEmail - Sender email
@@ -55,8 +64,11 @@ export const consultantService = {
         Subject: emailData.Subject,
         BodyText: emailData.BodyText,
         Attachments: emailData.Attachments || [],
-        EmailType: 'smtp' // Required field for backend
+        EmailType: 'smtp' // Optional field for backend DTO
       };
+
+      console.log('🔧 ConsultantService: Sending payload:', payload);
+      console.log('🔧 ConsultantService: Endpoint:', `${HELPDESK_API_CONSULTANT_CREATEEMAIL}${clientID}/softwareconsultant`);
 
       const response = await httpClient.post(
         `${HELPDESK_API_CONSULTANT_CREATEEMAIL}${clientID}/softwareconsultant`,
@@ -67,6 +79,7 @@ export const consultantService = {
       return response;
     } catch (error) {
       console.error('❌ ConsultantService: Error sending email:', error);
+      console.error('❌ ConsultantService: Error response:', error.response?.data);
       throw error;
     }
   },

@@ -345,17 +345,11 @@ export const HomeProvider = ({ children }) => {
         setNavigationMenus(menus);
       } catch (error) {
         console.error('Error loading navigation menus:', error);
-        toast({
-          title: "Error",
-          description: "Failed to load navigation menus",
-          variant: "destructive",
-        });
       } finally {
         setNavigationLoading(false);
       }
-    };
-
-    loadNavigationMenus();
+      };
+      loadNavigationMenus();
   }, []);
 
   // Check for Terms and Conditions on mount

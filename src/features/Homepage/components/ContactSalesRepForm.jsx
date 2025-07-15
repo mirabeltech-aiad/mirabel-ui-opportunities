@@ -8,11 +8,11 @@ import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
 import { apiCall } from '@/services/httpClient';
 import {
-  API_SALESREP_LIST_GET,
+  API_CONSULTANT_INFO_GET,
   HELPDESK_API_SALESREP_CREATEREQUEST,
   HELPDESK_API_ATTACHTEMPORARY_FILE
 } from '@/config/apiUrls';
-import { getUserInfo } from '@/utils/sessionHelpers';
+import { getUserInfo, getSessionValue } from '@/utils/sessionHelpers';
 import { useToast } from '@/features/Opportunity/hooks/use-toast';
 
 const ContactSalesRepForm = ({ isOpen, onClose }) => {
@@ -45,18 +45,24 @@ const ContactSalesRepForm = ({ isOpen, onClose }) => {
 
   const fetchSalesReps = async () => {
     try {
-      const res = await apiCall(API_SALESREP_LIST_GET, 'GET');
-      if (res && res.content && res.content.List) {
-        // Log the structure for debugging
-        console.log('Sales rep list:', res.content.List);
-        // Map to expected structure
-        const mapped = res.content.List.map(rep => ({
-          Name: rep.Name || rep.Display || rep.FullName || '',
-          Email: rep.Email || rep.Value || rep.EmailAddress || ''
+      const clientID = getSessionValue('ClientID');
+      if (!clientID) {
+        throw new Error('Client ID not found in session');
+      }
+
+      const res = await apiCall(`${API_CONSULTANT_INFO_GET}${clientID}`, 'GET');
+      if (res && res.content && res.content.Messages) {
+        // Extract sales reps from Messages field (matches legacy implementation)
+        const salesRepsList = res.content.Messages.map(rep => ({
+          Name: rep.Message || '',
+          Email: rep.Field || ''
         }));
-        setSalesReps(mapped.filter(rep => rep.Name && rep.Email));
+        setSalesReps(salesRepsList.filter(rep => rep.Name && rep.Email));
+      } else {
+        setSalesReps([]);
       }
     } catch (e) {
+      console.error('Error fetching sales reps:', e);
       setSalesReps([]);
     }
   };
