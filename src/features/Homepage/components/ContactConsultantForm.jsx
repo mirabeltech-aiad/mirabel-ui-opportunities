@@ -8,8 +8,10 @@ import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
 import { consultantService } from '../services/consultantService';
 import { getSessionValue } from '../../../utils/sessionHelpers';
+import { useToast } from '@/features/Opportunity/hooks/use-toast';
 
 const ContactConsultantForm = ({ isOpen, onClose, consultantInfo }) => {
+  const { toast } = useToast();
   const [formData, setFormData] = useState({
     subject: '',
     question: '',
@@ -113,15 +115,22 @@ const ContactConsultantForm = ({ isOpen, onClose, consultantInfo }) => {
       // Send email
       await consultantService.sendConsultantEmail(emailData);
 
-      // Show success message
-      alert('Your Software Consultant will respond back to you shortly.');
+      // Show success toast notification
+      toast({
+        title: "Message sent successfully",
+        description: "Your Software Consultant will respond back to you shortly.",
+      });
       
       // Close form
       onClose();
       
     } catch (error) {
       console.error('Error sending consultant email:', error);
-      alert(error.message || 'Unable to send message');
+      toast({
+        title: "Error sending message",
+        description: error.message || 'Unable to send message. Please try again.',
+        variant: "destructive",
+      });
     } finally {
       setIsSubmitting(false);
     }
