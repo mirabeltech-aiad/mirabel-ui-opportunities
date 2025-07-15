@@ -17,7 +17,7 @@ export const navigationService = {
    */
   transformSessionData: (apiResponse) => {
     try {
-      const content = apiResponse.data?.content || apiResponse.content || apiResponse;
+      const content = apiResponse.content || apiResponse;
       
       // Extract data from various nested objects
       const sessionDetails = content.SessionDetails || {};
