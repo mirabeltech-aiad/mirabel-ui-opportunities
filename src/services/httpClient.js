@@ -1,4 +1,4 @@
-import { getSessionValue } from '../utils/sessionHelpers';
+import { getSessionValue, performLoginRedirect } from '../utils/sessionHelpers';
 import { isTokenValid } from '../utils/authHelpers';
 import { getCurrentUserId } from '../utils/userUtils';
 
@@ -23,7 +23,7 @@ export const apiCall = (
       domain = `${TokenDetails?.subdomain || new URL(import.meta.env.REACT_APP_API_BASE_URL || "https://tech.magazinemanager.biz").hostname.split('.')[0]}`;
     }
     else {
-      baseURL = import.meta.env.REACT_APP_API_BASE_URL || "https://smoke-feature13.magazinemanager.com";
+      baseURL = import.meta.env.REACT_APP_API_BASE_URL || "http://localhost";
       const urlObj = new URL(baseURL);
       domain = urlObj.hostname.split('.')[0];
     }
@@ -127,6 +127,8 @@ export const apiCall = (
           return promise;
         } else if (res.status === 403) {
           return Promise.reject(res);
+        }else if (res.status === 400) {
+          performLoginRedirect();
         }
       }
       return res.json();
