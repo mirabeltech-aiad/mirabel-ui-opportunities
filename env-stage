@@ -1,4 +1,4 @@
-REACT_APP_API_BASE_URL="https://tech.magazinemanager.biz"
+REACT_APP_API_BASE_URL="https://smoke-feature13.magazinemanager.com"
 REACT_APP_PRODUCT="MM"
 REACT_APP_ENVIRONMENT="staging"
 REACT_APP_PAGE_SIZE="10"
