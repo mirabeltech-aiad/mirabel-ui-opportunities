@@ -54,7 +54,9 @@ export const navigationService = {
       // For now, we'll default to true for SA users, false otherwise
       const isAdmin = email.toLowerCase().includes('sa@') || email.toLowerCase().includes('admin');
       const isSA = isAdmin ? "true" : "false";
-      
+      const cultureUI = clientInfo.CultureUI || "en-US";
+      const siteType = clientInfo.SiteType || "TMM";
+     
       // Create the transformed data object
       const transformedData = {
         "UserID": userId,
@@ -85,7 +87,9 @@ export const navigationService = {
         "BSASubProductTypeId": "21",
         "BSASubProductTypeName": "Broadstreet",
         "CustomerPortalUrl": "http://tier1-portal.mirabeltechnologies.com",
-        "CanSendCRMEmail": "true"
+        "CanSendCRMEmail": "true",
+        "cultureUI": cultureUI,
+        "siteType": siteType
       };
       
       console.log('🔄 Transformed session data:', transformedData);
@@ -106,12 +110,10 @@ export const navigationService = {
    * @returns {Promise<Array>} Array of navigation menu objects
    */
   fetchNavigationData: async (userId = 1, siteId = 0) => {
-    try {
-        //// First, load session details and store in localStorage
-        await navigationService.loadSessionDetails();
-      
+    try {     
       // Then fetch navigation menus
       const response = await apiCall(`/services/admin/navigations/users/${userId}/${siteId}`, 'GET');     
+            
       // Check if response has the expected structure
       if (response?.content?.List) {
         const menus = response.content.List;
@@ -130,10 +132,8 @@ export const navigationService = {
       }
       return [];
     } catch (error) {
-      console.error('Error fetching navigation data:', error);
-      
-      // Return mock navigation data for development/fallback
-      return navigationService.getMockNavigationData();
+      console.error('❌ Error fetching navigation data:', error);
+      return [];
     }
   },
 
@@ -239,104 +239,6 @@ export const navigationService = {
     const baseUrl = navigationService.BASE_DOMAIN;
     const url = relativeUrl.startsWith('/') ? relativeUrl : `/${relativeUrl}`;
     return `${baseUrl}${url}`;
-  },
-
-  /**
-   * Get mock navigation data for development/fallback
-   * @returns {Array} Mock navigation menu structure
-   */
-  getMockNavigationData: () => {
-    return [
-      {
-        id: 1,
-        title: 'Management',
-        url: '',
-        sortOrder: 1,
-        isAdmin: true,
-        isNewWindow: false,
-        isVisible: true,
-        icon: '⚙️',
-        toolTip: 'Management tools and settings',
-        children: [
-          {
-            id: 11,
-            title: 'User Management',
-            url: '/admin/users',
-            sortOrder: 1,
-            isAdmin: true,
-            isNewWindow: false,
-            isVisible: true,
-            icon: '👥',
-            toolTip: 'Manage users',
-            fullUrl: `${navigationService.BASE_DOMAIN}/admin/users`
-          },
-          {
-            id: 12,
-            title: 'System Settings',
-            url: '/admin/settings',
-            sortOrder: 2,
-            isAdmin: true,
-            isNewWindow: false,
-            isVisible: true,
-            icon: '🔧',
-            toolTip: 'System configuration',
-            fullUrl: `${navigationService.BASE_DOMAIN}/admin/settings`
-          }
-        ],
-        fullUrl: ''
-      },
-      {
-        id: 2,
-        title: 'Reports',
-        url: '/reports',
-        sortOrder: 2,
-        isAdmin: false,
-        isNewWindow: false,
-        isVisible: true,
-        icon: '📊',
-        toolTip: 'View reports and analytics',
-        children: [
-          {
-            id: 21,
-            title: 'Sales Reports',
-            url: '/reports/sales',
-            sortOrder: 1,
-            isAdmin: false,
-            isNewWindow: false,
-            isVisible: true,
-            icon: '💰',
-            toolTip: 'Sales analytics',
-            fullUrl: `${navigationService.BASE_DOMAIN}/reports/sales`
-          },
-          {
-            id: 22,
-            title: 'User Analytics',
-            url: '/reports/users',
-            sortOrder: 2,
-            isAdmin: false,
-            isNewWindow: false,
-            isVisible: true,
-            icon: '📈',
-            toolTip: 'User behavior analytics',
-            fullUrl: `${navigationService.BASE_DOMAIN}/reports/users`
-          }
-        ],
-        fullUrl: `${navigationService.BASE_DOMAIN}/reports`
-      },
-      {
-        id: 3,
-        title: 'Tools',
-        url: '/tools',
-        sortOrder: 3,
-        isAdmin: false,
-        isNewWindow: false,
-        isVisible: true,
-        icon: '🛠️',
-        toolTip: 'Utility tools',
-        children: [],
-        fullUrl: `${navigationService.BASE_DOMAIN}/tools`
-      }
-    ];
   },
 
   /**
