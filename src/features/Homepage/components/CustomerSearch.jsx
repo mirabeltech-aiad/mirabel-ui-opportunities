@@ -193,7 +193,7 @@ const CustomerSearch = () => {
               onChange={(e) => handleSearchChange(e.target.value)}
               onKeyDown={handleKeyDown}
               onFocus={handleFocus}
-              className="pl-8 pr-8 py-2 bg-white border border-gray-300 text-gray-900 placeholder-gray-500 focus:bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-200 rounded-full h-10 text-sm w-full min-h-0 focus:text-gray-900"
+              className="pl-8 pr-4 py-2 bg-white border border-gray-300 text-gray-900 placeholder-gray-500 focus:bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-200 rounded-full h-10 text-sm w-full min-h-0 focus:text-gray-900"
               style={{ 
                 boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1)',
                 color: '#111827',
@@ -203,7 +203,7 @@ const CustomerSearch = () => {
                 fontSize: '14px',
                 lineHeight: '1.5',
                 paddingLeft: '32px',
-                paddingRight: '32px',
+                paddingRight: '16px',
                 paddingTop: '8px',
                 paddingBottom: '8px',
                 height: '40px',
@@ -212,15 +212,6 @@ const CustomerSearch = () => {
               }}
             />
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4 pointer-events-none" />
-            <Button
-              type="button"
-              variant="ghost"
-              size="sm"
-              onClick={handleSearchClick}
-              className="absolute right-2 top-1/2 transform -translate-y-1/2 h-6 w-6 p-0 hover:bg-gray-100 rounded-full"
-            >
-              <Search className="h-4 w-4 text-gray-500" />
-            </Button>
           </div>
         </PopoverTrigger>
         
