@@ -174,17 +174,88 @@ const homeReducer = (state, action) => {
 
 // Provider component
 export const HomeProvider = ({ children }) => {
-  // Clear tabs from localStorage on every page load (refresh)
-  React.useEffect(() => {
-    localStorage.removeItem('home-tabs');
-    localStorage.removeItem('home-active-tab');
-  }, []);
-
   const [state, dispatch] = useReducer(homeReducer, initialState);
   const { toast } = useToast();
 
-  // Load tabs from localStorage on mount
-  useEffect(() => {
+  // Check for Terms and Conditions
+  const checkTermsAndConditions = async () => {
+    try {
+      const agreementText = await termsAndConditionsService.getAgreementText();
+      if (agreementText && agreementText.trim()) {
+        showTermsModal();
+      }
+    } catch (error) {
+      console.error('Error checking Terms and Conditions:', error);
+      // Don't show error toast for this - it's expected if user has already accepted
+    }
+  };
+
+  // Load navigation menus
+  const loadNavigationMenus = async () => {
+    try {
+      const clientDetails = localStorage.getItem("MMClientVars");
+      let cultureUI = "en-US"; // Default value
+      let siteType = "TMM"; // Default value
+      let navBarType = 0; // Default to General
+      let userId = 1; // Default to General
+      
+      if (clientDetails) {
+        try {
+          const clientVars = JSON.parse(clientDetails);
+          cultureUI = clientVars.cultureUI || cultureUI;
+          siteType = clientVars.siteType || siteType;
+          userId = clientVars.UserID || userId;
+          
+          // Determine NavBarType based on culture and site type
+          if (cultureUI === "de-DE" && siteType === "CRM") {
+            navBarType = 3; // GermanCRM
+          } else if (siteType === "CRM") {
+            navBarType = 1; // CRM
+          } else if (cultureUI === "de-DE") {
+            navBarType = 2; // German
+          } else {
+            navBarType = 0; // General
+          }
+          
+        } catch (error) {
+          console.error("Error parsing client variables:", error);
+        }
+      }
+      const menus = await navigationService.fetchNavigationData(userId, navBarType);
+      setNavigationMenus(menus);
+      await checkTermsAndConditions();
+    } catch (error) {
+      console.error('Error loading navigation menus:', error);
+    }
+  };
+
+  // Load dashboards
+  const loadDashboards = async () => {
+    try {
+      setDashboardsLoading(true);
+      const dashboards = await dashboardService.getDashboards();
+      const activeDashboards = dashboardService.getActiveDashboards(dashboards);
+      setDashboards(activeDashboards);
+      
+      // Set default dashboard
+      const defaultDashboard = dashboardService.getDefaultDashboard(activeDashboards);
+      if (defaultDashboard) {
+        setSelectedDashboard(defaultDashboard);
+      }
+    } catch (error) {
+      console.error('Failed to load dashboards:', error);
+      toast({
+        title: "Error",
+        description: "Failed to load dashboards",
+        variant: "destructive",
+      });
+    } finally {
+      setDashboardsLoading(false);
+    }
+  };
+
+  // Load tabs from localStorage
+  const loadTabsFromStorage = () => {
     const savedTabs = localStorage.getItem('home-tabs');
     const savedActiveTab = localStorage.getItem('home-active-tab');
     
@@ -209,7 +280,27 @@ export const HomeProvider = ({ children }) => {
     if (savedActiveTab) {
       dispatch({ type: ACTIONS.SET_ACTIVE_TAB, payload: savedActiveTab });
     }
-  }, []);
+  };
+
+  // Main initialization effect - runs in sequence
+  useEffect(() => {
+    const initializeApp = async () => {
+      // Clear localStorage first
+      localStorage.removeItem('home-tabs');
+      localStorage.removeItem('home-active-tab');
+      
+      // 1. Load navigation menus first (as requested)
+      await loadNavigationMenus();
+      
+      // 2. Load dashboards
+      await loadDashboards();
+      
+      // 3. Load tabs from localStorage last
+      loadTabsFromStorage();
+    };
+
+    initializeApp();
+  }, []); // Removed toast dependency - initialization should only run once on mount
 
   // Save tabs to localStorage when they change
   useEffect(() => {
@@ -306,92 +397,6 @@ export const HomeProvider = ({ children }) => {
   const hideTermsModal = () => {
     dispatch({ type: ACTIONS.HIDE_TERMS_MODAL });
   };
-
-  // Load dashboards on mount
-  useEffect(() => {
-    const loadDashboards = async () => {
-      try {
-        setDashboardsLoading(true);
-        const dashboards = await dashboardService.getDashboards();
-        const activeDashboards = dashboardService.getActiveDashboards(dashboards);
-        setDashboards(activeDashboards);
-        
-        // Set default dashboard
-        const defaultDashboard = dashboardService.getDefaultDashboard(activeDashboards);
-        if (defaultDashboard) {
-          setSelectedDashboard(defaultDashboard);
-        }
-      } catch (error) {
-        console.error('Failed to load dashboards:', error);
-        toast({
-          title: "Error",
-          description: "Failed to load dashboards",
-          variant: "destructive",
-        });
-      } finally {
-        setDashboardsLoading(false);
-      }
-    };
-
-    loadDashboards();
-  }, [toast]);
-
-  // Load navigation menus on mount
-  useEffect(() => {
-    const loadNavigationMenus = async () => {
-      try {
-      const clientDetails = localStorage.getItem("MMClientVars");
-      let cultureUI = "en-US"; // Default value
-      let siteType = "TMM"; // Default value
-      let navBarType = 0; // Default to General
-      let userId = 1; // Default to General
-      
-      if (clientDetails) {
-        try {
-          const clientVars = JSON.parse(clientDetails);
-          cultureUI = clientVars.cultureUI || cultureUI;
-          siteType = clientVars.siteType || siteType;
-          userId = clientVars.UserID || userId;
-          
-          // Determine NavBarType based on culture and site type
-          if (cultureUI === "de-DE" && siteType === "CRM") {
-            navBarType = 3; // GermanCRM
-          } else if (siteType === "CRM") {
-            navBarType = 1; // CRM
-          } else if (cultureUI === "de-DE") {
-            navBarType = 2; // German
-          } else {
-            navBarType = 0; // General
-          }
-          
-        } catch (error) {
-          console.error("Error parsing client variables:", error);
-        }
-      }
-        const menus = await navigationService.fetchNavigationData(userId, navBarType);
-        setNavigationMenus(menus);
-        checkTermsAndConditions();
-      } catch (error) {
-        console.error('Error loading navigation menus:', error);
-      } finally {
-        setNavigationLoading(false);
-      }
-      };
-      loadNavigationMenus();
-  }, []);
-
-  // Check for Terms and Conditions on mount
-    const checkTermsAndConditions = async () => {
-      try {
-        const agreementText = await termsAndConditionsService.getAgreementText();
-        if (agreementText && agreementText.trim()) {
-          showTermsModal();
-        }
-      } catch (error) {
-        console.error('Error checking Terms and Conditions:', error);
-        // Don't show error toast for this - it's expected if user has already accepted
-      }
-    };
 
   const value = {
     ...state,

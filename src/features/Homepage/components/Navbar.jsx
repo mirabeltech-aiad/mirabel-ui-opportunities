@@ -40,7 +40,7 @@ const renderMenuItems = (items, openTabByUrl) => {
     if (item.children && item.children.length > 0) {
       return (
         <DropdownMenuSub key={item.id}>
-          <DropdownMenuSubTrigger className="rounded-md text-gray-800 font-medium hover:bg-ocean-100 hover:text-ocean-700 cursor-pointer flex items-center">
+          <DropdownMenuSubTrigger className="rounded-md text-gray-800 font-medium text-sm hover:bg-ocean-100 hover:text-ocean-700 cursor-pointer flex items-center">
             <span>{item.title}</span>
             {item.icon && (
               <Badge className="ml-2 text-xs" variant="secondary">
@@ -58,7 +58,7 @@ const renderMenuItems = (items, openTabByUrl) => {
         <DropdownMenuItem
           key={item.id}
           onClick={() => openTabByUrl(item.title, item.url)}
-          className="rounded-md font-medium hover:bg-ocean-100 hover:text-ocean-700 cursor-pointer flex items-center text-white"
+          className="rounded-md font-medium text-sm hover:bg-ocean-100 hover:text-ocean-700 cursor-pointer flex items-center text-white"
         >
           <span>{item.title}</span>
           {item.icon && (
@@ -371,14 +371,14 @@ const Navbar = () => {
                 navigationMenus.map((menu) => (
                   <DropdownMenu key={menu.id}>
                     <DropdownMenuTrigger asChild>
-                      <button className="px-2 py-1 rounded-md font-semibold text-white hover:bg-ocean-700 focus:bg-ocean-800 transition flex items-center text-base outline-none border-none h-8 min-h-0">
+                      <button className="px-2 py-1 rounded-md font-medium text-sm text-white hover:bg-ocean-700 focus:bg-ocean-800 transition flex items-center h-8 min-h-0">
                         <span>{menu.title}</span>
                         {menu.children && menu.children.length > 0 && <ChevronDown className="h-4 w-4 ml-1" />}
                       </button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="start" className="w-56 mt-2 rounded-lg shadow-lg bg-ocean-gradient border border-gray-100 p-1 max-h-96 overflow-y-auto scrollbar-thin scrollbar-thumb-ocean-400 scrollbar-track-ocean-100 text-white">
                       {menu.url && (
-                        <DropdownMenuItem onClick={() => openTabByUrl(menu.title, menu.url)} className="rounded-md font-medium hover:bg-ocean-100 hover:text-ocean-700 cursor-pointer text-white">
+                        <DropdownMenuItem onClick={() => openTabByUrl(menu.title, menu.url)} className="rounded-md font-medium text-sm hover:bg-ocean-100 hover:text-ocean-700 cursor-pointer text-white">
                           <span>{menu.title} Home</span>
                         </DropdownMenuItem>
                       )}
