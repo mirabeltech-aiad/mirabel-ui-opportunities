@@ -56,6 +56,11 @@ export const navigationService = {
       const isSA = isAdmin ? "true" : "false";
       const cultureUI = clientInfo.CultureUI || "en-US";
       const siteType = clientInfo.SiteType || "TMM";
+      const isUserHasMKMAccess=clientInfo.IsUserHasMKMAccess || false;
+      const isSiteDataPackEnabled=clientInfo.IsSiteDataPackEnabled || false;
+      const isUserHasDataPackAccess=clientInfo.IsUserHasDataPackAccess || false;
+      const isMirabelEmailServiceEnabled=clientInfo.IsMirabelEmailServiceEnabled || false;
+      const isrepnotificationenabled=clientInfo.IsRepNotificationEnabled || false;
      
       // Create the transformed data object
       const transformedData = {
@@ -89,7 +94,12 @@ export const navigationService = {
         "CustomerPortalUrl": "http://tier1-portal.mirabeltechnologies.com",
         "CanSendCRMEmail": "true",
         "cultureUI": cultureUI,
-        "siteType": siteType
+        "siteType": siteType,
+        "IsUserHasMKMAccess": isUserHasMKMAccess,
+        "IsSiteDataPackEnabled": isSiteDataPackEnabled,
+        "IsUserHasDataPackAccess": isUserHasDataPackAccess,
+        "IsMirabelEmailServiceEnabled": isMirabelEmailServiceEnabled,
+        "IsRepNotificationEnabled": isrepnotificationenabled
       };
       
       console.log('🔄 Transformed session data:', transformedData);
@@ -112,25 +122,12 @@ export const navigationService = {
   fetchNavigationData: async (userId = 1, siteId = 0) => {
     try {     
       // Then fetch navigation menus
-      const response = await apiCall(`/services/admin/navigations/users/${userId}/${siteId}`, 'GET');     
-            
+      const response = await apiCall(`/services/admin/navigations/users/${userId}/${siteId}`, 'GET');        
       // Check if response has the expected structure
       if (response?.content?.List) {
         const menus = response.content.List;
         return navigationService.processNavigationMenus(menus);
       }
-      
-      // Fallback: check if data is directly in response.data
-      if (response?.data?.content?.List) {
-        const menus = response.data.content.List;
-        return navigationService.processNavigationMenus(menus);
-      }
-      
-      // Additional fallback: check if response is directly an array
-      if (Array.isArray(response)) {
-        return navigationService.processNavigationMenus(response);
-      }
-      return [];
     } catch (error) {
       console.error('❌ Error fetching navigation data:', error);
       return [];
