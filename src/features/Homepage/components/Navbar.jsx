@@ -355,7 +355,7 @@ const Navbar = () => {
   };
 
   return (
-    <nav className="navbar bg-ocean-gradient shadow-md h-12">
+      <nav className="navbar bg-ocean-gradient shadow-md h-12">
       <div className="max-w-full px-2 sm:px-4 lg:px-6">
         <div className="flex items-center justify-between h-12 min-h-0">
           {/* Logo */}
@@ -411,17 +411,6 @@ const Navbar = () => {
                   {notifications}
                 </Badge>
               )}
-            </Button>
-
-            {/* Announcements Panel Button (btnCustomPanel) */}
-            <Button 
-              variant="ghost" 
-              size="icon" 
-              className="text-white hover:bg-ocean-700 rounded-full h-8 w-8 p-0 min-h-0"
-              onClick={toggleAnnouncementsPanel}
-              title="Announcements"
-            >
-              <MessageSquare className="h-5 w-5" />
             </Button>
 
             {/* User Menu - Updated to match ASP.NET design exactly */}

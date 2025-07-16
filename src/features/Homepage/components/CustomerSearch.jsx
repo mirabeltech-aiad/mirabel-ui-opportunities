@@ -181,7 +181,7 @@ const CustomerSearch = () => {
   }, []);
 
   return (
-    <div className="relative mr-2" style={{ width: '280px' }}>
+    <div className="relative" style={{ width: '150px' }}>
       <Popover open={isOpen} onOpenChange={setIsOpen}>
         <PopoverTrigger asChild>
           <div className="relative">
@@ -194,7 +194,7 @@ const CustomerSearch = () => {
               onKeyDown={handleKeyDown}
               onFocus={handleFocus}
               className="pl-8 pr-4 py-2 bg-white border border-gray-300 text-gray-900 placeholder-gray-500 focus:bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-200 rounded-full h-10 text-sm w-full min-h-0 focus:text-gray-900"
-              style={{ 
+              style={{
                 boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1)',
                 color: '#111827',
                 backgroundColor: '#ffffff',
@@ -206,9 +206,7 @@ const CustomerSearch = () => {
                 paddingRight: '16px',
                 paddingTop: '8px',
                 paddingBottom: '8px',
-                height: '30px',
-                width: '90%',
-                minWidth: '200px'
+                height: '30px'
               }}
             />
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4 pointer-events-none" />
