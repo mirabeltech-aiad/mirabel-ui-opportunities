@@ -10,6 +10,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from '@/components/ui/popover';
+import { navigationService } from '../services/navigationService';
 
 const CustomerSearch = () => {
   const [searchQuery, setSearchQuery] = useState('');
@@ -21,7 +22,7 @@ const CustomerSearch = () => {
   const searchTimeoutRef = useRef(null);
   const inputRef = useRef(null);
 
-  const { actions } = useHome();
+  const { actions, tabs } = useHome();
   const { toast } = useToast();
 
   // Debounced search function
@@ -77,6 +78,25 @@ const CustomerSearch = () => {
     }
   };
 
+  // Open tab by URL (same pattern as profile menu)
+  const openTabByUrl = (title, url) => {
+    if (!url) return;
+    
+    const fullUrl = navigationService.getFullUrl(url);
+    const existingTab = tabs.find(tab => tab.url === fullUrl);
+    if (existingTab) {
+      actions.setActiveTab(existingTab.id);
+    } else {
+      actions.addTab({
+        title,
+        url: fullUrl,
+        type: 'iframe',
+        icon: '🌐',
+        closable: true,
+      });
+    }
+  };
+
   // Perform the actual search
   const performSearch = () => {
     if (!searchQuery.trim()) return;
@@ -91,7 +111,7 @@ const CustomerSearch = () => {
       setIsOpen(false);
       setSearchFlag(selected.CustomerId || selected.DisplayName);
 
-      // Handle different types
+      // Handle different types using openTabByUrl pattern
       if (selected.Type === 'Rep' && selected.ContactID) {
         handleRepSearch(selected.ContactID);
       } else if (selected.ContactID && selected.ContactID > 0) {
@@ -113,79 +133,34 @@ const CustomerSearch = () => {
     }, 100);
   };
 
-  // Handle customer search
+  // Handle customer search using openTabByUrl pattern
   const handleCustomerSearch = (customer) => {
     if (customer.ContactID && !isNaN(customer.ContactID)) {
       // Contact ID was selected, go to contact page
       const url = `/ui/ContactEdit?edit=1&Search=1&gscustomerid=${customer.ContactID}`;
-      
-      // Generate unique ID and add tab
-      const tabId = `contact-${customer.ContactID}-${Date.now()}`;
-      actions.addTab({
-        id: tabId,
-        title: customer.DisplayName || 'Contact',
-        url: url,
-        type: 'iframe',
-        icon: '👤',
-        closable: true,
-      });
-      
-      // Keep the tab active and refresh
-      setTimeout(() => {
-        actions.setActiveTab(tabId);
-      }, 100);
+      openTabByUrl(customer.DisplayName || 'Contact', url);
     } else {
       // Text search
       handleTextSearch(customer.DisplayName || searchQuery);
     }
   };
 
-  // Handle rep search
+  // Handle rep search using openTabByUrl pattern
   const handleRepSearch = (repId) => {
     if (!isNaN(repId)) {
       const url = `/ui/ContactSearch?okToRun=YES&gsRepID=${repId}`;
-      
-      // Generate unique ID and add tab
-      const tabId = `rep-search-${repId}-${Date.now()}`;
-      actions.addTab({
-        id: tabId,
-        title: 'Advanced Search',
-        url: url,
-        type: 'iframe',
-        icon: '🔍',
-        closable: true,
-      });
-      
-      // Keep the tab active and refresh
-      setTimeout(() => {
-        actions.setActiveTab(tabId);
-      }, 100);
+      openTabByUrl('Advanced Search', url);
     }
   };
 
-  // Handle text search
+  // Handle text search using openTabByUrl pattern
   const handleTextSearch = (searchText) => {
     if (!searchText.trim()) return;
 
     // Encode search value and navigate to search page
     const encodedSearch = encodeURIComponent(searchText);
     const url = `/ui/ContactSearch?okToRun=YES&customer=${encodedSearch}`;
-    
-    // Generate unique ID and add tab
-    const tabId = `text-search-${Date.now()}`;
-    actions.addTab({
-      id: tabId,
-      title: 'Advanced Search',
-      url: url,
-      type: 'iframe',
-      icon: '🔍',
-      closable: true,
-    });
-    
-    // Keep the tab active and refresh
-    setTimeout(() => {
-      actions.setActiveTab(tabId);
-    }, 100);
+    openTabByUrl('Advanced Search', url);
   };
 
   // Handle focus (clear search flag)
