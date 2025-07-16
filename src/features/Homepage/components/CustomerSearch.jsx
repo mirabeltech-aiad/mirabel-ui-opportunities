@@ -206,8 +206,8 @@ const CustomerSearch = () => {
                 paddingRight: '16px',
                 paddingTop: '8px',
                 paddingBottom: '8px',
-                height: '40px',
-                width: '100%',
+                height: '30px',
+                width: '90%',
                 minWidth: '200px'
               }}
             />
