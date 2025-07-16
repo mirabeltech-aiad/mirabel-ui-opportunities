@@ -155,6 +155,15 @@
   background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
 }
 
+/* Remove all focus indicators */
+.no-focus-ring:focus {
+  outline: none !important;
+  box-shadow: none !important;
+  --tw-ring-offset-shadow: none !important;
+  --tw-ring-shadow: none !important;
+  ring: none !important;
+}
+
 /* Announcements Side Panel Styles (matching legacy) */
 .side-panel {
   position: fixed;
