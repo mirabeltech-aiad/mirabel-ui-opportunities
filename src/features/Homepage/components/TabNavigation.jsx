@@ -15,14 +15,22 @@ import {
 const TabNavigation = () => {
   const { tabs, activeTabId, actions } = useHome();
 
+  // Split tabs into fixed and draggable
+  const fixedTabsCount = 3; // Dashboard, Inbox, Search
+  const fixedTabs = tabs.slice(0, fixedTabsCount);
+  const draggableTabs = tabs.slice(fixedTabsCount);
+
   const handleDragEnd = (result) => {
     if (!result.destination) return;
 
-    const items = Array.from(tabs);
+    // Only reorder draggable tabs
+    const items = Array.from(draggableTabs);
     const [reorderedItem] = items.splice(result.source.index, 1);
     items.splice(result.destination.index, 0, reorderedItem);
 
-    actions.reorderTabs(items);
+    // Merge fixed and reordered draggable tabs
+    const newTabs = [...fixedTabs, ...items];
+    actions.reorderTabs(newTabs);
   };
 
   const handleTabClick = (tabId) => {
@@ -58,6 +66,40 @@ const TabNavigation = () => {
       {/* Tab Bar */}
       <div className="bg-white border-b border-gray-200 flex items-center px-2 py-0 h-8 min-h-0">
         <div className="flex items-center flex-1 min-w-0">
+          {/* Render fixed tabs (not draggable) */}
+          {fixedTabs.map((tab, index) => (
+            <div
+              key={tab.id}
+              className={`flex items-center rounded-t-lg transition-all duration-200 h-7 min-h-0 px-2 text-xs ${
+                activeTabId === tab.id
+                  ? 'bg-white border-t-2 border-blue-500 text-blue-600 shadow-sm'
+                  : 'bg-gray-100 hover:bg-gray-200 text-gray-700'
+              }`}
+            >
+              <div
+                className="flex items-center px-1 py-0 cursor-pointer flex-1 h-7 min-h-0"
+                onClick={() => handleTabClick(tab.id)}
+              >
+                <span className="mr-1 text-xs flex items-center">{tab.icon}</span>
+                <span className="text-xs font-medium truncate max-w-32 flex items-center">
+                  {tab.title}
+                </span>
+              </div>
+              {/* Close button (not draggable, but should not appear for fixed tabs) */}
+              {tab.closable !== false && (
+                <button
+                  onClick={(e) => handleTabClose(e, tab.id)}
+                  className="mr-1 p-0 rounded hover:bg-gray-300 transition-colors flex-shrink-0 h-5 w-5 min-h-0 flex items-center justify-center"
+                  title="Close tab"
+                  type="button"
+                >
+                  <X className="h-3 w-3" />
+                </button>
+              )}
+            </div>
+          ))}
+
+          {/* Draggable tabs (after the first three) */}
           <DragDropContext onDragEnd={handleDragEnd}>
             <Droppable droppableId="tabs" direction="horizontal">
               {(provided) => (
@@ -66,7 +108,7 @@ const TabNavigation = () => {
                   {...provided.droppableProps}
                   className="flex items-center space-x-1 flex-1 min-w-0"
                 >
-                  {visibleTabs.map((tab, index) => (
+                  {draggableTabs.map((tab, index) => (
                     <Draggable key={tab.id} draggableId={tab.id} index={index}>
                       {(provided, snapshot) => (
                         <div
@@ -78,7 +120,6 @@ const TabNavigation = () => {
                               : 'bg-gray-100 hover:bg-gray-200 text-gray-700'
                           } ${snapshot.isDragging ? 'opacity-50' : ''}`}
                         >
-                          {/* Unified tab rendering for all tabs */}
                           <div
                             {...provided.dragHandleProps}
                             className="flex items-center px-1 py-0 cursor-pointer flex-1 h-7 min-h-0"
@@ -89,7 +130,6 @@ const TabNavigation = () => {
                               {tab.title}
                             </span>
                           </div>
-                          {/* Close button (not draggable) */}
                           {tab.closable !== false && (
                             <button
                               onClick={(e) => handleTabClose(e, tab.id)}
