@@ -89,6 +89,7 @@ export const getMainLoginUrl = (returnUrl) => {
 
 // Modified logout utility to handle development mode
 export const logout = () => {
+
     // In development mode, just reset session without redirect
     if (isDevelopmentMode()) {
         import('./sessionHelpers.js').then(({ resetSession }) => {

@@ -162,24 +162,15 @@ const JiraTicketForm = ({ onClose }) => {
   };
 
   const handleSubmit = async (e) => {
-    debugger;
     e.preventDefault();
     
-    // Debug: Log form data and validation
-    console.log('Form submission started:', { formData, user });
-    
     if (!validateForm()) {
-      console.log('Form validation failed:', errors);
       return;
     }
-    
-    console.log('Form validation passed, checking authentication...');
     
     // Check authentication before submitting
     const token = getSessionValue("Token");
     const isAuthenticated = getSessionValue("IsAuthenticated");
-    
-    console.log('Authentication check:', { hasToken: !!token, isAuthenticated });
     
     if (!token || !isAuthenticated) {
       toast({ 
@@ -198,8 +189,6 @@ const JiraTicketForm = ({ onClose }) => {
       const clientId = getSessionValue("ClientID");
       const companyName = getSessionValue("CompanyName") || userInfo.companyName || '';
       const productType = getSessionValue("ProductType") || userInfo.clientId || '';
-      
-      console.log('User data for request:', { userInfo, clientId, companyName, productType });
       
       // Prepare request payload matching backend expectations exactly
       const request = {
@@ -222,11 +211,7 @@ const JiraTicketForm = ({ onClose }) => {
       const reporterEmail = encodeURIComponent(formData.email || userInfo.email || '');
       const endpoint = `${HELPDESK_API_TECHSUPPORT_CREATEREQUEST}${reporterName}/${reporterEmail}`;
       
-      console.log('Making API call:', { endpoint, request });
-      
       const res = await apiCall(endpoint, 'POST', request);
-      
-      console.log('API response:', res);
       
       if (res && res.content && res.content.Data && res.content.Data.issueKey) {
         toast({

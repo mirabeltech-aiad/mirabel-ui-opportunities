@@ -6,9 +6,7 @@ const SavedViewsTab = ({ savedViews, onLoadView, onDeleteView, onUpdateView, onS
   const [editingId, setEditingId] = useState(null);
   const [editName, setEditName] = useState("");
 
-  // Add debugging to see what we're receiving
-  console.log('SavedViewsTab: Received savedViews:', savedViews);
-  console.log('SavedViewsTab: savedViews length:', savedViews?.length || 0);
+
 
   const handleEditStart = (view) => {
     // For inline name editing, keep the existing behavior
@@ -33,18 +31,13 @@ const SavedViewsTab = ({ savedViews, onLoadView, onDeleteView, onUpdateView, onS
   // Separate views based on User ID: -1 for Global Views, others for My Views
   const globalViews = validSavedViews.filter(view => {
     const isGlobal = view?.User?.ID === -1;
-    console.log(`View "${view?.NameOfView}" (ID: ${view?.ID}) - User ID: ${view?.User?.ID}, isGlobal: ${isGlobal}`);
     return isGlobal;
   });
   
   const myViews = validSavedViews.filter(view => {
     const isMyView = view?.User?.ID !== -1 && view?.User?.ID !== undefined && view?.User?.ID !== null;
-    console.log(`View "${view?.NameOfView}" (ID: ${view?.ID}) - User ID: ${view?.User?.ID}, isMyView: ${isMyView}`);
     return isMyView;
   });
-
-  console.log('SavedViewsTab: Global Views count:', globalViews.length);
-  console.log('SavedViewsTab: My Views count:', myViews.length);
 
   return (
     <div className="h-full flex flex-col">

@@ -75,16 +75,12 @@ const HelpSystem = () => {
       icon: Users,
       action: async () => {
         try {
-          console.log('🔧 HelpSystem: Fetching consultant info...');
           const consultantData = await consultantService.getConsultantInfo();
-          console.log('🔧 HelpSystem: Consultant data received:', consultantData);
           
           if (consultantData?.content?.Status === 'Success') {
-            console.log('🔧 HelpSystem: Setting consultant info:', consultantData.content);
             setConsultantInfo(consultantData.content);
             // Form will be opened by useEffect when consultant info is set
           } else {
-            console.error('🔧 HelpSystem: Consultant data status not success:', consultantData);
             toast({
               title: "Error loading consultant information",
               description: "Unable to load consultant details. Please try again.",

@@ -151,7 +151,6 @@ const Navbar = () => {
       if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
         e.preventDefault();
         // Open command palette
-        console.log('Command palette opened');
       } else if (e.key === 'F5') {
         e.preventDefault();
         // Handle F5 refresh
@@ -335,19 +334,16 @@ const Navbar = () => {
 
   // Handle logout
   const handleLogout = () => {
-    // Show confirmation dialog
-    if (window.confirm('Are you sure you want to logout?')) {
-      // Clear session data
-      actions.clearSession();
-      
-      // Call auth logout
-      authLogout();
-      
-      toast({
-        title: "Logged out",
-        description: "You have been successfully logged out.",
-      });
-    }
+    // Clear session data
+    actions.clearSession();
+    
+    // Call auth logout
+    authLogout();
+    
+    toast({
+      title: "Logged out",
+      description: "You have been successfully logged out.",
+    });
   };
 
   return (

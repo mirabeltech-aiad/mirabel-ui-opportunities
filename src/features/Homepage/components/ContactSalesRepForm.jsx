@@ -173,8 +173,6 @@ const ContactSalesRepForm = ({ isOpen, onClose }) => {
       
       const endpoint = `${HELPDESK_API_SALESREP_CREATEREQUEST}${reporterName}/${reporterEmail}/${assigneeName}/${assigneeEmail}`;
       
-      console.log('Submitting sales rep contact:', { endpoint, request });
-      
       const res = await apiCall(endpoint, 'POST', request);
       
       if (res && res.content && res.content.Data && res.content.Data.issueKey) {

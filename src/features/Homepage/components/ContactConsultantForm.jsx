@@ -25,15 +25,10 @@ const ContactConsultantForm = ({ isOpen, onClose, consultantInfo }) => {
   const userEmail = getSessionValue('Email');
   const userName = getSessionValue('FullName');
 
-  // Debug consultant info
-  useEffect(() => {
-    console.log('🔧 ContactConsultantForm: Consultant info received:', consultantInfo);
-    console.log('🔧 ContactConsultantForm: Consultant info.Data:', consultantInfo?.Data);
-  }, [consultantInfo]);
+
 
   useEffect(() => {
     if (isOpen) {
-      console.log('🔧 ContactConsultantForm: Form opened with consultantInfo:', consultantInfo);
       // Reset form when opening
       setFormData({
         subject: '',
@@ -226,13 +221,9 @@ const ContactConsultantForm = ({ isOpen, onClose, consultantInfo }) => {
                   <Mail className="h-4 w-4 text-gray-600" />
                   <span className="font-medium">To:</span>
                   {(() => {
-                    console.log('🔧 ContactConsultantForm: Rendering To field with consultantInfo:', consultantInfo);
-                    console.log('🔧 ContactConsultantForm: consultantInfo?.Data:', consultantInfo?.Data);
                     if (consultantInfo?.Data) {
-                      console.log('🔧 ContactConsultantForm: Showing consultant:', consultantInfo.Data.Name, consultantInfo.Data.Email);
                       return <span>{consultantInfo.Data.Name} &lt;{consultantInfo.Data.Email}&gt;</span>;
                     } else {
-                      console.log('🔧 ContactConsultantForm: No consultant data, showing loading message');
                       return <span className="text-gray-600">Loading consultant information...</span>;
                     }
                   })()}
