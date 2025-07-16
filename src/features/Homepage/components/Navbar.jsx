@@ -55,7 +55,7 @@ const renderMenuItems = (items, openTabByUrl) => {
     if (item.children && item.children.length > 0) {
       return (
         <DropdownMenuSub key={item.id}>
-          <DropdownMenuSubTrigger className="rounded-md text-gray-800 font-medium hover:bg-ocean-100 hover:text-ocean-700 cursor-pointer flex items-center">
+          <DropdownMenuSubTrigger className="rounded-md text-gray-800 font-medium text-sm hover:bg-ocean-100 hover:text-ocean-700 cursor-pointer flex items-center">
             <span>{item.title}</span>
             {item.icon && (
               <Badge className="ml-2 text-xs" variant="secondary">
@@ -73,7 +73,7 @@ const renderMenuItems = (items, openTabByUrl) => {
         <DropdownMenuItem
           key={item.id}
           onClick={() => openTabByUrl(item.title, item.url)}
-          className="rounded-md font-medium hover:bg-ocean-100 hover:text-ocean-700 cursor-pointer flex items-center text-white"
+          className="rounded-md font-medium text-sm hover:bg-ocean-100 hover:text-ocean-700 cursor-pointer flex items-center text-white"
         >
           <span>{item.title}</span>
           {item.icon && (
