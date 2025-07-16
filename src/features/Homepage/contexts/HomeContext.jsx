@@ -193,7 +193,6 @@ export const HomeProvider = ({ children }) => {
   // Load navigation menus
   const loadNavigationMenus = async () => {
     try {
-      setNavigationLoading(true);
       const clientDetails = localStorage.getItem("MMClientVars");
       let cultureUI = "en-US"; // Default value
       let siteType = "TMM"; // Default value
@@ -227,8 +226,6 @@ export const HomeProvider = ({ children }) => {
       await checkTermsAndConditions();
     } catch (error) {
       console.error('Error loading navigation menus:', error);
-    } finally {
-      setNavigationLoading(false);
     }
   };
 
