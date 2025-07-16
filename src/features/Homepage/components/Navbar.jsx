@@ -270,6 +270,10 @@ const Navbar = () => {
   // Refresh current tab
   const handleRefresh = () => {
     const activeTab = tabs.find(tab => tab.id === actions.activeTabId);
+    console.log('🔄 Refresh - Active Tab ID:', actions.activeTabId);
+    console.log('🔄 Refresh - Active Tab:', activeTab);
+    console.log('🔄 Refresh - All Tabs:', tabs);
+    
     if (activeTab) {
       if (activeTab.id === 'dashboard') {
         // Refresh dashboard by reloading navigation and dashboards
@@ -284,6 +288,7 @@ const Navbar = () => {
         });
       } else if (activeTab.type === 'iframe') {
         // Refresh iframe content by tab ID
+        console.log('🔄 Refresh - Attempting to refresh iframe with tab ID:', activeTab.id);
         const success = refreshIframeByTabId(activeTab.id);
         if (success) {
           toast({
