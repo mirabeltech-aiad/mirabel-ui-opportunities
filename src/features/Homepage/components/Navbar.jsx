@@ -39,7 +39,7 @@ const renderMenuItems = (items, openTabByUrl) => {
     if (item.children && item.children.length > 0) {
       return (
         <DropdownMenuSub key={item.id}>
-          <DropdownMenuSubTrigger className="rounded-md text-gray-800 font-medium text-sm hover:bg-ocean-100 hover:text-ocean-700 cursor-pointer flex items-center">
+          <DropdownMenuSubTrigger className="rounded-md text-gray-800 font-medium text-sm hover:bg-ocean-100 hover:text-ocean-700 cursor-pointer flex items-center" style={{ fontSize: '13px' }}>
             <span>{item.title}</span>
             {item.icon && (
               <Badge className="ml-2 text-xs" variant="secondary">
@@ -58,6 +58,7 @@ const renderMenuItems = (items, openTabByUrl) => {
           key={item.id}
           onClick={() => openTabByUrl(item.title, item.url)}
           className="rounded-md font-medium text-sm hover:bg-ocean-100 hover:text-ocean-700 cursor-pointer flex items-center text-white"
+          style={{ fontSize: '13px' }}
         >
           <span>{item.title}</span>
           {item.icon && (
@@ -349,7 +350,7 @@ const Navbar = () => {
   };
 
   return (
-    <nav className="bg-ocean-gradient shadow-md h-12">
+    <nav className="navbar bg-ocean-gradient shadow-md h-12">
       <div className="max-w-full px-2 sm:px-4 lg:px-6">
         <div className="flex items-center justify-between h-12 min-h-0">
           {/* Logo */}
@@ -369,7 +370,10 @@ const Navbar = () => {
                 navigationMenus.map((menu) => (
                   <DropdownMenu key={menu.id}>
                     <DropdownMenuTrigger asChild>
-                      <button className="px-2 py-1 rounded-md font-medium text-sm text-white hover:bg-ocean-700 focus:bg-ocean-800 transition flex items-center h-8 min-h-0">
+                      <button
+                        className="px-2 py-1 rounded-md font-medium text-sm text-white hover:bg-ocean-700 focus:bg-ocean-800 transition flex items-center h-8 min-h-0"
+                        style={{ fontSize: '13px' }}
+                      >
                         <span>{menu.title}</span>
                         {menu.children && menu.children.length > 0 && <ChevronDown className="h-4 w-4 ml-1" />}
                       </button>

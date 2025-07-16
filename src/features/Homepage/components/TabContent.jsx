@@ -2,6 +2,7 @@ import React, { Suspense, lazy } from 'react';
 import { useHome } from '../contexts/HomeContext';
 import Dashboard from './Dashboard';
 import NewTab from './NewTab';
+import { withBaseUrl } from '@/lib/utils';
 
 // Lazy load components for better performance
 const OpportunityForm = lazy(() => import('./OpportunityForm'));
@@ -39,7 +40,7 @@ const TabContent = () => {
         if (activeTab.type === 'iframe' && activeTab.url) {
           return (
             <iframe
-              src={activeTab.url}
+              src={withBaseUrl(activeTab.url)}
               className="w-full h-full border-0"
               title={activeTab.title}
             />
