@@ -42,7 +42,7 @@ const initialState = {
       title: 'Inbox',
       component: 'Inbox',
       type: 'iframe',
-      url: '/intranet/Members/Home/InboxNotifications.aspx',
+      url: (typeof window !== 'undefined' ? window.location.origin : '') + '/intranet/Members/Home/InboxNotifications.aspx',
       closable: false,
       icon: '📥'
     },
@@ -51,7 +51,7 @@ const initialState = {
       title: 'Search',
       component: 'Search',
       type: 'iframe',
-      url: '/ui/Search',
+      url: (typeof window !== 'undefined' ? window.location.origin : '') + '/ui/Search',
       closable: false,
       icon: '🔍'
     }
