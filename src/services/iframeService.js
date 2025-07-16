@@ -46,7 +46,21 @@ export const printIframeByUrl = (url) => {
 // Get iframe element by tab ID
 export const getIframeByTabId = (tabId) => {
   try {
+    console.log('🔍 Looking for iframe with data-tab-id:', tabId);
     const iframe = document.querySelector(`iframe[data-tab-id="${tabId}"]`);
+    
+    if (iframe) {
+      console.log('✅ Found iframe:', iframe.src);
+    } else {
+      console.log('❌ No iframe found with data-tab-id:', tabId);
+      // List all iframes and their data-tab-id attributes
+      const allIframes = document.querySelectorAll('iframe');
+      console.log('🔍 All iframes in document:');
+      allIframes.forEach((f, index) => {
+        console.log(`  ${index + 1}. src: ${f.src}, data-tab-id: "${f.getAttribute('data-tab-id')}"`);
+      });
+    }
+    
     return iframe;
   } catch (error) {
     console.error('Error getting iframe by tab ID:', error);

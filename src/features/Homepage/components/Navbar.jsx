@@ -73,7 +73,7 @@ const renderMenuItems = (items, openTabByUrl) => {
 };
 
 const Navbar = () => {
-  const { actions, tabs, navigationMenus, navigationLoading } = useHome();
+  const { actions, tabs, activeTabId, navigationMenus, navigationLoading } = useHome();
   const { logout: authLogout, user } = useAuth();
   const { toast } = useToast();
   const [notifications, setNotifications] = useState(3);
@@ -155,7 +155,7 @@ const Navbar = () => {
       } else if (e.key === 'F5') {
         e.preventDefault();
         // Handle F5 refresh
-        const activeTab = tabs.find(tab => tab.id === actions.activeTabId);
+        const activeTab = tabs.find(tab => tab.id === activeTabId);
         if (activeTab) {
           if (activeTab.id === 'dashboard') {
             actions.setNavigationLoading(true);
@@ -186,7 +186,7 @@ const Navbar = () => {
     };
     document.addEventListener('keydown', handleKeyDown);
     return () => document.removeEventListener('keydown', handleKeyDown);
-  }, [tabs, actions, toast]);
+  }, [tabs, activeTabId, actions, toast]);
 
   // Load user permissions on component mount
   useEffect(() => {
@@ -269,7 +269,8 @@ const Navbar = () => {
 
   // Refresh current tab
   const handleRefresh = () => {
-    const activeTab = tabs.find(tab => tab.id === actions.activeTabId);
+    const activeTab = tabs.find(tab => tab.id === activeTabId);
+    
     if (activeTab) {
       if (activeTab.id === 'dashboard') {
         // Refresh dashboard by reloading navigation and dashboards
@@ -303,7 +304,7 @@ const Navbar = () => {
 
   // Print current tab
   const handlePrint = () => {
-    const activeTab = tabs.find(tab => tab.id === actions.activeTabId);
+    const activeTab = tabs.find(tab => tab.id === activeTabId);
     if (activeTab) {
       if (activeTab.id === 'dashboard') {
         // Print the dashboard content
