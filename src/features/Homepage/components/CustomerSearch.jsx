@@ -28,10 +28,12 @@ const CustomerSearch = () => {
   const debouncedSearch = useCallback(async (query) => {
     if (!query || query.trim().length < 3) {
       setSearchResults([]);
+      setIsOpen(false);
       return;
     }
 
     setIsLoading(true);
+    setIsOpen(true);
     try {
       const results = await customerSearchService.quickSearch(query);
       setSearchResults(results);
@@ -112,11 +114,11 @@ const CustomerSearch = () => {
 
   // Handle customer search
   const handleCustomerSearch = (customer) => {
-    if (customer.CustomerId && !isNaN(customer.CustomerId)) {
-      // Customer ID was selected, go to customer page
-      const url = `/ui/ContactEdit?edit=1&Search=1&gscustomerid=${customer.CustomerId}`;
+    if (customer.ContactID && !isNaN(customer.ContactID)) {
+      // Contact ID was selected, go to contact page
+      const url = `/ui60/ui/ContactEdit?edit=1&Search=1&gscustomerid=${customer.ContactID}`;
       actions.addTab({
-        title: customer.DisplayName || 'Customer',
+        title: customer.DisplayName || 'Contact',
         url: url,
         type: 'iframe',
         icon: '👤',
@@ -131,7 +133,7 @@ const CustomerSearch = () => {
   // Handle rep search
   const handleRepSearch = (repId) => {
     if (!isNaN(repId)) {
-      const url = `/ui/ContactSearch?okToRun=YES&gsRepID=${repId}`;
+      const url = `/ui60/ui/ContactSearch?okToRun=YES&gsRepID=${repId}`;
       actions.addTab({
         title: 'Advanced Search',
         url: url,
@@ -148,7 +150,7 @@ const CustomerSearch = () => {
 
     // Encode search value and navigate to search page
     const encodedSearch = encodeURIComponent(searchText);
-    const url = `/ui/ContactSearch?okToRun=YES&customer=${encodedSearch}`;
+    const url = `/ui60/ui/ContactSearch?okToRun=YES&customer=${encodedSearch}`;
     
     actions.addTab({
       title: 'Advanced Search',
@@ -177,7 +179,7 @@ const CustomerSearch = () => {
   }, []);
 
   return (
-    <div className="relative mr-2" style={{ width: '200px' }}>
+    <div className="relative mr-2" style={{ width: '280px' }}>
       <Popover open={isOpen} onOpenChange={setIsOpen}>
         <PopoverTrigger asChild>
           <div className="relative">
@@ -189,24 +191,33 @@ const CustomerSearch = () => {
               onChange={(e) => handleSearchChange(e.target.value)}
               onKeyDown={handleKeyDown}
               onFocus={handleFocus}
-              className="pl-8 pr-8 py-1 bg-ocean-700/30 border border-ocean-200 text-white placeholder-ocean-100 focus:bg-ocean-700/50 focus:border-ocean-300 rounded-full h-8 text-sm w-full min-h-0 focus:text-white"
+              className="pl-8 pr-8 py-2 bg-white border border-gray-300 text-gray-900 placeholder-gray-500 focus:bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-200 rounded-full h-10 text-sm w-full min-h-0 focus:text-gray-900"
               style={{ 
-                boxShadow: 'none',
-                color: 'white',
-                backgroundColor: 'rgba(26, 73, 118, 0.3)',
-                borderColor: 'rgb(26, 73, 118, 0.2)',
-                outline: 'none'
+                boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1)',
+                color: '#111827',
+                backgroundColor: '#ffffff',
+                borderColor: '#d1d5db',
+                outline: 'none',
+                fontSize: '14px',
+                lineHeight: '1.5',
+                paddingLeft: '32px',
+                paddingRight: '32px',
+                paddingTop: '8px',
+                paddingBottom: '8px',
+                height: '40px',
+                width: '100%',
+                minWidth: '200px'
               }}
             />
-            <Search className="absolute left-2 top-1/2 transform -translate-y-1/2 text-ocean-100 h-4 w-4 pointer-events-none" />
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4 pointer-events-none" />
             <Button
               type="button"
               variant="ghost"
               size="sm"
               onClick={handleSearchClick}
-              className="absolute right-1 top-1/2 transform -translate-y-1/2 h-6 w-6 p-0 hover:bg-ocean-600/50 rounded-full"
+              className="absolute right-2 top-1/2 transform -translate-y-1/2 h-6 w-6 p-0 hover:bg-gray-100 rounded-full"
             >
-              <Search className="h-3 w-3 text-ocean-100" />
+              <Search className="h-4 w-4 text-gray-500" />
             </Button>
           </div>
         </PopoverTrigger>
@@ -216,6 +227,7 @@ const CustomerSearch = () => {
           align="start"
           side="bottom"
           sideOffset={4}
+          forceMount
         >
           <div className="max-h-60 overflow-y-auto">
             {isLoading && (
@@ -226,19 +238,31 @@ const CustomerSearch = () => {
             
             {!isLoading && searchResults.length === 0 && searchQuery.length >= 3 && (
               <div className="p-4 text-center text-sm text-gray-500">
-                No results found.
+                No results found for "{searchQuery}".
               </div>
             )}
             
             {!isLoading && searchResults.length > 0 && (
               <div className="py-1">
+                <div className="px-4 py-2 text-xs text-gray-500 bg-gray-50">
+                  Found {searchResults.length} result{searchResults.length !== 1 ? 's' : ''}
+                </div>
                 {searchResults.map((result, index) => (
                   <div
-                    key={`${result.CustomerId}-${index}`}
+                    key={`${result.CustomerId || result.ContactID}-${index}`}
                     onClick={() => {
                       setSelectedResult(result);
                       setSearchQuery(result.DisplayName);
                       setIsOpen(false);
+                      
+                      // Handle the search action based on result type
+                      if (result.Type === 'Rep' && result.ContactID) {
+                        handleRepSearch(result.ContactID);
+                      } else if (result.ContactID) {
+                        handleCustomerSearch(result);
+                      } else {
+                        handleTextSearch(result.DisplayName);
+                      }
                     }}
                     className={`px-4 py-2 cursor-pointer hover:bg-blue-50 ${
                       index === 0 ? 'bg-blue-100' : ''
@@ -263,6 +287,8 @@ const CustomerSearch = () => {
                 ))}
               </div>
             )}
+            
+
             
             {searchQuery.length > 0 && searchQuery.length < 3 && (
               <div className="p-4 text-center text-sm text-gray-500">

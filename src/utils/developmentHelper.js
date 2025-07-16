@@ -198,7 +198,39 @@ export const initializeDevelopmentEnvironment = () => {
                 reload: () => window.location.reload(),
                 switchEnv: switchDevelopmentEnvironment
             };
-
+            
+            // Add session debug function to global scope
+            window.debugSession = async () => {
+                const { debugSession } = await import('./sessionHelpers');
+                return debugSession();
+            };
+            
+            // Add direct localStorage access
+            window.getSession = () => {
+                const mmClientVars = localStorage.getItem("MMClientVars");
+                if (mmClientVars) {
+                    try {
+                        return JSON.parse(mmClientVars);
+                    } catch (error) {
+                        console.error('Error parsing session:', error);
+                        return null;
+                    }
+                }
+                return null;
+            };
+            
+            // Add session setter
+            window.setSession = (sessionData) => {
+                localStorage.setItem("MMClientVars", JSON.stringify(sessionData));
+                console.log('✅ Session set:', sessionData);
+            };
+            
+            console.log('🔧 Global debug functions available:');
+            console.log('  - window.debugSession() - Full session debug');
+            console.log('  - window.getSession() - Get raw session data');
+            console.log('  - window.setSession(data) - Set session data');
+            console.log('  - window.devHelper - Development utilities');
+            
             console.log('🛠️ Development utilities available in console:');
             console.log('- devHelper.checkSession() - Check current session');
             console.log('- devHelper.initSession() - Force initialize session');
