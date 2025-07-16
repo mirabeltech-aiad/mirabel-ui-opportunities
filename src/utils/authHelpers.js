@@ -87,23 +87,14 @@ export const getMainLoginUrl = (returnUrl) => {
     return `${mmDomain}/intranet/Members/Home/Login.aspx?ReturnUrl=${encodedReturnUrl}`;
 };
 
-// Modified logout utility to handle development mode
+// Logout utility that redirects to legacy logout URL
 export const logout = () => {
-
-    // In development mode, just reset session without redirect
+    // In development mode, just reload
     if (isDevelopmentMode()) {
-        import('./sessionHelpers.js').then(({ resetSession }) => {
-            resetSession();
-            window.location.reload();
-        });
+        window.location.reload();
         return;
     }
 
-    // Production behavior remains the same
-    import('./sessionHelpers.js').then(({ resetSession }) => {
-        resetSession();
-        const returnUrl = window.location.href;
-        const mainLoginUrl = getMainLoginUrl(returnUrl);
-        window.location.href = mainLoginUrl;
-    });
+    // Redirect to legacy logout URL which handles all cleanup
+    window.location.href = '/intranet/Members/Home/Logout.aspx';
 };                                                                                                                                                                                                                             
