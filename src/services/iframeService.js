@@ -5,12 +5,22 @@
 // Refresh an iframe by its URL
 export const refreshIframeByUrl = (url) => {
   try {
-    const iframe = document.querySelector(`iframe[src*="${url}"]`);
-    if (iframe && iframe.contentWindow) {
-      // Reload the iframe
-      iframe.src = iframe.src;
-      return true;
+    // Get all iframes in the document
+    const iframes = document.querySelectorAll('iframe');
+    
+    // Find the iframe that matches the URL (check both full URL and partial matches)
+    for (const iframe of iframes) {
+      const iframeSrc = iframe.src;
+      const fullUrl = url.startsWith('http') ? url : `https://smoke-feature13.magazinemanager.com${url}`;
+      
+      // Check if the iframe src contains the URL or vice versa
+      if (iframeSrc.includes(url) || iframeSrc.includes(fullUrl) || 
+          url.includes(iframeSrc) || fullUrl.includes(iframeSrc)) {
+        iframe.src = iframe.src;
+        return true;
+      }
     }
+    
     return false;
   } catch (error) {
     console.error('Error refreshing iframe:', error);

@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useHome } from '../contexts/HomeContext';
 import navigationService from '../services/navigationService';
 import { useAuth } from '@/contexts/AuthContext';
-import { refreshIframeByUrl, printIframeByUrl } from '@/services/iframeService';
+import { refreshIframeByTabId, printIframeByTabId } from '@/services/iframeService';
 import { getUserPermissions } from '@/services/userService';
 import CustomerSearch from './CustomerSearch';
 import {
@@ -283,8 +283,8 @@ const Navbar = () => {
           description: "Dashboard data has been refreshed.",
         });
       } else if (activeTab.type === 'iframe') {
-        // Refresh iframe content
-        const success = refreshIframeByUrl(activeTab.url);
+        // Refresh iframe content by tab ID
+        const success = refreshIframeByTabId(activeTab.id);
         if (success) {
           toast({
             title: "Page refreshed",
@@ -313,8 +313,8 @@ const Navbar = () => {
           description: "Dashboard content is being printed.",
         });
       } else if (activeTab.type === 'iframe') {
-        // Print iframe content
-        const success = printIframeByUrl(activeTab.url);
+        // Print iframe content by tab ID
+        const success = printIframeByTabId(activeTab.id);
         if (success) {
           toast({
             title: "Print initiated",

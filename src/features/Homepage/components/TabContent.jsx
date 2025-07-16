@@ -43,6 +43,7 @@ const TabContent = () => {
               src={withBaseUrl(activeTab.url)}
               className="w-full h-full border-0"
               title={activeTab.title}
+              data-tab-id={activeTab.id}
             />
           );
         }
