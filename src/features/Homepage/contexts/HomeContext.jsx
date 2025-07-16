@@ -36,6 +36,24 @@ const initialState = {
       type: 'component',
       closable: false,
       icon: '📊'
+    },
+    {
+      id: 'inbox',
+      title: 'Inbox',
+      component: 'Inbox',
+      type: 'iframe',
+      url: '/intranet/Members/Home/InboxNotifications.aspx',
+      closable: false,
+      icon: '📥'
+    },
+    {
+      id: 'search',
+      title: 'Search',
+      component: 'Search',
+      type: 'iframe',
+      url: '/ui/Search',
+      closable: false,
+      icon: '🔍'
     }
   ],
   activeTabId: 'dashboard',
@@ -263,7 +281,8 @@ export const HomeProvider = ({ children }) => {
       try {
         const tabs = JSON.parse(savedTabs);
         tabs.forEach(tab => {
-          if (tab.id !== 'dashboard') {
+          // Only add if not already present (by id)
+          if (!state.tabs.some(t => t.id === tab.id)) {
             // Ensure closable property is set correctly for restored tabs
             const restoredTab = {
               ...tab,
