@@ -83,7 +83,8 @@ export const getMainLoginUrl = (returnUrl) => {
     // Use the current domain from environment or fallback to current origin
     const mmDomain = import.meta.env.REACT_APP_API_BASE_URL || window.location.origin;
     const encodedReturnUrl = encodeURIComponent(returnUrl);
-    return `${mmDomain}/intranet/Login.aspx?ReturnUrl=${encodedReturnUrl}`;
+    // Match legacy ASP.NET path: /intranet/Members/Home/Login.aspx
+    return `${mmDomain}/intranet/Members/Home/Login.aspx?ReturnUrl=${encodedReturnUrl}`;
 };
 
 // Modified logout utility to handle development mode
