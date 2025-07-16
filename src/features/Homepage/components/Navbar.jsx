@@ -4,8 +4,8 @@ import navigationService from '../services/navigationService';
 import { useAuth } from '@/contexts/AuthContext';
 import { refreshIframeByUrl, printIframeByUrl } from '@/services/iframeService';
 import { getUserPermissions } from '@/services/userService';
+import CustomerSearch from './CustomerSearch';
 import {
-  Search,
   User,
   Settings,
   LogOut,
@@ -30,7 +30,6 @@ import {
   DropdownMenuSubContent,
 } from '@/components/ui/dropdown-menu';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/features/Opportunity/hooks/use-toast';
 
@@ -76,7 +75,6 @@ const Navbar = () => {
   const { actions, tabs, navigationMenus, navigationLoading } = useHome();
   const { logout: authLogout, user } = useAuth();
   const { toast } = useToast();
-  const [searchQuery, setSearchQuery] = useState('');
   const [notifications, setNotifications] = useState(3);
   const [userPermissions, setUserPermissions] = useState({
     canManageUsers: false,
@@ -394,19 +392,7 @@ const Navbar = () => {
           <div className="flex items-center space-x-2 min-h-0">
             {/* Search Bar (moved here) */}
             {!navigationLoading && (
-              <div className="mr-0" style={{ width: '180px' }}>
-                <div className="relative h-8">
-                  <Input
-                    type="text"
-                    placeholder="Search"
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    className="pl-8 pr-2 py-1 bg-ocean-700/30 border border-ocean-200 text-white placeholder-ocean-100 focus:bg-ocean-700/50 focus:border-ocean-300 rounded-full h-8 text-base w-full min-h-0"
-                    style={{ boxShadow: 'none' }}
-                  />
-                  <Search className="absolute left-2 top-1/2 transform -translate-y-1/2 text-ocean-100 h-5 w-5" />
-                </div>
-              </div>
+              <CustomerSearch />
             )}
             {/* Notifications */}
             <Button variant="ghost" size="icon" className="text-white hover:bg-ocean-700 relative rounded-full h-8 w-8 p-0 min-h-0">
@@ -421,7 +407,10 @@ const Navbar = () => {
             {/* User Menu - Updated to match ASP.NET design exactly */}
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <button className="flex items-center px-4 py-1 rounded-full bg-ocean-600 hover:bg-ocean-700 text-white font-semibold shadow border border-ocean-700 focus:outline-none focus:ring-2 focus:ring-ocean-400 transition h-8 min-h-0">
+                <button 
+                  data-testid="profile-menu-button"
+                  className="flex items-center px-4 py-1 rounded-full bg-ocean-600 hover:bg-ocean-700 text-white font-semibold shadow border border-ocean-700 focus:outline-none focus:ring-2 focus:ring-ocean-400 transition h-8 min-h-0"
+                >
                   <User className="h-4 w-4 mr-2" />
                   <ChevronDown className="h-4 w-4 ml-1" />
                 </button>

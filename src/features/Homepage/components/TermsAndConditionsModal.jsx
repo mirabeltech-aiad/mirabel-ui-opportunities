@@ -104,8 +104,10 @@ const TermsAndConditionsModal = ({ isOpen, onClose, onAccept }) => {
   };
 
   const handleLogout = () => {
-    // Redirect to logout page (matching legacy behavior)
-    window.top.location.href = '/intranet/Members/Home/Logout.aspx';
+    // Use the auth logout function to ensure proper domain handling
+    import('../../../utils/authHelpers.js').then(({ logout }) => {
+      logout();
+    });
   };
 
   if (!isOpen) return null;

@@ -80,7 +80,8 @@ export const getMainLoginUrl = (returnUrl) => {
         return returnUrl;
     }
 
-    const mmDomain = import.meta.env.REACT_APP_API_BASE_URL || 'https://tech.magazinemanager.biz';
+    // Use the current domain from environment or fallback to current origin
+    const mmDomain = import.meta.env.REACT_APP_API_BASE_URL || window.location.origin;
     const encodedReturnUrl = encodeURIComponent(returnUrl);
     return `${mmDomain}/intranet/Login.aspx?ReturnUrl=${encodedReturnUrl}`;
 };
