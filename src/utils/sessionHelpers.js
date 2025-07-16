@@ -195,7 +195,8 @@ export const performLoginRedirect = (returnUrl = null) => {
         return;
     }
     const baseUrl = window.location.origin;
-    const loginUrl = `${baseUrl}/intranet/Login.aspx`;
+    // Match legacy ASP.NET path: /intranet/Members/Home/Login.aspx
+    const loginUrl = `${baseUrl}/intranet/Members/Home/Login.aspx`;
 
     window.location.href = loginUrl;
 };

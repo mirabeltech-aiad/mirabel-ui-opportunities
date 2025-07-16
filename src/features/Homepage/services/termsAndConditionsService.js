@@ -1,9 +1,9 @@
-import httpClient from '../services/httpClient';
+import httpClient from '../../../services/httpClient';
 import { 
   API_MM_AGREEMENTS_BYUSER_GET, 
   API_MM_AGREEMENTS_ACCEPT_POST 
-} from '../config/apiUrls';
-import { getUserInfo } from '../utils/sessionHelpers';
+} from '../../../config/apiUrls';
+import { getUserInfo } from '../../../utils/sessionHelpers';
 
 /**
  * Service for handling Terms and Conditions operations

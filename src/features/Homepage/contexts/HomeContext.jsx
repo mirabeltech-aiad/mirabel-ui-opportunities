@@ -2,7 +2,7 @@ import React, { createContext, useContext, useReducer, useEffect } from 'react';
 import { useToast } from '@/features/Opportunity/hooks/use-toast';
 import dashboardService from '../services/dashboardService';
 import navigationService from '../services/navigationService';
-import { termsAndConditionsService } from '@/services/termsAndConditionsService';
+import { termsAndConditionsService } from '../services/termsAndConditionsService';
 
 const HomeContext = createContext();
 

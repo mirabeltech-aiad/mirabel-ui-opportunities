@@ -4,8 +4,8 @@ import navigationService from '../services/navigationService';
 import { useAuth } from '@/contexts/AuthContext';
 import { refreshIframeByUrl, printIframeByUrl } from '@/services/iframeService';
 import { getUserPermissions } from '@/services/userService';
+import CustomerSearch from './CustomerSearch';
 import {
-  Search,
   User,
   Settings,
   LogOut,
@@ -30,24 +30,8 @@ import {
   DropdownMenuSubContent,
 } from '@/components/ui/dropdown-menu';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/features/Opportunity/hooks/use-toast';
-
-// Profile menu items with functionality
-const profileMenus = [
-  { title: 'Welcome', id: 'welcome', info: true },
-  { separator: true },
-  { title: 'My Account', id: 'myAccount', icon: User, url: '/ui/users/account' },
-  { title: 'Refresh', id: 'refresh', icon: RefreshCw },
-  { title: 'Print', id: 'print', icon: Printer },
-  { separator: true },
-  { title: 'User Setup', id: 'userSetup', icon: Users, url: '/ui/users/list' },
-  { title: 'Nav Bar Setup', id: 'navBarSetup', icon: Menu, url: '/intranet/Members/Admin/NavigationSetup.aspx' },
-  { title: 'Website Setup', id: 'websiteSetup', icon: Globe, url: '/ui/websitesetup' },
-  { separator: true },
-  { title: 'Logout', id: 'logout', icon: LogOut },
-];
 
 // Recursive menu renderer
 const renderMenuItems = (items, openTabByUrl) => {
@@ -91,13 +75,75 @@ const Navbar = () => {
   const { actions, tabs, navigationMenus, navigationLoading } = useHome();
   const { logout: authLogout, user } = useAuth();
   const { toast } = useToast();
-  const [searchQuery, setSearchQuery] = useState('');
   const [notifications, setNotifications] = useState(3);
   const [userPermissions, setUserPermissions] = useState({
     canManageUsers: false,
     canManageNavigation: false,
     canManageWebsite: false,
   });
+
+  // Fallback user info if AuthContext user is null
+  const [fallbackUser, setFallbackUser] = useState(null);
+
+  // Get user info directly if AuthContext user is null
+  useEffect(() => {
+    if (!user) {
+      try {
+        const userInfo = getUserInfo();
+        setFallbackUser(userInfo);
+      } catch (error) {
+        console.error('❌ Navbar: Error getting fallback user info:', error);
+        setFallbackUser(null);
+      }
+    }
+  }, [user]);
+
+  // Use either AuthContext user or fallback user
+  const currentUser = user || fallbackUser;
+
+  // Check if user is admin (fallback for permission loading issues)
+  const isAdmin = currentUser?.isAdmin || currentUser?.isSA || userPermissions.isAdmin || userPermissions.isSA || userPermissions.canManageUsers || userPermissions.canManageNavigation || userPermissions.canManageWebsite;
+
+  // Dynamic profile menu items based on user permissions
+  const getProfileMenus = () => {
+    const baseMenus = [
+      { title: 'My Account', id: 'myAccount', icon: User, url: '/ui/users/account' },
+      { title: 'Refresh', id: 'refresh', icon: RefreshCw },
+      { title: 'Print', id: 'print', icon: Printer },
+    ];
+
+    const adminMenus = [];
+    
+    // Add admin items based on specific permissions
+    if (userPermissions.canManageUsers || isAdmin) {
+      adminMenus.push({ title: 'User Setup', id: 'userSetup', icon: Users, url: '/ui/users/list' });
+    }
+    
+    if (userPermissions.canManageNavigation || isAdmin) {
+      adminMenus.push({ title: 'Nav Bar Setup', id: 'navBarSetup', icon: Menu, url: '/intranet/Members/Admin/NavigationSetup.aspx' });
+    }
+    
+    if (userPermissions.canManageWebsite || isAdmin) {
+      adminMenus.push({ title: 'Website Setup', id: 'websiteSetup', icon: Globe, url: '/ui/websitesetup' });
+    }
+
+    const logoutMenu = { title: 'Logout', id: 'logout', icon: LogOut };
+
+    // Build final menu array
+    const menus = [...baseMenus];
+    
+    // Add separator and admin menus if any exist
+    if (adminMenus.length > 0) {
+      menus.push({ separator: true });
+      menus.push(...adminMenus);
+    }
+    
+    // Add separator and logout
+    menus.push({ separator: true });
+    menus.push(logoutMenu);
+
+    return menus;
+  };
 
   useEffect(() => {
     const handleKeyDown = (e) => {
@@ -149,14 +195,22 @@ const Navbar = () => {
         setUserPermissions(permissions);
       } catch (error) {
         console.error('Error loading user permissions:', error);
-        // Keep default permissions (all false)
+        // Set default permissions if loading fails
+        setUserPermissions({
+          canManageUsers: false,
+          canManageNavigation: false,
+          canManageWebsite: false,
+          isAdmin: false,
+          isSA: false,
+          hasAdminAccess: false
+        });
       }
     };
 
-    if (user) {
+    if (currentUser) {
       loadUserPermissions();
     }
-  }, [user]);
+  }, [currentUser]);
 
   const openTabByUrl = (title, url) => {
     if (!url) return;
@@ -338,19 +392,7 @@ const Navbar = () => {
           <div className="flex items-center space-x-2 min-h-0">
             {/* Search Bar (moved here) */}
             {!navigationLoading && (
-              <div className="mr-0" style={{ width: '180px' }}>
-                <div className="relative h-8">
-                  <Input
-                    type="text"
-                    placeholder="Search"
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    className="pl-8 pr-2 py-1 bg-ocean-700/30 border border-ocean-200 text-white placeholder-ocean-100 focus:bg-ocean-700/50 focus:border-ocean-300 rounded-full h-8 text-base w-full min-h-0"
-                    style={{ boxShadow: 'none' }}
-                  />
-                  <Search className="absolute left-2 top-1/2 transform -translate-y-1/2 text-ocean-100 h-5 w-5" />
-                </div>
-              </div>
+              <CustomerSearch />
             )}
             {/* Notifications */}
             <Button variant="ghost" size="icon" className="text-white hover:bg-ocean-700 relative rounded-full h-8 w-8 p-0 min-h-0">
@@ -362,41 +404,43 @@ const Navbar = () => {
               )}
             </Button>
 
-            {/* User Menu */}
+            {/* User Menu - Updated to match ASP.NET design exactly */}
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <button className="flex items-center px-4 py-1 rounded-full bg-ocean-600 hover:bg-ocean-700 text-white font-semibold shadow border border-ocean-700 focus:outline-none focus:ring-2 focus:ring-ocean-400 transition h-8 min-h-0">
+                <button 
+                  data-testid="profile-menu-button"
+                  className="flex items-center px-4 py-1 rounded-full bg-ocean-600 hover:bg-ocean-700 text-white font-semibold shadow border border-ocean-700 focus:outline-none focus:ring-2 focus:ring-ocean-400 transition h-8 min-h-0"
+                >
                   <User className="h-4 w-4 mr-2" />
                   <ChevronDown className="h-4 w-4 ml-1" />
                 </button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-56 mt-2 rounded-lg shadow-lg bg-white border border-gray-100 p-1">
-                {profileMenus.map((item, idx) => {
-                  // Skip admin items if user doesn't have permission
-                  if (item.id === 'userSetup' && !userPermissions.canManageUsers) return null;
-                  if (item.id === 'navBarSetup' && !userPermissions.canManageNavigation) return null;
-                  if (item.id === 'websiteSetup' && !userPermissions.canManageWebsite) return null;
-                  
-                  return item.separator ? (
-                    <DropdownMenuSeparator key={idx} />
-                  ) : item.info ? (
-                    <DropdownMenuItem key={item.id} className="font-bold text-base cursor-default" disabled>
-                      Welcome
-                      <div className="text-xs font-normal text-gray-500">
-                        {user?.FullName || 'System Administrator'}
-                      </div>
-                    </DropdownMenuItem>
-                  ) : (
-                    <DropdownMenuItem
-                      key={item.id}
-                      onClick={() => handleProfileMenuClick(item)}
-                      className={`rounded-md font-medium cursor-pointer flex items-center text-gray-800 hover:bg-ocean-100 hover:text-ocean-700`}
-                    >
-                      {item.icon && <item.icon className="h-4 w-4 mr-2" />}
-                      {item.title}
-                    </DropdownMenuItem>
-                  );
-                })}
+              <DropdownMenuContent align="end" className="w-56 mt-2 rounded-lg shadow-lg border border-gray-200 p-0">
+                {/* Dark blue header section matching ASP.NET */}
+                <div className="bg-ocean-600 text-white px-4 py-3 rounded-t-lg">
+                  <div className="font-bold text-base">Welcome</div>
+                  <div className="text-sm text-ocean-100 mt-1">
+                    {currentUser?.fullName || currentUser?.FullName || 'System Administrator'}
+                  </div>
+                </div>
+                
+                {/* White background menu items */}
+                <div className="bg-white rounded-b-lg">
+                  {getProfileMenus().map((item, idx) => {
+                    return item.separator ? (
+                      <DropdownMenuSeparator key={idx} className="my-1" />
+                    ) : (
+                      <DropdownMenuItem
+                        key={item.id}
+                        onClick={() => handleProfileMenuClick(item)}
+                        className="rounded-none font-medium cursor-pointer flex items-center text-gray-800 hover:bg-ocean-50 hover:text-ocean-700 px-4 py-2 mx-0"
+                      >
+                        {item.icon && <item.icon className="h-4 w-4 mr-3 text-gray-600" />}
+                        <span className="text-sm">{item.title}</span>
+                      </DropdownMenuItem>
+                    );
+                  })}
+                </div>
               </DropdownMenuContent>
             </DropdownMenu>
           </div>

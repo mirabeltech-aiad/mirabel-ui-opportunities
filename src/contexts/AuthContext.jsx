@@ -37,16 +37,7 @@ export const AuthProvider = ({ children }) => {
   useEffect(() => {
     const initAuth = async () => {
       try {
-        // In development mode, always set authenticated state
-        if (isDevelopmentMode()) {
-          console.log('🔧 Development mode: Setting default authenticated state');
-          const userInfo = getUserInfo();
-          setUser(userInfo);
-          setLoading(false);
-          return;
-        }
-
-        // Production behavior remains the same
+        // Check if session is active
         if (isActiveSession()) {
           const userInfo = getUserInfo();
           setUser(userInfo);
@@ -60,6 +51,7 @@ export const AuthProvider = ({ children }) => {
           }
         }
       } catch (error) {
+        console.error('AuthContext: Error during initialization:', error);
         setAuthError(AUTH_ERRORS.INVALID_TOKEN);
         resetSession();
       } finally {
@@ -73,14 +65,6 @@ export const AuthProvider = ({ children }) => {
     const handleStorageChange = (event) => {
       if (event.key === "MMClientVars") {
         setTimeout(() => {
-          // In development mode, always maintain authenticated state
-          if (isDevelopmentMode()) {
-            const userInfo = getUserInfo();
-            setUser(userInfo);
-            return;
-          }
-
-          // Production behavior remains the same
           if (isActiveSession()) {
             const userInfo = getUserInfo();
             setUser(userInfo);
@@ -101,17 +85,6 @@ export const AuthProvider = ({ children }) => {
     setAuthError(null);
 
     try {
-      // In development mode, set session directly
-      if (isDevelopmentMode()) {
-        console.log('🔧 Development mode: Setting development session');
-        setClientSession(sessionValues);
-        const userInfo = getUserInfo();
-        setUser(userInfo);
-        setIsAuthenticating(false);
-        return;
-      }
-
-      // Production behavior remains the same
       sessionStorage.setItem("auth_return_url", window.location.pathname);
       const returnUrl = window.location.href;
       const mainLoginUrl = getMainLoginUrl(returnUrl);
@@ -124,14 +97,6 @@ export const AuthProvider = ({ children }) => {
 
   // Modified detectSession
   const detectSession = useCallback(() => {
-    // In development mode, always return true
-    if (isDevelopmentMode()) {
-      const userInfo = getUserInfo();
-      setUser(userInfo);
-      return true;
-    }
-
-    // Production behavior remains the same
     if (isActiveSession()) {
       const userInfo = getUserInfo();
       setUser(userInfo);

@@ -9,6 +9,9 @@ export const API_SAVE_SITEWIDE_SETTINGS = '/services/Admin/SiteSettings/DetailsS
 // Reports Dashboard.
 export const API_REPORTS_DASHBOARD = '/services/Report/Categories';
 
+// Customer Search APIs
+export const API_CRM_CONTACTS_SEARCH_QUICK = '/services/crm/contacts/search/Quick';
+
 // Consultant APIs
 export const API_CONSULTANT_INFO_GET = '/services/CRM/consultants/';
 export const HELPDESK_API_CONSULTANT_CREATEEMAIL = '/services/helpdesk/contactconsultant/createemail/';
