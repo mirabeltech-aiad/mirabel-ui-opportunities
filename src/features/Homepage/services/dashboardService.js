@@ -1,4 +1,5 @@
 import AxiosService from '@/services/AxiosService';
+import { apiCall } from '@/services/httpClient';
 
 /**
  * Dashboard service for fetching dashboard data from the API
@@ -10,8 +11,7 @@ export const dashboardService = {
    */
   getDashboards: async () => {
     try {
-      const response = await AxiosService.get('/services/User/Dashboards/false');
-      
+      const response = await apiCall('/services/User/Dashboards/false', 'GET');
       // Check if response has the expected structure
       if (response?.content?.Status === 'Success' && response?.content?.List) {
         return response.content.List;
