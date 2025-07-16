@@ -191,26 +191,119 @@ export const navigationService = {
       return [];
     }
 
-    // Sort menus by SortOrder
-    const sortedMenus = menus.sort((a, b) => (a.SortOrder || 0) - (b.SortOrder || 0));
+    // Get session data from localStorage (MMClientVars)
+    let sessionVars = {};
+    try {
+      sessionVars = JSON.parse(localStorage.getItem('MMClientVars')) || {};
+    } catch (e) {
+      sessionVars = {};
+    }
+
+    // Helper: Replace {{MM_SOMETHING}} in URL with sessionVars
+    function replaceSessionVarsInUrl(url) {
+      if (!url || typeof url !== 'string') return url;
+      return url.replace(/\{\{MM_(.*?)\}\}/g, (match, key) => {
+        return sessionVars[key] !== undefined ? sessionVars[key] : match;
+      });
+    }
+
+    // Helper: Permission/lock icon logic (MKM, DataPack, MES, etc.)
+    function getMenuLockStatus(menu) {
+      // Default: not locked
+      let isLocked = false;
+      let lockReason = '';
+      // MKM
+      if ((menu.URLSource === 'MKM' && (!sessionVars.IsSiteMKMEnabled || !sessionVars.IsUserHasMKMAccess)) ||
+          (menu.URLSource === 'MKM-DATA' && (!sessionVars.IsSiteDataPackEnabled || !sessionVars.IsUserHasDataPackAccess))) {
+        isLocked = true;
+        lockReason = 'MKM';
+      }
+      // MES
+      if (menu.URLSource === 'MES') {
+        if ((sessionVars.IsMirabelEmailServiceEnabled === false || sessionVars.IsRepNotificationEnabled) || !sessionVars.IsUserHasMKMAccess) {
+          if (!(sessionVars.IsRepNotificationEnabled && (menu.Caption === 'Email Builder' || menu.Caption === 'Workflows'))) {
+            isLocked = true;
+            lockReason = 'MES';
+          }
+        }
+      }
+      // Call Disposition Report
+      if (menu.Caption === 'Call Disposition Report' || menu.URL === '/ui/Reports/CallDisposition') {
+        if (!sessionVars.IsCallDispositionEnabled) {
+          isLocked = true;
+          lockReason = 'CallDisposition';
+        }
+      }
+      return { isLocked, lockReason };
+    }
+
+    // Helper: icon class logic
+    function getIconClass(menu, isLocked) {
+      if (isLocked) return 'mainMenuIcon lockIcon';
+      if (menu.Icon === 'New') return 'mainMenuIcon newFeatureIcon';
+      if (menu.Icon === 'Beta') return 'mainMenuIcon betaFeatureIcon';
+      return menu.IconCls || '';
+    }
+
+    // Helper: Insert menu URL into base URL at {0} placeholder, with ? or & as needed
+    function insertMenuUrlAtPlaceholder(baseUrl, menuUrl) {
+      if (!baseUrl || !menuUrl) return baseUrl || menuUrl;
+      // Add ? or & as in C# logic
+      const urlWithQuery = menuUrl + (menuUrl.includes('?') ? '&' : '?');
+      if (baseUrl.includes('{0}')) {
+        return baseUrl.replace('{0}', urlWithQuery);
+      }
+      // fallback: just concatenate
+      return baseUrl.replace(/\/$/, '') + '/' + menuUrl.replace(/^\//, '');
+    }
 
     // Helper: recursively build children
     function buildMenuTree(parentId) {
-      return sortedMenus
+      return menus
         .filter(menu => menu.ParentID === parentId)
-        .map(menu => ({
-          id: menu.ID,
-          title: menu.Caption,
-          url: menu.URL,
-          sortOrder: menu.SortOrder,
-          isAdmin: menu.IsAdmin,
-          isNewWindow: menu.IsNewWindow,
-          isVisible: menu.IsVisible,
-          icon: menu.Icon,
-          toolTip: menu.ToolTip,
-          children: buildMenuTree(menu.ID),
-          fullUrl: navigationService.getFullUrl(menu.URL)
-        }));
+        .map(menu => {
+          // Lock/permission logic
+          const { isLocked } = getMenuLockStatus(menu);
+          // Icon class
+          const iconCls = getIconClass(menu, isLocked);
+          // URL replacement
+          let url = replaceSessionVarsInUrl(menu.URL);
+          // Special URL handling for MKM/MES
+          if ((menu.URLSource === 'MKM' || menu.URLSource === 'MKM-DATA') && url) {
+            url = sessionVars.MarketingManagerSiteURL
+              ? insertMenuUrlAtPlaceholder(sessionVars.MarketingManagerSiteURL, url)
+              : url;
+          } else if (menu.URLSource === 'MES' && url) {
+            url = sessionVars.EmailServiceSiteURL
+              ? insertMenuUrlAtPlaceholder(sessionVars.EmailServiceSiteURL, url)
+              : url;
+          }
+          // Tooltip
+          const toolTip = menu.ToolTip || '';
+          // Special click handling
+          const isNewWindow = !!menu.IsNewWindow;
+          const isCalendar = url && url.toLowerCase().includes('calendar.aspx');
+          // Children
+          const children = buildMenuTree(menu.ID);
+          // Compose menu item
+          return {
+            id: menu.ID,
+            title: menu.Caption,
+            url,
+            sortOrder: menu.SortOrder,
+            isAdmin: menu.IsAdmin,
+            isNewWindow,
+            isVisible: menu.IsVisible,
+            icon: menu.Icon,
+            iconCls,
+            toolTip,
+            isLocked,
+            isCalendar,
+            urlSource: menu.URLSource,
+            children,
+            fullUrl: navigationService.getFullUrl(url)
+          };
+        });
     }
 
     // Top-level menus have ParentID === -1 or null
