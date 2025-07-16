@@ -5,6 +5,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { refreshIframeByTabId, printIframeByTabId } from '@/services/iframeService';
 import { getUserPermissions } from '@/services/userService';
 import CustomerSearch from './CustomerSearch';
+import AnnouncementsSidePanel from './AnnouncementsSidePanel';
 import {
   User,
   Settings,
@@ -18,6 +19,7 @@ import {
   Users,
   Menu,
   Globe,
+  MessageSquare,
 } from 'lucide-react';
 import {
   DropdownMenu,
@@ -77,6 +79,7 @@ const Navbar = () => {
   const { logout: authLogout, user } = useAuth();
   const { toast } = useToast();
   const [notifications, setNotifications] = useState(3);
+  const [isAnnouncementsPanelOpen, setIsAnnouncementsPanelOpen] = useState(false);
   const [userPermissions, setUserPermissions] = useState({
     canManageUsers: false,
     canManageNavigation: false,
@@ -346,6 +349,11 @@ const Navbar = () => {
     });
   };
 
+  // Toggle announcements panel (matching legacy btnCustomPanel functionality)
+  const toggleAnnouncementsPanel = () => {
+    setIsAnnouncementsPanelOpen(!isAnnouncementsPanelOpen);
+  };
+
   return (
     <nav className="navbar bg-ocean-gradient shadow-md h-12">
       <div className="max-w-full px-2 sm:px-4 lg:px-6">
@@ -405,6 +413,17 @@ const Navbar = () => {
               )}
             </Button>
 
+            {/* Announcements Panel Button (btnCustomPanel) */}
+            <Button 
+              variant="ghost" 
+              size="icon" 
+              className="text-white hover:bg-ocean-700 rounded-full h-8 w-8 p-0 min-h-0"
+              onClick={toggleAnnouncementsPanel}
+              title="Announcements"
+            >
+              <MessageSquare className="h-5 w-5" />
+            </Button>
+
             {/* User Menu - Updated to match ASP.NET design exactly */}
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
@@ -447,6 +466,12 @@ const Navbar = () => {
           </div>
         </div>
       </div>
+      
+      {/* Announcements Side Panel */}
+      <AnnouncementsSidePanel 
+        isOpen={isAnnouncementsPanelOpen} 
+        onClose={() => setIsAnnouncementsPanelOpen(false)} 
+      />
     </nav>
   );
 };
