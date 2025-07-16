@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Checkbox } from '@/components/ui/checkbox';
 import { useToast } from '@/features/Opportunity/hooks/use-toast';
-import { termsAndConditionsService } from '@/services/termsAndConditionsService';
+import { termsAndConditionsService } from '../services/termsAndConditionsService';
 
 const TermsAndConditionsModal = ({ isOpen, onClose, onAccept }) => {
   const { toast } = useToast();

@@ -1,4 +1,5 @@
 import httpClient from './httpClient';
+import { getUserInfo } from '@/utils/sessionHelpers';
 import {
   API_USER_ACCOUNT_GET,
   API_USER_ACCOUNT_UPDATE,
@@ -78,19 +79,44 @@ export const deleteUser = async (userId) => {
   }
 };
 
-// Get user permissions
+// Get user permissions - Fixed to derive from session data
 export const getUserPermissions = async () => {
   try {
-    // This would typically come from the user account or a separate permissions endpoint
-    const response = await httpClient.get('/services/User/Permissions');
-    return response.data;
+    // Get user info from session (similar to ASP.NET SessionManager)
+    const userInfo = getUserInfo();
+    
+    // Derive permissions from user role, similar to ASP.NET logic
+    const isAdmin = userInfo?.isAdmin || false;
+    const isSA = userInfo?.isSA || false;
+    
+    // Permission logic matching ASP.NET: IsAdmin || IsSA
+    const hasAdminAccess = isAdmin || isSA;
+    
+    console.log('User permissions derived:', {
+      userInfo,
+      isAdmin,
+      isSA,
+      hasAdminAccess
+    });
+    
+    return {
+      canManageUsers: hasAdminAccess,
+      canManageNavigation: hasAdminAccess,
+      canManageWebsite: hasAdminAccess,
+      isAdmin: isAdmin,
+      isSA: isSA,
+      hasAdminAccess: hasAdminAccess
+    };
   } catch (error) {
-    console.error('Error fetching user permissions:', error);
-    // Return default permissions if API fails
+    console.error('Error deriving user permissions:', error);
+    // Return default permissions if session data is unavailable
     return {
       canManageUsers: false,
       canManageNavigation: false,
       canManageWebsite: false,
+      isAdmin: false,
+      isSA: false,
+      hasAdminAccess: false
     };
   }
 }; 
