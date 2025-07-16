@@ -47,7 +47,6 @@ const CustomerSearch = () => {
 
   // Handle search input changes
   const handleSearchChange = (value) => {
-    console.log('Search input changed:', value);
     setSearchQuery(value);
     setSelectedResult(null);
 
@@ -93,10 +92,12 @@ const CustomerSearch = () => {
       setSearchFlag(selected.CustomerId || selected.DisplayName);
 
       // Handle different types
-      if (selected.Type === 'Rep') {
-        handleRepSearch(selected.CustomerId);
-      } else {
+      if (selected.Type === 'Rep' && selected.ContactID) {
+        handleRepSearch(selected.ContactID);
+      } else if (selected.ContactID && selected.ContactID > 0) {
         handleCustomerSearch(selected);
+      } else {
+        handleTextSearch(selected.DisplayName || searchQuery);
       }
     } else {
       // No selection, perform text search
@@ -116,14 +117,23 @@ const CustomerSearch = () => {
   const handleCustomerSearch = (customer) => {
     if (customer.ContactID && !isNaN(customer.ContactID)) {
       // Contact ID was selected, go to contact page
-      const url = `/ui60/ui/ContactEdit?edit=1&Search=1&gscustomerid=${customer.ContactID}`;
+      const url = `/ui/ContactEdit?edit=1&Search=1&gscustomerid=${customer.ContactID}`;
+      
+      // Generate unique ID and add tab
+      const tabId = `contact-${customer.ContactID}-${Date.now()}`;
       actions.addTab({
+        id: tabId,
         title: customer.DisplayName || 'Contact',
         url: url,
         type: 'iframe',
         icon: '👤',
         closable: true,
       });
+      
+      // Keep the tab active and refresh
+      setTimeout(() => {
+        actions.setActiveTab(tabId);
+      }, 100);
     } else {
       // Text search
       handleTextSearch(customer.DisplayName || searchQuery);
@@ -133,14 +143,23 @@ const CustomerSearch = () => {
   // Handle rep search
   const handleRepSearch = (repId) => {
     if (!isNaN(repId)) {
-      const url = `/ui60/ui/ContactSearch?okToRun=YES&gsRepID=${repId}`;
+      const url = `/ui/ContactSearch?okToRun=YES&gsRepID=${repId}`;
+      
+      // Generate unique ID and add tab
+      const tabId = `rep-search-${repId}-${Date.now()}`;
       actions.addTab({
+        id: tabId,
         title: 'Advanced Search',
         url: url,
         type: 'iframe',
         icon: '🔍',
         closable: true,
       });
+      
+      // Keep the tab active and refresh
+      setTimeout(() => {
+        actions.setActiveTab(tabId);
+      }, 100);
     }
   };
 
@@ -150,15 +169,23 @@ const CustomerSearch = () => {
 
     // Encode search value and navigate to search page
     const encodedSearch = encodeURIComponent(searchText);
-    const url = `/ui60/ui/ContactSearch?okToRun=YES&customer=${encodedSearch}`;
+    const url = `/ui/ContactSearch?okToRun=YES&customer=${encodedSearch}`;
     
+    // Generate unique ID and add tab
+    const tabId = `text-search-${Date.now()}`;
     actions.addTab({
+      id: tabId,
       title: 'Advanced Search',
       url: url,
       type: 'iframe',
       icon: '🔍',
       closable: true,
     });
+    
+    // Keep the tab active and refresh
+    setTimeout(() => {
+      actions.setActiveTab(tabId);
+    }, 100);
   };
 
   // Handle focus (clear search flag)
@@ -257,10 +284,13 @@ const CustomerSearch = () => {
                       
                       // Handle the search action based on result type
                       if (result.Type === 'Rep' && result.ContactID) {
+                        // Rep search - opens search page filtered by rep
                         handleRepSearch(result.ContactID);
-                      } else if (result.ContactID) {
+                      } else if (result.ContactID && result.ContactID > 0) {
+                        // Valid contact - opens contact edit page
                         handleCustomerSearch(result);
                       } else {
+                        // Text search - opens search page with text query
                         handleTextSearch(result.DisplayName);
                       }
                     }}
