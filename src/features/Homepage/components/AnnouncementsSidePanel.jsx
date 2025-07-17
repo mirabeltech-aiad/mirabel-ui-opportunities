@@ -9,9 +9,8 @@ const AnnouncementsSidePanel = ({ isOpen, onClose }) => {
   useEffect(() => {
     if (isOpen && iframeRef.current && !iframeRef.current.src) {
       // Load announcements when panel opens - using the correct URL pattern
-      // Following the same pattern as TabContent.jsx
-      const announcementUrl = withBaseUrl('ui60/ui/Announcements');
-      iframeRef.current.src = announcementUrl;
+      // Direct URL to the announcements page
+      iframeRef.current.src = '/ui/Announcements';
     }
 
     if (isOpen && iframeRef.current) {
