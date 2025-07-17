@@ -2,6 +2,8 @@ import CryptoJS from "crypto-js";
 import { isDevelopmentMode } from './developmentHelper';
 
 export const authEncryptDecryptKey = "20SA16ED";
+export const crmEncryptDecryptKey = "$%x@#~$a";
+export const enkey = "C6mL09K3Y";
 
 export const getBasePath = () => {
     return '/ui60/';
@@ -9,19 +11,36 @@ export const getBasePath = () => {
 
 export const encryptByDES = (message, key) => {
     try {
-        const encrypted = CryptoJS.DES.encrypt(message, key).toString();
-        return encrypted;
-    } catch (error) {
-        return null;
+        let keyHex = CryptoJS.enc.Utf8.parse(key);
+        let ivHex = CryptoJS.enc.Utf8.parse(key);
+        keyHex = CryptoJS.SHA1(keyHex);
+        ivHex = CryptoJS.SHA1(ivHex);
+        // CryptoJS use CBC as the default mode, and Pkcs7 as the default padding scheme
+        var encrypted = CryptoJS.DES.encrypt(message, keyHex, {
+            mode: CryptoJS.mode.CBC,
+            iv: ivHex,
+            padding: CryptoJS.pad.Pkcs7,
+        });
+        return encrypted.toString();
+    } catch {
+        return "";
     }
 };
 
 export const decrypt = (message, key) => {
     try {
-        const bytes = CryptoJS.AES.decrypt(message, key);
-        return bytes.toString(CryptoJS.enc.Utf8);
-    } catch (error) {
-        return null;
+        let keyHex = CryptoJS.enc.Utf8.parse(key);
+        let ivHex = CryptoJS.enc.Utf8.parse(key);
+        keyHex = CryptoJS.SHA1(keyHex);
+        ivHex = CryptoJS.SHA1(ivHex);
+        var decrypted = CryptoJS.DES.decrypt(message, keyHex, {
+            mode: CryptoJS.mode.CBC,
+            iv: ivHex,
+            padding: CryptoJS.pad.Pkcs7,
+        });
+        return decrypted.toString(CryptoJS.enc.Utf8);
+    } catch {
+        return "";
     }
 };
 
