@@ -135,4 +135,9 @@ const IframeContainer = ({
   );
 };
 
+window.openPageInNextTab = function (...args) {
+  console.log('openPageInNextTab called with:', args);
+  addTab({ url: args[0], title: args[1] });
+};
+
 export default IframeContainer; 
