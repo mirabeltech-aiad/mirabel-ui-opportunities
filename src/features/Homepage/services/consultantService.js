@@ -16,20 +16,14 @@ export const consultantService = {
   getConsultantInfo: async () => {
     try {
       const clientID = getSessionValue('ClientID');
-      console.log('🔧 ConsultantService: ClientID from session:', clientID);
       
       if (!clientID) {
         throw new Error('Client ID not found in session');
       }
 
       const endpoint = `${API_CONSULTANT_INFO_GET}${clientID}`;
-      console.log('🔧 ConsultantService: Calling endpoint:', endpoint);
       
       const response = await httpClient.get(endpoint);
-      console.log('🔧 ConsultantService: Raw response:', response);
-      console.log('🔧 ConsultantService: Response content:', response?.content);
-      console.log('🔧 ConsultantService: Response content.Data:', response?.content?.Data);
-      console.log('🔧 ConsultantService: Consultant info retrieved successfully');
       return response;
     } catch (error) {
       console.error('❌ ConsultantService: Error getting consultant info:', error);
@@ -67,19 +61,14 @@ export const consultantService = {
         EmailType: 'smtp' // Optional field for backend DTO
       };
 
-      console.log('🔧 ConsultantService: Sending payload:', payload);
-      console.log('🔧 ConsultantService: Endpoint:', `${HELPDESK_API_CONSULTANT_CREATEEMAIL}${clientID}/softwareconsultant`);
-
       const response = await httpClient.post(
         `${HELPDESK_API_CONSULTANT_CREATEEMAIL}${clientID}/softwareconsultant`,
         payload
       );
       
-      console.log('🔧 ConsultantService: Email sent successfully');
       return response;
     } catch (error) {
       console.error('❌ ConsultantService: Error sending email:', error);
-      console.error('❌ ConsultantService: Error response:', error.response?.data);
       throw error;
     }
   },
