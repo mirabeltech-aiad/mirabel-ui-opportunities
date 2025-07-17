@@ -3,6 +3,7 @@ import { useToast } from '@/features/Opportunity/hooks/use-toast';
 import dashboardService from '../services/dashboardService';
 import navigationService from '../services/navigationService';
 import { termsAndConditionsService } from '../services/termsAndConditionsService';
+import { initializePageNavigation, cleanupPageNavigation } from '@/utils/pageNavigation';
 
 const HomeContext = createContext();
 
@@ -51,7 +52,7 @@ const initialState = {
       title: 'Search',
       component: 'Search',
       type: 'iframe',
-      url: (typeof window !== 'undefined' ? window.location.origin : '') + '/ui/Search',
+      url: 'http://localhost:3001/ui/Search',
       closable: false,
       icon: '🔍'
     }
@@ -320,6 +321,18 @@ export const HomeProvider = ({ children }) => {
 
     initializeApp();
   }, []); // Removed toast dependency - initialization should only run once on mount
+
+  // Initialize page navigation helpers when actions are available
+  useEffect(() => {
+    if (value && value.actions) {
+      initializePageNavigation(value.actions);
+      
+      // Cleanup on unmount
+      return () => {
+        cleanupPageNavigation();
+      };
+    }
+  }, []); // Run once on mount
 
   // Save tabs to localStorage when they change
   useEffect(() => {
