@@ -185,7 +185,9 @@ const HelpSystem = () => {
   // Initialize Front Chat when component mounts
   useEffect(() => {
     console.log('🔧 HelpSystem: Initializing Front Chat...');
-    chatService.initializeFrontChat();
+    chatService.initializeFrontChat().catch(error => {
+      console.error('❌ HelpSystem: Failed to initialize Front Chat:', error);
+    });
   }, []);
 
   return (

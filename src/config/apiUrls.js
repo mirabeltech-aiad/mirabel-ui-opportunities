@@ -16,6 +16,11 @@ export const API_CRM_CONTACTS_SEARCH_QUICK = '/services/crm/contacts/search/Quic
 export const API_CONSULTANT_INFO_GET = '/services/CRM/consultants/';
 export const HELPDESK_API_CONSULTANT_CREATEEMAIL = '/services/helpdesk/contactconsultant/createemail/';
 
+// Front Chat APIs
+export const API_FRONTCHAT_CONFIG = '/services/api/frontchat/config';
+export const API_FRONTCHAT_HMAC = '/services/api/frontchat/hmac';
+export const API_FRONTCHAT_INIT = '/services/api/frontchat/init';
+
 // Tech Support APIs
 export const HELPDESK_API_ERROR_CATEGORY = '/services/helpdesk/techsupport/errorcategory';
 export const HELPDESK_API_TECHSUPPORT_CREATEREQUEST = '/services/helpdesk/techsupport/create/';
@@ -42,4 +47,6 @@ export const API_NAVIGATION_SETUP_UPDATE = '/services/Admin/Navigation/Setup/Upd
 // Website Setup APIs
 export const API_WEBSITE_SETUP_GET = '/services/Admin/Website/Setup/';
 export const API_WEBSITE_SETUP_UPDATE = '/services/Admin/Website/Setup/Update';
+
+
 

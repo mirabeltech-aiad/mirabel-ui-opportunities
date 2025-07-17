@@ -1,68 +1,106 @@
 import { getSessionValue } from '../../../utils/sessionHelpers';
+import { 
+  API_FRONTCHAT_CONFIG, 
+  API_FRONTCHAT_HMAC, 
+  API_FRONTCHAT_INIT 
+} from '../../../config/apiUrls';
 
 /**
  * Chat service for Front Chat integration
+ * Uses secure backend API endpoints for configuration and HMAC generation
  * Matches the backend logic for Front Chat initialization and HMAC authentication
  */
 export const chatService = {
   /**
-   * Get Front Chat configuration from environment
-   * @returns {Object} Front Chat configuration
+   * Get Front Chat configuration from secure backend API
+   * @returns {Promise<Object>} Front Chat configuration
    */
-  getFrontChatConfig: () => {
-    return {
-      chatId: import.meta.env.REACT_APP_FRONT_CHAT_ID || '18e215377facefd562516d3688f3fa6a',
-      apiToken: import.meta.env.REACT_APP_FRONT_CHAT_API || '',
-      hashKey: import.meta.env.REACT_APP_FRONT_USER_HASH_KEY || ''
-    };
-  },
-
-  /**
-   * Generate HMAC hash for user authentication (matches backend GetHMAC method)
-   * @param {string} email - User email
-   * @returns {string} HMAC hash
-   */
-  generateHMAC: (email) => {
-    const hashKey = import.meta.env.REACT_APP_FRONT_USER_HASH_KEY || '';
-    if (!hashKey || !email) {
-      console.warn('Missing hash key or email for HMAC generation');
-      return '';
-    }
-
-    // Simple HMAC implementation for development
-    // In production, this should use a proper crypto library
+  async getFrontChatConfig() {
     try {
-      const encoder = new TextEncoder();
-      const keyData = encoder.encode(hashKey);
-      const messageData = encoder.encode(email);
-      
-      // For now, return a simple hash (in production, use proper HMAC-SHA256)
-      const combined = keyData.length + messageData.length;
-      return combined.toString(16).padStart(64, '0');
+      const response = await fetch(API_FRONTCHAT_CONFIG);
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      const data = await response.json();
+      return data.content || data;
     } catch (error) {
-      console.error('Error generating HMAC:', error);
+      console.error('Failed to get Front Chat config:', error);
+      // Fallback to environment variable if API fails
+      return { 
+        chatId: import.meta.env.REACT_APP_FRONT_CHAT_ID || '18e215377facefd562516d3688f3fa6a' 
+      };
+    }
+  },
+
+  /**
+   * Get HMAC hash from secure backend API
+   * @param {string} email - User email
+   * @returns {Promise<string>} HMAC hash
+   */
+  async generateHMAC(email) {
+    try {
+      const response = await fetch(`${API_FRONTCHAT_HMAC}?email=${encodeURIComponent(email)}`);
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      const data = await response.json();
+      return data.content?.userHash || data.userHash || '';
+    } catch (error) {
+      console.error('Failed to generate HMAC:', error);
       return '';
     }
   },
 
   /**
-   * Initialize Front Chat with user data
+   * Get complete Front Chat initialization data from backend
+   * @returns {Promise<Object>} Complete initialization data
+   */
+  async getFrontChatInitData() {
+    try {
+      const response = await fetch(API_FRONTCHAT_INIT);
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      const data = await response.json();
+      return data.content || data;
+    } catch (error) {
+      console.error('Failed to get Front Chat init data:', error);
+      return null;
+    }
+  },
+
+  /**
+   * Initialize Front Chat with secure backend data
    * Matches backend initialization: window.FrontChat('init', {...})
    */
-  initializeFrontChat: () => {
+  async initializeFrontChat() {
     try {
-      const config = chatService.getFrontChatConfig();
-      const userEmail = getSessionValue('Email') || '';
-      const userName = getSessionValue('FullName') || getSessionValue('UserName') || '';
-      const companyName = getSessionValue('CompanyName') || '';
-      const userHash = chatService.generateHMAC(userEmail);
+      // Try to get complete initialization data from backend first
+      let initData = await chatService.getFrontChatInitData();
+      
+      if (!initData) {
+        // Fallback to manual data gathering if backend fails
+        const config = await chatService.getFrontChatConfig();
+        const userEmail = getSessionValue('Email') || '';
+        const userName = getSessionValue('FullName') || getSessionValue('UserName') || '';
+        const companyName = getSessionValue('CompanyName') || '';
+        const userHash = await chatService.generateHMAC(userEmail);
 
-      console.log('🔧 Initializing Front Chat with config:', {
-        chatId: config.chatId,
-        hasEmail: !!userEmail,
-        hasUserName: !!userName,
-        hasCompanyName: !!companyName,
-        hasUserHash: !!userHash
+        initData = {
+          chatId: config.chatId,
+          email: userEmail,
+          userHash: userHash,
+          name: userName,
+          customFields: { Title: companyName }
+        };
+      }
+
+      console.log('🔧 Initializing Front Chat with secure config:', {
+        chatId: initData.chatId,
+        hasEmail: !!initData.email,
+        hasUserName: !!initData.name,
+        hasCompanyName: !!initData.customFields?.Title,
+        hasUserHash: !!initData.userHash
       });
 
       // Check if Front Chat is available
@@ -72,16 +110,14 @@ export const chatService = {
         return;
       }
 
-      // Initialize Front Chat with user data
+      // Initialize Front Chat with secure data
       window.FrontChat('init', {
-        chatId: config.chatId,
+        chatId: initData.chatId,
         useDefaultLauncher: false,
-        email: userEmail,
-        userHash: userHash,
-        name: userName,
-        customFields: {
-          Title: companyName,
-        },
+        email: initData.email,
+        userHash: initData.userHash,
+        name: initData.name,
+        customFields: initData.customFields,
         onInitCompleted: () => {
           console.log('✅ Front Chat initialized successfully');
           
@@ -248,9 +284,8 @@ export const chatService = {
       }
 
       header.addEventListener('mousedown', handleMouseDown);
-      console.log('✅ Front Chat draggable functionality enabled');
     } catch (error) {
-      console.error('❌ Error setting up Front Chat draggable:', error);
+      console.error('❌ Error making Front Chat draggable:', error);
     }
   }
 }; 
