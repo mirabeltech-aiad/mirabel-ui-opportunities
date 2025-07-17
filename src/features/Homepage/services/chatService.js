@@ -110,16 +110,55 @@ export const chatService = {
         return;
       }
 
-      // Initialize Front Chat with secure data
+      // Try initialization with full user data first
+      try {
+        window.FrontChat('init', {
+          chatId: initData.chatId,
+          useDefaultLauncher: false,
+          email: initData.email,
+          userHash: initData.userHash,
+          name: initData.name,
+          customFields: initData.customFields,
+          onInitCompleted: () => {
+            console.log('✅ Front Chat initialized successfully with user data');
+            
+            // Set up window visibility change handler
+            window.FrontChat('onWindowVisibilityChanged', function (e) {
+              if (e.is_window_visible) {
+                console.log('🔧 Front Chat window became visible, setting up draggable...');
+                chatService.makeChatBoxDraggable();
+              }
+            });
+          },
+          onError: (error) => {
+            console.warn('⚠️ Front Chat initialization warning:', error);
+            // Try fallback initialization without user data
+            chatService.initializeFrontChatFallback(initData.chatId);
+          }
+        });
+      } catch (initError) {
+        console.warn('⚠️ Front Chat initialization failed, trying fallback:', initError);
+        chatService.initializeFrontChatFallback(initData.chatId);
+      }
+
+    } catch (error) {
+      console.error('❌ Error initializing Front Chat:', error);
+    }
+  },
+
+  /**
+   * Fallback Front Chat initialization without user data
+   * Used when the main initialization fails due to conversation ID issues
+   */
+  initializeFrontChatFallback(chatId) {
+    try {
+      console.log('🔄 Trying Front Chat fallback initialization...');
+      
       window.FrontChat('init', {
-        chatId: initData.chatId,
+        chatId: chatId,
         useDefaultLauncher: false,
-        email: initData.email,
-        userHash: initData.userHash,
-        name: initData.name,
-        customFields: initData.customFields,
         onInitCompleted: () => {
-          console.log('✅ Front Chat initialized successfully');
+          console.log('✅ Front Chat initialized successfully with fallback');
           
           // Set up window visibility change handler
           window.FrontChat('onWindowVisibilityChanged', function (e) {
@@ -130,9 +169,8 @@ export const chatService = {
           });
         }
       });
-
     } catch (error) {
-      console.error('❌ Error initializing Front Chat:', error);
+      console.error('❌ Front Chat fallback initialization also failed:', error);
     }
   },
 
