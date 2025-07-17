@@ -17,72 +17,23 @@ export const customerSearchService = {
    */
   async quickSearch(searchQuery, page = 1, start = 0, limit = 20) {
     try {
-      // Get session data directly from localStorage first
-      const mmClientVarsRaw = localStorage.getItem("MMClientVars");
-      let userId = null;
-      
-      if (mmClientVarsRaw) {
-        try {
-          const mmClientVars = JSON.parse(mmClientVarsRaw);
-          userId = mmClientVars.UserID;
-        } catch (error) {
-          // Silent fallback for parsing errors
-        }
-      }
-      
-      // Fallback to getUserInfo if direct access fails
-      if (!userId) {
-        const userInfo = getUserInfo();
-        userId = userInfo?.userId;
-      }
-      
-      // Final fallback to getSessionValue
-      if (!userId) {
-        const { getSessionValue } = await import('../utils/sessionHelpers');
-        userId = getSessionValue('UserID');
-      }
-
-      if (!userId) {
-        throw new Error('User session not available');
-      }
-
-      if (!searchQuery || searchQuery.trim().length < 3) {
-        return [];
-      }
-
-      const requestData = {
+      const params = new URLSearchParams({
         searchQuery: searchQuery.trim(),
-        userID: userId
-      };
+        page: page.toString(),
+        start: start.toString(),
+        limit: limit.toString()
+      });
 
-      const response = await httpClient.post(API_CRM_CONTACTS_SEARCH_QUICK, requestData);
+      const response = await httpClient.get(`${API_CRM_CONTACTS_SEARCH_QUICK}?${params}`);
       
-      // Handle different response formats (matching legacy behavior)
-      let contacts = [];
-      if (response.content?.List) {
-        // New format: response.content.List
-        contacts = response.content.List;
-      } else if (response.data?.content?.List) {
-        // Alternative format: response.data.content.List
-        contacts = response.data.content.List;
-      } else if (response.data?.List) {
-        // Direct List format
-        contacts = response.data.List;
-      } else if (response.data?.d?.List) {
-        // Legacy format with 'd' wrapper
-        contacts = response.data.d.List;
-      } else if (Array.isArray(response.data)) {
-        // Direct array format
-        contacts = response.data;
+      if (response && response.data) {
+        return response.data;
       }
       
-      // Filter out inactive contacts (matching legacy behavior)
-      const activeContacts = contacts.filter(contact => !contact.InActive) || [];
-      
-      return activeContacts;
-    } catch (error) {
-      console.error('Error in customer quick search:', error);
       return [];
+    } catch (error) {
+      console.error('CustomerSearchService: API call failed:', error);
+      throw error;
     }
   },
 
