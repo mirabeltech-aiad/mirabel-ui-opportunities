@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import { useHome } from '../contexts/HomeContext';
+import { initializePageNavigation, cleanupPageNavigation } from '@/utils/pageNavigation';
 import Navbar from './Navbar';
 import TabContent from './TabContent';
 import DashboardTab from './DashboardTab';
@@ -14,6 +15,18 @@ import {
 
 const TabNavigation = () => {
   const { tabs, activeTabId, actions } = useHome();
+
+  // Initialize page navigation helpers when component mounts
+  useEffect(() => {
+    console.log('Initializing page navigation helpers in TabNavigation');
+    initializePageNavigation(actions);
+
+    // Cleanup function
+    return () => {
+      console.log('Cleaning up page navigation helpers in TabNavigation');
+      cleanupPageNavigation();
+    };
+  }, [actions]);
 
   // Split tabs into fixed and draggable
   const fixedTabsCount = 3; // Dashboard, Inbox, Search
