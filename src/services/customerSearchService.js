@@ -17,31 +17,10 @@ export const customerSearchService = {
    */
   async quickSearch(searchQuery, page = 1, start = 0, limit = 20) {
     try {
-      // Get session data directly from localStorage first
-      const mmClientVarsRaw = localStorage.getItem("MMClientVars");
-      let userId = null;
+      // Get user ID from session (matching legacy behavior)
+      const userInfo = getUserInfo();
+      const userId = userInfo?.userId;
       
-      if (mmClientVarsRaw) {
-        try {
-          const mmClientVars = JSON.parse(mmClientVarsRaw);
-          userId = mmClientVars.UserID;
-        } catch (error) {
-          // Silent fallback for parsing errors
-        }
-      }
-      
-      // Fallback to getUserInfo if direct access fails
-      if (!userId) {
-        const userInfo = getUserInfo();
-        userId = userInfo?.userId;
-      }
-      
-      // Final fallback to getSessionValue
-      if (!userId) {
-        const { getSessionValue } = await import('../utils/sessionHelpers');
-        userId = getSessionValue('UserID');
-      }
-
       if (!userId) {
         throw new Error('User session not available');
       }
@@ -50,9 +29,10 @@ export const customerSearchService = {
         return [];
       }
 
+      // Create request body matching ContactQuickSearchDTO structure
       const requestData = {
-        searchQuery: searchQuery.trim(),
-        userID: userId
+        SearchQuery: searchQuery.trim(),
+        UserID: userId
       };
 
       const response = await httpClient.post(API_CRM_CONTACTS_SEARCH_QUICK, requestData);
@@ -81,8 +61,8 @@ export const customerSearchService = {
       
       return activeContacts;
     } catch (error) {
-      console.error('Error in customer quick search:', error);
-      return [];
+      console.error('CustomerSearchService: API call failed:', error);
+      throw error;
     }
   },
 

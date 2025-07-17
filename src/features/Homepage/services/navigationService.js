@@ -1,5 +1,6 @@
 import AxiosService from '@/services/AxiosService';
 import { apiCall } from '@/services/httpClient';
+import { decrypt, authEncryptDecryptKey } from '@/utils/authHelpers';
 
 /**
  * Navigation service for fetching dynamic navigation menus from the API
@@ -9,6 +10,46 @@ export const navigationService = {
    * Base domain for navigation URLs
    */
   BASE_DOMAIN: 'https://smoke-feature13.magazinemanager.com',
+
+  /**
+   * Cache for API response data
+   */
+  // _apiDataCache: null,
+
+  /**
+   * Fetch and decrypt API data for MarketingManagerSiteURL and EmailServiceSiteURL
+   * @returns {Promise<Object>} Decrypted API data
+   */
+  fetchApiData: async () => {
+    try {
+      // Return cached data if available
+      // if (navigationService._apiDataCache) {
+      //   return navigationService._apiDataCache;
+      // }
+      const response = await apiCall('/services/admin/common/k/8', 'GET');      
+      if (response?.content?.Data) {       
+        // Decrypt the response data
+        const decryptedData = decrypt(response.content.Data, authEncryptDecryptKey);    
+        if (decryptedData && decryptedData.trim() !== '') {
+          try {
+            const data = JSON.parse(decryptedData);
+            // Cache the data
+            // navigationService._apiDataCache = data;
+            
+            return data;
+          } catch (parseError) {
+            throw new Error('Failed to parse decrypted data as JSON');
+          }
+        } else {
+          throw new Error('Decryption failed - returned empty data');
+        }
+      } else {
+        throw new Error('Invalid API response structure - missing content.Data');
+      }
+    } catch (error) {
+      throw error;
+    }
+  },
 
   /**
    * Transform API response data into MMnewclientvars format
@@ -60,7 +101,8 @@ export const navigationService = {
       const isSiteDataPackEnabled=clientInfo.IsSiteDataPackEnabled || false;
       const isUserHasDataPackAccess=clientInfo.IsUserHasDataPackAccess || false;
       const isMirabelEmailServiceEnabled=clientInfo.IsMirabelEmailServiceEnabled || false;
-      const isrepnotificationenabled=clientInfo.IsRepNotificationEnabled || false;
+      const isRepNotificationEnabled=clientInfo.IsRepNotificationEnabled || false;
+      const isCallDispositionEnabled = clientInfo.IsCallDispositionEnabled || false;
      
       // Create the transformed data object
       const transformedData = {
@@ -99,7 +141,7 @@ export const navigationService = {
         "IsSiteDataPackEnabled": isSiteDataPackEnabled,
         "IsUserHasDataPackAccess": isUserHasDataPackAccess,
         "IsMirabelEmailServiceEnabled": isMirabelEmailServiceEnabled,
-        "IsRepNotificationEnabled": isrepnotificationenabled
+        "IsRepNotificationEnabled": isRepNotificationEnabled
       };
       
       console.log('🔄 Transformed session data:', transformedData);
@@ -121,12 +163,20 @@ export const navigationService = {
    */
   fetchNavigationData: async (userId = 1, siteId = 0) => {
     try {     
+      // Fetch API data once for URL construction
+      let apiData = {};
+      try {
+        apiData = await navigationService.fetchApiData();
+      } catch (error) {
+        console.warn('⚠️ Failed to fetch API data, proceeding without MKM/MES URLs:', error);
+      }
+      
       // Then fetch navigation menus
       const response = await apiCall(`/services/admin/navigations/users/${userId}/${siteId}`, 'GET');        
       // Check if response has the expected structure
       if (response?.content?.List) {
         const menus = response.content.List;
-        return navigationService.processNavigationMenus(menus);
+        return await navigationService.processNavigationMenus(menus, apiData);
       }
     } catch (error) {
       console.error('❌ Error fetching navigation data:', error);
@@ -138,55 +188,106 @@ export const navigationService = {
    * Load session details and store in localStorage with transformed format
    * @returns {Promise<Object>} Session details response
    */
-  loadSessionDetails: async () => {
-    try {
-      console.log('🔄 Loading session details...');
-      const response = await apiCall('/services/admin/common/SessionDetailsGet','GET');
-      
-      console.log('📊 Raw session API response:', response);
-      
-      // Transform the response data into the desired format
-      const transformedData = navigationService.transformSessionData(response);
-      
-      // Store transformed data in localStorage with key 'MMnewclientvars'
-      localStorage.setItem('MMClientVars', JSON.stringify(transformedData));
-      console.log('✅ Session details transformed and stored in localStorage as MMnewclientvars');
-      console.log('📝 Stored data:', transformedData);
-      
-      // Also update the existing MMClientVars for backward compatibility
-      const existingClientVars = localStorage.getItem('MMClientVars');
-      if (existingClientVars) {
+    loadSessionDetails: async () => {
         try {
-          const existing = JSON.parse(existingClientVars);
-          const updatedClientVars = { ...existing, ...transformedData };
-          localStorage.setItem('MMClientVars', JSON.stringify(updatedClientVars));
-          console.log('🔄 Updated MMClientVars for backward compatibility');
-        } catch (e) {
-          console.warn('⚠️ Could not update MMClientVars:', e);
+            console.log('🔄 Loading session details...');
+            const response = await apiCall('/services/admin/common/SessionDetailsGet','GET');
+
+            console.log('📊 Raw session API response:', response);
+
+            // Transform the response data into the desired format
+            const transformedData = navigationService.transformSessionData(response);
+
+            // Store transformed data in localStorage with key 'MMnewclientvars'
+            localStorage.setItem('MMClientVars', JSON.stringify(transformedData));
+            console.log('✅ Session details transformed and stored in localStorage as MMnewclientvars');
+            console.log('📝 Stored data:', transformedData);
+
+            // Also update the existing MMClientVars for backward compatibility
+            const existingClientVars = localStorage.getItem('MMClientVars');
+            if (existingClientVars) {
+                try {
+                    const existing = JSON.parse(existingClientVars);
+                    const updatedClientVars = { ...existing, ...transformedData };
+                    localStorage.setItem('MMClientVars', JSON.stringify(updatedClientVars));
+                    console.log('🔄 Updated MMClientVars for backward compatibility');
+                } catch (e) {
+                    console.warn('⚠️ Could not update MMClientVars:', e);
+                }
+            } else {
+                // Create MMClientVars if it doesn't exist
+                localStorage.setItem('MMClientVars', JSON.stringify(transformedData));
+                console.log('➕ Created MMClientVars with transformed data');
+            }
+
+            return transformedData;
+        } catch (error) {
+            console.error('❌ Failed to load session details:', error);
+
+            // Store fallback data
+            const fallbackData = navigationService.transformSessionData({});
+            localStorage.setItem('MMClientVars', JSON.stringify(fallbackData));
+            console.log('🔄 Stored fallback session data');
+
+            throw error;
         }
-      } else {
-        // Create MMClientVars if it doesn't exist
-        localStorage.setItem('MMClientVars', JSON.stringify(transformedData));
-        console.log('➕ Created MMClientVars with transformed data');
-      }
+    },
+
+  /**
+   * Get MarketingManagerSiteURL - matches backend logic exactly
+   * @returns {Promise<string>} Constructed MKM URL
+   */
+  getMarketingManagerSiteURL: async () => {
+    try {
+      // Get API data for base URL
+      const apiData = await navigationService.fetchApiData();
+      const marketingManagerURL = apiData.MarketingManagerURL || '';
       
-      return transformedData;
+      // Get session data for parameters
+      const sessionVars = navigationService.getSessionDetails() || {};
+      const isSiteMKMEnabled = sessionVars.IsSiteMKMEnabled === true || sessionVars.IsSiteMKMEnabled === 'True';
+      const isUserHasMKMAccess = sessionVars.IsUserHasMKMAccess === true || sessionVars.IsUserHasMKMAccess === 'True';
+      const isSiteDataPackEnabled = sessionVars.IsSiteDataPackEnabled === true || sessionVars.IsSiteDataPackEnabled === 'True';
+      const isUserHasDataPackAccess = sessionVars.IsUserHasDataPackAccess === true || sessionVars.IsUserHasDataPackAccess === 'True';
+      
+      // Construct URL exactly as backend does
+      const mkmSiteURL = `${marketingManagerURL}{0}ISMKM=1&FE=${isSiteMKMEnabled ? "1" : "0"}&MKMFE=${isSiteMKMEnabled ? "1" : "0"}&MKMUA=${isUserHasMKMAccess ? "1" : "0"}&DPFE=${isSiteDataPackEnabled ? "1" : "0"}&DPUA=${isUserHasDataPackAccess ? "1" : "0"}`;
+
+      return mkmSiteURL;
     } catch (error) {
-      console.error('❌ Failed to load session details:', error);
+      console.error('❌ Error getting MarketingManagerSiteURL:', error);
+      return '';
+    }
+  },
+
+  /**
+   * Get EmailServiceSiteURL - matches backend logic exactly
+   * @returns {Promise<string>} Constructed MES URL
+   */
+  getEmailServiceSiteURL: async () => {
+    try {
+      // Get API data for base URL
+      const apiData = await navigationService.fetchApiData();
+      const emailServiceSiteURL = apiData.EmailServiceSiteURL || '';
       
-      // Store fallback data
-      const fallbackData = navigationService.transformSessionData({});
-      localStorage.setItem('MMClientVars', JSON.stringify(fallbackData));
-      console.log('🔄 Stored fallback session data');
+      // Get session data for parameters
+      const sessionVars = navigationService.getSessionDetails() || {};
+      const isMirabelEmailServiceEnabled = sessionVars.IsMirabelEmailServiceEnabled === true || sessionVars.IsMirabelEmailServiceEnabled === 'True';
+      const isUserHasMKMAccess = sessionVars.IsUserHasMKMAccess === true || sessionVars.IsUserHasMKMAccess === 'True';
       
-      throw error;
+      // Construct URL exactly as backend does
+      const mesSiteURL = `${emailServiceSiteURL}{0}ISMKM=1&ISMES=1&FE=${isMirabelEmailServiceEnabled ? "1" : "0"}&ESFE=${isMirabelEmailServiceEnabled ? "1" : "0"}&MKMUA=${isUserHasMKMAccess ? "1" : "0"}`;
+      
+      return mesSiteURL;
+    } catch (error) {
+      return '';
     }
   },
 
   /**
    * Recursively build menu tree for unlimited depth
    */
-  processNavigationMenus: (menus) => {
+  processNavigationMenus: async (menus, apiData = null) => {
     if (!Array.isArray(menus)) {
       return [];
     }
@@ -199,26 +300,61 @@ export const navigationService = {
       sessionVars = {};
     }
 
-    // Helper: Replace {{MM_SOMETHING}} in URL with sessionVars
-    function replaceSessionVarsInUrl(url) {
-      if (!url || typeof url !== 'string') return url;
-      return url.replace(/\{\{MM_(.*?)\}\}/g, (match, key) => {
-        return sessionVars[key] !== undefined ? sessionVars[key] : match;
-      });
+    // Fetch API data for MKM/MES URLs if not provided
+    if (!apiData) {
+      try {
+        apiData = await navigationService.fetchApiData();
+      } catch (error) {
+        console.warn('⚠️ Failed to fetch API data for navigation URLs:', error);
+        apiData = {};
+      }
     }
 
-    // Helper: Permission/lock icon logic (MKM, DataPack, MES, etc.)
+    // Helper: Replace {{MM_SOMETHING}} in URL with sessionVars - matches backend logic exactly
+    function replaceSessionVarsInUrl(url) {
+      if (!url || typeof url !== 'string') return url;
+      
+      // Decode URL first as backend does
+      let decodedURL = decodeURIComponent(url);
+      
+      // Find all {{MM_*}} placeholders
+      const matches = decodedURL.match(/\{\{(MM_.*?)\}\}/g);
+      if (!matches) return url;
+      
+      let processedURL = decodedURL;
+      matches.forEach(match => {
+        const sessionVarKey = match.replace('{{', '').replace('}}', '').replace('MM_', '');
+        if (sessionVars[sessionVarKey] !== undefined) {
+          processedURL = processedURL.replace(match, sessionVars[sessionVarKey]);
+        }
+      });
+      
+      return processedURL;
+    }
+
+    // Helper: Permission/lock icon logic - matches backend logic exactly
     function getMenuLockStatus(menu) {
-      // Default: not locked
       let isLocked = false;
       let lockReason = '';
-      // MKM
-      if ((menu.URLSource === 'MKM' && (!sessionVars.IsSiteMKMEnabled || !sessionVars.IsUserHasMKMAccess)) ||
-          (menu.URLSource === 'MKM-DATA' && (!sessionVars.IsSiteDataPackEnabled || !sessionVars.IsUserHasDataPackAccess))) {
-        isLocked = true;
-        lockReason = 'MKM';
+      
+      // Call Disposition Report - check first as backend does
+      if (menu.Caption === 'Call Disposition Report' || menu.URL === '/ui/Reports/CallDisposition') {
+        if (!sessionVars.IsCallDispositionEnabled) {
+          isLocked = true;
+          lockReason = 'CallDisposition';
+        }
       }
-      // MES
+      
+      // MKM and MKM-DATA logic
+      if (menu.URLSource === 'MKM' || menu.URLSource === 'MKM-DATA') {
+        if ((menu.URLSource === 'MKM' && (!sessionVars.IsSiteMKMEnabled || !sessionVars.IsUserHasMKMAccess)) ||
+            (menu.URLSource === 'MKM-DATA' && (!sessionVars.IsSiteDataPackEnabled || !sessionVars.IsUserHasDataPackAccess))) {
+          isLocked = true;
+          lockReason = 'MKM';
+        }
+      }
+      
+      // MES logic - matches backend exactly
       if (menu.URLSource === 'MES') {
         if ((sessionVars.IsMirabelEmailServiceEnabled === false || sessionVars.IsRepNotificationEnabled) || !sessionVars.IsUserHasMKMAccess) {
           if (!(sessionVars.IsRepNotificationEnabled && (menu.Caption === 'Email Builder' || menu.Caption === 'Workflows'))) {
@@ -227,17 +363,11 @@ export const navigationService = {
           }
         }
       }
-      // Call Disposition Report
-      if (menu.Caption === 'Call Disposition Report' || menu.URL === '/ui/Reports/CallDisposition') {
-        if (!sessionVars.IsCallDispositionEnabled) {
-          isLocked = true;
-          lockReason = 'CallDisposition';
-        }
-      }
+      
       return { isLocked, lockReason };
     }
 
-    // Helper: icon class logic
+    // Helper: icon class logic - matches backend exactly
     function getIconClass(menu, isLocked) {
       if (isLocked) return 'mainMenuIcon lockIcon';
       if (menu.Icon === 'New') return 'mainMenuIcon newFeatureIcon';
@@ -245,7 +375,7 @@ export const navigationService = {
       return menu.IconCls || '';
     }
 
-    // Helper: Insert menu URL into base URL at {0} placeholder, with ? or & as needed
+    // Helper: Insert menu URL into base URL at {0} placeholder - matches backend exactly
     function insertMenuUrlAtPlaceholder(baseUrl, menuUrl) {
       if (!baseUrl || !menuUrl) return baseUrl || menuUrl;
       // Add ? or & as in C# logic
@@ -258,33 +388,33 @@ export const navigationService = {
     }
 
     // Helper: recursively build children
-    function buildMenuTree(parentId) {
-      return menus
+    async function buildMenuTree(parentId) {
+      const menuPromises = menus
         .filter(menu => menu.ParentID === parentId)
-        .map(menu => {
+        .map(async menu => {
           // Lock/permission logic
           const { isLocked } = getMenuLockStatus(menu);
           // Icon class
           const iconCls = getIconClass(menu, isLocked);
           // URL replacement
           let url = replaceSessionVarsInUrl(menu.URL);
-          // Special URL handling for MKM/MES
+          
+          // Special URL handling for MKM/MES - matches backend exactly
           if ((menu.URLSource === 'MKM' || menu.URLSource === 'MKM-DATA') && url) {
-            url = sessionVars.MarketingManagerSiteURL
-              ? insertMenuUrlAtPlaceholder(sessionVars.MarketingManagerSiteURL, url)
-              : url;
+            const marketingManagerSiteURL = await navigationService.getMarketingManagerSiteURL();
+            url = insertMenuUrlAtPlaceholder(marketingManagerSiteURL, url);
           } else if (menu.URLSource === 'MES' && url) {
-            url = sessionVars.EmailServiceSiteURL
-              ? insertMenuUrlAtPlaceholder(sessionVars.EmailServiceSiteURL, url)
-              : url;
+            const emailServiceSiteURL = await navigationService.getEmailServiceSiteURL();
+            url = insertMenuUrlAtPlaceholder(emailServiceSiteURL, url);
           }
+          
           // Tooltip
           const toolTip = menu.ToolTip || '';
           // Special click handling
           const isNewWindow = !!menu.IsNewWindow;
           const isCalendar = url && url.toLowerCase().includes('calendar.aspx');
           // Children
-          const children = buildMenuTree(menu.ID);
+          const children = await buildMenuTree(menu.ID);
           // Compose menu item
           return {
             id: menu.ID,
@@ -304,10 +434,14 @@ export const navigationService = {
             fullUrl: navigationService.getFullUrl(url)
           };
         });
+      
+      return Promise.all(menuPromises);
     }
 
     // Top-level menus have ParentID === -1 or null
-    return buildMenuTree(-1).concat(buildMenuTree(null));
+    const topLevelMenus1 = await buildMenuTree(-1);
+    const topLevelMenus2 = await buildMenuTree(null);
+    return topLevelMenus1.concat(topLevelMenus2);
   },
 
   /**
@@ -388,6 +522,99 @@ export const navigationService = {
     } catch (error) {
       console.error('❌ Error updating session data:', error);
       return null;
+    }
+  },
+
+  /**
+   * Menu click handlers - matches backend JavaScript functions
+   */
+  menuItemClick: (pageURL, caption) => {
+    // Decode URL
+    const decodedURL = decodeURIComponent(pageURL);
+    
+    // Check if it's a tablet/phone (you'll need to implement this)
+    const isTabletOrPhone = navigationService.checkAndOpenPageForTablet(decodedURL, caption);
+    
+    if (!isTabletOrPhone) {
+      // Add new tab to home panel
+      navigationService.addNewTabToHomePanel(decodedURL, caption);
+    }
+  },
+
+  menuItemClickNewWindow: (pageURL) => {
+    // Decode URL
+    const decodedURL = decodeURIComponent(pageURL);
+    
+    // Open in new window
+    window.open(decodedURL, '_blank', '');
+  },
+
+  openCalendar: (url) => {
+    // Decode URL
+    const decodedURL = decodeURIComponent(url);
+    
+    // Check if it's a tablet/phone
+    const isTabletOrPhone = navigationService.checkAndOpenPageForTablet(decodedURL, 'Calendar');
+    
+    if (!isTabletOrPhone) {
+      // Check if calendar tab already exists
+      const existingCalendarTab = document.getElementById('TabCalendar');
+      if (existingCalendarTab) {
+        // Calendar tab already open - activate it
+        console.log('Calendar tab already exists, activating...');
+        // TODO: Implement tab activation logic
+      } else {
+        // Create new calendar tab
+        console.log('Creating new calendar tab with URL:', decodedURL);
+        // TODO: Implement calendar tab creation logic
+      }
+    }
+  },
+
+  /**
+   * Check if device is tablet/phone and handle accordingly
+   * @param {string} url - URL to open
+   * @param {string} caption - Page caption
+   * @returns {boolean} True if handled for tablet/phone
+   */
+  checkAndOpenPageForTablet: (url, caption) => {
+    // Detect if device is tablet or phone
+    const isTabletOrPhone = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+    
+    if (isTabletOrPhone) {
+      // For tablet/phone, open in new window
+      window.open(url, '_blank', '');
+      return true;
+    }
+    
+    return false;
+  },
+
+  /**
+   * Add new tab to home panel
+   * @param {string} url - URL to open
+   * @param {string} caption - Tab caption
+   */
+  addNewTabToHomePanel: (url, caption) => {
+    // TODO: Implement tab management logic
+    // This should integrate with your React tab system
+    console.log('Adding new tab:', caption, 'with URL:', url);
+    
+    // For now, just open in new window
+    window.open(url, '_blank', '');
+  },
+
+  /**
+   * Get decoded URI - matches backend getDecodedURI function
+   * @param {string} url - URL to decode
+   * @returns {string} Decoded URL
+   */
+  getDecodedURI: (url) => {
+    try {
+      return decodeURIComponent(url);
+    } catch (e) {
+      console.warn('Error decoding URI:', e);
+      return url;
     }
   }
 };
