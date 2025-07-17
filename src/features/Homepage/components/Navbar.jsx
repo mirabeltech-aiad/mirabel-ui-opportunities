@@ -4,8 +4,11 @@ import navigationService from '../services/navigationService';
 import { useAuth } from '@/contexts/AuthContext';
 import { refreshIframeByTabId, printIframeByTabId } from '@/services/iframeService';
 import { getUserPermissions } from '@/services/userService';
+import { getUserInfo } from '@/utils/sessionHelpers';
 import CustomerSearch from './CustomerSearch';
 import AnnouncementsSidePanel from './AnnouncementsSidePanel';
+import BellNotification from './BellNotification';
+import { useAnnouncementCount } from '../hooks/useAnnouncementCount';
 import {
   User,
   Settings,
@@ -78,8 +81,8 @@ const Navbar = () => {
   const { actions, tabs, activeTabId, navigationMenus, navigationLoading } = useHome();
   const { logout: authLogout, user } = useAuth();
   const { toast } = useToast();
-  const [notifications, setNotifications] = useState(3);
   const [isAnnouncementsPanelOpen, setIsAnnouncementsPanelOpen] = useState(false);
+  const unreadCount = useAnnouncementCount();
   const [userPermissions, setUserPermissions] = useState({
     canManageUsers: false,
     canManageNavigation: false,
@@ -354,6 +357,11 @@ const Navbar = () => {
     setIsAnnouncementsPanelOpen(!isAnnouncementsPanelOpen);
   };
 
+  // Handle opening announcements panel from bell notification
+  const handleOpenAnnouncementsPanel = () => {
+    setIsAnnouncementsPanelOpen(true);
+  };
+
   return (
       <nav className="navbar bg-ocean-gradient shadow-md h-12">
       <div className="max-w-full px-2 sm:px-4 lg:px-6">
@@ -403,15 +411,11 @@ const Navbar = () => {
             {!navigationLoading && (
               <CustomerSearch />
             )}
-            {/* Notifications */}
-            <Button variant="ghost" size="icon" className="text-white hover:bg-ocean-700 relative rounded-full h-8 w-8 p-0 min-h-0">
-              <Bell className="h-5 w-5" />
-              {notifications > 0 && (
-                <Badge className="absolute -top-1 -right-1 h-5 w-5 rounded-full p-0 text-xs bg-red-600 text-white flex items-center justify-center">
-                  {notifications}
-                </Badge>
-              )}
-            </Button>
+            {/* Bell Notification */}
+            <BellNotification 
+              onOpenAnnouncementsPanel={handleOpenAnnouncementsPanel} 
+              unreadCount={unreadCount}
+            />
 
             {/* User Menu - Updated to match ASP.NET design exactly */}
             <DropdownMenu>

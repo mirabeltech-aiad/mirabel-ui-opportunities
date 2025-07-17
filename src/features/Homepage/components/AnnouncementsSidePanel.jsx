@@ -1,14 +1,17 @@
 import React, { useEffect, useRef } from 'react';
 import { X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { withBaseUrl } from '@/lib/utils';
 
 const AnnouncementsSidePanel = ({ isOpen, onClose }) => {
   const iframeRef = useRef(null);
 
   useEffect(() => {
     if (isOpen && iframeRef.current && !iframeRef.current.src) {
-      // Load announcements when panel opens
-      iframeRef.current.src = 'ui/Announcements';
+      // Load announcements when panel opens - using the correct URL pattern
+      // Following the same pattern as TabContent.jsx
+      const announcementUrl = withBaseUrl('ui60/ui/Announcements');
+      iframeRef.current.src = announcementUrl;
     }
 
     if (isOpen && iframeRef.current) {
@@ -19,46 +22,62 @@ const AnnouncementsSidePanel = ({ isOpen, onClose }) => {
           if (iframeRef.current.contentWindow.document.body) {
             iframeRef.current.contentWindow.document.body.scrollTop = 0;
           }
-          if (iframeRef.current.contentWindow.document.documentElement) {
-            iframeRef.current.contentWindow.document.documentElement.scrollTop = 0;
-          }
         }
       } catch (error) {
-        // Cross-origin iframe will throw error, ignore it
-        console.warn('Could not scroll iframe content (cross-origin):', error);
+        // Cross-origin restrictions might prevent this
+        console.log('Could not scroll iframe content:', error.message);
       }
     }
   }, [isOpen]);
 
-  return (
-    <div 
-      className={`fixed top-0 right-0 h-full w-96 bg-white shadow-2xl transform transition-transform duration-300 ease-in-out z-50 ${
-        isOpen ? 'translate-x-0' : 'translate-x-full'
-      }`}
-      style={{ right: isOpen ? '0px' : '-400px' }}
-    >
-      {/* Header */}
-      <div className="flex items-center justify-between p-4 border-b border-gray-200 bg-gray-50">
-        <div className="font-semibold text-gray-800">Announcements</div>
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={onClose}
-          className="h-8 w-8 p-0 hover:bg-gray-200"
-        >
-          <X className="h-4 w-4" />
-        </Button>
-      </div>
+  // Handle iframe load event
+  const handleIframeLoad = () => {
+    console.log('Announcements iframe loaded');
+  };
 
-      {/* Content */}
-      <div className="h-full">
-        <iframe
-          ref={iframeRef}
-          className="w-full h-full border-0"
-          title="Announcements"
-          sandbox="allow-same-origin allow-scripts allow-forms allow-popups allow-top-navigation"
-          referrerPolicy="strict-origin-when-cross-origin"
-        />
+  // Handle iframe error
+  const handleIframeError = () => {
+    console.error('Failed to load announcements iframe');
+  };
+
+  if (!isOpen) return null;
+
+  return (
+    <div className="fixed inset-0 z-50 flex">
+      {/* Backdrop */}
+      <div 
+        className="absolute inset-0 bg-black bg-opacity-50"
+        onClick={onClose}
+      />
+      
+      {/* Side Panel */}
+      <div className="relative ml-auto w-96 h-full bg-white shadow-xl flex flex-col">
+        {/* Header - Matching navbar and profile dropdown styling */}
+        <div className="flex items-center justify-between p-4 bg-ocean-600 text-white">
+          <h2 className="text-lg font-semibold flex-1">
+            Announcements
+          </h2>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={onClose}
+            className="h-8 w-8 p-0 hover:bg-ocean-700 text-white flex-shrink-0"
+          >
+            <X className="h-4 w-4" />
+          </Button>
+        </div>
+
+        {/* Iframe Content */}
+        <div className="flex-1 relative">
+          <iframe
+            ref={iframeRef}
+            className="w-full h-full border-0"
+            title="Announcements"
+            onLoad={handleIframeLoad}
+            onError={handleIframeError}
+            sandbox="allow-same-origin allow-scripts allow-forms allow-popups"
+          />
+        </div>
       </div>
     </div>
   );
