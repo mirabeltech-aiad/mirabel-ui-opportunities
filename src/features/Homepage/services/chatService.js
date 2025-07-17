@@ -4,6 +4,7 @@ import {
   API_FRONTCHAT_HMAC, 
   API_FRONTCHAT_INIT 
 } from '../../../config/apiUrls';
+import httpClient from '../../../services/httpClient';
 
 /**
  * Chat service for Front Chat integration
@@ -17,11 +18,7 @@ export const chatService = {
    */
   async getFrontChatConfig() {
     try {
-      const response = await fetch(API_FRONTCHAT_CONFIG);
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-      const data = await response.json();
+      const data = await httpClient.get(API_FRONTCHAT_CONFIG);
       return data.content || data;
     } catch (error) {
       console.error('Failed to get Front Chat config:', error);
@@ -39,11 +36,7 @@ export const chatService = {
    */
   async generateHMAC(email) {
     try {
-      const response = await fetch(`${API_FRONTCHAT_HMAC}?email=${encodeURIComponent(email)}`);
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-      const data = await response.json();
+      const data = await httpClient.get(API_FRONTCHAT_HMAC, { email });
       return data.content?.userHash || data.userHash || '';
     } catch (error) {
       console.error('Failed to generate HMAC:', error);
@@ -57,11 +50,7 @@ export const chatService = {
    */
   async getFrontChatInitData() {
     try {
-      const response = await fetch(API_FRONTCHAT_INIT);
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-      const data = await response.json();
+      const data = await httpClient.get(API_FRONTCHAT_INIT);
       return data.content || data;
     } catch (error) {
       console.error('Failed to get Front Chat init data:', error);
@@ -95,17 +84,10 @@ export const chatService = {
         };
       }
 
-      console.log('🔧 Initializing Front Chat with secure config:', {
-        chatId: initData.chatId,
-        hasEmail: !!initData.email,
-        hasUserName: !!initData.name,
-        hasCompanyName: !!initData.customFields?.Title,
-        hasUserHash: !!initData.userHash
-      });
+
 
       // Check if Front Chat is available
       if (typeof window.FrontChat === 'undefined') {
-        console.warn('Front Chat not loaded, loading script...');
         chatService.loadFrontChatScript();
         return;
       }
@@ -119,25 +101,20 @@ export const chatService = {
           userHash: initData.userHash,
           name: initData.name,
           customFields: initData.customFields,
-          onInitCompleted: () => {
-            console.log('✅ Front Chat initialized successfully with user data');
-            
-            // Set up window visibility change handler
-            window.FrontChat('onWindowVisibilityChanged', function (e) {
-              if (e.is_window_visible) {
-                console.log('🔧 Front Chat window became visible, setting up draggable...');
-                chatService.makeChatBoxDraggable();
-              }
-            });
-          },
-          onError: (error) => {
-            console.warn('⚠️ Front Chat initialization warning:', error);
-            // Try fallback initialization without user data
-            chatService.initializeFrontChatFallback(initData.chatId);
-          }
+                  onInitCompleted: () => {
+          // Set up window visibility change handler
+          window.FrontChat('onWindowVisibilityChanged', function (e) {
+            if (e.is_window_visible) {
+              chatService.makeChatBoxDraggable();
+            }
+          });
+        },
+                  onError: (error) => {
+          // Try fallback initialization without user data
+          chatService.initializeFrontChatFallback(initData.chatId);
+        }
         });
       } catch (initError) {
-        console.warn('⚠️ Front Chat initialization failed, trying fallback:', initError);
         chatService.initializeFrontChatFallback(initData.chatId);
       }
 
@@ -152,25 +129,20 @@ export const chatService = {
    */
   initializeFrontChatFallback(chatId) {
     try {
-      console.log('🔄 Trying Front Chat fallback initialization...');
-      
       window.FrontChat('init', {
         chatId: chatId,
         useDefaultLauncher: false,
         onInitCompleted: () => {
-          console.log('✅ Front Chat initialized successfully with fallback');
-          
           // Set up window visibility change handler
           window.FrontChat('onWindowVisibilityChanged', function (e) {
             if (e.is_window_visible) {
-              console.log('🔧 Front Chat window became visible, setting up draggable...');
               chatService.makeChatBoxDraggable();
             }
           });
         }
       });
     } catch (error) {
-      console.error('❌ Front Chat fallback initialization also failed:', error);
+      console.error('Front Chat fallback initialization failed:', error);
     }
   },
 
@@ -179,7 +151,6 @@ export const chatService = {
    */
   loadFrontChatScript: () => {
     if (document.querySelector('script[src*="chat-assets.frontapp.com"]')) {
-      console.log('Front Chat script already loaded');
       return;
     }
 
@@ -187,14 +158,13 @@ export const chatService = {
     script.src = 'https://chat-assets.frontapp.com/v1/chat.bundle.js';
     script.async = true;
     script.onload = () => {
-      console.log('✅ Front Chat script loaded');
       // Initialize after script loads
       setTimeout(() => {
         chatService.initializeFrontChat();
       }, 1000);
     };
     script.onerror = () => {
-      console.error('❌ Failed to load Front Chat script');
+      console.error('Failed to load Front Chat script');
     };
     document.head.appendChild(script);
   },
@@ -205,15 +175,13 @@ export const chatService = {
   showChat: () => {
     try {
       if (typeof window.FrontChat === 'undefined') {
-        console.warn('Front Chat not initialized, initializing...');
         chatService.initializeFrontChat();
         return;
       }
 
-      console.log('🔧 Showing Front Chat...');
       window.FrontChat('show');
     } catch (error) {
-      console.error('❌ Error showing Front Chat:', error);
+      console.error('Error showing Front Chat:', error);
     }
   },
 
@@ -224,14 +192,12 @@ export const chatService = {
     try {
       const chatbox = document.getElementById('front-chat-iframe');
       if (!chatbox) {
-        console.log('Front Chat iframe not found, waiting...');
         setTimeout(() => chatService.makeChatBoxDraggable(), 1000);
         return;
       }
 
       const header = chatbox.contentDocument?.getElementsByClassName('fc-3_a5O')?.[0];
       if (!header) {
-        console.log('Front Chat header not found, waiting...');
         setTimeout(() => chatService.makeChatBoxDraggable(), 1000);
         return;
       }
@@ -277,7 +243,6 @@ export const chatService = {
       }
 
       function handleMouseDown(e) {
-        console.log("Mouse down on Front Chat header");
         e.preventDefault();
         moveElement = true;
         moveChatBox({
@@ -323,7 +288,7 @@ export const chatService = {
 
       header.addEventListener('mousedown', handleMouseDown);
     } catch (error) {
-      console.error('❌ Error making Front Chat draggable:', error);
+      console.error('Error making Front Chat draggable:', error);
     }
   }
 }; 
