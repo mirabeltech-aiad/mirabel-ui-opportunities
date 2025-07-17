@@ -120,9 +120,9 @@ const CustomerSearch = () => {
     
     // Navigate based on result type (same logic as legacy)
     if (result.Type === 'Rep') {
-      selectCustomersByRep(result.CustomerId);
+      selectCustomersByRep(result.ContactID);
     } else {
-      selectCustomer(result.CustomerId, result.DisplayName);
+      selectCustomer(result.ContactID, result.DisplayName);
     }
   };
 
@@ -290,7 +290,7 @@ const CustomerSearch = () => {
           ) : searchResults.length > 0 ? (
             searchResults.map((result, index) => (
               <div
-                key={`${result.CustomerId}-${index}`}
+                key={`${result.ContactID}-${index}`}
                 className={`px-3 py-2 cursor-pointer hover:bg-gray-100 transition-colors ${
                   index === selectedIndex ? 'bg-blue-50 border-l-2 border-blue-500' : ''
                 }`}
