@@ -28,28 +28,9 @@ const IframeContainer = ({
   const { actions } = useHome();
 
   // Base domain for all iframe URLs
-  const BASE_DOMAIN = 'https://smoke-feature13.magazinemanager.com';
+  const BASE_DOMAIN ='https://smoke-feature13.magazinemanager.com';
 
-  // Set up the global function for iframe communication
-  React.useEffect(() => {
-    window.openPageInNextTab = function (...args) {
-      console.log('openPageInNextTab called with:', args);
-      if (args[0] && args[1]) {
-        actions.addTab({ 
-          url: args[0], 
-          title: args[1],
-          type: 'iframe',
-          icon: '🌐',
-          closable: true
-        });
-      }
-    };
 
-    // Cleanup function to remove the global function when component unmounts
-    return () => {
-      delete window.openPageInNextTab;
-    };
-  }, [actions]);
 
   // Construct full URL by combining base domain with relative URL
   const fullUrl = url ? `${BASE_DOMAIN}${url.startsWith('/') ? '' : '/'}${url}` : '';

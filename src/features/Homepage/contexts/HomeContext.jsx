@@ -51,7 +51,7 @@ const initialState = {
       title: 'Search',
       component: 'Search',
       type: 'iframe',
-      url: (typeof window !== 'undefined' ? window.location.origin : '') + '/ui/Search',
+      url:  (typeof window !== 'undefined' ? window.location.origin : '') + '/ui/Search',
       closable: false,
       icon: '🔍'
     }
