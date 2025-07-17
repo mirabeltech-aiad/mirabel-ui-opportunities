@@ -14,7 +14,7 @@ export const navigationService = {
   /**
    * Cache for API response data
    */
-  // _apiDataCache: null,
+   _apiDataCache: null,
 
   /**
    * Fetch and decrypt API data for MarketingManagerSiteURL and EmailServiceSiteURL
@@ -23,9 +23,9 @@ export const navigationService = {
   fetchApiData: async () => {
     try {
       // Return cached data if available
-      // if (navigationService._apiDataCache) {
-      //   return navigationService._apiDataCache;
-      // }
+      if (navigationService._apiDataCache) {
+        return navigationService._apiDataCache;
+      }
       const response = await apiCall('/services/admin/common/k/8', 'GET');      
       if (response?.content?.Data) {       
         // Decrypt the response data
@@ -34,7 +34,7 @@ export const navigationService = {
           try {
             const data = JSON.parse(decryptedData);
             // Cache the data
-            // navigationService._apiDataCache = data;
+            navigationService._apiDataCache = data;
             
             return data;
           } catch (parseError) {
@@ -163,20 +163,12 @@ export const navigationService = {
    */
   fetchNavigationData: async (userId = 1, siteId = 0) => {
     try {     
-      // Fetch API data once for URL construction
-      let apiData = {};
-      try {
-        apiData = await navigationService.fetchApiData();
-      } catch (error) {
-        console.warn('⚠️ Failed to fetch API data, proceeding without MKM/MES URLs:', error);
-      }
-      
       // Then fetch navigation menus
       const response = await apiCall(`/services/admin/navigations/users/${userId}/${siteId}`, 'GET');        
       // Check if response has the expected structure
       if (response?.content?.List) {
         const menus = response.content.List;
-        return await navigationService.processNavigationMenus(menus, apiData);
+        return await navigationService.processNavigationMenus(menus);
       }
     } catch (error) {
       console.error('❌ Error fetching navigation data:', error);
