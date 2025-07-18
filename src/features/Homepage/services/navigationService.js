@@ -68,12 +68,13 @@ export const navigationService = {
       const clientInfo = clientDetails.ClientInformation || {};
       const dataPackDetails = clientDetails.DataPackDetails || {};
       const tokenInfo = sessionDetails.Token || {};
+      const employeeDetails = content.EmployeeDetails || {};
       
       // Extract user ID - try multiple sources
       const userId = content.UserId || claims.LoggedInUserID || clientDetails.EmployeeId || 1;
       
       // Extract email - try multiple sources
-      const email = sessionDetails.UserName || claims.Email || "sa@magazinemanager.com";
+      const email = sessionDetails.UserName || claims.Email || employeeDetails.Email || "sa@magazinemanager.com";
       
       // Extract domain information
       const domain = claims.Domain || clientInfo.ClientSubDomain || "smoke-feature13";
@@ -93,16 +94,22 @@ export const navigationService = {
       
       // Determine admin status - could be derived from various sources
       // For now, we'll default to true for SA users, false otherwise
-      const isAdmin = email.toLowerCase().includes('sa@') || email.toLowerCase().includes('admin');
+      const isAdmin = email.toLowerCase().includes('sa@') || email.toLowerCase().includes('admin') || employeeDetails.IsSA;
       const isSA = isAdmin ? "true" : "false";
       const cultureUI = clientInfo.CultureUI || "en-US";
       const siteType = clientInfo.SiteType || "TMM";
-      const isUserHasMKMAccess=clientInfo.IsUserHasMKMAccess || false;
-      const isSiteDataPackEnabled=clientInfo.IsSiteDataPackEnabled || false;
-      const isUserHasDataPackAccess=clientInfo.IsUserHasDataPackAccess || false;
+      const isUserHasMKMAccess=dataPackDetails.IsUserHasMKMAccess || false;
+      const isSiteDataPackEnabled=dataPackDetails.IsDataPackEnabled || false;
+      const isUserHasDataPackAccess=dataPackDetails.IsUserHasDataPackAccess || false;
       const isMirabelEmailServiceEnabled=clientInfo.IsMirabelEmailServiceEnabled || false;
       const isRepNotificationEnabled=clientInfo.IsRepNotificationEnabled || false;
       const isCallDispositionEnabled = clientInfo.IsCallDispositionEnabled || false;
+     
+      // Extract user's full name from EmployeeDetails
+      const fullName = employeeDetails.Name || employeeDetails.SalesRepName || 
+                      (employeeDetails.FirstName && employeeDetails.LastName ? 
+                       `${employeeDetails.FirstName} ${employeeDetails.LastName}` : null) ||
+                      "User";
      
       // Create the transformed data object
       const transformedData = {
@@ -112,8 +119,8 @@ export const navigationService = {
         "IsAuthenticated": true, // Add this for compatibility
         "Token": accessToken,
         "IsSA": isSA,
-        "UserName": isAdmin ? "Administrator System" : "User",
-        "DisplayName": isAdmin ? "Administrator,System" : "User,Name",
+        "UserName": isAdmin ? "System Administrator" : fullName,
+        "DisplayName": isAdmin ? "System Administrator" : fullName,
         "UserNameID": isAdmin ? "sadministrator" : "user",
         "ClientID": clientId.toString(),
         "Host": host,
@@ -127,7 +134,7 @@ export const navigationService = {
         "TimeAdd": (clientInfo.TimeAdd || 0).toString(),
         "PageList": "", // Default empty
         "HelpSite": "https://helpwp.emailnow.info",
-        "FullName": isAdmin ? "System Administrator" : "User Name",
+        "FullName": fullName,
         "DepartmentID": "1",
         "PASubProductTypeId": "0",
         "PASubProductTypeName": "",
@@ -144,12 +151,9 @@ export const navigationService = {
         "IsRepNotificationEnabled": isRepNotificationEnabled
       };
       
-      console.log('🔄 Transformed session data:', transformedData);
       return transformedData;
       
     } catch (error) {
-      console.error('❌ Error transforming session data:', error);
-      
       // Return fallback data structure
      
     }
@@ -182,18 +186,13 @@ export const navigationService = {
    */
     loadSessionDetails: async () => {
         try {
-            console.log('🔄 Loading session details...');
             const response = await apiCall('/services/admin/common/SessionDetailsGet','GET');
-
-            console.log('📊 Raw session API response:', response);
 
             // Transform the response data into the desired format
             const transformedData = navigationService.transformSessionData(response);
 
             // Store transformed data in localStorage with key 'MMnewclientvars'
             localStorage.setItem('MMClientVars', JSON.stringify(transformedData));
-            console.log('✅ Session details transformed and stored in localStorage as MMnewclientvars');
-            console.log('📝 Stored data:', transformedData);
 
             // Also update the existing MMClientVars for backward compatibility
             const existingClientVars = localStorage.getItem('MMClientVars');
@@ -202,14 +201,12 @@ export const navigationService = {
                     const existing = JSON.parse(existingClientVars);
                     const updatedClientVars = { ...existing, ...transformedData };
                     localStorage.setItem('MMClientVars', JSON.stringify(updatedClientVars));
-                    console.log('🔄 Updated MMClientVars for backward compatibility');
                 } catch (e) {
                     console.warn('⚠️ Could not update MMClientVars:', e);
                 }
             } else {
                 // Create MMClientVars if it doesn't exist
                 localStorage.setItem('MMClientVars', JSON.stringify(transformedData));
-                console.log('➕ Created MMClientVars with transformed data');
             }
 
             return transformedData;
@@ -509,7 +506,6 @@ export const navigationService = {
       // Also update MMClientVars for backward compatibility
       localStorage.setItem('MMClientVars', JSON.stringify(updated));
       
-      console.log('✅ Session data updated:', updated);
       return updated;
     } catch (error) {
       console.error('❌ Error updating session data:', error);
@@ -553,11 +549,9 @@ export const navigationService = {
       const existingCalendarTab = document.getElementById('TabCalendar');
       if (existingCalendarTab) {
         // Calendar tab already open - activate it
-        console.log('Calendar tab already exists, activating...');
         // TODO: Implement tab activation logic
       } else {
         // Create new calendar tab
-        console.log('Creating new calendar tab with URL:', decodedURL);
         // TODO: Implement calendar tab creation logic
       }
     }
@@ -590,7 +584,6 @@ export const navigationService = {
   addNewTabToHomePanel: (url, caption) => {
     // TODO: Implement tab management logic
     // This should integrate with your React tab system
-    console.log('Adding new tab:', caption, 'with URL:', url);
     
     // For now, just open in new window
     window.open(url, '_blank', '');

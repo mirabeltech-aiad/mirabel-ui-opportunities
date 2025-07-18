@@ -42,17 +42,17 @@ const TabNavigation = () => {
     };
   }, [contextMenu.visible]);
 
-  // Initialize page navigation helpers when component mounts
-  useEffect(() => {
-    console.log('Initializing page navigation helpers in TabNavigation');
-    initializePageNavigation(actions);
+  // // Initialize page navigation helpers when component mounts
+  // useEffect(() => {
+  //   console.log('Initializing page navigation helpers in TabNavigation');
+  //   initializePageNavigation(actions);
 
-    // Cleanup function
-    return () => {
-      console.log('Cleaning up page navigation helpers in TabNavigation');
-      cleanupPageNavigation();
-    };
-  }, [actions]);
+  //   // Cleanup function
+  //   return () => {
+  //     console.log('Cleaning up page navigation helpers in TabNavigation');
+  //     cleanupPageNavigation();
+  //   };
+  // }, [actions]);
 
   // Split tabs into fixed and draggable
   const fixedTabsCount = 3; // Dashboard, Inbox, Search
