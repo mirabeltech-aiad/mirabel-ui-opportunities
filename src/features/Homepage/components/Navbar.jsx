@@ -431,7 +431,7 @@ const Navbar = () => {
                 <div className="bg-ocean-600 text-white px-4 py-3 rounded-t-lg">
                   <div className="font-bold text-base">Welcome</div>
                   <div className="text-sm text-ocean-100 mt-1">
-                    {currentUser?.fullName || currentUser?.FullName || 'System Administrator'}
+                    {currentUser?.fullName || currentUser?.FullName || getSessionValue('FullName') || getSessionValue('UserName') || 'System Administrator'}
                   </div>
                 </div>
                 

@@ -127,7 +127,7 @@ export const navigationService = {
         "TimeAdd": (clientInfo.TimeAdd || 0).toString(),
         "PageList": "", // Default empty
         "HelpSite": "https://helpwp.emailnow.info",
-        "FullName": isAdmin ? "System Administrator" : "User Name",
+        "FullName": isAdmin ? "System Administrator" : (clientInfo.FullName || clientInfo.UserName || "User"),
         "DepartmentID": "1",
         "PASubProductTypeId": "0",
         "PASubProductTypeName": "",
