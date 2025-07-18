@@ -20,30 +20,39 @@ const TabNavigation = () => {
   const [contextMenu, setContextMenu] = useState({ visible: false, x: 0, y: 0, tabId: null });
   const contextMenuRef = useRef(null);
 
-  // Hide context menu on click outside
+  // Hide context menu on click outside, scroll, or blur
   useEffect(() => {
-    const handleClick = (e) => {
+    const handleCloseMenu = (e) => {
       if (contextMenuRef.current && !contextMenuRef.current.contains(e.target)) {
         setContextMenu((prev) => ({ ...prev, visible: false }));
       }
     };
+    const handleScrollOrBlur = () => {
+      setContextMenu((prev) => ({ ...prev, visible: false }));
+    };
     if (contextMenu.visible) {
-      document.addEventListener('mousedown', handleClick);
+      document.addEventListener('mousedown', handleCloseMenu);
+      window.addEventListener('scroll', handleScrollOrBlur, true);
+      window.addEventListener('blur', handleScrollOrBlur);
     }
-    return () => document.removeEventListener('mousedown', handleClick);
+    return () => {
+      document.removeEventListener('mousedown', handleCloseMenu);
+      window.removeEventListener('scroll', handleScrollOrBlur, true);
+      window.removeEventListener('blur', handleScrollOrBlur);
+    };
   }, [contextMenu.visible]);
 
-  // Initialize page navigation helpers when component mounts
-  useEffect(() => {
-    console.log('Initializing page navigation helpers in TabNavigation');
-    initializePageNavigation(actions);
+  // // Initialize page navigation helpers when component mounts
+  // useEffect(() => {
+  //   console.log('Initializing page navigation helpers in TabNavigation');
+  //   initializePageNavigation(actions);
 
-    // Cleanup function
-    return () => {
-      console.log('Cleaning up page navigation helpers in TabNavigation');
-      cleanupPageNavigation();
-    };
-  }, [actions]);
+  //   // Cleanup function
+  //   return () => {
+  //     console.log('Cleaning up page navigation helpers in TabNavigation');
+  //     cleanupPageNavigation();
+  //   };
+  // }, [actions]);
 
   // Split tabs into fixed and draggable
   const fixedTabsCount = 3; // Dashboard, Inbox, Search
