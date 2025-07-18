@@ -44,7 +44,7 @@ const renderMenuItems = (items, openTabByUrl) => {
     if (item.children && item.children.length > 0) {
       return (
         <DropdownMenuSub key={item.id}>
-          <DropdownMenuSubTrigger className="rounded-md text-gray-800 font-medium text-sm hover:bg-ocean-100 hover:text-ocean-700 cursor-pointer flex items-center" style={{ fontSize: '13px' }}>
+          <DropdownMenuSubTrigger className="rounded-md text-white font-medium text-sm hover:bg-ocean-100 hover:text-ocean-700 cursor-pointer flex items-center" style={{ fontSize: '13px' }}>
             <span>{item.title}</span>
             {item.icon && (
               <Badge className="ml-2 text-xs" variant="secondary">
@@ -52,7 +52,7 @@ const renderMenuItems = (items, openTabByUrl) => {
               </Badge>
             )}
           </DropdownMenuSubTrigger>
-          <DropdownMenuSubContent className="w-56 mt-2 rounded-lg shadow-lg bg-ocean-gradient border border-gray-100 p-1 max-h-96 overflow-y-auto scrollbar-thin scrollbar-thumb-ocean-400 scrollbar-track-ocean-100 text-white">
+          <DropdownMenuSubContent className="w-56 mt-2 rounded-lg shadow-lg bg-ocean-gradient border border-gray-100 p-1 text-white">
             {renderMenuItems(item.children, openTabByUrl)}
           </DropdownMenuSubContent>
         </DropdownMenuSub>
@@ -388,12 +388,11 @@ const Navbar = () => {
                         style={{ fontSize: '13px' }}
                       >
                         <span>{menu.title}</span>
-                        {menu.children && menu.children.length > 0 && <ChevronDown className="h-4 w-4 ml-1" />}
                       </button>
                     </DropdownMenuTrigger>
-                    <DropdownMenuContent align="start" className="w-56 mt-2 rounded-lg shadow-lg bg-ocean-gradient border border-gray-100 p-1 max-h-96 overflow-y-auto scrollbar-thin scrollbar-thumb-ocean-400 scrollbar-track-ocean-100 text-white">
+                    <DropdownMenuContent align="start" className="w-56 mt-2 rounded-lg shadow-lg bg-ocean-gradient border border-gray-100 p-1 text-white">
                       {menu.url && (
-                        <DropdownMenuItem onClick={() => openTabByUrl(menu.title, menu.url)} className="rounded-md font-medium text-sm hover:bg-ocean-100 hover:text-ocean-700 cursor-pointer text-white">
+                        <DropdownMenuItem onClick={() => openTabByUrl(menu.title, menu.url)} className="rounded-md font-medium text-sm hover:bg-ocean-100 hover:text-ocean-700 cursor-pointer text-white" style={{ fontSize: '13px' }}>
                           <span>{menu.title} Home</span>
                         </DropdownMenuItem>
                       )}
@@ -425,7 +424,6 @@ const Navbar = () => {
                   className="flex items-center px-4 py-1 rounded-full bg-ocean-600 hover:bg-ocean-700 text-white font-semibold shadow border border-ocean-700 focus:outline-none focus:ring-2 focus:ring-ocean-400 transition h-8 min-h-0"
                 >
                   <User className="h-4 w-4 mr-2" />
-                  <ChevronDown className="h-4 w-4 ml-1" />
                 </button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-56 mt-2 rounded-lg shadow-lg border border-gray-200 p-0">
@@ -447,9 +445,10 @@ const Navbar = () => {
                         key={item.id}
                         onClick={() => handleProfileMenuClick(item)}
                         className="rounded-none font-medium cursor-pointer flex items-center text-gray-800 hover:bg-ocean-50 hover:text-ocean-700 px-4 py-2 mx-0"
+                        style={{ fontSize: '13px' }}
                       >
                         {item.icon && <item.icon className="h-4 w-4 mr-3 text-gray-600" />}
-                        <span className="text-sm">{item.title}</span>
+                        <span>{item.title}</span>
                       </DropdownMenuItem>
                     );
                   })}
