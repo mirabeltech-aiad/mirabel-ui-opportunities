@@ -24,7 +24,7 @@ export const API_FRONTCHAT_INIT = '/services/api/frontchat/init';
 // Tech Support APIs
 export const HELPDESK_API_ERROR_CATEGORY = '/services/helpdesk/techsupport/errorcategory';
 export const HELPDESK_API_TECHSUPPORT_CREATEREQUEST = '/services/helpdesk/techsupport/create/';
-export const HELPDESK_API_ATTACHTEMPORARY_FILE = '/services/helpdesk/techsupport/attachtemporaryfile';
+export const HELPDESK_API_ATTACHTEMPORARY_FILE = '/services/helpdesk/attachmentsTemporarily/upload';
 export const HELPDESK_API_SALESREP_CREATEREQUEST = '/services/helpdesk/salesrep/create/';
 export const API_SALESREP_LIST_GET = '/services/CRM/salesreps/';
 

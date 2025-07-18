@@ -113,9 +113,18 @@ const JiraTicketForm = ({ onClose }) => {
       const baseUrl = httpClient.getBaseURL();
       const uploadUrl = baseUrl.replace(/\/$/, '') + HELPDESK_API_ATTACHTEMPORARY_FILE;
       
-      // Use proper headers for file upload
+      // Get authentication token
+      const token = getSessionValue("Token");
+      const domain = getSessionValue("Domain") || window.location.hostname;
+      
+      // Use proper headers for file upload with authentication
       const res = await fetch(uploadUrl, {
         method: 'POST',
+        headers: {
+          'Accept': 'application/json',
+          'Authorization': token ? `Bearer ${token}` : '',
+          'domain': domain
+        },
         body: formDataObj // Don't set Content-Type header, let browser set it with boundary
       });
       
