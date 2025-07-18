@@ -4,7 +4,7 @@ import navigationService from '../services/navigationService';
 import { useAuth } from '@/contexts/AuthContext';
 import { refreshIframeByTabId, printIframeByTabId } from '@/services/iframeService';
 import { getUserPermissions } from '@/services/userService';
-import { getUserInfo } from '@/utils/sessionHelpers';
+import { getUserInfo, getSessionValue } from '@/utils/sessionHelpers';
 import CustomerSearch from './CustomerSearch';
 import AnnouncementsSidePanel from './AnnouncementsSidePanel';
 import BellNotification from './BellNotification';
