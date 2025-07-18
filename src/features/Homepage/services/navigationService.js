@@ -68,12 +68,13 @@ export const navigationService = {
       const clientInfo = clientDetails.ClientInformation || {};
       const dataPackDetails = clientDetails.DataPackDetails || {};
       const tokenInfo = sessionDetails.Token || {};
+      const employeeDetails = content.EmployeeDetails || {};
       
       // Extract user ID - try multiple sources
       const userId = content.UserId || claims.LoggedInUserID || clientDetails.EmployeeId || 1;
       
       // Extract email - try multiple sources
-      const email = sessionDetails.UserName || claims.Email || "sa@magazinemanager.com";
+      const email = sessionDetails.UserName || claims.Email || employeeDetails.Email || "sa@magazinemanager.com";
       
       // Extract domain information
       const domain = claims.Domain || clientInfo.ClientSubDomain || "smoke-feature13";
@@ -93,16 +94,22 @@ export const navigationService = {
       
       // Determine admin status - could be derived from various sources
       // For now, we'll default to true for SA users, false otherwise
-      const isAdmin = email.toLowerCase().includes('sa@') || email.toLowerCase().includes('admin');
+      const isAdmin = email.toLowerCase().includes('sa@') || email.toLowerCase().includes('admin') || employeeDetails.IsSA;
       const isSA = isAdmin ? "true" : "false";
       const cultureUI = clientInfo.CultureUI || "en-US";
       const siteType = clientInfo.SiteType || "TMM";
-      const isUserHasMKMAccess=clientInfo.IsUserHasMKMAccess || false;
-      const isSiteDataPackEnabled=clientInfo.IsSiteDataPackEnabled || false;
-      const isUserHasDataPackAccess=clientInfo.IsUserHasDataPackAccess || false;
+      const isUserHasMKMAccess=dataPackDetails.IsUserHasMKMAccess || false;
+      const isSiteDataPackEnabled=dataPackDetails.IsDataPackEnabled || false;
+      const isUserHasDataPackAccess=dataPackDetails.IsUserHasDataPackAccess || false;
       const isMirabelEmailServiceEnabled=clientInfo.IsMirabelEmailServiceEnabled || false;
       const isRepNotificationEnabled=clientInfo.IsRepNotificationEnabled || false;
       const isCallDispositionEnabled = clientInfo.IsCallDispositionEnabled || false;
+     
+      // Extract user's full name from EmployeeDetails
+      const fullName = employeeDetails.Name || employeeDetails.SalesRepName || 
+                      (employeeDetails.FirstName && employeeDetails.LastName ? 
+                       `${employeeDetails.FirstName} ${employeeDetails.LastName}` : null) ||
+                      "User";
      
       // Create the transformed data object
       const transformedData = {
@@ -112,8 +119,8 @@ export const navigationService = {
         "IsAuthenticated": true, // Add this for compatibility
         "Token": accessToken,
         "IsSA": isSA,
-        "UserName": isAdmin ? "Administrator System" : "User",
-        "DisplayName": isAdmin ? "Administrator,System" : "User,Name",
+        "UserName": isAdmin ? "System Administrator" : fullName,
+        "DisplayName": isAdmin ? "System Administrator" : fullName,
         "UserNameID": isAdmin ? "sadministrator" : "user",
         "ClientID": clientId.toString(),
         "Host": host,
@@ -127,7 +134,7 @@ export const navigationService = {
         "TimeAdd": (clientInfo.TimeAdd || 0).toString(),
         "PageList": "", // Default empty
         "HelpSite": "https://helpwp.emailnow.info",
-        "FullName": isAdmin ? "System Administrator" : (clientInfo.FullName || clientInfo.UserName || "User"),
+        "FullName": fullName,
         "DepartmentID": "1",
         "PASubProductTypeId": "0",
         "PASubProductTypeName": "",
