@@ -27,6 +27,23 @@ export const encryptByDES = (message, key) => {
     }
 };
 
+export const encrypt = (message, key) => {
+    try {
+        let keyHex = CryptoJS.enc.Utf8.parse(key);
+        let ivHex = CryptoJS.enc.Utf8.parse(key);
+        keyHex = CryptoJS.SHA1(keyHex);
+        ivHex = CryptoJS.SHA1(ivHex);
+        var encrypted = CryptoJS.DES.encrypt(message, keyHex, {
+            mode: CryptoJS.mode.CBC,
+            iv: ivHex,
+            padding: CryptoJS.pad.Pkcs7,
+        });
+        return encrypted.toString();
+    } catch {
+        return "";
+    }
+};
+
 export const decrypt = (message, key) => {
     try {
         let keyHex = CryptoJS.enc.Utf8.parse(key);
