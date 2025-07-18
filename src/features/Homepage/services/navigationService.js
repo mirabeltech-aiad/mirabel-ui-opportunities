@@ -151,12 +151,9 @@ export const navigationService = {
         "IsRepNotificationEnabled": isRepNotificationEnabled
       };
       
-      console.log('🔄 Transformed session data:', transformedData);
       return transformedData;
       
     } catch (error) {
-      console.error('❌ Error transforming session data:', error);
-      
       // Return fallback data structure
      
     }
@@ -189,18 +186,13 @@ export const navigationService = {
    */
     loadSessionDetails: async () => {
         try {
-            console.log('🔄 Loading session details...');
             const response = await apiCall('/services/admin/common/SessionDetailsGet','GET');
-
-            console.log('📊 Raw session API response:', response);
 
             // Transform the response data into the desired format
             const transformedData = navigationService.transformSessionData(response);
 
             // Store transformed data in localStorage with key 'MMnewclientvars'
             localStorage.setItem('MMClientVars', JSON.stringify(transformedData));
-            console.log('✅ Session details transformed and stored in localStorage as MMnewclientvars');
-            console.log('📝 Stored data:', transformedData);
 
             // Also update the existing MMClientVars for backward compatibility
             const existingClientVars = localStorage.getItem('MMClientVars');
@@ -209,14 +201,12 @@ export const navigationService = {
                     const existing = JSON.parse(existingClientVars);
                     const updatedClientVars = { ...existing, ...transformedData };
                     localStorage.setItem('MMClientVars', JSON.stringify(updatedClientVars));
-                    console.log('🔄 Updated MMClientVars for backward compatibility');
                 } catch (e) {
                     console.warn('⚠️ Could not update MMClientVars:', e);
                 }
             } else {
                 // Create MMClientVars if it doesn't exist
                 localStorage.setItem('MMClientVars', JSON.stringify(transformedData));
-                console.log('➕ Created MMClientVars with transformed data');
             }
 
             return transformedData;
@@ -516,7 +506,6 @@ export const navigationService = {
       // Also update MMClientVars for backward compatibility
       localStorage.setItem('MMClientVars', JSON.stringify(updated));
       
-      console.log('✅ Session data updated:', updated);
       return updated;
     } catch (error) {
       console.error('❌ Error updating session data:', error);
@@ -560,11 +549,9 @@ export const navigationService = {
       const existingCalendarTab = document.getElementById('TabCalendar');
       if (existingCalendarTab) {
         // Calendar tab already open - activate it
-        console.log('Calendar tab already exists, activating...');
         // TODO: Implement tab activation logic
       } else {
         // Create new calendar tab
-        console.log('Creating new calendar tab with URL:', decodedURL);
         // TODO: Implement calendar tab creation logic
       }
     }
@@ -597,7 +584,6 @@ export const navigationService = {
   addNewTabToHomePanel: (url, caption) => {
     // TODO: Implement tab management logic
     // This should integrate with your React tab system
-    console.log('Adding new tab:', caption, 'with URL:', url);
     
     // For now, just open in new window
     window.open(url, '_blank', '');
