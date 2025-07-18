@@ -88,6 +88,8 @@ const Navbar = () => {
     canManageNavigation: false,
     canManageWebsite: false,
   });
+  // Add state to track which parent menu is open
+  const [openMenuId, setOpenMenuId] = useState(null);
 
   // Fallback user info if AuthContext user is null
   const [fallbackUser, setFallbackUser] = useState(null);
@@ -380,10 +382,14 @@ const Navbar = () => {
                 <Loader2 className="h-4 w-4 animate-spin text-white" />
               ) : (
                 navigationMenus.map((menu) => (
-                  <DropdownMenu key={menu.id}>
+                  <DropdownMenu key={menu.id} onOpenChange={(open) => setOpenMenuId(open ? menu.id : (openMenuId === menu.id ? null : openMenuId))}>
                     <DropdownMenuTrigger asChild>
                       <button
-                        className="px-2 py-1 rounded-md font-medium text-sm text-white hover:bg-ocean-700 hover:text-black focus:bg-ocean-800 transition flex items-center h-8 min-h-0"
+                        className={`px-2 py-1 rounded-md font-medium text-sm transition flex items-center h-8 min-h-0 ${
+                          openMenuId === menu.id
+                            ? 'bg-blue-200 text-blue-900 shadow font-semibold' // Professional highlight for active
+                            : 'text-white hover:bg-ocean-700 hover:text-black focus:bg-ocean-800'
+                        }`}
                         style={{ fontSize: '13px' }}
                       >
                         <span>{menu.title}</span>
