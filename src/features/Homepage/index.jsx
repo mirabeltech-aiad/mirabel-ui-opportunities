@@ -3,6 +3,7 @@ import { HomeProvider, useHome } from './contexts/HomeContext';
 import TabNavigation from './components/TabNavigation';
 import HelpSystem from './components/HelpSystem';
 import TermsAndConditionsModal from './components/TermsAndConditionsModal';
+import ChangePasswordManager from './components/ChangePasswordManager';
 import { Toaster } from '@/components/ui/toaster';
 
 const Home = () => {
@@ -12,6 +13,7 @@ const Home = () => {
         <TabNavigation />
         <HelpSystem />
         <TermsAndConditionsModalWrapper />
+        <ChangePasswordManager />
       </div>
     </HomeProvider>
   );

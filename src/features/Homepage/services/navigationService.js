@@ -104,6 +104,9 @@ export const navigationService = {
       const isRepNotificationEnabled=clientInfo.IsRepNotificationEnabled || false;
       const isCallDispositionEnabled = clientInfo.IsCallDispositionEnabled || false;
      
+      // Extract change password information
+      const changePassword = sessionDetails.ChangePassword || authInfo.ChangePassword || content.ChangePassword || null;
+      
       // Create the transformed data object
       const transformedData = {
         "UserID": userId,
@@ -141,7 +144,8 @@ export const navigationService = {
         "IsSiteDataPackEnabled": isSiteDataPackEnabled,
         "IsUserHasDataPackAccess": isUserHasDataPackAccess,
         "IsMirabelEmailServiceEnabled": isMirabelEmailServiceEnabled,
-        "IsRepNotificationEnabled": isRepNotificationEnabled
+        "IsRepNotificationEnabled": isRepNotificationEnabled,
+        "ChangePassword": changePassword
       };
       
       console.log('🔄 Transformed session data:', transformedData);
