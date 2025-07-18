@@ -371,7 +371,7 @@ const Navbar = () => {
             <div className="flex items-center min-h-0">
               <div className="flex-shrink-0">
                 <div className="flex items-center">
-                  <img src={logoUrl} alt="Logo" style={{ height: 32, marginRight: 16 }} />
+                  <img src={logoUrl} alt="Logo" style={{ height: 32, marginRight:0 }} />
                 </div>
               </div>
             {/* Top Menus */}
