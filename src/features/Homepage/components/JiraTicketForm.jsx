@@ -170,9 +170,16 @@ const JiraTicketForm = ({ onClose }) => {
     
     // Check authentication before submitting
     const token = getSessionValue("Token");
-    const isAuthenticated = getSessionValue("IsAuthenticated");
+    const userInfo = getUserInfo();
     
-    if (!token || !isAuthenticated) {
+    // More robust authentication check
+    if (!token || !userInfo.email || !userInfo.userId) {
+      console.error('Authentication check failed:', { 
+        hasToken: !!token, 
+        hasEmail: !!userInfo.email, 
+        hasUserId: !!userInfo.userId,
+        userInfo 
+      });
       toast({ 
         title: 'Authentication Error', 
         description: 'Please log in again to submit a support ticket.', 
@@ -185,10 +192,17 @@ const JiraTicketForm = ({ onClose }) => {
     
     try {
       // Get user data from session
-      const userInfo = getUserInfo();
       const clientId = getSessionValue("ClientID");
       const companyName = getSessionValue("CompanyName") || userInfo.companyName || '';
       const productType = getSessionValue("ProductType") || userInfo.clientId || '';
+      
+      console.log('Submitting ticket with data:', {
+        reporterName: formData.name || userInfo.fullName,
+        reporterEmail: formData.email || userInfo.email,
+        companyName,
+        productType,
+        clientId
+      });
       
       // Prepare request payload matching backend expectations exactly
       const request = {
@@ -211,7 +225,12 @@ const JiraTicketForm = ({ onClose }) => {
       const reporterEmail = encodeURIComponent(formData.email || userInfo.email || '');
       const endpoint = `${HELPDESK_API_TECHSUPPORT_CREATEREQUEST}${reporterName}/${reporterEmail}`;
       
+      console.log('Making API call to:', endpoint);
+      console.log('Request payload:', request);
+      
       const res = await apiCall(endpoint, 'POST', request);
+      
+      console.log('API response:', res);
       
       if (res && res.content && res.content.Data && res.content.Data.issueKey) {
         toast({
@@ -233,10 +252,17 @@ const JiraTicketForm = ({ onClose }) => {
         });
         onClose();
       } else {
+        console.error('Invalid API response format:', res);
         throw new Error('No issue key returned from API');
       }
     } catch (error) {
       console.error('Error in handleSubmit:', error);
+      console.error('Error details:', {
+        message: error.message,
+        stack: error.stack,
+        response: error.response,
+        status: error.status
+      });
       
       // Handle specific error cases
       let errorMessage = 'Failed to create ticket. Please try again.';
@@ -245,6 +271,14 @@ const JiraTicketForm = ({ onClose }) => {
         errorMessage = 'Authentication error. Please refresh the page and try again.';
       } else if (error.isHtmlResponse) {
         errorMessage = 'Server returned an error page. Please check your authentication and try again.';
+      } else if (error.status === 401) {
+        errorMessage = 'Authentication failed. Please log in again.';
+      } else if (error.status === 403) {
+        errorMessage = 'Access denied. You may not have permission to create support tickets.';
+      } else if (error.status === 404) {
+        errorMessage = 'API endpoint not found. Please contact support.';
+      } else if (error.status === 500) {
+        errorMessage = 'Server error. Please try again later.';
       } else if (error.message) {
         errorMessage = error.message;
       }

@@ -1,6 +1,7 @@
 // src/Routers/routeTree.js
 import { lazy } from 'react';
 import Home from '../features/Homepage';
+import Navigation from '@/features/Navigation/components/Navbar';
 
 const WelcomePage = lazy(() => import('../pages/Welcome'));
 const Pipeline = lazy(() => import('../pages/Opportunity/Pipeline'));
@@ -80,6 +81,11 @@ export const routes = [
   {
     path: '/home',
     component: Home,
+    exact: true,
+  },
+  {
+    path: '/navigation1',
+    component: Navigation,
     exact: true,
   },
   // {

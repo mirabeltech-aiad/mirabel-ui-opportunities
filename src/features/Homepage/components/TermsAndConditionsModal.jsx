@@ -25,7 +25,6 @@ const TermsAndConditionsModal = ({ isOpen, onClose, onAccept }) => {
       const text = await termsAndConditionsService.getAgreementText();
       setAgreementText(text);
     } catch (error) {
-      console.error('Error fetching agreement text:', error);
       toast({
         title: 'Error',
         description: 'Failed to load Terms and Conditions. Please try again.',
@@ -57,7 +56,6 @@ const TermsAndConditionsModal = ({ isOpen, onClose, onAccept }) => {
         window.location.reload();
       }
     } catch (error) {
-      console.error('Error accepting agreement:', error);
       toast({
         title: 'Error',
         description: 'Failed to accept agreement. Please try again.',
