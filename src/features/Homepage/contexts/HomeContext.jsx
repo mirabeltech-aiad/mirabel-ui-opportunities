@@ -23,7 +23,10 @@ const ACTIONS = {
   SET_NAVIGATION_MENUS: 'SET_NAVIGATION_MENUS',
   SET_NAVIGATION_LOADING: 'SET_NAVIGATION_LOADING',
   SHOW_TERMS_MODAL: 'SHOW_TERMS_MODAL',
-  HIDE_TERMS_MODAL: 'HIDE_TERMS_MODAL'
+  HIDE_TERMS_MODAL: 'HIDE_TERMS_MODAL',
+  SET_LOGO_URL: 'SET_LOGO_URL',
+  SET_MM_INTEGRATION: 'SET_MM_INTEGRATION',
+  SET_CRM_PROSPECTING: 'SET_CRM_PROSPECTING'
 };
 
 // Initial state
@@ -66,7 +69,12 @@ const initialState = {
   dashboardsLoading: true, // Start with loading true to prevent showing dummy dashboard
   navigationMenus: [],
   navigationLoading: false,
-  showTermsModal: false
+  showTermsModal: false,
+  logoUrl: null,
+  mmIntegrationSrc: null,
+  crmProspectingUrl: null,
+  isMMIntegration: false,
+  isCRMProspecting: false
 };
 
 // Reducer
@@ -185,6 +193,26 @@ const homeReducer = (state, action) => {
         showTermsModal: false
       };
     
+    case ACTIONS.SET_LOGO_URL:
+      return {
+        ...state,
+        logoUrl: action.payload
+      };
+    
+    case ACTIONS.SET_MM_INTEGRATION:
+      return {
+        ...state,
+        mmIntegrationSrc: action.payload.mmIntegrationSrc,
+        isMMIntegration: action.payload.isMMIntegration
+      };
+    
+    case ACTIONS.SET_CRM_PROSPECTING:
+      return {
+        ...state,
+        crmProspectingUrl: action.payload.crmProspectingUrl,
+        isCRMProspecting: action.payload.isCRMProspecting
+      };
+    
     default:
       return state;
   }
@@ -205,6 +233,109 @@ export const HomeProvider = ({ children }) => {
     } catch (error) {
       console.error('Error checking Terms and Conditions:', error);
       // Don't show error toast for this - it's expected if user has already accepted
+    }
+  };
+
+  // Setup logo and MM/MKM integration (matching legacy ASP.NET SetupHeaderToolbar)
+  const setupLogoAndMMIntegration = async () => {
+    try {
+      const clientDetails = localStorage.getItem("MMClientVars");
+      let mmClientVars = {};
+      
+      if (clientDetails) {
+        try {
+          mmClientVars = JSON.parse(clientDetails);
+        } catch (error) {
+          console.error("Error parsing client variables:", error);
+        }
+      }
+
+      // Hostname and SiteType logic for logo selection (matching legacy ASP.NET)
+      const hostname = typeof window !== 'undefined' ? window.location.hostname : '';
+      const isNewspaperManager = hostname.includes('.newspapermanager');
+      const isCRM = mmClientVars.SiteType === 'CRM';
+
+      // Logo selection logic (matching legacy ASP.NET)
+      let logoUrl = "/intranet/NewImages/Logo-MM.svg";
+      if (isNewspaperManager) {
+        logoUrl = "/Intranet/NewImages/Logo-NM.svg";
+      }
+      if (isCRM) {
+        logoUrl = "/intranet/NewImages/Logo-MKM.svg";
+      }
+      
+      setLogoUrl(logoUrl);
+
+      // Feature flags for MM/MKM integration (matching legacy ASP.NET)
+      const showMMIntegration = (
+        mmClientVars.IsMKMEnabled === 'True' ||
+        mmClientVars.IsMirabelEmailServiceEnabled === true ||
+        mmClientVars.IsUserHasDataPackAccess === true ||
+        mmClientVars.isMirableEmailTransEnabled === true
+      );
+
+      // Helper to insert menu URL at {0} placeholder
+      function insertMenuUrlAtPlaceholder(baseUrl, menuUrl) {
+        if (!baseUrl || !menuUrl) return baseUrl || menuUrl;
+        const urlWithQuery = menuUrl + (menuUrl.includes('?') ? '&' : '?');
+        if (baseUrl.includes('{0}')) {
+          return baseUrl.replace('{0}', urlWithQuery);
+        }
+        return baseUrl.replace(/\/$/, '') + '/' + menuUrl.replace(/^\//, '');
+      }
+
+      // MM Integration iframe src (matching legacy ASP.NET)
+      let mmIntegrationSrc = null;
+      if (showMMIntegration && mmClientVars.Token) {
+        try {
+          // Fetch MarketingManagerSiteURL from API (robust approach)
+          const marketingManagerSiteURL = await navigationService.getMarketingManagerSiteURL();
+          if (marketingManagerSiteURL) {
+            mmIntegrationSrc = insertMenuUrlAtPlaceholder(marketingManagerSiteURL, '/AssignData.aspx?') + '&accesstoken=' + mmClientVars.Token;
+          }
+        } catch (error) {
+          console.error('Error fetching MarketingManagerSiteURL:', error);
+          // Fallback to localStorage if API fails
+          if (mmClientVars.MarketingManagerSiteURL) {
+            mmIntegrationSrc = insertMenuUrlAtPlaceholder(mmClientVars.MarketingManagerSiteURL, '/AssignData.aspx?') + '&accesstoken=' + mmClientVars.Token;
+          }
+        }
+      }
+
+      // CRM Prospecting panel (matching legacy ASP.NET)
+      let crmProspectingUrl = null;
+      const showProspecting = isCRM && mmClientVars.IsUserHasDataPackAccess === true;
+      
+      if (showProspecting) {
+        try {
+          // Fetch MarketingManagerSiteURL from API (robust approach)
+          const marketingManagerSiteURL = await navigationService.getMarketingManagerSiteURL();
+          if (marketingManagerSiteURL) {
+            crmProspectingUrl = insertMenuUrlAtPlaceholder(marketingManagerSiteURL, '/midashboard.aspx?');
+          }
+        } catch (error) {
+          console.error('Error fetching MarketingManagerSiteURL for prospecting:', error);
+          // Fallback to localStorage if API fails
+          if (mmClientVars.MarketingManagerSiteURL) {
+            crmProspectingUrl = insertMenuUrlAtPlaceholder(mmClientVars.MarketingManagerSiteURL, '/midashboard.aspx?');
+          }
+        }
+      }
+
+      // Set MM integration state
+      setMMIntegration({
+        mmIntegrationSrc,
+        isMMIntegration: !!mmIntegrationSrc
+      });
+
+      // Set CRM prospecting state
+      setCRMProspecting({
+        crmProspectingUrl,
+        isCRMProspecting: !!crmProspectingUrl
+      });
+
+    } catch (error) {
+      console.error('Error setting up logo and MM integration:', error);
     }
   };
 
@@ -241,6 +372,10 @@ export const HomeProvider = ({ children }) => {
       }
       const menus = await navigationService.fetchNavigationData(userId, navBarType);
       setNavigationMenus(menus);
+      
+      // Setup logo and MM/MKM integration after navigation (matching legacy ASP.NET pattern)
+      await setupLogoAndMMIntegration();
+      
       await checkTermsAndConditions();
     } catch (error) {
       console.error('Error loading navigation menus:', error);
@@ -426,6 +561,18 @@ export const HomeProvider = ({ children }) => {
     dispatch({ type: ACTIONS.HIDE_TERMS_MODAL });
   };
 
+  const setLogoUrl = (url) => {
+    dispatch({ type: ACTIONS.SET_LOGO_URL, payload: url });
+  };
+
+  const setMMIntegration = (isMMIntegration) => {
+    dispatch({ type: ACTIONS.SET_MM_INTEGRATION, payload: isMMIntegration });
+  };
+
+  const setCRMProspecting = (isCRMProspecting) => {
+    dispatch({ type: ACTIONS.SET_CRM_PROSPECTING, payload: isCRMProspecting });
+  };
+
   const value = {
     ...state,
     actions: {
@@ -444,7 +591,10 @@ export const HomeProvider = ({ children }) => {
       setNavigationMenus,
       setNavigationLoading,
       showTermsModal,
-      hideTermsModal
+      hideTermsModal,
+      setLogoUrl,
+      setMMIntegration,
+      setCRMProspecting
     }
   };
 

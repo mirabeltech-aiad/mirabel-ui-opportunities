@@ -78,7 +78,7 @@ const renderMenuItems = (items, openTabByUrl) => {
 };
 
 const Navbar = () => {
-  const { actions, tabs, activeTabId, navigationMenus, navigationLoading } = useHome();
+  const { actions, tabs, activeTabId, navigationMenus, navigationLoading, logoUrl, mmIntegrationSrc, crmProspectingUrl, isMMIntegration, isCRMProspecting } = useHome();
   const { logout: authLogout, user } = useAuth();
   const { toast } = useToast();
   const [isAnnouncementsPanelOpen, setIsAnnouncementsPanelOpen] = useState(false);
@@ -363,18 +363,17 @@ const Navbar = () => {
   };
 
   return (
+    <>
       <nav className="navbar bg-ocean-gradient shadow-md h-12">
-      <div className="max-w-full px-2 sm:px-4 lg:px-6">
-        <div className="flex items-center justify-between h-12 min-h-0">
-          {/* Logo */}
-          <div className="flex items-center min-h-0">
-            <div className="flex-shrink-0">
-              <div className="flex items-center">
-                <div className="w-8 h-8 bg-white rounded-lg flex items-center justify-center mr-2">
-                  <span className="text-ocean-600 font-bold text-lg">M</span>
+        <div className="max-w-full px-2 sm:px-4 lg:px-6">
+          <div className="flex items-center justify-between h-12 min-h-0">
+            {/* Logo */}
+            <div className="flex items-center min-h-0">
+              <div className="flex-shrink-0">
+                <div className="flex items-center">
+                  <img src={logoUrl} alt="Logo" style={{ height: 32, marginRight: 16 }} />
                 </div>
               </div>
-            </div>
             {/* Top Menus */}
             <div className="ml-4 flex items-center space-x-1 min-h-0">
               {navigationLoading ? (
@@ -465,6 +464,21 @@ const Navbar = () => {
         onClose={() => setIsAnnouncementsPanelOpen(false)} 
       />
     </nav>
+    
+    {/* MM Integration Iframe (matching legacy ASP.NET) */}
+    {isMMIntegration && mmIntegrationSrc && (
+      <div style={{ margin: '8px 0' }}>
+        <iframe src={mmIntegrationSrc} title="MM Integration" style={{ width: 0, height: 0, border: 0, display: 'none' }} />
+      </div>
+    )}
+    
+    {/* CRM Prospecting Panel (matching legacy ASP.NET) */}
+    {isCRMProspecting && crmProspectingUrl && (
+      <div style={{ margin: '8px 0' }}>
+        <iframe src={crmProspectingUrl} title="Prospecting Dashboard" style={{ width: '100%', height: 400, border: '1px solid #ccc' }} />
+      </div>
+    )}
+    </>
   );
 };
 
