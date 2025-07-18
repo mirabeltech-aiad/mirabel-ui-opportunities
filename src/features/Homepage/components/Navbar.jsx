@@ -78,7 +78,7 @@ const renderMenuItems = (items, openTabByUrl) => {
 };
 
 const Navbar = () => {
-  const { actions, tabs, activeTabId, navigationMenus, navigationLoading, logoUrl, mmIntegrationSrc, crmProspectingUrl, isMMIntegration, isCRMProspecting } = useHome();
+    const { actions, tabs, activeTabId, navigationMenus, navigationLoading, logoUrl, mmIntegrationSrc, crmProspectingUrl, isMMIntegration, isCRMProspecting } = useHome();
   const { logout: authLogout, user } = useAuth();
   const { toast } = useToast();
   const [isAnnouncementsPanelOpen, setIsAnnouncementsPanelOpen] = useState(false);
@@ -467,14 +467,14 @@ const Navbar = () => {
     
     {/* MM Integration Iframe (matching legacy ASP.NET) */}
     {isMMIntegration && mmIntegrationSrc && (
-      <div style={{ margin: '8px 0' }}>
+      <div>
         <iframe src={mmIntegrationSrc} title="MM Integration" style={{ width: 0, height: 0, border: 0, display: 'none' }} />
       </div>
     )}
     
     {/* CRM Prospecting Panel (matching legacy ASP.NET) */}
     {isCRMProspecting && crmProspectingUrl && (
-      <div style={{ margin: '8px 0' }}>
+      <div>
         <iframe src={crmProspectingUrl} title="Prospecting Dashboard" style={{ width: '100%', height: 400, border: '1px solid #ccc' }} />
       </div>
     )}
