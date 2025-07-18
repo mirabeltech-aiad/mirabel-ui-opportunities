@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import { useHome } from '../contexts/HomeContext';
 import { initializePageNavigation, cleanupPageNavigation } from '@/utils/pageNavigation';
@@ -15,6 +15,23 @@ import {
 
 const TabNavigation = () => {
   const { tabs, activeTabId, actions } = useHome();
+
+  // Context menu state
+  const [contextMenu, setContextMenu] = useState({ visible: false, x: 0, y: 0, tabId: null });
+  const contextMenuRef = useRef(null);
+
+  // Hide context menu on click outside
+  useEffect(() => {
+    const handleClick = (e) => {
+      if (contextMenuRef.current && !contextMenuRef.current.contains(e.target)) {
+        setContextMenu((prev) => ({ ...prev, visible: false }));
+      }
+    };
+    if (contextMenu.visible) {
+      document.addEventListener('mousedown', handleClick);
+    }
+    return () => document.removeEventListener('mousedown', handleClick);
+  }, [contextMenu.visible]);
 
   // Initialize page navigation helpers when component mounts
   useEffect(() => {
@@ -66,6 +83,45 @@ const TabNavigation = () => {
     });
   };
 
+  // Context menu actions
+  const handleContextMenu = (e, tabId) => {
+    e.preventDefault();
+    setContextMenu({ visible: true, x: e.clientX, y: e.clientY, tabId });
+  };
+
+  // Helper: is tab fixed?
+  const isFixedTab = (tabId) => {
+    return tabs.findIndex((tab) => tab.id === tabId) < fixedTabsCount;
+  };
+  // Helper: non-fixed tabs
+  const nonFixedTabs = tabs.slice(fixedTabsCount);
+  const nonFixedTabsCount = nonFixedTabs.length;
+  const isRightClickFixed = isFixedTab(contextMenu.tabId);
+  const onlyFixedTabs = nonFixedTabsCount === 0;
+  const onlyOneNonFixedTab = nonFixedTabsCount === 1 && !isRightClickFixed;
+  const moreThanOneNonFixedTab = nonFixedTabsCount > 1 && !isRightClickFixed;
+
+  const handleCloseTab = () => {
+    actions.removeTab(contextMenu.tabId);
+    setContextMenu((prev) => ({ ...prev, visible: false }));
+  };
+  const handleCloseOtherTabs = () => {
+    tabs.forEach((tab) => {
+      if (tab.id !== contextMenu.tabId && tab.closable !== false) {
+        actions.removeTab(tab.id);
+      }
+    });
+    setContextMenu((prev) => ({ ...prev, visible: false }));
+  };
+  const handleCloseAllTabs = () => {
+    tabs.forEach((tab) => {
+      if (tab.closable !== false) {
+        actions.removeTab(tab.id);
+      }
+    });
+    setContextMenu((prev) => ({ ...prev, visible: false }));
+  };
+
   // Split tabs into visible and overflow
   const maxVisibleTabs = 8;
   const visibleTabs = tabs.slice(0, maxVisibleTabs);
@@ -83,6 +139,7 @@ const TabNavigation = () => {
           {fixedTabs.map((tab, index) => (
             <div
               key={tab.id}
+              onContextMenu={(e) => handleContextMenu(e, tab.id)}
               className={`flex items-center rounded-t-lg transition-all duration-200 h-7 min-h-0 px-2 text-xs ${
                 activeTabId === tab.id
                   ? 'bg-white border-t-2 border-blue-500 text-blue-600 shadow-sm'
@@ -127,6 +184,7 @@ const TabNavigation = () => {
                         <div
                           ref={provided.innerRef}
                           {...provided.draggableProps}
+                          onContextMenu={(e) => handleContextMenu(e, tab.id)}
                           className={`flex items-center rounded-t-lg transition-all duration-200 h-7 min-h-0 px-2 text-xs ${
                             activeTabId === tab.id
                               ? 'bg-white border-t-2 border-blue-500 text-blue-600 shadow-sm'
@@ -205,7 +263,38 @@ const TabNavigation = () => {
           )}
         </div>
       </div>
-
+      {/* Context Menu */}
+      {contextMenu.visible && (
+        <div
+          ref={contextMenuRef}
+          style={{ position: 'fixed', top: contextMenu.y, left: contextMenu.x, zIndex: 9999, minWidth: 180, background: 'white', border: '1px solid #e5e7eb', boxShadow: '0 2px 8px rgba(0,0,0,0.08)' }}
+          className="rounded shadow-md text-sm"
+        >
+          <div
+            className={`px-4 py-1.5 cursor-pointer hover:bg-blue-100 ${((onlyFixedTabs || isRightClickFixed) ? 'text-gray-400 cursor-not-allowed' : 'text-gray-900')}`}
+            onClick={(!onlyFixedTabs && !isRightClickFixed) ? handleCloseTab : undefined}
+            style={{ pointerEvents: (onlyFixedTabs || isRightClickFixed) ? 'none' : 'auto', lineHeight: 1.5 }}
+          >
+            Close Tab
+          </div>
+          <div className="border-t border-gray-200 mx-2" />
+          <div
+            className={`px-4 py-1.5 cursor-pointer hover:bg-blue-100 ${((onlyFixedTabs || onlyOneNonFixedTab || isRightClickFixed) ? 'text-gray-400 cursor-not-allowed' : 'text-gray-900')}`}
+            onClick={(moreThanOneNonFixedTab ? handleCloseOtherTabs : undefined)}
+            style={{ pointerEvents: (onlyFixedTabs || onlyOneNonFixedTab || isRightClickFixed) ? 'none' : 'auto', lineHeight: 1.5 }}
+          >
+            Close Other Tabs
+          </div>
+          <div className="border-t border-gray-200 mx-2" />
+          <div
+            className={`px-4 py-1.5 cursor-pointer hover:bg-blue-100 ${((onlyFixedTabs || isRightClickFixed) ? 'text-gray-400 cursor-not-allowed' : 'text-gray-900')}`}
+            onClick={(!onlyFixedTabs && !isRightClickFixed) ? handleCloseAllTabs : undefined}
+            style={{ pointerEvents: (onlyFixedTabs || isRightClickFixed) ? 'none' : 'auto', lineHeight: 1.5 }}
+          >
+            Close All Tabs
+          </div>
+        </div>
+      )}
       {/* Tab Content */}
       <div className="flex-1 overflow-hidden">
         <TabContent />

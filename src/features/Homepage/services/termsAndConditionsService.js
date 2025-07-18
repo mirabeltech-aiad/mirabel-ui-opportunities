@@ -9,6 +9,7 @@ import { getUserInfo } from '../../../utils/sessionHelpers';
  * Service for handling Terms and Conditions operations
  */
 export const termsAndConditionsService = {
+
   /**
    * Get agreement text for the current user
    * @returns {Promise<string>} The agreement text
@@ -27,9 +28,10 @@ export const termsAndConditionsService = {
         `${API_MM_AGREEMENTS_BYUSER_GET}${clientId}/${userId}`
       );
       
-      return response.data;
+      // Extract the agreement text from the response structure
+      // API returns: { responseHeader: null, content: { Status: "Success", Data: "<html>..." } }
+      return response.content?.Data || '';
     } catch (error) {
-      console.error('Error fetching agreement text:', error);
       throw error;
     }
   },
@@ -54,7 +56,6 @@ export const termsAndConditionsService = {
       
       return response.data;
     } catch (error) {
-      console.error('Error accepting agreement:', error);
       throw error;
     }
   }
