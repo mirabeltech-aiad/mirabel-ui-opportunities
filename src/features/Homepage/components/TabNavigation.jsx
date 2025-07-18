@@ -267,27 +267,29 @@ const TabNavigation = () => {
       {contextMenu.visible && (
         <div
           ref={contextMenuRef}
-          style={{ position: 'fixed', top: contextMenu.y, left: contextMenu.x, zIndex: 9999, minWidth: 150, background: 'white', border: '1px solid #d1d5db', boxShadow: '0 2px 8px rgba(0,0,0,0.08)' }}
-          className="rounded shadow-md"
+          style={{ position: 'fixed', top: contextMenu.y, left: contextMenu.x, zIndex: 9999, minWidth: 180, background: 'white', border: '1px solid #e5e7eb', boxShadow: '0 2px 8px rgba(0,0,0,0.08)' }}
+          className="rounded shadow-md text-sm"
         >
           <div
-            className={`px-4 py-2 cursor-pointer hover:bg-blue-100 ${((onlyFixedTabs || isRightClickFixed) ? 'text-gray-400 cursor-not-allowed' : '')}`}
+            className={`px-4 py-1.5 cursor-pointer hover:bg-blue-100 ${((onlyFixedTabs || isRightClickFixed) ? 'text-gray-400 cursor-not-allowed' : 'text-gray-900')}`}
             onClick={(!onlyFixedTabs && !isRightClickFixed) ? handleCloseTab : undefined}
-            style={{ pointerEvents: (onlyFixedTabs || isRightClickFixed) ? 'none' : 'auto' }}
+            style={{ pointerEvents: (onlyFixedTabs || isRightClickFixed) ? 'none' : 'auto', lineHeight: 1.5 }}
           >
             Close Tab
           </div>
+          <div className="border-t border-gray-200 mx-2" />
           <div
-            className={`px-4 py-2 cursor-pointer hover:bg-blue-100 ${((onlyFixedTabs || onlyOneNonFixedTab || isRightClickFixed) ? 'text-gray-400 cursor-not-allowed' : '')}`}
+            className={`px-4 py-1.5 cursor-pointer hover:bg-blue-100 ${((onlyFixedTabs || onlyOneNonFixedTab || isRightClickFixed) ? 'text-gray-400 cursor-not-allowed' : 'text-gray-900')}`}
             onClick={(moreThanOneNonFixedTab ? handleCloseOtherTabs : undefined)}
-            style={{ pointerEvents: (onlyFixedTabs || onlyOneNonFixedTab || isRightClickFixed) ? 'none' : 'auto' }}
+            style={{ pointerEvents: (onlyFixedTabs || onlyOneNonFixedTab || isRightClickFixed) ? 'none' : 'auto', lineHeight: 1.5 }}
           >
             Close Other Tabs
           </div>
+          <div className="border-t border-gray-200 mx-2" />
           <div
-            className={`px-4 py-2 cursor-pointer hover:bg-blue-100 ${((onlyFixedTabs || isRightClickFixed) ? 'text-gray-400 cursor-not-allowed' : '')}`}
+            className={`px-4 py-1.5 cursor-pointer hover:bg-blue-100 ${((onlyFixedTabs || isRightClickFixed) ? 'text-gray-400 cursor-not-allowed' : 'text-gray-900')}`}
             onClick={(!onlyFixedTabs && !isRightClickFixed) ? handleCloseAllTabs : undefined}
-            style={{ pointerEvents: (onlyFixedTabs || isRightClickFixed) ? 'none' : 'auto' }}
+            style={{ pointerEvents: (onlyFixedTabs || isRightClickFixed) ? 'none' : 'auto', lineHeight: 1.5 }}
           >
             Close All Tabs
           </div>
