@@ -303,7 +303,7 @@ const HelpSystem = () => {
       {showLivePhoneModal && (
         <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
           <Card className="w-full max-w-lg max-h-[90vh] overflow-hidden">
-            <CardHeader className="bg-gradient-to-r from-teal-600 to-teal-700 text-white">
+            <CardHeader className="bg-ocean-gradient text-white">
               <div className="flex items-center justify-between">
                 <CardTitle className="flex items-center">
                   <Phone className="h-5 w-5 mr-2" />
@@ -319,11 +319,11 @@ const HelpSystem = () => {
                 <div className="space-y-4">
                   <div className="text-base">
                     If you would like to skip to the front of the line to get immediate assistance and are willing to pay for that service, we get it! We also offer
-                    <a href="tel:+1(954)332-3222" className="font-bold text-teal-700 hover:underline ml-1">live on demand consulting!</a> These calls are billed in 5 minute increments at $10 per five minutes with a limit of 15 minutes per call. If you reach a voicemail – your call will be returned within the hour.
+                    <a href="tel:+1(954)332-3222" className="font-bold text-ocean-700 hover:underline ml-1">live on demand consulting!</a> These calls are billed in 5 minute increments at $10 per five minutes with a limit of 15 minutes per call. If you reach a voicemail – your call will be returned within the hour.
                   </div>
                   <div className="text-base">
                     <strong>Hotline</strong><br />
-                    <a href="tel:+1(954)332-3222" className="text-lg font-semibold text-teal-800 hover:underline">(954-332-3222)</a>
+                    <a href="tel:+1(954)332-3222" className="text-lg font-semibold text-ocean-800 hover:underline">(954-332-3222)</a>
                   </div>
                 </div>
               ) : (
