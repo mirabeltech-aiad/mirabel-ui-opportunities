@@ -310,7 +310,7 @@ const JiraTicketForm = ({ onClose }) => {
   return (
     <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
       <Card className="w-full max-w-2xl max-h-[90vh] overflow-hidden">
-        <CardHeader className="bg-gradient-to-r from-red-600 to-red-700 text-white">
+        <CardHeader className="bg-ocean-gradient text-white">
           <div className="flex items-center justify-between">
             <CardTitle className="flex items-center">
               <Send className="h-5 w-5 mr-2" />
@@ -389,7 +389,7 @@ const JiraTicketForm = ({ onClose }) => {
             {/* Form Actions */}
             <div className="flex justify-end space-x-3 pt-4 border-t">
               <Button type="button" variant="outline" onClick={onClose} disabled={isSubmitting}>Cancel</Button>
-              <Button type="submit" disabled={isSubmitting} className="bg-red-600 hover:bg-red-700">
+              <Button type="submit" disabled={isSubmitting} className="bg-ocean-600 hover:bg-ocean-700">
                 {isSubmitting ? (<><div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>Creating...</>) : (<><Send className="h-4 w-4 mr-2" />Submit Ticket</>)}
               </Button>
             </div>

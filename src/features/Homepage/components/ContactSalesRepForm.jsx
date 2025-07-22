@@ -211,7 +211,7 @@ const ContactSalesRepForm = ({ isOpen, onClose }) => {
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
       <Card className="w-full max-w-4xl max-h-[90vh] overflow-y-auto">
-        <CardHeader className="bg-pink-600 text-white">
+        <CardHeader className="bg-ocean-gradient text-white">
           <div className="flex items-center justify-between">
             <CardTitle className="text-xl font-semibold">
               Contact your Sales Rep
@@ -220,7 +220,7 @@ const ContactSalesRepForm = ({ isOpen, onClose }) => {
               variant="ghost"
               size="sm"
               onClick={onClose}
-              className="text-white hover:bg-pink-700"
+              className="text-white hover:bg-white/20"
             >
               <LucideX className="h-5 w-5" />
             </Button>
@@ -333,7 +333,7 @@ const ContactSalesRepForm = ({ isOpen, onClose }) => {
             {/* Form Actions */}
             <div className="flex justify-end space-x-3 pt-4 border-t">
               <Button type="button" variant="outline" onClick={onClose} disabled={isSubmitting || isUploading}>Cancel</Button>
-              <Button type="submit" disabled={isSubmitting || isUploading} className="bg-pink-600 hover:bg-pink-700">
+              <Button type="submit" disabled={isSubmitting || isUploading} className="bg-ocean-600 hover:bg-ocean-700">
                 {isSubmitting ? (<><div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>Sending...</>) : (<><Send className="h-4 w-4 mr-2" />Send</>)}
               </Button>
             </div>

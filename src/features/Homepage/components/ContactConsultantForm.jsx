@@ -191,7 +191,7 @@ const ContactConsultantForm = ({ isOpen, onClose, consultantInfo }) => {
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
       <Card className="w-full max-w-4xl max-h-[90vh] overflow-y-auto">
-        <CardHeader className="bg-blue-600 text-white">
+        <CardHeader className="bg-ocean-gradient text-white">
           <div className="flex items-center justify-between">
             <CardTitle className="text-xl font-semibold">
               Contact your Software Consultant
@@ -200,7 +200,7 @@ const ContactConsultantForm = ({ isOpen, onClose, consultantInfo }) => {
               variant="ghost"
               size="sm"
               onClick={onClose}
-              className="text-white hover:bg-blue-700"
+              className="text-white hover:bg-white/20"
             >
               <X className="h-5 w-5" />
             </Button>
@@ -332,7 +332,7 @@ const ContactConsultantForm = ({ isOpen, onClose, consultantInfo }) => {
               <Button
                 type="submit"
                 disabled={isSubmitting}
-                className="bg-blue-600 hover:bg-blue-700"
+                className="bg-ocean-600 hover:bg-ocean-700"
               >
                 {isSubmitting ? (
                   <div className="flex items-center gap-2">
