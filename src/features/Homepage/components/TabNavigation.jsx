@@ -146,6 +146,7 @@ const TabNavigation = () => {
       url += (url.includes('?') ? '&' : '?') + 'accesstoken=' + token;
     }
     actions.setSelectedDashboard({ ...dashboard, URL: url });
+    actions.setActiveTab('dashboard');
   };
 
   return (
@@ -159,7 +160,9 @@ const TabNavigation = () => {
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <button
-                className="px-2 py-1 rounded-md font-medium text-sm transition flex items-center h-7 min-h-0 bg-blue-100 text-blue-900 border border-blue-300 hover:bg-blue-200 focus:bg-blue-200"
+                className={`px-2 py-1 rounded-t-lg font-medium text-xs transition flex items-center h-7 min-h-0 ${
+                  activeTabId === 'dashboard' ? 'bg-ocean-600 text-white font-semibold shadow-md' : 'bg-gray-100 text-gray-700 hover:bg-ocean-100 hover:text-ocean-900'
+                }`}
                 style={{ fontSize: '13px', minWidth: 140 }}
               >
                 {selectedDashboard ? selectedDashboard.DashBoardName : 'Sales Dashboard'}
