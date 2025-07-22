@@ -12,9 +12,10 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import { getSessionValue } from '@/utils/sessionHelpers';
 
 const TabNavigation = () => {
-  const { tabs, activeTabId, actions } = useHome();
+  const { tabs, activeTabId, actions, dashboards, selectedDashboard, dashboardsLoading } = useHome();
 
   // Context menu state
   const [contextMenu, setContextMenu] = useState({ visible: false, x: 0, y: 0, tabId: null });
@@ -55,9 +56,10 @@ const TabNavigation = () => {
   // }, [actions]);
 
   // Split tabs into fixed and draggable
-  const fixedTabsCount = 3; // Dashboard, Inbox, Search
-  const fixedTabs = tabs.slice(0, fixedTabsCount);
-  const draggableTabs = tabs.slice(fixedTabsCount);
+  // Only Inbox and Search are fixed tabs now (remove Dashboard tab)
+  const fixedTabsCount = 2; // Inbox, Search
+  const fixedTabs = tabs.slice(1, 3); // skip the first tab (Dashboard)
+  const draggableTabs = tabs.slice(3);
 
   const handleDragEnd = (result) => {
     if (!result.destination) return;
@@ -136,15 +138,58 @@ const TabNavigation = () => {
   const visibleTabs = tabs.slice(0, maxVisibleTabs);
   const overflowTabs = tabs.slice(maxVisibleTabs);
 
+  const handleDashboardSelect = async (dashboard) => {
+    if (!dashboard) return;
+    let url = dashboard.URL;
+    if (url && url.toUpperCase().includes('ISMKM=1')) {
+      const token = getSessionValue('Token');
+      url += (url.includes('?') ? '&' : '?') + 'accesstoken=' + token;
+    }
+    actions.setSelectedDashboard({ ...dashboard, URL: url });
+  };
+
   return (
     <div className="flex flex-col h-screen">
       {/* Navbar */}
       <Navbar />
-      
       {/* Tab Bar */}
       <div className="bg-white border-b border-gray-200 flex items-center px-2 py-0 h-8 min-h-0">
+        {/* Sales Dashboard Dropdown - now in TabNavigation */}
+        <div>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <button
+                className="px-2 py-1 rounded-md font-medium text-sm transition flex items-center h-7 min-h-0 bg-blue-100 text-blue-900 border border-blue-300 hover:bg-blue-200 focus:bg-blue-200"
+                style={{ fontSize: '13px', minWidth: 140 }}
+              >
+                {selectedDashboard ? selectedDashboard.DashBoardName : 'Sales Dashboard'}
+                <ChevronDown className="ml-2 h-4 w-4" />
+              </button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="start" className="w-56 mt-2 bg-white border border-gray-100 p-0 text-gray-800 font-medium">
+              {dashboardsLoading ? (
+                <DropdownMenuItem disabled>Loading...</DropdownMenuItem>
+              ) : (
+                dashboards.map((dashboard) => (
+                  <DropdownMenuItem
+                    key={dashboard.ID}
+                    onClick={() => handleDashboardSelect(dashboard)}
+                    className={
+                      selectedDashboard && selectedDashboard.ID === dashboard.ID
+                        ? 'bg-blue-100 text-blue-900 font-semibold'
+                        : ''
+                    }
+                  >
+                    {dashboard.DashBoardName}
+                  </DropdownMenuItem>
+                ))
+              )}
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
+        {/* End Sales Dashboard Dropdown */}
         <div className="flex items-center flex-1 min-w-0">
-          {/* Render fixed tabs (not draggable) */}
+          {/* Render fixed tabs (Inbox, Search only) */}
           {fixedTabs.map((tab, index) => (
             <div
               key={tab.id}
