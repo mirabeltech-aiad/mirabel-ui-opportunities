@@ -151,8 +151,8 @@ const TabNavigation = () => {
               onContextMenu={(e) => handleContextMenu(e, tab.id)}
               className={`flex items-center rounded-t-lg transition-all duration-200 h-7 min-h-0 px-2 text-xs ${
                 activeTabId === tab.id
-                  ? 'bg-white border-t-2 border-blue-500 text-blue-600 shadow-sm'
-                  : 'bg-gray-100 hover:bg-gray-200 text-gray-700'
+                  ? 'bg-ocean-600 text-white font-semibold shadow-md'
+                  : 'bg-gray-100 hover:bg-ocean-100 text-gray-700 hover:text-ocean-900'
               }`}
             >
               <div
@@ -196,8 +196,8 @@ const TabNavigation = () => {
                           onContextMenu={(e) => handleContextMenu(e, tab.id)}
                           className={`flex items-center rounded-t-lg transition-all duration-200 h-7 min-h-0 px-2 text-xs ${
                             activeTabId === tab.id
-                              ? 'bg-white border-t-2 border-blue-500 text-blue-600 shadow-sm'
-                              : 'bg-gray-100 hover:bg-gray-200 text-gray-700'
+                              ? 'bg-ocean-600 text-white font-semibold shadow-md'
+                              : 'bg-gray-100 hover:bg-ocean-100 text-gray-700 hover:text-ocean-900'
                           } ${snapshot.isDragging ? 'opacity-50' : ''}`}
                         >
                           <div

@@ -23,6 +23,7 @@ import {
   Menu,
   Globe,
   MessageSquare,
+  ChevronUp,
 } from 'lucide-react';
 import {
   DropdownMenu,
@@ -44,15 +45,15 @@ const renderMenuItems = (items, openTabByUrl) => {
     if (item.children && item.children.length > 0) {
       return (
         <DropdownMenuSub key={item.id}>
-          <DropdownMenuSubTrigger className="rounded-md text-white font-medium text-sm hover:!bg-ocean-100 hover:!text-black focus:!bg-ocean-100 focus:!text-black data-[state=open]:!bg-ocean-100 data-[state=open]:!text-black cursor-pointer flex items-center transition-colors duration-150" style={{ fontSize: '13px' }}>
+          <DropdownMenuSubTrigger className="rounded-none text-gray-800 font-medium px-4 py-2 hover:bg-[#e6f0fa] focus:bg-[#e6f0fa] hover:text-ocean-900 focus:text-ocean-900 cursor-pointer flex items-center gap-2 transition-colors duration-150 whitespace-nowrap" style={{ fontFamily: 'inherit', fontSize: '13px', fontWeight: 500, lineHeight: '1.5' }}>
             <span>{item.title}</span>
             {item.icon && (
-              <Badge className="ml-2 text-xs" variant="secondary">
+              <Badge className="ml-2 text-xs align-middle" variant="secondary">
                 {item.icon}
               </Badge>
             )}
           </DropdownMenuSubTrigger>
-          <DropdownMenuSubContent className="w-56 mt-2 rounded-lg shadow-lg bg-ocean-gradient border border-gray-100 p-1 text-white">
+          <DropdownMenuSubContent className="w-auto min-w-56 max-w-xl mt-2 bg-white border border-gray-100 p-0 text-gray-800 font-medium" style={{ fontFamily: 'inherit', fontSize: '13px', lineHeight: '1.5' }}>
             {renderMenuItems(item.children, openTabByUrl)}
           </DropdownMenuSubContent>
         </DropdownMenuSub>
@@ -62,12 +63,12 @@ const renderMenuItems = (items, openTabByUrl) => {
         <DropdownMenuItem
           key={item.id}
           onClick={() => openTabByUrl(item.title, item.url)}
-          className="rounded-md font-medium text-sm hover:!bg-ocean-100 hover:!text-black focus:!bg-ocean-100 focus:!text-black cursor-pointer flex items-center text-white transition-colors duration-150"
-          style={{ fontSize: '13px' }}
+          className="rounded-none font-medium px-4 py-2 hover:bg-[#e6f0fa] focus:bg-[#e6f0fa] hover:text-ocean-900 focus:text-ocean-900 cursor-pointer text-gray-800 transition-colors duration-150 flex items-center gap-2 whitespace-nowrap"
+          style={{ fontFamily: 'inherit', fontSize: '13px', fontWeight: 500, lineHeight: '1.5' }}
         >
           <span>{item.title}</span>
           {item.icon && (
-            <Badge className="ml-2 text-xs" variant="secondary">
+            <Badge className="ml-2 text-xs align-middle" variant="secondary">
               {item.icon}
             </Badge>
           )}
@@ -75,6 +76,68 @@ const renderMenuItems = (items, openTabByUrl) => {
       );
     }
   });
+};
+
+// Helper to render menu items with 'Show more' if needed
+const renderMenuItemsWithShowMore = (items, openTabByUrl, expanded, setExpanded) => {
+  const VISIBLE_COUNT = 10;
+  if (!items || items.length <= VISIBLE_COUNT || expanded) {
+    return (
+      <div className={expanded ? 'overflow-y-auto max-h-[400px]' : ''}>
+        {items.map((item) => renderMenuItemOrSub(item, openTabByUrl, expanded, setExpanded))}
+      </div>
+    );
+  }
+  return [
+    ...items.slice(0, VISIBLE_COUNT).map((item) => renderMenuItemOrSub(item, openTabByUrl, expanded, setExpanded)),
+    <div key="show-more" className="flex justify-center items-center cursor-pointer py-2 hover:bg-[#e6f0fa]" onClick={() => setExpanded(true)}>
+      <ChevronDown className="h-4 w-4 mr-1" />
+      <span className="text-xs font-medium text-ocean-900">Show more</span>
+    </div>
+  ];
+};
+
+// Helper to render a single menu item or submenu
+const renderMenuItemOrSub = (item, openTabByUrl, expanded, setExpanded) => {
+  if (item.children && item.children.length > 0) {
+    return (
+      <DropdownMenuSub key={item.id}>
+        <DropdownMenuSubTrigger className="rounded-none text-gray-800 font-medium px-4 py-2 hover:bg-[#e6f0fa] focus:bg-[#e6f0fa] hover:text-ocean-900 focus:text-ocean-900 cursor-pointer flex items-center gap-2 transition-colors duration-150 whitespace-nowrap" style={{ fontFamily: 'inherit', fontSize: '13px', fontWeight: 500, lineHeight: '1.5' }}>
+          <span>{item.title}</span>
+          {item.icon && (
+            <Badge className="ml-2 text-xs align-middle" variant="secondary">
+              {item.icon}
+            </Badge>
+          )}
+        </DropdownMenuSubTrigger>
+        <DropdownMenuSubContent className="w-auto min-w-56 max-w-xl mt-2 bg-white border border-gray-100 p-0 text-gray-800 font-medium" style={{ fontFamily: 'inherit', fontSize: '13px', lineHeight: '1.5' }}>
+          <SubMenuWithShowMore items={item.children} openTabByUrl={openTabByUrl} />
+        </DropdownMenuSubContent>
+      </DropdownMenuSub>
+    );
+  } else {
+    return (
+      <DropdownMenuItem
+        key={item.id}
+        onClick={() => openTabByUrl(item.title, item.url)}
+        className="rounded-none font-medium px-4 py-2 hover:bg-[#e6f0fa] focus:bg-[#e6f0fa] hover:text-ocean-900 focus:text-ocean-900 cursor-pointer text-gray-800 transition-colors duration-150 flex items-center gap-2 whitespace-nowrap"
+        style={{ fontFamily: 'inherit', fontSize: '13px', fontWeight: 500, lineHeight: '1.5' }}
+      >
+        <span>{item.title}</span>
+        {item.icon && (
+          <Badge className="ml-2 text-xs align-middle" variant="secondary">
+            {item.icon}
+          </Badge>
+        )}
+      </DropdownMenuItem>
+    );
+  }
+};
+
+// SubMenuWithShowMore component
+const SubMenuWithShowMore = ({ items, openTabByUrl }) => {
+  const [expanded, setExpanded] = React.useState(false);
+  return <>{renderMenuItemsWithShowMore(items, openTabByUrl, expanded, setExpanded)}</>;
 };
 
 const Navbar = () => {
@@ -90,6 +153,7 @@ const Navbar = () => {
   });
   // Add state to track which parent menu is open
   const [openMenuId, setOpenMenuId] = useState(null);
+  const [expandedMenus, setExpandedMenus] = React.useState({});
 
   // Fallback user info if AuthContext user is null
   const [fallbackUser, setFallbackUser] = useState(null);
@@ -364,6 +428,14 @@ const Navbar = () => {
     setIsAnnouncementsPanelOpen(true);
   };
 
+  const handleExpandMenu = (menuId) => {
+    setExpandedMenus((prev) => ({ ...prev, [menuId]: true }));
+  };
+
+  const handleCollapseMenu = (menuId) => {
+    setExpandedMenus((prev) => ({ ...prev, [menuId]: false }));
+  };
+
   return (
     <>
       <nav className="navbar bg-ocean-gradient shadow-md h-12">
@@ -395,13 +467,19 @@ const Navbar = () => {
                         <span>{menu.title}</span>
                       </button>
                     </DropdownMenuTrigger>
-                    <DropdownMenuContent align="start" className="w-56 mt-2 rounded-lg shadow-lg bg-ocean-gradient border border-gray-100 p-1 text-white">
+                    <DropdownMenuContent align="start" className="w-auto min-w-56 max-w-xl mt-2 bg-white border border-gray-100 p-0 text-gray-800 font-medium" style={{ fontFamily: 'inherit', fontSize: '13px', lineHeight: '1.5' }}>
                       {menu.url && (
-                        <DropdownMenuItem onClick={() => openTabByUrl(menu.title, menu.url)} className="rounded-md font-medium text-sm hover:!bg-ocean-100 hover:!text-black focus:!bg-ocean-100 focus:!text-black cursor-pointer text-white transition-colors duration-150" style={{ fontSize: '13px' }}>
+                        <DropdownMenuItem onClick={() => openTabByUrl(menu.title, menu.url)} className="rounded-none font-medium px-4 py-2 hover:bg-[#e6f0fa] focus:bg-[#e6f0fa] hover:text-ocean-900 focus:text-ocean-900 cursor-pointer text-gray-800 transition-colors duration-150 flex items-center gap-2 whitespace-nowrap" style={{ fontFamily: 'inherit', fontSize: '13px', fontWeight: 500, lineHeight: '1.5' }}>
                           <span>{menu.title} Home</span>
                         </DropdownMenuItem>
                       )}
-                      {menu.children && renderMenuItems(menu.children, openTabByUrl)}
+                      {renderMenuItemsWithShowMore(menu.children, openTabByUrl, expandedMenus[menu.id], () => handleExpandMenu(menu.id))}
+                      {menu.children && menu.children.length > 10 && expandedMenus[menu.id] && (
+                        <div className="flex justify-center items-center cursor-pointer py-2 hover:bg-[#e6f0fa]" onClick={() => handleCollapseMenu(menu.id)}>
+                          <ChevronUp className="h-4 w-4 mr-1" />
+                          <span className="text-xs font-medium text-ocean-900">Show less</span>
+                        </div>
+                      )}
                     </DropdownMenuContent>
                   </DropdownMenu>
                 ))
