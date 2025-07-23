@@ -99,11 +99,11 @@ const ScheduleTrainingForm = ({ isOpen, onClose }) => {
   return (
     <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-1 sm:p-4">
       <Card className="w-full max-w-4xl max-h-[95vh] sm:max-h-[85vh] overflow-hidden flex flex-col">
-        <CardHeader className="bg-ocean-gradient text-white">
+        <CardHeader className="text-white" style={{ background: 'linear-gradient(135deg, #0c4a6e 0%, #38bdf8 100%)' }}>
           <div className="flex items-center justify-between gap-2">
-            <CardTitle className="flex items-center min-w-0 flex-1">
+            <CardTitle className="flex items-center flex-1">
               <Calendar className="h-5 w-5 mr-2 flex-shrink-0" />
-              <span className="truncate">Schedule Training</span>
+              <span>Schedule Training</span>
             </CardTitle>
             <Button
               variant="ghost"

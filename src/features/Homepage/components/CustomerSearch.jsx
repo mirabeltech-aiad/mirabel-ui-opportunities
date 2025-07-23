@@ -217,7 +217,7 @@ const CustomerSearch = () => {
   }
 
   return (
-    <div className="relative" style={{ width: '160px' }}>
+    <div className="relative" style={{ width: '185px' }}>
       <div className="relative">
         <input
           ref={inputRef}
@@ -228,26 +228,26 @@ const CustomerSearch = () => {
           onKeyDown={handleKeyDown}
           onFocus={handleFocus}
           onBlur={handleBlur}
-          className="pl-8 pr-3 py-1.5 bg-white border border-gray-300 text-gray-900 placeholder-gray-500 focus:bg-white focus:border-blue-500 rounded-full h-8 text-sm w-full min-h-0 focus:text-gray-900 focus:outline-none focus:ring-0 focus:shadow-none no-focus-ring"
+          className="pl-8 pr-3 py-1 bg-white/95 backdrop-blur-sm border border-white/30 text-gray-900 placeholder-gray-600 focus:bg-white focus:border-white/50 focus:ring-1 focus:ring-white/30 rounded-full h-7 text-sm w-full min-h-0 focus:text-gray-900 focus:outline-none no-focus-ring"
           style={{
-            boxShadow: '0 1px 2px rgba(0, 0, 0, 0.1)',
+            boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
             color: '#111827',
-            backgroundColor: '#ffffff',
-            borderColor: '#d1d5db',
+            backgroundColor: 'rgba(255, 255, 255, 0.95)',
+            borderColor: 'rgba(255, 255, 255, 0.3)',
             outline: 'none',
             fontSize: '13px',
             lineHeight: '1.4',
-            paddingLeft: '28px',
+            paddingLeft: '32px',
             paddingRight: '12px',
-            paddingTop: '6px',
-            paddingBottom: '6px',
-            height: '32px',
+            paddingTop: '4px',
+            paddingBottom: '4px',
+            height: '28px',
             WebkitAppearance: 'none',
             MozAppearance: 'none',
             appearance: 'none'
           }}
         />
-        <Search className="absolute left-2.5 top-1/2 transform -translate-y-1/2 text-gray-400 h-3.5 w-3.5 pointer-events-none" />
+        <Search className="absolute left-2.5 top-1/2 transform -translate-y-1/2 text-gray-500 h-3.5 w-3.5 pointer-events-none" />
         
         {/* Loading indicator */}
         {isLoading && (

@@ -499,14 +499,14 @@ const Navbar = () => {
               unreadCount={unreadCount}
             />
 
-            {/* User Menu - Updated to match ASP.NET design exactly */}
+            {/* User Menu - Professional round profile icon */}
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <button 
                   data-testid="profile-menu-button"
-                  className="flex items-center px-4 py-1 rounded-full bg-ocean-600 hover:bg-ocean-700 text-white font-semibold shadow border border-ocean-700 focus:outline-none focus:ring-2 focus:ring-ocean-400 transition h-8 min-h-0"
+                  className="flex items-center justify-center w-8 h-8 rounded-full bg-ocean-600 hover:bg-ocean-700 text-white font-semibold shadow border border-ocean-500 focus:outline-none focus:ring-0 transition-all duration-200 min-h-0"
                 >
-                  <User className="h-4 w-4 mr-2" />
+                  <User className="h-4 w-4" />
                 </button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-56 mt-2 rounded-lg shadow-lg border border-gray-200 p-0">
