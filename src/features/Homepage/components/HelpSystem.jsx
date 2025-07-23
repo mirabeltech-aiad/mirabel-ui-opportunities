@@ -219,27 +219,35 @@ const HelpSystem = () => {
         </div>
       </div>
 
-      {/* Help Panel */}
+            {/* Help Panel */}
       {helpVisible && (
         <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-          <div className="relative w-full max-w-5xl max-h-[95vh] bg-white rounded-xl shadow-2xl overflow-y-auto">
-            {/* Close Button */}
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={actions.toggleHelp}
-              className="absolute top-4 right-4 text-gray-500 hover:bg-gray-200"
-              aria-label="Close Help & Support"
-            >
-              <LucideX className="h-6 w-6" />
-            </Button>
-            {/* Title with Modern Styling */}
-            <h2 className="text-3xl font-bold mb-8 mt-8 ml-8">
-              <span className="bg-gradient-to-r from-slate-100 to-slate-300 text-slate-800 px-6 py-2 rounded-xl shadow-sm border border-slate-200">
-                Help &amp; Support
-              </span>
-            </h2>
-            <CardContent className="p-6 overflow-y-auto max-h-[calc(95vh-200px)]">
+          <div className="relative w-full max-w-5xl max-h-[95vh] bg-white rounded-xl shadow-2xl overflow-hidden">
+            {/* Professional Header */}
+            <div className="bg-ocean-gradient text-white px-6 py-4 rounded-t-xl">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center space-x-3">
+                  <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">
+                    <HelpCircle className="h-6 w-6 text-white" />
+                  </div>
+                  <div>
+                    <h2 className="text-xl font-semibold">Support Center</h2>
+                    <p className="text-ocean-100 text-sm">Get help and assistance</p>
+                  </div>
+                </div>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={actions.toggleHelp}
+                  className="text-white hover:bg-white/20 rounded-full"
+                  aria-label="Close Support Center"
+                >
+                  <LucideX className="h-5 w-5" />
+                </Button>
+              </div>
+            </div>
+            
+            <CardContent className="p-6 overflow-y-auto max-h-[calc(95vh-140px)]">
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                 {helpOptions.map((option) => {
                   const IconComponent = option.icon;
