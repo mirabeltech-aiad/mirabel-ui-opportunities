@@ -605,7 +605,17 @@ export const navigationService = {
       console.warn('Error decoding URI:', e);
       return url;
     }
+  },
+
+getSessionValue: (key) => {
+  try {
+    const mmClientVarsRaw = JSON.parse(localStorage.getItem("MMClientVars"));
+    if (!mmClientVarsRaw) return '';
+    return mmClientVarsRaw && mmClientVarsRaw[key] !== undefined && mmClientVarsRaw[key] !== null ? String(mmClientVarsRaw[key]) : '';
+  } catch {
+    return '';
   }
+}
 };
 
 export default navigationService; 
