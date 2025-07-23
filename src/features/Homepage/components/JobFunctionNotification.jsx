@@ -84,7 +84,7 @@ const JobFunctionNotification = ({ isOpen, onClose }) => {
         <DialogPrimitive.Content
           ref={ref}
           className={
-            'fixed left-[50%] top-[50%] z-50 grid w-full max-w-lg translate-x-[-50%] translate-y-[-50%] gap-4 border bg-background p-6 shadow-lg duration-200 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[state=closed]:slide-out-to-left-1/2 data-[state=closed]:slide-out-to-top-[48%] data-[state=open]:slide-in-from-left-1/2 data-[state=open]:slide-in-from-top-[48%] sm:rounded-lg'
+            'fixed left-[50%] top-[50%] z-50 grid w-full max-w-lg max-h-[400px] translate-x-[-50%] translate-y-[-50%] gap-4 border bg-background p-6 shadow-lg duration-200 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[state=closed]:slide-out-to-left-1/2 data-[state=closed]:slide-out-to-top-[48%] data-[state=open]:slide-in-from-left-1/2 data-[state=open]:slide-in-from-top-[48%] sm:rounded-lg'
           }
           onInteractOutside={e => e.preventDefault()}
           onEscapeKeyDown={e => e.preventDefault()}
@@ -99,16 +99,15 @@ const JobFunctionNotification = ({ isOpen, onClose }) => {
   return (
     <Dialog open={isOpen} onOpenChange={() => {}}>
       <ModalContent>
-        <DialogHeader>
-          <DialogTitle>Job Function Required</DialogTitle>
-        </DialogHeader>
-        {/* Always show the job function selection UI, no loading or error states */}
-        <>
-          <div className="mb-4 text-sm text-gray-700">
+        <div className="flex flex-col h-full">
+          <DialogHeader>
+            <DialogTitle className="mb-4">Job Function Required</DialogTitle>
+          </DialogHeader>
+          <div className="mb-2 mt-0 text-sm text-gray-700">
             Please select your job function(s) from this list. This allows the site administrators to tailor communications, training, and notifications to best suit your needs while using this site.<br />
             Thank You.
           </div>
-          <div className="max-h-72 overflow-y-auto border rounded p-2 mb-4">
+          <div className="flex-1 max-h-48 overflow-y-auto border rounded p-2">
             {jobFunctions.map((job) => (
               <div key={job.Value} className="flex items-center space-x-2 py-1">
                 <Checkbox
@@ -123,12 +122,12 @@ const JobFunctionNotification = ({ isOpen, onClose }) => {
               </div>
             ))}
           </div>
-        </>
-        <DialogFooter>
-          <Button onClick={handleSave} disabled={saving || loading || selected.length === 0}>
-            {saving ? 'Saving...' : 'Save'}
-          </Button>
-        </DialogFooter>
+          <div className="flex justify-end mt-3">
+            <Button onClick={handleSave} disabled={saving || loading || selected.length === 0}>
+              {saving ? 'Saving...' : 'Save'}
+            </Button>
+          </div>
+        </div>
       </ModalContent>
     </Dialog>
   );
