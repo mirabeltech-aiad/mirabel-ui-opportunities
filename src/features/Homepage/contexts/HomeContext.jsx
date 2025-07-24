@@ -1,5 +1,4 @@
 import React, { createContext, useContext, useReducer, useEffect } from 'react';
-import { useToast } from '@/features/Opportunity/hooks/use-toast';
 import dashboardService from '../services/dashboardService';
 import navigationService from '../services/navigationService';
 import { termsAndConditionsService } from '../services/termsAndConditionsService';
@@ -221,7 +220,6 @@ const homeReducer = (state, action) => {
 // Provider component
 export const HomeProvider = ({ children }) => {
   const [state, dispatch] = useReducer(homeReducer, initialState);
-  const { toast } = useToast();
 
   // Check for Terms and Conditions
   const checkTermsAndConditions = async () => {
@@ -232,7 +230,6 @@ export const HomeProvider = ({ children }) => {
       }
     } catch (error) {
       console.error('Error checking Terms and Conditions:', error);
-      // Don't show error toast for this - it's expected if user has already accepted
     }
   };
 
@@ -397,11 +394,6 @@ export const HomeProvider = ({ children }) => {
       }
     } catch (error) {
       console.error('Failed to load dashboards:', error);
-      toast({
-        title: "Error",
-        description: "Failed to load dashboards",
-        variant: "destructive",
-      });
     } finally {
       setDashboardsLoading(false);
     }
@@ -454,7 +446,7 @@ export const HomeProvider = ({ children }) => {
     };
 
     initializeApp();
-  }, []); // Removed toast dependency - initialization should only run once on mount
+  }, []);
 
   // Save tabs to localStorage when they change
   useEffect(() => {
@@ -462,47 +454,9 @@ export const HomeProvider = ({ children }) => {
     localStorage.setItem('home-active-tab', state.activeTabId);
   }, [state.tabs, state.activeTabId]);
 
-  // Actions
-  const addTab = (tabData) => {
-    // Handle URL based on whether it contains ui60 or not
-    let processedUrl = tabData.url;
-    if (tabData.url && tabData.type === 'iframe') {
-      // For iframe tabs, use URL as provided
-      // - URLs with 'ui60' are React app routes (keep as is)
-      // - URLs without 'ui60' are legacy ASP.NET routes (use as is)
-      processedUrl = tabData.url;
-    }
-
-    const newTab = {
-      id: tabData.id || `${tabData.type}-${Date.now()}`,
-      title: tabData.title,
-      component: tabData.component,
-      type: tabData.type || 'component',
-      closable: tabData.closable !== false,
-      icon: tabData.icon || '📄',
-      url: processedUrl,
-      content: tabData.content
-    };
-    
-    dispatch({ type: ACTIONS.ADD_TAB, payload: newTab });
-    toast({
-      title: "Tab Added",
-      description: `Added "${newTab.title}" tab`,
-      variant: "default",
-    });
-  };
-
   const removeTab = (tabId) => {
     const tab = state.tabs.find(t => t.id === tabId);
     dispatch({ type: ACTIONS.REMOVE_TAB, payload: tabId });
-    
-    if (tab) {
-      toast({
-        title: "Tab Removed",
-        description: `Removed "${tab.title}" tab`,
-        variant: "default",
-      });
-    }
   };
 
   const reorderTabs = (newOrder) => {
@@ -576,7 +530,6 @@ export const HomeProvider = ({ children }) => {
   const value = {
     ...state,
     actions: {
-      addTab,
       removeTab,
       reorderTabs,
       setActiveTab,

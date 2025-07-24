@@ -26,24 +26,6 @@ export const dashboardService = {
       return [];
     } catch (error) {
       console.error('Error fetching dashboards:', error);
-      
-      // Return mock data for development/fallback
-      return [
-        {
-          ID: 2,
-          DashBoardName: "Sales Dashboard",
-          URL: "/ui/User/AnalyticsDashboard?Id={#Sales_DashboardID#}&pageSource=homepage",
-          IsDefault: true,
-          IsActive: true
-        },
-        {
-          ID: 3,
-          DashBoardName: "Audience",
-          URL: "/DashBoard.aspx?ISMKM=1",
-          IsDefault: false,
-          IsActive: true
-        }
-      ];
     }
   },
 
