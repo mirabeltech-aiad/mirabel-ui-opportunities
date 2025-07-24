@@ -35,7 +35,7 @@ const ChangePasswordManager = () => {
         
         if (url) {
           setChangePasswordUrl(url);
-          setShowAlert(true);
+          setShowModal(true);
           setHasBeenShown(true);
         } else {
           console.error('Failed to generate change password URL');
@@ -78,12 +78,7 @@ const ChangePasswordManager = () => {
 
   return (
     <>
-      <ChangePasswordAlert
-        isOpen={showAlert}
-        onClose={handleAlertClose}
-        onContinue={handleAlertContinue}
-      />
-      
+
       <ChangePasswordModal
         isOpen={showModal}
         onClose={handleModalClose}
