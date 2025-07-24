@@ -112,7 +112,7 @@ export const navigationService = {
                       "User";
      
       // Extract change password information
-      const changePassword = sessionDetails.IsPasswordExpired  || content.ChangePassword || null;
+      const changePassword = sessionDetails.IsPasswordExpired;
       
       // Create the transformed data object
       const transformedData = {
