@@ -220,7 +220,7 @@ const homeReducer = (state, action) => {
 // Provider component
 export const HomeProvider = ({ children }) => {
   const [state, dispatch] = useReducer(homeReducer, initialState);
-
+  
   // Check for Terms and Conditions
   const checkTermsAndConditions = async () => {
     try {
@@ -454,6 +454,32 @@ export const HomeProvider = ({ children }) => {
     localStorage.setItem('home-active-tab', state.activeTabId);
   }, [state.tabs, state.activeTabId]);
 
+  // Actions
+  const addTab = (tabData) => {
+    // Handle URL based on whether it contains ui60 or not
+    let processedUrl = tabData.url;
+    if (tabData.url && tabData.type === 'iframe') {
+      // For iframe tabs, use URL as provided
+      // - URLs with 'ui60' are React app routes (keep as is)
+      // - URLs without 'ui60' are legacy ASP.NET routes (use as is)
+      processedUrl = tabData.url;
+    }
+
+    const newTab = {
+      id: tabData.id || `${tabData.type}-${Date.now()}`,
+      title: tabData.title,
+      component: tabData.component,
+      type: tabData.type || 'component',
+      closable: tabData.closable !== false,
+      icon: tabData.icon || '📄',
+      url: processedUrl,
+      content: tabData.content
+    };
+    
+    dispatch({ type: ACTIONS.ADD_TAB, payload: newTab });
+  };
+
+
   const removeTab = (tabId) => {
     const tab = state.tabs.find(t => t.id === tabId);
     dispatch({ type: ACTIONS.REMOVE_TAB, payload: tabId });
@@ -530,6 +556,7 @@ export const HomeProvider = ({ children }) => {
   const value = {
     ...state,
     actions: {
+      addTab,
       removeTab,
       reorderTabs,
       setActiveTab,
