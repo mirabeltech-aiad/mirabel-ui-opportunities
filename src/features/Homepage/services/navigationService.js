@@ -483,7 +483,7 @@ export const navigationService = {
   },
 
   /**
-   * Get session details from localStorage (MMnewclientvars)
+  
    * @returns {Object|null} Session details or null
    */
   getSessionDetails: () => {
