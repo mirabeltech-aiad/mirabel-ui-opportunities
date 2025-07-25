@@ -388,9 +388,8 @@ export const HomeProvider = ({ children }) => {
       setDashboards(activeDashboards);
       
       // Set default dashboard
-      const defaultDashboard = dashboardService.getDefaultDashboard(activeDashboards);
-      if (defaultDashboard) {
-        setSelectedDashboard(defaultDashboard);
+      if (activeDashboards && activeDashboards.length > 0) {
+        setSelectedDashboard(activeDashboards[0]);
         dispatch({ type: ACTIONS.SET_ACTIVE_TAB, payload: 'dashboard' }); // Set active tab to dashboard
       }
     } catch (error) {
