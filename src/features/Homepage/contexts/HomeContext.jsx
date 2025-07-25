@@ -432,8 +432,8 @@ export const HomeProvider = ({ children }) => {
   useEffect(() => {
     const initializeApp = async () => {
       // Clear localStorage first
-      localStorage.removeItem('home-tabs');
-      localStorage.removeItem('home-active-tab');
+      // localStorage.removeItem('home-tabs');
+      // localStorage.removeItem('home-active-tab');
       
       // 1. Load navigation menus first (as requested)
       await loadNavigationMenus();
