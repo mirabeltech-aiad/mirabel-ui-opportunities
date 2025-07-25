@@ -33,11 +33,11 @@ const initialState = {
   tabs: [
     {
       id: 'dashboard',
-      title: 'Dashboard',
+      title: 'Sales Dashboard',
       component: 'Dashboard',
       type: 'component',
       closable: false,
-      icon: '📊'
+      icon: '' // Optionally add an icon for the dashboard tab
     },
     {
       id: 'inbox',
@@ -58,7 +58,7 @@ const initialState = {
       icon: '🔍'
     }
   ],
-  activeTabId: 'dashboard',
+  activeTabId: 'dashboard', // Set default to 'dashboard' (not in tabs array)
   helpVisible: false,
   helpPosition: { x: typeof window !== 'undefined' ? window.innerWidth - 100 : 1320, y: typeof window !== 'undefined' ? window.innerHeight - 100 : 620 },
   sessionData: null,
@@ -391,6 +391,7 @@ export const HomeProvider = ({ children }) => {
       const defaultDashboard = dashboardService.getDefaultDashboard(activeDashboards);
       if (defaultDashboard) {
         setSelectedDashboard(defaultDashboard);
+        dispatch({ type: ACTIONS.SET_ACTIVE_TAB, payload: 'dashboard' }); // Set active tab to dashboard
       }
     } catch (error) {
       console.error('Failed to load dashboards:', error);

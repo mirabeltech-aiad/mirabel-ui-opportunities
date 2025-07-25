@@ -256,11 +256,11 @@ const TabNavigation = () => {
                           ref={provided.innerRef}
                           {...provided.draggableProps}
                           onContextMenu={(e) => handleContextMenu(e, tab.id)}
-                          className={`flex items-center rounded transition-all duration-200 h-8 min-h-0 px-1 text-xs ${
+                          className={`flex items-center rounded transition-all duration-100 h-8 min-h-0 px-1 text-xs ${
                             activeTabId === tab.id
                               ? 'bg-blue-100 text-blue-900 font-bold shadow-sm'
                               : 'bg-transparent hover:bg-gray-100 text-gray-700'
-                          } ${snapshot.isDragging ? 'opacity-50' : ''}`}
+                          }${snapshot.isDragging ? ' opacity-90 shadow-lg' : ''}`}
                           style={{ fontFamily: 'inherit', fontSize: '13px', fontWeight: 500, lineHeight: '1.5', border: 'none', boxShadow: activeTabId === tab.id ? '0 2px 8px rgba(0,0,0,0.04)' : 'none', marginRight: '1px', height: '24px', minHeight: '24px', paddingTop: '0', paddingBottom: '0' }}
                         >
                           <div
