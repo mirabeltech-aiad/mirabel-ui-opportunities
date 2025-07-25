@@ -13,10 +13,9 @@ import {
   HELPDESK_API_ATTACHTEMPORARY_FILE
 } from '@/config/apiUrls';
 import { getUserInfo, getSessionValue } from '@/utils/sessionHelpers';
-import { useToast } from '@/features/Opportunity/hooks/use-toast';
+import { toast } from '@/components/ui/sonner';
 
 const ContactSalesRepForm = ({ isOpen, onClose }) => {
-  const { toast } = useToast();
   const [formData, setFormData] = useState({
     to: '',
     cc: '',
@@ -185,22 +184,22 @@ const ContactSalesRepForm = ({ isOpen, onClose }) => {
       const res = await apiCall(endpoint, 'POST', request);
       
       if (res && res.content && res.content.Data && res.content.Data.issueKey) {
-        toast({
-          title: 'Request Created Successfully',
-          description: `Your request ${res.content.Data.issueKey} has been created. Your Sales Rep will respond back to you shortly.`,
-          variant: 'default',
-        });
+        toast.success(
+          `Your request ${res.content.Data.issueKey} has been created. Your Sales Rep will respond back to you shortly.`,
+          {
+            action: {
+              label: 'View Ticket',
+              onClick: () => window.open(`https://mirabel.atlassian.net/browse/${res.content.Data.issueKey}`, '_blank')
+            }
+          }
+        );
         onClose();
       } else {
         throw new Error('No issue key returned from API');
       }
     } catch (error) {
       console.error('Error creating sales rep contact:', error);
-      toast({
-        title: 'Error Creating Request',
-        description: error.message || 'Unable to send message. Please try again.',
-        variant: 'destructive',
-      });
+      toast.error(error.message || 'Unable to send message. Please try again.');
     } finally {
       setIsSubmitting(false);
     }
