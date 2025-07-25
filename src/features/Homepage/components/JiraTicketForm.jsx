@@ -13,7 +13,7 @@ import {
 } from '@/components/ui/select';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { useToast } from '@/features/Opportunity/hooks/use-toast';
+import { toast } from '@/components/ui/sonner';
 import { getUserInfo, getSessionValue } from '@/utils/sessionHelpers';
 import httpClient, { apiCall } from '@/services/httpClient';
 import {
@@ -23,7 +23,6 @@ import {
 } from '@/config/apiUrls';
 
 const JiraTicketForm = ({ onClose }) => {
-  const { toast } = useToast();
   const user = getUserInfo();
   const [categories, setCategories] = useState([]);
   const [attachments, setAttachments] = useState([]);
@@ -54,6 +53,8 @@ const JiraTicketForm = ({ onClose }) => {
     }
   }, [user]);
 
+
+
   const fetchCategories = async () => {
     try {
       const res = await apiCall(HELPDESK_API_ERROR_CATEGORY, 'GET');
@@ -83,11 +84,7 @@ const JiraTicketForm = ({ onClose }) => {
     // Validate file sizes
     for (let file of files) {
       if (file.size > 10 * 1024 * 1024) {
-        toast({ 
-          title: 'File too big', 
-          description: `${file.name} is larger than 10MB.`, 
-          variant: 'destructive' 
-        });
+        toast.error(`${file.name} is larger than 10MB.`);
         continue;
       }
       validFiles.push(file);
@@ -141,11 +138,7 @@ const JiraTicketForm = ({ onClose }) => {
           ...data.content.Data.temporaryAttachments
         ]);
         
-        toast({ 
-          title: 'Files uploaded successfully', 
-          description: `${validFiles.length} file(s) uploaded.`, 
-          variant: 'default' 
-        });
+        toast.success(`${validFiles.length} file(s) uploaded successfully.`);
       } else {
         throw new Error('Invalid response format from upload endpoint');
       }
@@ -155,11 +148,7 @@ const JiraTicketForm = ({ onClose }) => {
         a.uploading ? { ...a, uploading: false, error: true } : a
       ));
       
-      toast({ 
-        title: 'Upload Failed', 
-        description: error.message || 'Could not upload file(s). Please try again.', 
-        variant: 'destructive' 
-      });
+      toast.error(error.message || 'Could not upload file(s). Please try again.');
     } finally {
       setIsUploading(false);
       if (fileInputRef.current) fileInputRef.current.value = '';
@@ -189,11 +178,7 @@ const JiraTicketForm = ({ onClose }) => {
         hasUserId: !!userInfo.userId,
         userInfo 
       });
-      toast({ 
-        title: 'Authentication Error', 
-        description: 'Please log in again to submit a support ticket.', 
-        variant: 'destructive' 
-      });
+      toast.error('Please log in again to submit a support ticket.');
       return;
     }
     
@@ -242,23 +227,15 @@ const JiraTicketForm = ({ onClose }) => {
       console.log('API response:', res);
       
       if (res && res.content && res.content.Data && res.content.Data.issueKey) {
-        toast({
-          title: 'Ticket Created Successfully',
-          description: (
-            <div>
-              <p>Your request {res.content.Data.issueKey} has been created.</p>
-              <a 
-                href={`https://mirabel.atlassian.net/browse/${res.content.Data.issueKey}`} 
-                target="_blank" 
-                rel="noopener noreferrer" 
-                className="text-blue-600 hover:underline"
-              >
-                View Ticket
-              </a>
-            </div>
-          ),
-          variant: 'default',
-        });
+        toast.success(
+          `Your request ${res.content.Data.issueKey} has been created.`,
+          {
+            action: {
+              label: 'View Ticket',
+              onClick: () => window.open(`https://mirabel.atlassian.net/browse/${res.content.Data.issueKey}`, '_blank')
+            }
+          }
+        );
         onClose();
       } else {
         console.error('Invalid API response format:', res);
@@ -292,11 +269,7 @@ const JiraTicketForm = ({ onClose }) => {
         errorMessage = error.message;
       }
       
-      toast({ 
-        title: 'Error Creating Ticket', 
-        description: errorMessage, 
-        variant: 'destructive' 
-      });
+      toast.error(errorMessage);
     } finally {
       setIsSubmitting(false);
     }

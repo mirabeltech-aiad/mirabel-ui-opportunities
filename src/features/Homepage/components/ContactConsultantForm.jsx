@@ -8,10 +8,9 @@ import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
 import { consultantService } from '../services/consultantService';
 import { getSessionValue } from '../../../utils/sessionHelpers';
-import { useToast } from '@/features/Opportunity/hooks/use-toast';
+import { toast } from '@/components/ui/sonner';
 
 const ContactConsultantForm = ({ isOpen, onClose, consultantInfo }) => {
-  const { toast } = useToast();
   const [formData, setFormData] = useState({
     subject: '',
     question: '',
@@ -62,11 +61,7 @@ const ContactConsultantForm = ({ isOpen, onClose, consultantInfo }) => {
     const validFiles = [];
     for (const file of files) {
       if (file.size > 10 * 1024 * 1024) { // 10MB limit
-        toast({
-          title: "File too large",
-          description: `${file.name} is larger than 10MB. Please select a smaller file.`,
-          variant: "destructive",
-        });
+        toast.error(`${file.name} is larger than 10MB. Please select a smaller file.`);
         continue;
       }
       validFiles.push(file);
@@ -119,11 +114,7 @@ const ContactConsultantForm = ({ isOpen, onClose, consultantInfo }) => {
           processedAttachments = await consultantService.processAttachments(attachments);
         } catch (attachmentError) {
           console.error('Error processing attachments:', attachmentError);
-          toast({
-            title: "Attachment Error",
-            description: attachmentError.message || 'Error processing attachments. Please try again.',
-            variant: "destructive",
-          });
+          toast.error(attachmentError.message || 'Error processing attachments. Please try again.');
           return;
         }
       }
@@ -152,10 +143,7 @@ const ContactConsultantForm = ({ isOpen, onClose, consultantInfo }) => {
       await consultantService.sendConsultantEmail(emailData);
 
       // Show success toast notification
-      toast({
-        title: "Message sent successfully",
-        description: "Your Software Consultant will respond back to you shortly.",
-      });
+      toast.success("Your Software Consultant will respond back to you shortly.");
       
       // Close form
       onClose();
@@ -176,11 +164,7 @@ const ContactConsultantForm = ({ isOpen, onClose, consultantInfo }) => {
         errorMessage = error.message;
       }
       
-      toast({
-        title: "Error sending message",
-        description: errorMessage,
-        variant: "destructive",
-      });
+      toast.error(errorMessage);
     } finally {
       setIsSubmitting(false);
     }
