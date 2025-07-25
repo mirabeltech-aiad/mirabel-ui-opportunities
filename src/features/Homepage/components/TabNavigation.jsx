@@ -56,10 +56,10 @@ const TabNavigation = () => {
   }, [actions]);
 
   // Split tabs into fixed and draggable
-  // Only Inbox and Search are fixed tabs now (remove Dashboard tab)
-  const fixedTabsCount = 2; // Inbox, Search
-  const fixedTabs = tabs.slice(1, 3); // skip the first tab (Dashboard)
-  const draggableTabs = tabs.slice(3);
+  // First three tabs: dropdown (dashboard), Inbox, Search are fixed
+  const fixedTabsCount = 3; // Dropdown, Inbox, Search
+  const fixedTabs = tabs.slice(0, fixedTabsCount); // first three tabs are fixed
+  const draggableTabs = tabs.slice(fixedTabsCount); // tabs after the first three are draggable
 
   const handleDragEnd = (result) => {
     if (!result.destination) return;
@@ -70,7 +70,7 @@ const TabNavigation = () => {
     items.splice(result.destination.index, 0, reorderedItem);
 
     // Merge fixed and reordered draggable tabs
-    const newTabs = [...fixedTabs, ...items];
+    const newTabs = [...tabs.slice(0, fixedTabsCount), ...items];
     actions.reorderTabs(newTabs);
   };
 
@@ -155,81 +155,91 @@ const TabNavigation = () => {
       <Navbar />
       {/* Tab Bar */}
       <div className="bg-white border-b border-gray-200 flex items-center px-2 py-0 h-9 min-h-0" style={{ boxShadow: '0 1px 0 0 #e5e7eb', height: '28px', minHeight: '28px', fontFamily: 'inherit', fontSize: '13px', fontWeight: 500, lineHeight: '1.5' }}>
-        {/* Sales Dashboard Dropdown - now in TabNavigation */}
-        <div>
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <button
-                className={`px-2 py-1 rounded font-medium text-xs transition flex items-center h-8 min-h-0 ${
-                  activeTabId === 'dashboard' ? 'bg-blue-100 text-blue-900 font-bold shadow-sm' : 'bg-transparent text-gray-700 hover:bg-gray-100'
-                }`}
-                style={{ fontFamily: 'inherit', fontSize: '13px', fontWeight: 500, lineHeight: '1.5', minWidth: 120, border: 'none', boxShadow: activeTabId === 'dashboard' ? '0 2px 8px rgba(0,0,0,0.04)' : 'none', height: '24px', minHeight: '24px', paddingTop: '0', paddingBottom: '0' }}
-              >
-                {selectedDashboard ? selectedDashboard.DashBoardName : 'Sales Dashboard'}
-                <ChevronDown className="ml-2 h-4 w-4" />
-              </button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="start" className="w-56 mt-2 bg-white border border-gray-100 p-0 text-gray-800 font-medium">
-              {dashboardsLoading ? (
-                <DropdownMenuItem disabled>Loading...</DropdownMenuItem>
-              ) : (
-                dashboards.map((dashboard) => (
-                  <DropdownMenuItem
-                    key={dashboard.ID}
-                    onClick={() => handleDashboardSelect(dashboard)}
-                    className={
-                      selectedDashboard && selectedDashboard.ID === dashboard.ID
-                        ? 'bg-blue-100 text-blue-900 font-semibold'
-                        : ''
-                    }
-                  >
-                    {dashboard.DashBoardName}
-                  </DropdownMenuItem>
-                ))
-              )}
-            </DropdownMenuContent>
-          </DropdownMenu>
-        </div>
-        {/* End Sales Dashboard Dropdown */}
-        <div className="flex items-center flex-1 min-w-0">
-          {/* Render fixed tabs (Inbox, Search only) */}
-          {fixedTabs.map((tab, index) => (
-            <div
-              key={tab.id}
-              onContextMenu={(e) => handleContextMenu(e, tab.id)}
-              className={`flex items-center rounded transition-all duration-200 h-8 min-h-0 px-1 text-xs ${
-                activeTabId === tab.id
-                  ? 'bg-blue-100 text-blue-900 font-bold shadow-sm'
-                  : 'bg-transparent hover:bg-gray-100 text-gray-700'
-              }`}
-              style={{ fontFamily: 'inherit', fontSize: '13px', fontWeight: 500, lineHeight: '1.5', border: 'none', boxShadow: activeTabId === tab.id ? '0 2px 8px rgba(0,0,0,0.04)' : 'none', marginRight: '1px', height: '24px', minHeight: '24px', paddingTop: '0', paddingBottom: '0' }}
-            >
-              <div
-                className="flex items-center px-1 py-0 cursor-pointer flex-1 h-8 min-h-0"
-                onClick={() => handleTabClick(tab.id)}
-                style={{ fontSize: '13px' }}
-              >
-                <span className="mr-0.5 text-xs flex items-center" style={{ fontSize: '13px' }}>{tab.icon}</span>
-                <span className="text-xs font-medium truncate max-w-32 flex items-center" style={{ fontSize: '13px', marginRight: '2px' }}>
-                  {tab.title}
-                </span>
-              </div>
-              {/* Close button (not draggable, but should not appear for fixed tabs) */}
-              {tab.closable !== false && (
+        {/* Sales Dashboard Dropdown as first fixed tab */}
+        {fixedTabs.length > 0 && (
+          <div
+            key={fixedTabs[0].id}
+            onContextMenu={(e) => handleContextMenu(e, fixedTabs[0].id)}
+            className={`flex items-center rounded transition-all duration-200 h-8 min-h-0 px-1 text-xs ${
+              activeTabId === fixedTabs[0].id
+                ? 'bg-blue-100 text-blue-900 font-bold shadow-sm'
+                : 'bg-transparent hover:bg-gray-100 text-gray-700'
+            }`}
+            style={{ fontFamily: 'inherit', fontSize: '13px', fontWeight: 500, lineHeight: '1.5', border: 'none', boxShadow: activeTabId === fixedTabs[0].id ? '0 2px 8px rgba(0,0,0,0.04)' : 'none', marginRight: '1px', height: '24px', minHeight: '24px', paddingTop: '0', paddingBottom: '0' }}
+          >
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
                 <button
-                  onClick={(e) => handleTabClose(e, tab.id)}
-                  className="mr-1 p-0 rounded hover:bg-gray-200 transition-colors flex-shrink-0 h-5 w-5 min-h-0 flex items-center justify-center"
-                  title="Close tab"
-                  type="button"
-                  style={{ display: 'none' }} // Hide close for fixed tabs visually
+                  className={`px-2 py-1 rounded font-medium text-xs transition flex items-center h-8 min-h-0 ${
+                    activeTabId === 'dashboard' ? 'bg-blue-100 text-blue-900 font-bold shadow-sm' : 'bg-transparent text-gray-700 hover:bg-gray-100'
+                  }`}
+                  style={{ fontFamily: 'inherit', fontSize: '13px', fontWeight: 500, lineHeight: '1.5', minWidth: 120, border: 'none', boxShadow: activeTabId === 'dashboard' ? '0 2px 8px rgba(0,0,0,0.04)' : 'none', height: '24px', minHeight: '24px', paddingTop: '0', paddingBottom: '0' }}
+                  onClick={() => handleTabClick('dashboard')}
                 >
-                  <X className="h-3 w-3" />
+                  {selectedDashboard ? selectedDashboard.DashBoardName : 'Sales Dashboard'}
+                  <ChevronDown className="ml-2 h-4 w-4" />
                 </button>
-              )}
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="start" className="w-56 mt-2 bg-white border border-gray-100 p-0 text-gray-800 font-medium">
+                {dashboardsLoading ? (
+                  <DropdownMenuItem disabled>Loading...</DropdownMenuItem>
+                ) : (
+                  dashboards.map((dashboard) => (
+                    <DropdownMenuItem
+                      key={dashboard.ID}
+                      onClick={() => handleDashboardSelect(dashboard)}
+                      className={
+                        selectedDashboard && selectedDashboard.ID === dashboard.ID
+                          ? 'bg-blue-100 text-blue-900 font-semibold'
+                          : ''
+                      }
+                    >
+                      {dashboard.DashBoardName}
+                    </DropdownMenuItem>
+                  ))
+                )}
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
+        )}
+        {/* Render remaining fixed tabs (Inbox, Search) */}
+        {fixedTabs.slice(1).map((tab, index) => (
+          <div
+            key={tab.id}
+            onContextMenu={(e) => handleContextMenu(e, tab.id)}
+            className={`flex items-center rounded transition-all duration-200 h-8 min-h-0 px-1 text-xs ${
+              activeTabId === tab.id
+                ? 'bg-blue-100 text-blue-900 font-bold shadow-sm'
+                : 'bg-transparent hover:bg-gray-100 text-gray-700'
+            }`}
+            style={{ fontFamily: 'inherit', fontSize: '13px', fontWeight: 500, lineHeight: '1.5', border: 'none', boxShadow: activeTabId === tab.id ? '0 2px 8px rgba(0,0,0,0.04)' : 'none', marginRight: '1px', height: '24px', minHeight: '24px', paddingTop: '0', paddingBottom: '0' }}
+          >
+            <div
+              className="flex items-center px-1 py-0 cursor-pointer flex-1 h-8 min-h-0"
+              onClick={() => handleTabClick(tab.id)}
+              style={{ fontSize: '13px' }}
+            >
+              <span className="mr-0.5 text-xs flex items-center" style={{ fontSize: '13px' }}>{tab.icon}</span>
+              <span className="text-xs font-medium truncate max-w-32 flex items-center" style={{ fontSize: '13px', marginRight: '2px' }}>
+                {tab.title}
+              </span>
             </div>
-          ))}
+            {/* Close button (not draggable, but should not appear for fixed tabs) */}
+            {tab.closable !== false && (
+              <button
+                onClick={(e) => handleTabClose(e, tab.id)}
+                className="mr-1 p-0 rounded hover:bg-gray-200 transition-colors flex-shrink-0 h-5 w-5 min-h-0 flex items-center justify-center"
+                title="Close tab"
+                type="button"
+                style={{ display: 'none' }} // Hide close for fixed tabs visually
+              >
+                <X className="h-3 w-3" />
+              </button>
+            )}
+          </div>
+        ))}
 
-          {/* Draggable tabs (after the first three) */}
+          {/* Draggable tabs (after the first two) */}
           <DragDropContext onDragEnd={handleDragEnd}>
             <Droppable droppableId="tabs" direction="horizontal">
               {(provided) => (
@@ -326,7 +336,6 @@ const TabNavigation = () => {
             </DropdownMenu>
           )}
         </div>
-      </div>
       {/* Context Menu */}
       {contextMenu.visible && (
         <div
