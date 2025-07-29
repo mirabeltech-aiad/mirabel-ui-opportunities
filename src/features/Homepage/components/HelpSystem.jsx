@@ -222,32 +222,27 @@ const HelpSystem = () => {
             {/* Help Panel */}
       {helpVisible && (
         <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-          <div className="relative w-full max-w-5xl max-h-[95vh] bg-white rounded-xl shadow-2xl overflow-hidden">
+          <div className="relative w-full max-w-5xl bg-white rounded-xl shadow-2xl overflow-hidden">
             {/* Professional Header */}
-            <div className="bg-ocean-gradient text-white px-6 py-4 rounded-t-xl">
+            <CardHeader className="bg-ocean-gradient text-white">
               <div className="flex items-center justify-between">
-                <div className="flex items-center space-x-3">
-                  <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">
-                    <HelpCircle className="h-6 w-6 text-white" />
-                  </div>
-                  <div>
-                    <h2 className="text-xl font-semibold">Support Center</h2>
-                    <p className="text-ocean-100 text-sm">Get help and assistance</p>
-                  </div>
-                </div>
+                <CardTitle className="flex items-center">
+                  <HelpCircle className="h-5 w-5 mr-2" />
+                  Support Center
+                </CardTitle>
                 <Button
                   variant="ghost"
-                  size="icon"
+                  size="sm"
                   onClick={actions.toggleHelp}
-                  className="text-white hover:bg-white/20 rounded-full"
+                  className="text-white hover:bg-white/20"
                   aria-label="Close Support Center"
                 >
-                  <LucideX className="h-5 w-5" />
+                  <LucideX className="h-4 w-4" />
                 </Button>
               </div>
-            </div>
+            </CardHeader>
             
-            <CardContent className="p-6 overflow-y-auto max-h-[calc(95vh-140px)]">
+            <CardContent className="p-6">
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                 {helpOptions.map((option) => {
                   const IconComponent = option.icon;
