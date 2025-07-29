@@ -28,8 +28,11 @@ import { useToast } from '@/components/ui/use-toast';
 
 const HelpSystem = () => {
   const { helpVisible, helpPosition, actions } = useHome();
+  
+
   const [isDragging, setIsDragging] = useState(false);
   const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
+  const [dragStartPosition, setDragStartPosition] = useState({ x: 0, y: 0 });
   const [helpIconVisible, setHelpIconVisible] = useState(true);
   const [showTicketForm, setShowTicketForm] = useState(false);
   const [showContactForm, setShowContactForm] = useState(false);
@@ -148,6 +151,7 @@ const HelpSystem = () => {
     if (e.button !== 0) return; // Only left click
     
     setIsDragging(true);
+    setDragStartPosition({ x: e.clientX, y: e.clientY });
     const rect = buttonRef.current.getBoundingClientRect();
     setDragOffset({
       x: e.clientX - rect.left,
@@ -156,12 +160,19 @@ const HelpSystem = () => {
   };
 
   const handleClick = (e) => {
-    // Prevent click if user was dragging
-    if (isDragging) {
+    // Calculate distance moved
+    const distance = Math.sqrt(
+      Math.pow(e.clientX - dragStartPosition.x, 2) + 
+      Math.pow(e.clientY - dragStartPosition.y, 2)
+    );
+    
+    // Prevent click if user was dragging (moved more than 5px)
+    if (distance > 5) {
       e.preventDefault();
       e.stopPropagation();
       return;
     }
+    
     actions.toggleHelp();
   };
 
@@ -205,11 +216,9 @@ const HelpSystem = () => {
     });
   };
 
-  const handleMouseUp = () => {
-    // Add a small delay to prevent click from firing after drag
-    setTimeout(() => {
-      setIsDragging(false);
-    }, 10);
+  const handleMouseUp = (e) => {
+    // Reset dragging state immediately
+    setIsDragging(false);
   };
 
   useEffect(() => {
@@ -225,7 +234,6 @@ const HelpSystem = () => {
 
   // Initialize Front Chat when component mounts
   useEffect(() => {
-    console.log('🔧 HelpSystem: Initializing Front Chat...');
     chatService.initializeFrontChat().catch(error => {
       console.error('❌ HelpSystem: Failed to initialize Front Chat:', error);
     });
