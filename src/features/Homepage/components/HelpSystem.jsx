@@ -66,7 +66,10 @@ const HelpSystem = () => {
       title: 'Chat',
       description: 'To ask a quick question on the software click here.',
       icon: MessageCircle,
-      action: () => chatService.showChat(),
+      action: () => {
+        chatService.showChat();
+        actions.toggleHelp(); // Close help panel when chat is opened
+      },
       color: 'bg-green-500'
     },
     {
