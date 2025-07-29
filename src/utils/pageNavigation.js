@@ -5,6 +5,7 @@
  */
 
 import { isWindowTopAccessible } from './windowHelpers';
+import { apiCall } from '@/services/httpClient';
 
 /**
  * Opens a page in a new browser tab
@@ -96,6 +97,30 @@ export const initializePageNavigation = (homeActions) => {
     console.log('Page navigation helpers exposed on window.top');
   } else {
     console.warn('window.top not available, cannot expose navigation helpers');
+  }
+
+  // Load the localizer script
+  loadLocalizerScript();
+};
+
+const loadLocalizerScript = async () => {
+  try {
+    const response = await apiCall('/services/admin/common/contentversion', 'GET');
+    
+    if (response) {
+      const version = response;
+      console.log("📦 Content Version:", version);
+
+      const script = document.createElement("script");
+      script.src = `/intranet/localizer.js.axd?v=${version}`;
+      script.async = true;
+
+      document.head.appendChild(script);
+    } else {
+      console.warn("⚠️ No version data received from API");
+    }
+  } catch (err) {
+    console.error("❌ Failed to load localizer script:", err);
   }
 };
 
