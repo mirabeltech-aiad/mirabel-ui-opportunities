@@ -225,11 +225,11 @@ const ContactSalesRepForm = ({ isOpen, onClose }) => {
             </Button>
           </div>
         </CardHeader>
-        <CardContent className="p-6">
-          <form onSubmit={handleSubmit} className="space-y-6">
+        <CardContent className="p-4">
+          <form onSubmit={handleSubmit} className="space-y-3">
             {/* From/To Information */}
-            <div className="bg-gray-50 p-4 rounded-lg">
-              <div className="space-y-2">
+            <div className="bg-gray-50 p-3 rounded-lg">
+              <div className="space-y-1">
                 <div className="flex items-center gap-2">
                   <User className="h-4 w-4 text-gray-600" />
                   <span className="font-medium">From:</span>
@@ -252,7 +252,7 @@ const ContactSalesRepForm = ({ isOpen, onClose }) => {
               </div>
             </div>
             {/* CC Field */}
-            <div className="space-y-2">
+            <div className="space-y-1">
               <Label htmlFor="cc" className="text-sm font-medium">
                 CC
               </Label>
@@ -269,7 +269,7 @@ const ContactSalesRepForm = ({ isOpen, onClose }) => {
               )}
             </div>
             {/* Subject Field */}
-            <div className="space-y-2">
+            <div className="space-y-1">
               <Label htmlFor="subject" className="text-sm font-medium">
                 Subject <span className="text-red-500">*</span>
               </Label>
@@ -287,7 +287,7 @@ const ContactSalesRepForm = ({ isOpen, onClose }) => {
               )}
             </div>
             {/* Question Field */}
-            <div className="space-y-2">
+            <div className="space-y-1">
               <Label htmlFor="question" className="text-sm font-medium">
                 Question <span className="text-red-500">*</span>
               </Label>
@@ -296,7 +296,7 @@ const ContactSalesRepForm = ({ isOpen, onClose }) => {
                 placeholder="Enter your question or request"
                 value={formData.question}
                 onChange={(e) => handleInputChange('question', e.target.value)}
-                className={`min-h-[200px] ${errors.question ? 'border-red-500' : ''}`}
+                className={`min-h-[120px] ${errors.question ? 'border-red-500' : ''}`}
                 required
               />
               {errors.question && (
@@ -304,7 +304,7 @@ const ContactSalesRepForm = ({ isOpen, onClose }) => {
               )}
             </div>
             {/* File Attachments */}
-            <div className="space-y-2">
+            <div className="space-y-1">
               <Label htmlFor="attachments" className="text-sm font-medium flex items-center gap-2">
                 <Upload className="h-4 w-4" />
                 Attach File:
@@ -330,7 +330,7 @@ const ContactSalesRepForm = ({ isOpen, onClose }) => {
               )}
             </div>
             {/* Form Actions */}
-            <div className="flex justify-end space-x-3 pt-4 border-t">
+            <div className="flex justify-end space-x-3 pt-3 border-t">
               <Button type="button" variant="outline" onClick={onClose} disabled={isSubmitting || isUploading}>Cancel</Button>
               <Button type="submit" disabled={isSubmitting || isUploading} className="bg-ocean-600 hover:bg-ocean-700">
                 {isSubmitting ? (<><div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>Sending...</>) : (<><Send className="h-4 w-4 mr-2" />Send</>)}
