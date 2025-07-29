@@ -282,7 +282,7 @@ const JiraTicketForm = ({ onClose }) => {
 
   return (
     <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-      <Card className="w-full max-w-2xl max-h-[90vh] overflow-hidden">
+      <Card className="w-full max-w-2xl max-h-[95vh] overflow-hidden">
         <CardHeader className="bg-ocean-gradient text-white">
           <div className="flex items-center justify-between">
             <CardTitle className="flex items-center">
@@ -294,10 +294,10 @@ const JiraTicketForm = ({ onClose }) => {
             </Button>
           </div>
         </CardHeader>
-        <CardContent className="p-6 overflow-y-auto max-h-[calc(90vh-80px)]">
-          <form onSubmit={handleSubmit} className="space-y-6">
+        <CardContent className="p-4 overflow-y-auto max-h-[calc(95vh-120px)]">
+          <form onSubmit={handleSubmit} className="space-y-3">
             {/* Support Category */}
-            <div className="space-y-2">
+            <div className="space-y-1">
               <Label htmlFor="category">Support Category *</Label>
               <Select value={formData.category} onValueChange={v => handleInputChange('category', v)}>
                 <SelectTrigger className={errors.category ? 'border-red-500' : ''}>
@@ -312,32 +312,32 @@ const JiraTicketForm = ({ onClose }) => {
               {errors.category && <div className="flex items-center text-red-600 text-sm"><AlertCircle className="h-4 w-4 mr-1" />{errors.category}</div>}
             </div>
             {/* Summary */}
-            <div className="space-y-2">
+            <div className="space-y-1">
               <Label htmlFor="summary">Summary *</Label>
               <Input id="summary" value={formData.summary} onChange={e => handleInputChange('summary', e.target.value)} placeholder="Brief description of the issue" className={errors.summary ? 'border-red-500' : ''} />
               {errors.summary && <div className="flex items-center text-red-600 text-sm"><AlertCircle className="h-4 w-4 mr-1" />{errors.summary}</div>}
             </div>
             {/* Description */}
-            <div className="space-y-2">
+            <div className="space-y-1">
               <Label htmlFor="description">Description *</Label>
-              <Textarea id="description" value={formData.description} onChange={e => handleInputChange('description', e.target.value)} placeholder="Detailed description, steps to reproduce, expected vs actual behavior..." rows={6} className={errors.description ? 'border-red-500' : ''} />
+              <Textarea id="description" value={formData.description} onChange={e => handleInputChange('description', e.target.value)} placeholder="Detailed description, steps to reproduce, expected vs actual behavior..." rows={3} className={errors.description ? 'border-red-500' : ''} />
               {errors.description && <div className="flex items-center text-red-600 text-sm"><AlertCircle className="h-4 w-4 mr-1" />{errors.description}</div>}
             </div>
             {/* Name/Email */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="space-y-2">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+              <div className="space-y-1">
                 <Label htmlFor="name">Your Name *</Label>
                 <Input id="name" value={formData.name} onChange={e => handleInputChange('name', e.target.value)} className={errors.name ? 'border-red-500' : ''} />
                 {errors.name && <div className="flex items-center text-red-600 text-sm"><AlertCircle className="h-4 w-4 mr-1" />{errors.name}</div>}
               </div>
-              <div className="space-y-2">
+              <div className="space-y-1">
                 <Label htmlFor="email">Your Email *</Label>
                 <Input id="email" value={formData.email} onChange={e => handleInputChange('email', e.target.value)} className={errors.email ? 'border-red-500' : ''} />
                 {errors.email && <div className="flex items-center text-red-600 text-sm"><AlertCircle className="h-4 w-4 mr-1" />{errors.email}</div>}
                 </div>
             </div>
             {/* Attachments */}
-            <div className="space-y-2">
+            <div className="space-y-1">
               <Label>Attachments</Label>
               <div className="flex items-center space-x-2">
                 <input ref={fileInputRef} type="file" multiple onChange={handleFileChange} disabled={isUploading} className="hidden" id="file-upload" />
@@ -360,7 +360,7 @@ const JiraTicketForm = ({ onClose }) => {
               </div>
             </div>
             {/* Form Actions */}
-            <div className="flex justify-end space-x-3 pt-4 border-t">
+            <div className="flex justify-end space-x-3 pt-3 border-t">
               <Button type="button" variant="outline" onClick={onClose} disabled={isSubmitting}>Cancel</Button>
               <Button type="submit" disabled={isSubmitting} className="bg-ocean-600 hover:bg-ocean-700">
                 {isSubmitting ? (<><div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>Creating...</>) : (<><Send className="h-4 w-4 mr-2" />Submit Ticket</>)}

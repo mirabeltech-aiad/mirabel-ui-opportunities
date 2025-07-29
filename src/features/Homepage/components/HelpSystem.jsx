@@ -30,6 +30,7 @@ const HelpSystem = () => {
   const { helpVisible, helpPosition, actions } = useHome();
   const [isDragging, setIsDragging] = useState(false);
   const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
+  const [helpIconVisible, setHelpIconVisible] = useState(true);
   const [showTicketForm, setShowTicketForm] = useState(false);
   const [showContactForm, setShowContactForm] = useState(false);
   const [showTrainingForm, setShowTrainingForm] = useState(false);
@@ -65,7 +66,10 @@ const HelpSystem = () => {
       title: 'Chat',
       description: 'To ask a quick question on the software click here.',
       icon: MessageCircle,
-      action: () => chatService.showChat(),
+      action: () => {
+        chatService.showChat();
+        actions.toggleHelp(); // Close help panel when chat is opened
+      },
       color: 'bg-green-500'
     },
     {
@@ -151,6 +155,40 @@ const HelpSystem = () => {
     });
   };
 
+  const handleClick = (e) => {
+    // Prevent click if user was dragging
+    if (isDragging) {
+      e.preventDefault();
+      e.stopPropagation();
+      return;
+    }
+    actions.toggleHelp();
+  };
+
+  const handleCloseHelp = () => {
+    actions.toggleHelp();
+  };
+
+  const handleHideHelpIcon = () => {
+    setHelpIconVisible(false);
+  };
+
+
+
+  const handleOverlayClick = (e) => {
+    // Close help panel when clicking on the overlay
+    if (e.target === e.currentTarget) {
+      handleCloseHelp();
+    }
+  };
+
+  const handleKeyDown = (e) => {
+    // Close help panel when pressing Escape key
+    if (e.key === 'Escape') {
+      handleCloseHelp();
+    }
+  };
+
   const handleMouseMove = (e) => {
     if (!isDragging) return;
 
@@ -168,7 +206,10 @@ const HelpSystem = () => {
   };
 
   const handleMouseUp = () => {
-    setIsDragging(false);
+    // Add a small delay to prevent click from firing after drag
+    setTimeout(() => {
+      setIsDragging(false);
+    }, 10);
   };
 
   useEffect(() => {
@@ -190,25 +231,42 @@ const HelpSystem = () => {
     });
   }, []);
 
+  // Handle Escape key to close help panel
+  useEffect(() => {
+    const handleEscapeKey = (e) => {
+      if (e.key === 'Escape' && helpVisible) {
+        handleCloseHelp();
+      }
+    };
+
+    if (helpVisible) {
+      document.addEventListener('keydown', handleEscapeKey);
+      return () => {
+        document.removeEventListener('keydown', handleEscapeKey);
+      };
+    }
+  }, [helpVisible]);
+
   return (
     <>
       {/* Draggable Help Button */}
-      <div
-        ref={buttonRef}
-        style={{
-          position: 'fixed',
-          left: helpPosition.x,
-          top: helpPosition.y,
-          zIndex: 1000,
-          cursor: isDragging ? 'grabbing' : 'grab',
-        }}
-        onMouseDown={handleMouseDown}
-        className="group"
-      >
+      {helpIconVisible && (
+        <div
+          ref={buttonRef}
+          style={{
+            position: 'fixed',
+            left: helpPosition.x,
+            top: helpPosition.y,
+            zIndex: 1000,
+            cursor: isDragging ? 'grabbing' : 'grab',
+          }}
+          onMouseDown={handleMouseDown}
+          className="group"
+        >
         <Button
           size="lg"
           className="bg-ocean-600 hover:bg-ocean-700 text-white border-2 border-white shadow-lg rounded-full w-14 h-14 p-0 transition-all duration-200"
-          onClick={() => actions.toggleHelp()}
+          onClick={handleClick}
         >
           <HelpCircle className="h-6 w-6" />
         </Button>
@@ -217,37 +275,51 @@ const HelpSystem = () => {
         <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-2 py-1 bg-gray-900 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap">
           Help
         </div>
+        
+        {/* Hide Help Icon Button */}
+        <Button
+          size="sm"
+          variant="ghost"
+          onClick={handleHideHelpIcon}
+          className="absolute -top-2 -right-2 bg-red-500 hover:bg-red-600 text-white rounded-full w-6 h-6 p-0 opacity-0 group-hover:opacity-100 transition-opacity duration-200"
+          title="Hide Help Icon"
+        >
+          <X className="h-3 w-3" />
+        </Button>
       </div>
+      )}
+
+
 
             {/* Help Panel */}
       {helpVisible && (
-        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-          <div className="relative w-full max-w-5xl max-h-[95vh] bg-white rounded-xl shadow-2xl overflow-hidden">
+        <div 
+          className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4"
+          onClick={handleOverlayClick}
+          onKeyDown={handleKeyDown}
+          tabIndex={0}
+        >
+          <div className="relative w-full max-w-5xl bg-white rounded-xl shadow-2xl overflow-hidden">
             {/* Professional Header */}
-            <div className="bg-ocean-gradient text-white px-6 py-4 rounded-t-xl">
+            <CardHeader className="bg-ocean-gradient text-white">
               <div className="flex items-center justify-between">
-                <div className="flex items-center space-x-3">
-                  <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">
-                    <HelpCircle className="h-6 w-6 text-white" />
-                  </div>
-                  <div>
-                    <h2 className="text-xl font-semibold">Support Center</h2>
-                    <p className="text-ocean-100 text-sm">Get help and assistance</p>
-                  </div>
-                </div>
+                <CardTitle className="flex items-center">
+                  <HelpCircle className="h-5 w-5 mr-2" />
+                  Support Center
+                </CardTitle>
                 <Button
                   variant="ghost"
-                  size="icon"
-                  onClick={actions.toggleHelp}
-                  className="text-white hover:bg-white/20 rounded-full"
+                  size="sm"
+                  onClick={handleCloseHelp}
+                  className="text-white hover:bg-white/20"
                   aria-label="Close Support Center"
                 >
-                  <LucideX className="h-5 w-5" />
+                  <LucideX className="h-4 w-4" />
                 </Button>
               </div>
-            </div>
+            </CardHeader>
             
-            <CardContent className="p-6 overflow-y-auto max-h-[calc(95vh-140px)]">
+            <CardContent className="p-6">
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                 {helpOptions.map((option) => {
                   const IconComponent = option.icon;

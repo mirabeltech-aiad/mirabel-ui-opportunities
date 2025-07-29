@@ -174,7 +174,7 @@ const ContactConsultantForm = ({ isOpen, onClose, consultantInfo }) => {
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <Card className="w-full max-w-4xl max-h-[90vh] overflow-y-auto">
+      <Card className="w-full max-w-4xl max-h-[95vh] overflow-hidden">
         <CardHeader className="bg-ocean-gradient text-white">
           <div className="flex items-center justify-between">
             <CardTitle className="text-xl font-semibold">
@@ -191,11 +191,11 @@ const ContactConsultantForm = ({ isOpen, onClose, consultantInfo }) => {
           </div>
         </CardHeader>
         
-        <CardContent className="p-6">
-          <form onSubmit={handleSubmit} className="space-y-6">
+        <CardContent className="p-4 overflow-y-auto max-h-[calc(95vh-120px)]">
+          <form onSubmit={handleSubmit} className="space-y-3">
             {/* From/To Information */}
-            <div className="bg-gray-50 p-4 rounded-lg">
-              <div className="space-y-2">
+            <div className="bg-gray-50 p-3 rounded-lg">
+              <div className="space-y-1">
                 <div className="flex items-center gap-2">
                   <User className="h-4 w-4 text-gray-600" />
                   <span className="font-medium">From:</span>
@@ -221,7 +221,7 @@ const ContactConsultantForm = ({ isOpen, onClose, consultantInfo }) => {
             </div>
 
             {/* CC Field */}
-            <div className="space-y-2">
+            <div className="space-y-1">
               <Label htmlFor="cc" className="text-sm font-medium">
                 CC
               </Label>
@@ -239,7 +239,7 @@ const ContactConsultantForm = ({ isOpen, onClose, consultantInfo }) => {
             </div>
 
             {/* Subject Field */}
-            <div className="space-y-2">
+            <div className="space-y-1">
               <Label htmlFor="subject" className="text-sm font-medium">
                 Subject <span className="text-red-500">*</span>
               </Label>
@@ -258,7 +258,7 @@ const ContactConsultantForm = ({ isOpen, onClose, consultantInfo }) => {
             </div>
 
             {/* Question Field */}
-            <div className="space-y-2">
+            <div className="space-y-1">
               <Label htmlFor="question" className="text-sm font-medium">
                 Question <span className="text-red-500">*</span>
               </Label>
@@ -267,7 +267,7 @@ const ContactConsultantForm = ({ isOpen, onClose, consultantInfo }) => {
                 placeholder="Enter your question or request"
                 value={formData.question}
                 onChange={(e) => handleInputChange('question', e.target.value)}
-                className={`min-h-[200px] ${errors.question ? 'border-red-500' : ''}`}
+                className={`min-h-[120px] ${errors.question ? 'border-red-500' : ''}`}
                 required
               />
               {errors.question && (
@@ -276,7 +276,7 @@ const ContactConsultantForm = ({ isOpen, onClose, consultantInfo }) => {
             </div>
 
             {/* File Attachments */}
-            <div className="space-y-2">
+            <div className="space-y-1">
               <Label htmlFor="attachments" className="text-sm font-medium flex items-center gap-2">
                 <Upload className="h-4 w-4" />
                 Attach File:
@@ -304,7 +304,7 @@ const ContactConsultantForm = ({ isOpen, onClose, consultantInfo }) => {
             </div>
 
             {/* Action Buttons */}
-            <div className="flex justify-end gap-3 pt-4 border-t">
+            <div className="flex justify-end gap-3 pt-3 border-t">
               <Button
                 type="button"
                 variant="outline"
