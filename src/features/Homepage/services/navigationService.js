@@ -118,7 +118,7 @@ export const navigationService = {
       sources: ["clientInfo.IsRepNotificationEnabled"]
     },
     "ChangePassword": { 
-      sources: ["sessionDetails.IsPasswordExpired"]
+      sources: ["dataPackDetails.IsPasswordExpired"]
     },
     
     // Static/computed values
