@@ -94,8 +94,8 @@ export const navigationService = {
       
       // Determine admin status - could be derived from various sources
       // For now, we'll default to true for SA users, false otherwise
-      const isAdmin = email.toLowerCase().includes('sa@') || email.toLowerCase().includes('admin') || employeeDetails.IsSA;
-      const isSA = isAdmin ? "true" : "false";
+      const isAdmin =  employeeDetails.IsAdmin;
+      const isSA = employeeDetails.IsSA;
       const cultureUI = clientInfo.CultureUI || "en-US";
       const siteType = clientInfo.SiteType || "TMM";
       const isUserHasMKMAccess=dataPackDetails.IsUserHasMKMAccess || false;
