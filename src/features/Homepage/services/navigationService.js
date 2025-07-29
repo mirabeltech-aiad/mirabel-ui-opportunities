@@ -51,6 +51,111 @@ export const navigationService = {
     }
   },
 
+  // Key-value pair mapping for transformed data
+  dataFieldMapping: {
+    // Direct mappings from response objects
+    "UserID": { 
+      sources: ["content.UserId", "claims.LoggedInUserID", "clientDetails.EmployeeId"]
+    },
+    "Email": { 
+      sources: ["sessionDetails.UserName", "claims.Email", "employeeDetails.Email"]
+    },
+    "Token": { 
+      sources: ["tokenInfo.AccessToken"]
+    },
+    "AccessTokenTimeOut": { 
+      sources: ["tokenInfo.AccessTokenExpiredTime"]
+    },
+    "ClientID": { 
+      sources: ["content.ClientId", "claims.LoggedInSiteClientID", "clientInfo.ClientID"],
+      transform: (value) => value.toString()
+    },
+    "CompanyName": { 
+      sources: ["clientInfo.Name"]
+    },
+    "Domain": { 
+      sources: ["claims.Domain", "clientInfo.ClientSubDomain"]
+    },
+    "Host": { 
+      sources: ["clientInfo.ClientAddress"],
+      computed: true // Will be computed in the transformation logic
+    },
+    "PackageTypeID": { 
+      sources: ["dataPackDetails.PackageTypeID"],
+      transform: (value) => value.toString()
+    },
+    "ProductType": { 
+      sources: ["dataPackDetails.PackageTypeID"],
+      transform: (value) => value === 1 ? "10178" : value.toString()
+    },
+    "IsMKMEnabled": { 
+      sources: ["dataPackDetails.IsMKMEnabled"],
+      transform: (value) => value ? "True" : "False"
+    },
+    "cultureUI": { 
+      sources: ["clientInfo.CultureUI"]
+    },
+    "siteType": { 
+      sources: ["clientInfo.SiteType"]
+    },
+    "TimeAdd": { 
+      sources: ["clientInfo.TimeAdd"],
+      transform: (value) => (value || 0).toString()
+    },
+    "IsUserHasMKMAccess": { 
+      sources: ["dataPackDetails.IsUserHasMKMAccess"]
+    },
+    "IsSiteDataPackEnabled": { 
+      sources: ["dataPackDetails.IsDataPackEnabled"]
+    },
+    "IsUserHasDataPackAccess": { 
+      sources: ["dataPackDetails.IsUserHasDataPackAccess"]
+    },
+    "IsMirabelEmailServiceEnabled": { 
+      sources: ["clientInfo.IsMirabelEmailServiceEnabled"]
+    },
+    "IsRepNotificationEnabled": { 
+      sources: ["clientInfo.IsRepNotificationEnabled"]
+    },
+    "ChangePassword": { 
+      sources: ["sessionDetails.IsPasswordExpired"]
+    },
+    
+    // Static/computed values
+    "IsAuthenticated": { 
+      sources: ["sessionDetails.IsAuthenticated"]
+    },
+    "UserName":  { 
+      sources: ["sessionDetails.UserName"]
+    },
+    "DisplayName": { computed: true },
+    "FullName": { 
+      sources: ["employeeDetails.Name", "employeeDetails.SalesRepName"],
+      combineFields: {
+        firstName: "employeeDetails.FirstName",
+        lastName: "employeeDetails.LastName"
+      }
+    },
+    "IsAdmin": { 
+      sources: ["employeeDetails.IsAdmin"]
+    },
+    "IsSA": { 
+      sources: ["employeeDetails.IsSA"],
+      transform: (value) => value ? "true" : "false"
+    },
+    "UserNameID": { sources: ["employeeDetails.ID"] },
+    "ContentVersion": { computed: true },
+    "PageList": { static: "" },
+    "HelpSite": { static: "https://helpwp.emailnow.info" },
+    "DepartmentID": { static: "1" },
+    "PASubProductTypeId": { sources: ["employeeDetails.PASubProductTypeId"] },
+    "PASubProductTypeName": { sources: ["employeeDetails.PASubProductTypeName"] },
+    "BSASubProductTypeId": { sources: ["employeeDetails.BSASubProductTypeId"] },
+    "BSASubProductTypeName": { sources: ["employeeDetails.BSASubProductTypeName"] },
+    "CustomerPortalUrl": { static: "http://tier1-portal.mirabeltechnologies.com" },
+    "CanSendCRMEmail": { sources: ["employeeDetails.CanSendCRMEmail"] }
+  },
+
   /**
    * Transform API response data into MMnewclientvars format
    * @param {Object} apiResponse - The raw API response
@@ -70,90 +175,101 @@ export const navigationService = {
       const tokenInfo = sessionDetails.Token || {};
       const employeeDetails = content.EmployeeDetails || {};
       
-      // Extract user ID - try multiple sources
-      const userId = content.UserId || claims.LoggedInUserID || clientDetails.EmployeeId || 1;
-      
-      // Extract email - try multiple sources
-      const email = sessionDetails.UserName || claims.Email || employeeDetails.Email || "sa@magazinemanager.com";
-      
-      // Extract domain information
-      const domain = claims.Domain || clientInfo.ClientSubDomain || "smoke-feature13";
-      const host = clientInfo.ClientAddress || `${domain}.magazinemanager.com`;
-      
-      // Extract token information
-      const accessToken = tokenInfo.AccessToken || "";
-      const tokenExpiry = tokenInfo.AccessTokenExpiredTime || "";
-      
-      // Extract client information
-      const clientId = content.ClientId || claims.LoggedInSiteClientID || clientInfo.ClientID || "10007";
-      const companyName = clientInfo.Name || "Mirabel Development | Home Page Migration to ReactJs | Test site";
-      
-      // Extract package information
-      const packageTypeId = dataPackDetails.PackageTypeID || 1;
-      const isMKMEnabled = dataPackDetails.IsMKMEnabled || false;
-      
-      // Determine admin status - could be derived from various sources
-      // For now, we'll default to true for SA users, false otherwise
-      const isAdmin = email.toLowerCase().includes('sa@') || email.toLowerCase().includes('admin') || employeeDetails.IsSA;
-      const isSA = isAdmin ? "true" : "false";
-      const cultureUI = clientInfo.CultureUI || "en-US";
-      const siteType = clientInfo.SiteType || "TMM";
-      const isUserHasMKMAccess=dataPackDetails.IsUserHasMKMAccess || false;
-      const isSiteDataPackEnabled=dataPackDetails.IsDataPackEnabled || false;
-      const isUserHasDataPackAccess=dataPackDetails.IsUserHasDataPackAccess || false;
-      const isMirabelEmailServiceEnabled=clientInfo.IsMirabelEmailServiceEnabled || false;
-      const isRepNotificationEnabled=clientInfo.IsRepNotificationEnabled || false;
-      const isCallDispositionEnabled = clientInfo.IsCallDispositionEnabled || false;
-     
-      // Extract user's full name from EmployeeDetails
-      const fullName = employeeDetails.Name || employeeDetails.SalesRepName || 
-                      (employeeDetails.FirstName && employeeDetails.LastName ? 
-                       `${employeeDetails.FirstName} ${employeeDetails.LastName}` : null) ||
-                      "User";
-     
-      // Extract change password information
-      const changePassword = sessionDetails.IsPasswordExpired;
-      
-      // Create the transformed data object
-      const transformedData = {
-        "UserID": userId,
-        "Email": email,
-        "IsAdmin": isAdmin,
-        "IsAuthenticated": true, // Add this for compatibility
-        "Token": accessToken,
-        "IsSA": isSA,
-        "UserName": isAdmin ? "System Administrator" : fullName,
-        "DisplayName": isAdmin ? "System Administrator" : fullName,
-        "UserNameID": isAdmin ? "sadministrator" : "user",
-        "ClientID": clientId.toString(),
-        "Host": host,
-        "Domain": domain,
-        "ContentVersion": Date.now().toString(), // Use current timestamp
-        "AccessTokenTimeOut": tokenExpiry,
-        "IsMKMEnabled": isMKMEnabled ? "True" : "False",
-        "CompanyName": companyName,
-        "ProductType": packageTypeId === 1 ? "10178" : packageTypeId.toString(),
-        "PackageTypeID": packageTypeId.toString(), // Add this for dashboard logic
-        "TimeAdd": (clientInfo.TimeAdd || 0).toString(),
-        "PageList": "", // Default empty
-        "HelpSite": "https://helpwp.emailnow.info",
-        "FullName": fullName,
-        "DepartmentID": "1",
-        "PASubProductTypeId": "0",
-        "PASubProductTypeName": "",
-        "BSASubProductTypeId": "21",
-        "BSASubProductTypeName": "Broadstreet",
-        "CustomerPortalUrl": "http://tier1-portal.mirabeltechnologies.com",
-        "CanSendCRMEmail": "true",
-        "cultureUI": cultureUI,
-        "siteType": siteType,
-        "IsUserHasMKMAccess": isUserHasMKMAccess,
-        "IsSiteDataPackEnabled": isSiteDataPackEnabled,
-        "IsUserHasDataPackAccess": isUserHasDataPackAccess,
-        "IsMirabelEmailServiceEnabled": isMirabelEmailServiceEnabled,
-        "IsRepNotificationEnabled": isRepNotificationEnabled,
-        "ChangePassword": changePassword
+      // Helper function to get nested object property by path
+      const getNestedValue = (obj, path) => {
+        return path.split('.').reduce((current, key) => current?.[key], obj);
       };
+
+      // Available data objects for mapping
+      const dataContext = {
+        content,
+        sessionDetails,
+        authInfo,
+        claims,
+        clientDetails,
+        clientInfo,
+        dataPackDetails,
+        tokenInfo,
+        employeeDetails
+      };
+
+      // Extract email for computed functions
+      const email =  employeeDetails.Email ;
+
+      // Build transformed data using the mapping
+      const transformedData = {};
+      
+      Object.entries(navigationService.dataFieldMapping)
+        .map(([finalKey, mapping]) => {
+          let value = null;
+          
+          // Handle static values
+          if (mapping.hasOwnProperty('static')) {
+            value = mapping.static;
+          }
+          // Handle computed values
+          else if (mapping.computed) {
+            switch (finalKey) {
+              case 'Host':
+                value = clientInfo?.ClientAddress || 
+                        `${claims?.Domain || clientInfo?.ClientSubDomain || "smoke-feature13"}.magazinemanager.com`;
+                break;
+              case 'UserName':
+              case 'DisplayName':
+                const isAdminUser = email.toLowerCase().includes('sa@') || email.toLowerCase().includes('admin') || employeeDetails.IsSA;
+                const userFullName = employeeDetails.Name || employeeDetails.SalesRepName || 
+                                  (employeeDetails.FirstName && employeeDetails.LastName ? 
+                                   `${employeeDetails.FirstName} ${employeeDetails.LastName}` : null) ||
+                                  "User";
+                value = userFullName;
+                break;
+              
+              
+              
+              case 'UserNameID':
+                const isAdminUserID = email.toLowerCase().includes('sa@') || email.toLowerCase().includes('admin') || employeeDetails.IsSA;
+                value = isAdminUserID ? "sadministrator" : "user";
+                break;
+              case 'ContentVersion':
+                value = Date.now().toString();
+                break;
+            }
+          }
+                     // Handle source-based values
+           else if (mapping.sources) {
+             // Try each source until we find a value
+             for (const sourcePath of mapping.sources) {
+               const sourceValue = getNestedValue(dataContext, sourcePath);
+               if (sourceValue !== null && sourceValue !== undefined) {
+                 value = sourceValue;
+                 break;
+               }
+             }
+             
+             // If no source provided a value, try combining fields (for FullName)
+             if ((value === null || value === undefined) && mapping.combineFields) {
+               const firstName = getNestedValue(dataContext, mapping.combineFields.firstName);
+               const lastName = getNestedValue(dataContext, mapping.combineFields.lastName);
+               if (firstName && lastName) {
+                 value = `${firstName} ${lastName}`;
+               }
+             }
+             
+
+             
+             // Apply transformation if specified
+             if (value !== null && value !== undefined && mapping.transform) {
+               value = mapping.transform(value);
+             }
+           }
+          
+          // Only add to final object if we have a value (excluding null/undefined)
+          if (value !== null && value !== undefined) {
+            transformedData[finalKey] = value;
+          }
+          
+          return { key: finalKey, value };
+        });
       
       return transformedData;
       
