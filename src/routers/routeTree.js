@@ -16,6 +16,8 @@ const Reports = lazy(() => import('../pages/Opportunity/Reports'));
 const Admin = lazy(() => import('../pages/Opportunity/Admin'));
 const Settings = lazy(() => import('../pages/Opportunity/Settings'));
 const NotFound = lazy(() => import('../pages/Opportunity/NotFound'));
+// const CbReportsPage = lazy(() => import('../pages/ChargeBriteReports/Index'));
+const CirculationDashboard = lazy(() => import('../features/ChargeBrite/pages/CirculationDashboard'));
 
 export const routes = [
   {
@@ -88,6 +90,14 @@ export const routes = [
     component: Navigation,
     exact: true,
   },
+
+  {
+    path: '/circulation',
+    component: CirculationDashboard,
+    exact: true,
+  },
+
+
   // {
   //   path: '/sitewidesettings',
   //   component: SiteWideSettingsPage,

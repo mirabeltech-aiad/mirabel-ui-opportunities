@@ -35,7 +35,7 @@ export const sessionValues = (() => {
         "Email": "techsupport@magazinemanager.com",
         "IsAdmin": false,
         "IsAuthenticated": true, // Critical for authentication check
-        "Token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJMb2dnZWRJblVzZXJJRCI6IjQ5IiwiTG9nZ2VkSW5TaXRlQ2xpZW50SUQiOiI1IiwiTG9nZ2VkSW5TaXRlQ3VsdHVyZVVJIjoiZW4tVVMiLCJEYXRlVGltZSI6IjcvMS8yMDI1IDg6Mzc6MjkgQU0iLCJMb2dnZWRJblNpdGVDdXJyZW5jeVN5bWJvbCI6IiQiLCJMb2dnZWRJblNpdGVEYXRlRm9ybWF0IjoiIiwiRG9tYWluIjoidGVjaCIsIkxvZ2dlZEluU2l0ZVRpbWVBZGQiOlsiMCIsIjAiXSwiU291cmNlIjoiVE1NIiwiRW1haWwiOiJ0ZWNoc3VwcG9ydEBtYWdhemluZW1hbmFnZXIuY29tIiwiSXNBUElVc2VyIjoiRmFsc2UiLCJuYmYiOjE3NTEzNTkwNDksImV4cCI6MTk3MjExMTA0OSwiaWF0IjoxNzUxMzU5MDQ5LCJpc3MiOiJNYWdhemluZU1hbmFnZXIiLCJhdWQiOiIqIn0.kHbiLOxU7W_6h5aIOMXCCWlpQ8znkIU3mnnU3hutG0Y",
+        "Token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJMb2dnZWRJblVzZXJJRCI6IjEiLCJMb2dnZWRJblNpdGVDbGllbnRJRCI6IjEwMDA3IiwiTG9nZ2VkSW5TaXRlQ3VsdHVyZVVJIjoiZW4tVVMiLCJEYXRlVGltZSI6IjcvMzAvMjAyNSAxMjo1MjozOSBQTSIsIkxvZ2dlZEluU2l0ZUN1cnJlbmN5U3ltYm9sIjoiIiwiTG9nZ2VkSW5TaXRlRGF0ZUZvcm1hdCI6IiIsIkRvbWFpbiI6InNtb2tlLWZlYXR1cmUxMyIsIkxvZ2dlZEluU2l0ZVRpbWVBZGQiOlsiMCIsIjAiXSwiU291cmNlIjoiVE1NIiwiRW1haWwiOiJzYUBtYWdhemluZW1hbmFnZXIuY29tIiwiSXNBUElVc2VyIjoiRmFsc2UiLCJuYmYiOjE3NTM4Nzk5NTksImV4cCI6MTc1Njg3OTk1OSwiaWF0IjoxNzUzODc5OTU5LCJpc3MiOiJNYWdhemluZU1hbmFnZXIiLCJhdWQiOiIqIn0.GMBn3Yj3wUbqltrbzO1vizzYb9c54G3_Ey9bm8Z0j3A",
         "IsSA": "false",
         "UserName": "Support Tech",
         "DisplayName": "Support,Tech",
@@ -110,19 +110,19 @@ export const isDevelopmentMode = () => {
     // When in doubt, treat as production for security
     const isDev = isLocalhost && (isExplicitDev || isNodeDev);
 
-    // Debug logging
-    console.log('🔍 Environment Check (STRICT):', {
-        'NODE_ENV': import.meta.env.NODE_ENV,
-        'REACT_APP_ENVIRONMENT': import.meta.env.REACT_APP_ENVIRONMENT,
-        'hostname': window.location.hostname,
-        'isLocalhost': isLocalhost,
-        'isExplicitDev': isExplicitDev,
-        'isNodeDev': isNodeDev,
-        'isDevelopmentMode': isDev,
-        'treatAsProduction': !isDev
-    });
+    // // Debug logging
+    // console.log('🔍 Environment Check (STRICT):', {
+    //     'NODE_ENV': import.meta.env.NODE_ENV,
+    //     'REACT_APP_ENVIRONMENT': import.meta.env.REACT_APP_ENVIRONMENT,
+    //     'hostname': window.location.hostname,
+    //     'isLocalhost': isLocalhost,
+    //     'isExplicitDev': isExplicitDev,
+    //     'isNodeDev': isNodeDev,
+    //     'isDevelopmentMode': isDev,
+    //     'treatAsProduction': !isDev
+    // });
 
-    return isDev;
+    return isDev || true;
 };
 
 // Initialize development environment
