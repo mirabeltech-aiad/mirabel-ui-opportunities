@@ -23,11 +23,11 @@ export const apiCall = (
       domain = `${TokenDetails?.subdomain || new URL(import.meta.env.REACT_APP_API_BASE_URL || "https://tech.magazinemanager.biz").hostname.split('.')[0]}`;
     }
     else {
-      baseURL = import.meta.env.REACT_APP_API_BASE_URL || "http://localhost";
+      baseURL = import.meta.env.REACT_APP_API_BASE_URL || "https://smoke-feature13.magazinemanager.com/";
       const urlObj = new URL(baseURL);
       domain = urlObj.hostname.split('.')[0];
     }
-    token = TokenDetails?.Token || getSessionValue("Token") || "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJMb2dnZWRJblVzZXJJRCI6IjEiLCJMb2dnZWRJblNpdGVDbGllbnRJRCI6IjEwMDA3IiwiTG9nZ2VkSW5TaXRlQ3VsdHVyZVVJIjoiZW4tVVMiLCJEYXRlVGltZSI6IjcvMTQvMjAyNSA5OjAzOjQ4IEFNIiwiTG9nZ2VkSW5TaXRlQ3VycmVuY3lTeW1ib2wiOiIiLCJMb2dnZWRJblNpdGVEYXRlRm9ybWF0IjoiIiwiRG9tYWluIjoic21va2UtZmVhdHVyZTEzIiwiTG9nZ2VkSW5TaXRlVGltZUFkZCI6WyIwIiwiMCJdLCJTb3VyY2UiOiJUTU0iLCJFbWFpbCI6InNhQG1hZ2F6aW5lbWFuYWdlci5jb20iLCJJc0FQSVVzZXIiOiJGYWxzZSIsIm5iZiI6MTc1MjQ4MzgyOCwiZXhwIjoxNzU1NDgzODI4LCJpYXQiOjE3NTI0ODM4MjgsImlzcyI6Ik1hZ2F6aW5lTWFuYWdlciIsImF1ZCI6IioifQ.JGt4yfWmQ0NbChd69WmkjhYXewJhnrBUGzcxoMYjTLI"; // If TokenDetails.Token isn't working, use session token
+    token = TokenDetails?.Token || getSessionValue("Token") || "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJMb2dnZWRJblVzZXJJRCI6IjEiLCJMb2dnZWRJblNpdGVDbGllbnRJRCI6IjEwMDA3IiwiTG9nZ2VkSW5TaXRlQ3VsdHVyZVVJIjoiZW4tVVMiLCJEYXRlVGltZSI6IjcvMjgvMjAyNSAxMDo0NDowMiBBTSIsIkxvZ2dlZEluU2l0ZUN1cnJlbmN5U3ltYm9sIjoiIiwiTG9nZ2VkSW5TaXRlRGF0ZUZvcm1hdCI6IiIsIkRvbWFpbiI6InNtb2tlLWZlYXR1cmUxMyIsIkxvZ2dlZEluU2l0ZVRpbWVBZGQiOlsiMCIsIjAiXSwiU291cmNlIjoiVE1NIiwiRW1haWwiOiJzYUBtYWdhemluZW1hbmFnZXIuY29tIiwiSXNBUElVc2VyIjoiRmFsc2UiLCJuYmYiOjE3NTM2OTk0NDIsImV4cCI6MTc1NjY5OTQ0MiwiaWF0IjoxNzUzNjk5NDQyLCJpc3MiOiJNYWdhemluZU1hbmFnZXIiLCJhdWQiOiIqIn0.4FPql_k3UE6UCVyZhT9UCaa8Er2584kqRUYF97Y-vzw"; // If TokenDetails.Token isn't working, use session token
 
 
   } else if (process.env.NODE_ENV === "test") {
@@ -127,8 +127,6 @@ export const apiCall = (
           return promise;
         } else if (res.status === 403) {
           return Promise.reject(res);
-        }else if (res.status === 400) {
-          performLoginRedirect();
         }
       }
       return res.json();

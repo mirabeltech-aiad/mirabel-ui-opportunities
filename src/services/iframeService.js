@@ -11,7 +11,7 @@ export const refreshIframeByUrl = (url) => {
     // Find the iframe that matches the URL (check both full URL and partial matches)
     for (const iframe of iframes) {
       const iframeSrc = iframe.src;
-      const fullUrl = url.startsWith('http') ? url : `https://smoke-feature13.magazinemanager.com${url}`;
+      const fullUrl = url.startsWith('http') ? url : `http://localhost:3001${url}`;
       
       // Check if the iframe src contains the URL or vice versa
       if (iframeSrc.includes(url) || iframeSrc.includes(fullUrl) || 
