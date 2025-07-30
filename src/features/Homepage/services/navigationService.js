@@ -1,6 +1,6 @@
 import AxiosService from '@/services/AxiosService';
 import { apiCall } from '@/services/httpClient';
-import { decrypt, authEncryptDecryptKey } from '@/utils/authHelpers';
+import { decrypt, authEncryptDecryptKey, logout } from '@/utils/authHelpers';
 
 /**
  * Navigation service for fetching dynamic navigation menus from the API
@@ -51,233 +51,6 @@ export const navigationService = {
     }
   },
 
-  // Key-value pair mapping for transformed data
-  dataFieldMapping: {
-    // Direct mappings from response objects
-    "UserID": { 
-      sources: ["content.UserId", "claims.LoggedInUserID", "clientDetails.EmployeeId"]
-    },
-    "Email": { 
-      sources: ["sessionDetails.UserName", "claims.Email", "employeeDetails.Email"]
-    },
-    "Token": { 
-      sources: ["tokenInfo.AccessToken"]
-    },
-    "AccessTokenTimeOut": { 
-      sources: ["tokenInfo.AccessTokenExpiredTime"]
-    },
-    "ClientID": { 
-      sources: ["content.ClientId", "claims.LoggedInSiteClientID", "clientInfo.ClientID"],
-      transform: (value) => value.toString()
-    },
-    "CompanyName": { 
-      sources: ["clientInfo.Name"]
-    },
-    "Domain": { 
-      sources: ["claims.Domain", "clientInfo.ClientSubDomain"]
-    },
-    "Host": { 
-      sources: ["clientInfo.ClientAddress"],
-      computed: true // Will be computed in the transformation logic
-    },
-    "PackageTypeID": { 
-      sources: ["dataPackDetails.PackageTypeID"],
-      transform: (value) => value.toString()
-    },
-    "ProductType": { 
-      sources: ["dataPackDetails.PackageTypeID"],
-      transform: (value) => value === 1 ? "10178" : value.toString()
-    },
-    "IsMKMEnabled": { 
-      sources: ["dataPackDetails.IsMKMEnabled"],
-      transform: (value) => value ? "True" : "False"
-    },
-    "cultureUI": { 
-      sources: ["clientInfo.CultureUI"]
-    },
-    "siteType": { 
-      sources: ["clientInfo.SiteType"]
-    },
-    "TimeAdd": { 
-      sources: ["clientInfo.TimeAdd"],
-      transform: (value) => (value || 0).toString()
-    },
-    "IsUserHasMKMAccess": { 
-      sources: ["dataPackDetails.IsUserHasMKMAccess"]
-    },
-    "IsSiteDataPackEnabled": { 
-      sources: ["dataPackDetails.IsDataPackEnabled"]
-    },
-    "IsUserHasDataPackAccess": { 
-      sources: ["dataPackDetails.IsUserHasDataPackAccess"]
-    },
-    "IsMirabelEmailServiceEnabled": { 
-      sources: ["clientInfo.IsMirabelEmailServiceEnabled"]
-    },
-    "IsRepNotificationEnabled": { 
-      sources: ["clientInfo.IsRepNotificationEnabled"]
-    },
-    "ChangePassword": { 
-      sources: ["dataPackDetails.IsPasswordExpired"]
-    },
-    
-    // Static/computed values
-    "IsAuthenticated": { 
-      sources: ["sessionDetails.IsAuthenticated"]
-    },
-    "UserName":  { 
-      sources: ["sessionDetails.UserName"]
-    },
-    "DisplayName": { computed: true },
-    "FullName": { 
-      sources: ["employeeDetails.Name", "employeeDetails.SalesRepName"],
-      combineFields: {
-        firstName: "employeeDetails.FirstName",
-        lastName: "employeeDetails.LastName"
-      }
-    },
-    "IsAdmin": { 
-      sources: ["employeeDetails.IsAdmin"]
-    },
-    "IsSA": { 
-      sources: ["employeeDetails.IsSA"],
-      transform: (value) => value ? "true" : "false"
-    },
-    "UserNameID": { sources: ["employeeDetails.ID"] },
-    "ContentVersion": { computed: true },
-    "PageList": { static: "" },
-    "HelpSite": { static: "https://helpwp.emailnow.info" },
-    "DepartmentID": { static: "1" },
-    "PASubProductTypeId": { sources: ["employeeDetails.PASubProductTypeId"] },
-    "PASubProductTypeName": { sources: ["employeeDetails.PASubProductTypeName"] },
-    "BSASubProductTypeId": { sources: ["employeeDetails.BSASubProductTypeId"] },
-    "BSASubProductTypeName": { sources: ["employeeDetails.BSASubProductTypeName"] },
-    "CustomerPortalUrl": { static: "http://tier1-portal.mirabeltechnologies.com" },
-    "CanSendCRMEmail": { sources: ["employeeDetails.CanSendCRMEmail"] }
-  },
-
-  /**
-   * Transform API response data into MMnewclientvars format
-   * @param {Object} apiResponse - The raw API response
-   * @returns {Object} Transformed data in the desired format
-   */
-  transformSessionData: (apiResponse) => {
-    try {
-      const content = apiResponse.content || apiResponse;
-      
-      // Extract data from various nested objects
-      const sessionDetails = content.SessionDetails || {};
-      const authInfo = content.AuthenticationInfo || {};
-      const claims = authInfo.Claims || {};
-      const clientDetails = sessionDetails.ClientsDetails?.[0] || {};
-      const clientInfo = clientDetails.ClientInformation || {};
-      const dataPackDetails = clientDetails.DataPackDetails || {};
-      const tokenInfo = sessionDetails.Token || {};
-      const employeeDetails = content.EmployeeDetails || {};
-      
-      // Helper function to get nested object property by path
-      const getNestedValue = (obj, path) => {
-        return path.split('.').reduce((current, key) => current?.[key], obj);
-      };
-
-      // Available data objects for mapping
-      const dataContext = {
-        content,
-        sessionDetails,
-        authInfo,
-        claims,
-        clientDetails,
-        clientInfo,
-        dataPackDetails,
-        tokenInfo,
-        employeeDetails
-      };
-
-      // Extract email for computed functions
-      const email =  employeeDetails.Email ;
-
-      // Build transformed data using the mapping
-      const transformedData = {};
-      
-      Object.entries(navigationService.dataFieldMapping)
-        .map(([finalKey, mapping]) => {
-          let value = null;
-          
-          // Handle static values
-          if (mapping.hasOwnProperty('static')) {
-            value = mapping.static;
-          }
-          // Handle computed values
-          else if (mapping.computed) {
-            switch (finalKey) {
-              case 'Host':
-                value = clientInfo?.ClientAddress || 
-                        `${claims?.Domain || clientInfo?.ClientSubDomain || "smoke-feature13"}.magazinemanager.com`;
-                break;
-              case 'UserName':
-              case 'DisplayName':
-                const isAdminUser = email.toLowerCase().includes('sa@') || email.toLowerCase().includes('admin') || employeeDetails.IsSA;
-                const userFullName = employeeDetails.Name || employeeDetails.SalesRepName || 
-                                  (employeeDetails.FirstName && employeeDetails.LastName ? 
-                                   `${employeeDetails.FirstName} ${employeeDetails.LastName}` : null) ||
-                                  "User";
-                value = userFullName;
-                break;
-              
-              
-              
-              case 'UserNameID':
-                const isAdminUserID = email.toLowerCase().includes('sa@') || email.toLowerCase().includes('admin') || employeeDetails.IsSA;
-                value = isAdminUserID ? "sadministrator" : "user";
-                break;
-              case 'ContentVersion':
-                value = Date.now().toString();
-                break;
-            }
-          }
-                     // Handle source-based values
-           else if (mapping.sources) {
-             // Try each source until we find a value
-             for (const sourcePath of mapping.sources) {
-               const sourceValue = getNestedValue(dataContext, sourcePath);
-               if (sourceValue !== null && sourceValue !== undefined) {
-                 value = sourceValue;
-                 break;
-               }
-             }
-             
-             // If no source provided a value, try combining fields (for FullName)
-             if ((value === null || value === undefined) && mapping.combineFields) {
-               const firstName = getNestedValue(dataContext, mapping.combineFields.firstName);
-               const lastName = getNestedValue(dataContext, mapping.combineFields.lastName);
-               if (firstName && lastName) {
-                 value = `${firstName} ${lastName}`;
-               }
-             }
-             
-
-             
-             // Apply transformation if specified
-             if (value !== null && value !== undefined && mapping.transform) {
-               value = mapping.transform(value);
-             }
-           }
-          
-          // Only add to final object if we have a value (excluding null/undefined)
-          if (value !== null && value !== undefined) {
-            transformedData[finalKey] = value;
-          }
-          
-          return { key: finalKey, value };
-        });
-      
-      return transformedData;
-      
-    } catch (error) {
-      // Return fallback data structure
-     
-    }
-  },
 
   /**
    * Fetch navigation data from the API
@@ -308,37 +81,33 @@ export const navigationService = {
         try {
             const response = await apiCall('/services/admin/common/SessionDetailsGet','GET');
 
-            // Transform the response data into the desired format
-            const transformedData = navigationService.transformSessionData(response);
+            if(response.content.SessionResponse){
+              const sessionData = response.content.SessionResponse;
 
-            // Store transformed data in localStorage with key 'MMnewclientvars'
-            localStorage.setItem('MMClientVars', JSON.stringify(transformedData));
-
-            // Also update the existing MMClientVars for backward compatibility
-            const existingClientVars = localStorage.getItem('MMClientVars');
-            if (existingClientVars) {
-                try {
-                    const existing = JSON.parse(existingClientVars);
-                    const updatedClientVars = { ...existing, ...transformedData };
-                    localStorage.setItem('MMClientVars', JSON.stringify(updatedClientVars));
-                } catch (e) {
-                    console.warn('⚠️ Could not update MMClientVars:', e);
-                }
-            } else {
-                // Create MMClientVars if it doesn't exist
-                localStorage.setItem('MMClientVars', JSON.stringify(transformedData));
-            }
-
-            return transformedData;
+              // Store transformed data in localStorage with key 'MMnewclientvars'
+              localStorage.setItem('MMClientVars', JSON.stringify(sessionData));
+  
+              // Also update the existing MMClientVars for backward compatibility
+              const existingClientVars = localStorage.getItem('MMClientVars');
+              if (existingClientVars) {
+                  try {
+                      const existing = JSON.parse(existingClientVars);
+                      const updatedClientVars = { ...existing, ...sessionData };
+                      localStorage.setItem('MMClientVars', JSON.stringify(updatedClientVars));
+                  } catch (e) {
+                      console.warn('⚠️ Could not update MMClientVars:', e);
+                  }
+              } else {
+                  // Create MMClientVars if it doesn't exist
+                  localStorage.setItem('MMClientVars', JSON.stringify(sessionData));
+              }
+            }else{
+              logout();
+            }         
+            return sessionData;
         } catch (error) {
             console.error('❌ Failed to load session details:', error);
-
-            // Store fallback data
-            const fallbackData = navigationService.transformSessionData({});
-            localStorage.setItem('MMClientVars', JSON.stringify(fallbackData));
-            console.log('🔄 Stored fallback session data');
-
-            throw error;
+            logout();
         }
     },
 
