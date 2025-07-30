@@ -15,7 +15,6 @@ import {
   LogOut,
   Bell,
   ChevronDown,
-  ChevronRight,
   HelpCircle,
   Loader2,
   RefreshCw,
@@ -45,33 +44,25 @@ const renderMenuItems = (items, openTabByUrl) => {
   return items.map((item) => {
     if (item.children && item.children.length > 0) {
       return (
-        <div key={item.id} className="relative group">
-                  <div className="rounded-none text-gray-800 font-medium px-4 py-2 hover:bg-[#e6f0fa] focus:bg-[#e6f0fa] hover:text-ocean-900 focus:text-ocean-900 cursor-pointer flex items-center gap-2 transition-colors duration-150 whitespace-nowrap" style={{ fontFamily: 'inherit', fontSize: '13px', fontWeight: 500, lineHeight: '1.5' }}>
-          <span>{item.title}</span>
-          {item.icon && (
-            <Badge className="ml-2 text-xs align-middle" variant="secondary">
-              {item.icon}
-            </Badge>
-          )}
-          {item.iconCls && (
-            <span className={`ml-2 ${item.iconCls}`}></span>
-          )}
-          <ChevronRight className="ml-auto h-4 w-4" />
-        </div>
-          <div className="absolute left-full top-0 ml-1 w-auto min-w-56 max-w-xl bg-white border border-gray-100 rounded-md shadow-lg z-50 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200" style={{ fontFamily: 'inherit', fontSize: '13px', lineHeight: '1.5' }}>
+        <DropdownMenuSub key={item.id}>
+          <DropdownMenuSubTrigger className="rounded-none text-gray-800 font-medium px-4 py-2 hover:bg-[#e6f0fa] focus:bg-[#e6f0fa] hover:text-ocean-900 focus:text-ocean-900 cursor-pointer flex items-center gap-2 transition-colors duration-150 whitespace-nowrap" style={{ fontFamily: 'inherit', fontSize: '13px', fontWeight: 500, lineHeight: '1.5' }}>
+            <span>{item.title}</span>
+            {item.icon && (
+              <Badge className="ml-2 text-xs align-middle" variant="secondary">
+                {item.icon}
+              </Badge>
+            )}
+          </DropdownMenuSubTrigger>
+          <DropdownMenuSubContent className="w-auto min-w-56 max-w-xl mt-2 bg-white border border-gray-100 p-0 text-gray-800 font-medium" style={{ fontFamily: 'inherit', fontSize: '13px', lineHeight: '1.5' }}>
             {renderMenuItems(item.children, openTabByUrl)}
-          </div>
-        </div>
+          </DropdownMenuSubContent>
+        </DropdownMenuSub>
       );
     } else {
       return (
-        <div
+        <DropdownMenuItem
           key={item.id}
-          onClick={() => {
-            openTabByUrl(item.title, item.url);
-            // Close the parent menu when clicking on a menu item
-            setOpenMenuId(null);
-          }}
+          onClick={() => openTabByUrl(item.title, item.url)}
           className="rounded-none font-medium px-4 py-2 hover:bg-[#e6f0fa] focus:bg-[#e6f0fa] hover:text-ocean-900 focus:text-ocean-900 cursor-pointer text-gray-800 transition-colors duration-150 flex items-center gap-2 whitespace-nowrap"
           style={{ fontFamily: 'inherit', fontSize: '13px', fontWeight: 500, lineHeight: '1.5' }}
         >
@@ -81,7 +72,7 @@ const renderMenuItems = (items, openTabByUrl) => {
               {item.icon}
             </Badge>
           )}
-        </div>
+        </DropdownMenuItem>
       );
     }
   });
@@ -92,7 +83,7 @@ const renderMenuItemsWithShowMore = (items, openTabByUrl, expanded, setExpanded)
   const VISIBLE_COUNT = 10;
   if (!items || items.length <= VISIBLE_COUNT || expanded) {
     return (
-      <div>
+      <div className={expanded ? 'overflow-y-auto max-h-[400px]' : ''}>
         {items.map((item) => renderMenuItemOrSub(item, openTabByUrl, expanded, setExpanded))}
       </div>
     );
@@ -110,33 +101,25 @@ const renderMenuItemsWithShowMore = (items, openTabByUrl, expanded, setExpanded)
 const renderMenuItemOrSub = (item, openTabByUrl, expanded, setExpanded) => {
   if (item.children && item.children.length > 0) {
     return (
-      <div key={item.id} className="relative group">
-        <div className="rounded-none text-gray-800 font-medium px-4 py-2 hover:bg-[#e6f0fa] focus:bg-[#e6f0fa] hover:text-ocean-900 focus:text-ocean-900 cursor-pointer flex items-center gap-2 transition-colors duration-150 whitespace-nowrap" style={{ fontFamily: 'inherit', fontSize: '13px', fontWeight: 500, lineHeight: '1.5' }}>
+      <DropdownMenuSub key={item.id}>
+        <DropdownMenuSubTrigger className="rounded-none text-gray-800 font-medium px-4 py-2 hover:bg-[#e6f0fa] focus:bg-[#e6f0fa] hover:text-ocean-900 focus:text-ocean-900 cursor-pointer flex items-center gap-2 transition-colors duration-150 whitespace-nowrap" style={{ fontFamily: 'inherit', fontSize: '13px', fontWeight: 500, lineHeight: '1.5' }}>
           <span>{item.title}</span>
           {item.icon && (
             <Badge className="ml-2 text-xs align-middle" variant="secondary">
               {item.icon}
             </Badge>
           )}
-          {item.iconCls && (
-            <span className={`ml-2 ${item.iconCls}`}></span>
-          )}
-          <ChevronRight className="ml-auto h-4 w-4" />
-        </div>
-        <div className="absolute left-full top-0 ml-1 w-auto min-w-56 max-w-xl bg-white border border-gray-100 rounded-md shadow-lg z-50 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200" style={{ fontFamily: 'inherit', fontSize: '13px', lineHeight: '1.5' }}>
+        </DropdownMenuSubTrigger>
+        <DropdownMenuSubContent className="w-auto min-w-56 max-w-xl mt-2 bg-white border border-gray-100 p-0 text-gray-800 font-medium" style={{ fontFamily: 'inherit', fontSize: '13px', lineHeight: '1.5' }}>
           <SubMenuWithShowMore items={item.children} openTabByUrl={openTabByUrl} />
-        </div>
-      </div>
+        </DropdownMenuSubContent>
+      </DropdownMenuSub>
     );
   } else {
     return (
-      <div
+      <DropdownMenuItem
         key={item.id}
-        onClick={() => {
-          openTabByUrl(item.title, item.url);
-          // Close the parent menu when clicking on a menu item
-          setOpenMenuId(null);
-        }}
+        onClick={() => openTabByUrl(item.title, item.url)}
         className="rounded-none font-medium px-4 py-2 hover:bg-[#e6f0fa] focus:bg-[#e6f0fa] hover:text-ocean-900 focus:text-ocean-900 cursor-pointer text-gray-800 transition-colors duration-150 flex items-center gap-2 whitespace-nowrap"
         style={{ fontFamily: 'inherit', fontSize: '13px', fontWeight: 500, lineHeight: '1.5' }}
       >
@@ -146,10 +129,7 @@ const renderMenuItemOrSub = (item, openTabByUrl, expanded, setExpanded) => {
             {item.icon}
           </Badge>
         )}
-        {item.iconCls && (
-          <span className={`ml-2 ${item.iconCls}`}></span>
-        )}
-      </div>
+      </DropdownMenuItem>
     );
   }
 };
@@ -174,20 +154,6 @@ const Navbar = () => {
   // Add state to track which parent menu is open
   const [openMenuId, setOpenMenuId] = useState(null);
   const [expandedMenus, setExpandedMenus] = React.useState({});
-
-  // Close menu when clicking outside
-  useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (openMenuId && !event.target.closest('.menu-container')) {
-        setOpenMenuId(null);
-      }
-    };
-
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-    };
-  }, [openMenuId]);
 
   // Fallback user info if AuthContext user is null
   const [fallbackUser, setFallbackUser] = useState(null);
@@ -488,59 +454,34 @@ const Navbar = () => {
                 <Loader2 className="h-4 w-4 animate-spin text-white" />
               ) : (
                 navigationMenus.map((menu) => (
-                  <div key={menu.id} className="relative menu-container">
-                    <button
-                      onClick={() => {
-                        console.log(`Clicked ${menu.title}, current openMenuId:`, openMenuId);
-                        if (openMenuId === menu.id) {
-                          setOpenMenuId(null);
-                        } else {
-                          setOpenMenuId(menu.id);
-                        }
-                      }}
-                      className={`px-2 py-1 rounded-md font-medium text-sm transition flex items-center h-8 min-h-0 ${
-                        openMenuId === menu.id
-                          ? 'bg-blue-200 text-blue-900 shadow font-semibold' // Professional highlight for active
-                          : 'text-white hover:bg-ocean-700 hover:text-black focus:bg-ocean-800'
-                      }`}
-                      style={{ fontSize: '13px' }}
-                    >
-                      <span>{menu.title}</span>
-                    </button>
-                    
-                    {/* Custom Dropdown Content */}
-                    {openMenuId === menu.id && (
-                      <div className="absolute top-full left-0 mt-2 w-auto min-w-56 max-w-xl bg-white border border-gray-100 rounded-md shadow-lg z-50" style={{ fontFamily: 'inherit', fontSize: '13px', lineHeight: '1.5' }}>
-                        {menu.url && (
-                          <div 
-                            onClick={() => {
-                              openTabByUrl(menu.title, menu.url);
-                              setOpenMenuId(null);
-                            }}
-                            className="rounded-none font-medium px-4 py-2 hover:bg-[#e6f0fa] focus:bg-[#e6f0fa] hover:text-ocean-900 focus:text-ocean-900 cursor-pointer text-gray-800 transition-colors duration-150 flex items-center gap-2 whitespace-nowrap"
-                            style={{ fontFamily: 'inherit', fontSize: '13px', fontWeight: 500, lineHeight: '1.5' }}
-                          >
-                            <span>{menu.title} Home</span>
-                            {menu.icon && (
-                              <Badge className="ml-2 text-xs align-middle" variant="secondary">
-                                {menu.icon}
-                              </Badge>
-                            )}
-                            {menu.iconCls && (
-                              <span className={`ml-2 ${menu.iconCls}`}></span>
-                            )}
-                          </div>
-                        )}
-                        {renderMenuItemsWithShowMore(menu.children, openTabByUrl, expandedMenus[menu.id], () => handleExpandMenu(menu.id))}
-                        {menu.children && menu.children.length > 10 && expandedMenus[menu.id] && (
-                          <div className="flex justify-center items-center cursor-pointer py-2 hover:bg-[#e6f0fa]" onClick={() => handleCollapseMenu(menu.id)}>
-                            <ChevronUp className="h-4 w-4 mr-1" />
-                            <span className="text-xs font-medium text-ocean-900">Show less</span>
-                          </div>
-                        )}
-                      </div>
-                    )}
-                  </div>
+                  <DropdownMenu key={menu.id} onOpenChange={(open) => setOpenMenuId(open ? menu.id : (openMenuId === menu.id ? null : openMenuId))}>
+                    <DropdownMenuTrigger asChild>
+                      <button
+                        className={`px-2 py-1 rounded-md font-medium text-sm transition flex items-center h-8 min-h-0 ${
+                          openMenuId === menu.id
+                            ? 'bg-blue-200 text-blue-900 shadow font-semibold' // Professional highlight for active
+                            : 'text-white hover:bg-ocean-700 hover:text-black focus:bg-ocean-800'
+                        }`}
+                        style={{ fontSize: '13px' }}
+                      >
+                        <span>{menu.title}</span>
+                      </button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="start" className="w-auto min-w-56 max-w-xl mt-2 bg-white border border-gray-100 p-0 text-gray-800 font-medium" style={{ fontFamily: 'inherit', fontSize: '13px', lineHeight: '1.5' }}>
+                      {menu.url && (
+                        <DropdownMenuItem onClick={() => openTabByUrl(menu.title, menu.url)} className="rounded-none font-medium px-4 py-2 hover:bg-[#e6f0fa] focus:bg-[#e6f0fa] hover:text-ocean-900 focus:text-ocean-900 cursor-pointer text-gray-800 transition-colors duration-150 flex items-center gap-2 whitespace-nowrap" style={{ fontFamily: 'inherit', fontSize: '13px', fontWeight: 500, lineHeight: '1.5' }}>
+                          <span>{menu.title} Home</span>
+                        </DropdownMenuItem>
+                      )}
+                      {renderMenuItemsWithShowMore(menu.children, openTabByUrl, expandedMenus[menu.id], () => handleExpandMenu(menu.id))}
+                      {menu.children && menu.children.length > 10 && expandedMenus[menu.id] && (
+                        <div className="flex justify-center items-center cursor-pointer py-2 hover:bg-[#e6f0fa]" onClick={() => handleCollapseMenu(menu.id)}>
+                          <ChevronUp className="h-4 w-4 mr-1" />
+                          <span className="text-xs font-medium text-ocean-900">Show less</span>
+                        </div>
+                      )}
+                    </DropdownMenuContent>
+                  </DropdownMenu>
                 ))
               )}
             </div>
