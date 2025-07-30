@@ -80,7 +80,7 @@ export const navigationService = {
     loadSessionDetails: async () => {
         try {
             const response = await apiCall('/services/admin/common/SessionDetailsGet','GET');
-
+           console.log('Loadsessiondetails',response.content.SessionResponse);
             if(response.content.SessionResponse){
               const sessionData = response.content.SessionResponse;
 
@@ -102,6 +102,7 @@ export const navigationService = {
                   localStorage.setItem('MMClientVars', JSON.stringify(sessionData));
               }
             }else{
+              console.log('Logout');
               logout();
             }         
             return sessionData;
