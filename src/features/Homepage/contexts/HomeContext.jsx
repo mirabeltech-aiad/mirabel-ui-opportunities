@@ -336,36 +336,10 @@ export const HomeProvider = ({ children }) => {
     }
   };
 
-  // Load navigation menus (optimized - with caching)
+  // Load navigation menus (optimized - no caching)
   const loadNavigationMenus = async () => {
     try {
       setNavigationLoading(true);
-      
-      // Check cache first with expiration
-      const cacheKey = 'navigationMenus';
-      const cacheExpiryKey = 'navigationMenusExpiry';
-      const cachedMenus = sessionStorage.getItem(cacheKey);
-      const cacheExpiry = sessionStorage.getItem(cacheExpiryKey);
-      
-      const now = Date.now();
-      const CACHE_DURATION = 60 * 60 * 1000; // 1 hour in milliseconds
-      
-      if (cachedMenus && cacheExpiry && now < parseInt(cacheExpiry)) {
-        try {
-          const menus = JSON.parse(cachedMenus);
-          setNavigationMenus(menus);
-          setNavigationLoading(false);
-          return; // Exit early if cache hit and not expired
-        } catch (error) {
-          console.error('Error parsing cached menus:', error);
-          sessionStorage.removeItem(cacheKey);
-          sessionStorage.removeItem(cacheExpiryKey);
-        }
-      } else if (cachedMenus) {
-        // Cache expired, remove it
-        sessionStorage.removeItem(cacheKey);
-        sessionStorage.removeItem(cacheExpiryKey);
-      }
       
       const clientDetails = localStorage.getItem("MMClientVars");
       let cultureUI = "en-US"; // Default value
@@ -398,15 +372,6 @@ export const HomeProvider = ({ children }) => {
       
       const menus = await navigationService.fetchNavigationData(userId, navBarType);
       setNavigationMenus(menus);
-      
-      // Cache the menus for future loads with expiration
-      try {
-        const expiryTime = Date.now() + CACHE_DURATION;
-        sessionStorage.setItem(cacheKey, JSON.stringify(menus));
-        sessionStorage.setItem(cacheExpiryKey, expiryTime.toString());
-      } catch (error) {
-        console.error('Error caching menus:', error);
-      }
     } catch (error) {
       console.error('Error loading navigation menus:', error);
     } finally {
@@ -590,15 +555,7 @@ export const HomeProvider = ({ children }) => {
     dispatch({ type: ACTIONS.SET_CRM_PROSPECTING, payload: isCRMProspecting });
   };
 
-  // Force refresh navigation menus (clears cache and reloads)
-  const refreshNavigationMenus = async () => {
-    // Clear cache
-    sessionStorage.removeItem('navigationMenus');
-    sessionStorage.removeItem('navigationMenusExpiry');
-    
-    // Reload menus
-    await loadNavigationMenus();
-  };
+
 
   const value = {
     ...state,
@@ -621,8 +578,7 @@ export const HomeProvider = ({ children }) => {
       hideTermsModal,
       setLogoUrl,
       setMMIntegration,
-      setCRMProspecting,
-      refreshNavigationMenus
+      setCRMProspecting
     }
   };
 
