@@ -100,20 +100,20 @@ export const initializePageNavigation = (homeActions) => {
   }
 
   // Load the localizer script
-  loadLocalizerScript();
+  // loadLocalizerScript();
 };
 
 const loadLocalizerScript = async () => {
   try {
-
-      const version = response;
-      console.log("📦 Content Version:", version);
+      const version = '1.0.0';
+      console.log("📦 Loading localizer script with Content Version:", version);
 
       const script = document.createElement("script");
-      script.src = `/intranet/localizer.js.axd?v='1.0.0'`;
+      script.src = `/intranet/localizer.js.axd?v=${version}`;
       script.async = true;
 
       document.head.appendChild(script);
+      console.log("✅ Localizer script loaded successfully");
 
   } catch (err) {
     console.error("❌ Failed to load localizer script:", err);
