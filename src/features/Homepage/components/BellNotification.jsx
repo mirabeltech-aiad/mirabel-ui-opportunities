@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
-import { Bell } from 'lucide-react';
+import { Megaphone } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 
 /**
- * Bell Notification Component
+ * Announcement Notification Component
  * Migrated from ASP.NET Home.aspx announcement functionality
- * Simple bell icon that opens the announcements side panel
+ * Simple megaphone icon that opens the announcements side panel
  */
 const BellNotification = ({ onOpenAnnouncementsPanel, unreadCount = 0 }) => {
   return (
@@ -17,7 +17,7 @@ const BellNotification = ({ onOpenAnnouncementsPanel, unreadCount = 0 }) => {
       onClick={onOpenAnnouncementsPanel}
       title="Announcements"
     >
-      <Bell className="h-5 w-5" />
+      <Megaphone className="h-5 w-5" />
       {unreadCount > 0 && (
         <Badge
           variant="destructive"
