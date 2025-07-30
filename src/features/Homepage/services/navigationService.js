@@ -82,30 +82,30 @@ export const navigationService = {
             const response = await apiCall('/services/admin/common/SessionDetailsGet','GET');
            console.log('Loadsessiondetails',response.content.SessionResponse);
             if(response.content.SessionResponse){
-              const sessionData = response.content.SessionResponse;
+              const sessionDataResponse = response.content.SessionResponse;
 
               // Store transformed data in localStorage with key 'MMnewclientvars'
-              localStorage.setItem('MMClientVars', JSON.stringify(sessionData));
+              localStorage.setItem('MMClientVars', JSON.stringify(sessionDataResponse));
   
               // Also update the existing MMClientVars for backward compatibility
               const existingClientVars = localStorage.getItem('MMClientVars');
               if (existingClientVars) {
                   try {
                       const existing = JSON.parse(existingClientVars);
-                      const updatedClientVars = { ...existing, ...sessionData };
+                      const updatedClientVars = { ...existing, ...sessionDataResponse };
                       localStorage.setItem('MMClientVars', JSON.stringify(updatedClientVars));
                   } catch (e) {
                       console.warn('⚠️ Could not update MMClientVars:', e);
                   }
               } else {
                   // Create MMClientVars if it doesn't exist
-                  localStorage.setItem('MMClientVars', JSON.stringify(sessionData));
+                  localStorage.setItem('MMClientVars', JSON.stringify(sessionDataResponse));
               }
             }else{
               console.log('Logout');
               logout();
             }         
-            return sessionData;
+            return sessionDataResponse;
         } catch (error) {
             console.error('❌ Failed to load session details:', error);
             logout();
