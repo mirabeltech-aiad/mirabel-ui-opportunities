@@ -80,9 +80,10 @@ export const navigationService = {
     loadSessionDetails: async () => {
         try {
             const response = await apiCall('/services/admin/common/SessionDetailsGet','GET');
+            let sessionDataResponse = null;
            console.log('Loadsessiondetails',response.content.SessionResponse);
             if(response.content.SessionResponse){
-              const sessionDataResponse = response.content.SessionResponse;
+               sessionDataResponse = response.content.SessionResponse;
 
               // Store transformed data in localStorage with key 'MMnewclientvars'
               localStorage.setItem('MMClientVars', JSON.stringify(sessionDataResponse));
