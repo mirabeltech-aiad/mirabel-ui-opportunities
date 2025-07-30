@@ -336,9 +336,37 @@ export const HomeProvider = ({ children }) => {
     }
   };
 
-  // Load navigation menus
+  // Load navigation menus (optimized - with caching)
   const loadNavigationMenus = async () => {
     try {
+      setNavigationLoading(true);
+      
+      // Check cache first with expiration
+      const cacheKey = 'navigationMenus';
+      const cacheExpiryKey = 'navigationMenusExpiry';
+      const cachedMenus = sessionStorage.getItem(cacheKey);
+      const cacheExpiry = sessionStorage.getItem(cacheExpiryKey);
+      
+      const now = Date.now();
+      const CACHE_DURATION = 60 * 60 * 1000; // 1 hour in milliseconds
+      
+      if (cachedMenus && cacheExpiry && now < parseInt(cacheExpiry)) {
+        try {
+          const menus = JSON.parse(cachedMenus);
+          setNavigationMenus(menus);
+          setNavigationLoading(false);
+          return; // Exit early if cache hit and not expired
+        } catch (error) {
+          console.error('Error parsing cached menus:', error);
+          sessionStorage.removeItem(cacheKey);
+          sessionStorage.removeItem(cacheExpiryKey);
+        }
+      } else if (cachedMenus) {
+        // Cache expired, remove it
+        sessionStorage.removeItem(cacheKey);
+        sessionStorage.removeItem(cacheExpiryKey);
+      }
+      
       const clientDetails = localStorage.getItem("MMClientVars");
       let cultureUI = "en-US"; // Default value
       let siteType = "TMM"; // Default value
@@ -367,15 +395,22 @@ export const HomeProvider = ({ children }) => {
           console.error("Error parsing client variables:", error);
         }
       }
+      
       const menus = await navigationService.fetchNavigationData(userId, navBarType);
       setNavigationMenus(menus);
       
-      // Setup logo and MM/MKM integration after navigation (matching legacy ASP.NET pattern)
-      await setupLogoAndMMIntegration();
-      
-      await checkTermsAndConditions();
+      // Cache the menus for future loads with expiration
+      try {
+        const expiryTime = Date.now() + CACHE_DURATION;
+        sessionStorage.setItem(cacheKey, JSON.stringify(menus));
+        sessionStorage.setItem(cacheExpiryKey, expiryTime.toString());
+      } catch (error) {
+        console.error('Error caching menus:', error);
+      }
     } catch (error) {
       console.error('Error loading navigation menus:', error);
+    } finally {
+      setNavigationLoading(false);
     }
   };
 
@@ -428,20 +463,22 @@ export const HomeProvider = ({ children }) => {
     }
   };
 
-  // Main initialization effect - runs in sequence
+  // Main initialization effect - runs in parallel for speed
   useEffect(() => {
     const initializeApp = async () => {
       // Clear localStorage first
       localStorage.removeItem('home-tabs');
       localStorage.removeItem('home-active-tab');
       
-      // 1. Load navigation menus first (as requested)
-      await loadNavigationMenus();
+      // Run all initialization tasks in parallel for faster loading
+      await Promise.all([
+        loadNavigationMenus(),     // Load menu data immediately
+        loadDashboards(),          // Load dashboards in parallel
+        setupLogoAndMMIntegration(), // Load logo/MM setup in parallel
+        checkTermsAndConditions()   // Check terms in parallel
+      ]);
       
-      // 2. Load dashboards
-      await loadDashboards();
-      
-      // 3. Load tabs from localStorage last
+      // Load tabs from localStorage after main data is loaded
       loadTabsFromStorage();
     };
 
@@ -553,6 +590,16 @@ export const HomeProvider = ({ children }) => {
     dispatch({ type: ACTIONS.SET_CRM_PROSPECTING, payload: isCRMProspecting });
   };
 
+  // Force refresh navigation menus (clears cache and reloads)
+  const refreshNavigationMenus = async () => {
+    // Clear cache
+    sessionStorage.removeItem('navigationMenus');
+    sessionStorage.removeItem('navigationMenusExpiry');
+    
+    // Reload menus
+    await loadNavigationMenus();
+  };
+
   const value = {
     ...state,
     actions: {
@@ -574,7 +621,8 @@ export const HomeProvider = ({ children }) => {
       hideTermsModal,
       setLogoUrl,
       setMMIntegration,
-      setCRMProspecting
+      setCRMProspecting,
+      refreshNavigationMenus
     }
   };
 
