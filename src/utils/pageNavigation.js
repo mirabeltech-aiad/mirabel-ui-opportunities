@@ -100,7 +100,7 @@ export const initializePageNavigation = (homeActions) => {
   }
 
   // Load the localizer script
-  // loadLocalizerScript();
+   loadLocalizerScript();
 };
 
 const loadLocalizerScript = async () => {
@@ -111,7 +111,7 @@ const loadLocalizerScript = async () => {
       const script = document.createElement("script");
       script.src = `/intranet/localizer.js.axd?v=${version}`;
       script.async = true;
-
+console.log('script',script);
       document.head.appendChild(script);
       console.log("✅ Localizer script loaded successfully");
 
