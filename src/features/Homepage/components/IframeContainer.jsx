@@ -113,15 +113,6 @@ const IframeContainer = ({
           >
             <RefreshCw className="h-4 w-4" />
           </Button>
-          <Button
-            onClick={openInNewTab}
-            variant="outline"
-            size="sm"
-            className="bg-white/90 backdrop-blur-sm"
-            title="Open in new tab"
-          >
-            <ExternalLink className="h-4 w-4" />
-          </Button>
         </div>
       )}
 
