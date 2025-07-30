@@ -103,12 +103,12 @@ export const navigationService = {
               }
             }else{
               console.log('Logout');
-              logout();
+             // logout();
             }         
             return sessionDataResponse;
         } catch (error) {
             console.error('❌ Failed to load session details:', error);
-            logout();
+          //  logout();
         }
     },
 
