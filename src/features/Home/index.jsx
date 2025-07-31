@@ -20,6 +20,7 @@ const Home = () => {
   useEffect(() => {
     const initializeComponent = async () => {
       try {
+        alert("0")
         // Validate localStorage first
         const isLocalStorageValid = validateLocalStorage();
         console.log('🔍 localStorage validation result:', isLocalStorageValid);
