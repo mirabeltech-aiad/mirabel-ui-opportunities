@@ -24,9 +24,7 @@ const Home = () => {
         const isLocalStorageValid = validateLocalStorage();
         console.log('🔍 localStorage validation result:', isLocalStorageValid);
 
-        alert('index.jsx outside');
         const sessionDataResponse = await navigationService.loadSessionDetails();
-        alert("index.jsx inside: " + JSON.stringify(sessionDataResponse));
 
 
         // Ensure session data is properly loaded and not just fallback values
