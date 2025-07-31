@@ -237,14 +237,14 @@ export const HomeProvider = ({ children, sessionLoaded = false }) => {
   // Setup logo and MM/MKM integration (matching legacy ASP.NET SetupHeaderToolbar)
   const setupLogoAndMMIntegration = async () => {
     try {
-      const clientDetails = localStorage.getItem("MMClientVars");
+      const clientDetails = getSessionData();
       let mmClientVars = {};
       
       if (clientDetails) {
         try {
-          mmClientVars = JSON.parse(clientDetails);
+          mmClientVars = clientDetails; // clientDetails is already a parsed object
         } catch (error) {
-          console.error("Error parsing client variables:", error);
+          console.error("Error processing client variables:", error);
         }
       }
 
@@ -284,41 +284,41 @@ export const HomeProvider = ({ children, sessionLoaded = false }) => {
 
       // MM Integration iframe src (matching legacy ASP.NET)
       let mmIntegrationSrc = null;
-      if (showMMIntegration && mmClientVars.Token) {
-        try {
-          // Fetch MarketingManagerSiteURL from API (robust approach)
-          const marketingManagerSiteURL = await navigationService.getMarketingManagerSiteURL();
-          if (marketingManagerSiteURL) {
-            mmIntegrationSrc = insertMenuUrlAtPlaceholder(marketingManagerSiteURL, '/AssignData.aspx?') + '&accesstoken=' + mmClientVars.Token;
-          }
-        } catch (error) {
-          console.error('Error fetching MarketingManagerSiteURL:', error);
-          // Fallback to localStorage if API fails
-          if (mmClientVars.MarketingManagerSiteURL) {
-            mmIntegrationSrc = insertMenuUrlAtPlaceholder(mmClientVars.MarketingManagerSiteURL, '/AssignData.aspx?') + '&accesstoken=' + mmClientVars.Token;
-          }
-        }
-      }
+      // if (showMMIntegration && mmClientVars.Token) {
+      //   try {
+      //     // Fetch MarketingManagerSiteURL from API (robust approach)
+      //     const marketingManagerSiteURL = await navigationService.getMarketingManagerSiteURL();
+      //     if (marketingManagerSiteURL) {
+      //       mmIntegrationSrc = insertMenuUrlAtPlaceholder(marketingManagerSiteURL, '/AssignData.aspx?') + '&accesstoken=' + mmClientVars.Token;
+      //     }
+      //   } catch (error) {
+      //     console.error('Error fetching MarketingManagerSiteURL:', error);
+      //     // Fallback to localStorage if API fails
+      //     if (mmClientVars.MarketingManagerSiteURL) {
+      //       mmIntegrationSrc = insertMenuUrlAtPlaceholder(mmClientVars.MarketingManagerSiteURL, '/AssignData.aspx?') + '&accesstoken=' + mmClientVars.Token;
+      //     }
+      //   }
+      // }
 
       // CRM Prospecting panel (matching legacy ASP.NET)
       let crmProspectingUrl = null;
       const showProspecting = isCRM && mmClientVars.IsUserHasDataPackAccess === true;
       
-      if (showProspecting) {
-        try {
-          // Fetch MarketingManagerSiteURL from API (robust approach)
-          const marketingManagerSiteURL = await navigationService.getMarketingManagerSiteURL();
-          if (marketingManagerSiteURL) {
-            crmProspectingUrl = insertMenuUrlAtPlaceholder(marketingManagerSiteURL, '/midashboard.aspx?');
-          }
-        } catch (error) {
-          console.error('Error fetching MarketingManagerSiteURL for prospecting:', error);
-          // Fallback to localStorage if API fails
-          if (mmClientVars.MarketingManagerSiteURL) {
-            crmProspectingUrl = insertMenuUrlAtPlaceholder(mmClientVars.MarketingManagerSiteURL, '/midashboard.aspx?');
-          }
-        }
-      }
+      // if (showProspecting) {
+      //   try {
+      //     // Fetch MarketingManagerSiteURL from API (robust approach)
+      //     const marketingManagerSiteURL = await navigationService.getMarketingManagerSiteURL();
+      //     if (marketingManagerSiteURL) {
+      //       crmProspectingUrl = insertMenuUrlAtPlaceholder(marketingManagerSiteURL, '/midashboard.aspx?');
+      //     }
+      //   } catch (error) {
+      //     console.error('Error fetching MarketingManagerSiteURL for prospecting:', error);
+      //     // Fallback to localStorage if API fails
+      //     if (mmClientVars.MarketingManagerSiteURL) {
+      //       crmProspectingUrl = insertMenuUrlAtPlaceholder(mmClientVars.MarketingManagerSiteURL, '/midashboard.aspx?');
+      //     }
+      //   }
+      // }
 
       // Set MM integration state
       setMMIntegration({
@@ -350,10 +350,11 @@ export const HomeProvider = ({ children, sessionLoaded = false }) => {
       
       if (clientDetails) {
         try {
-          const clientVars = JSON.parse(clientDetails);
-          cultureUI = clientVars.cultureUI || cultureUI;
-          siteType = clientVars.siteType || siteType;
-          userId = clientVars.UserID || userId;
+          // clientDetails is already a parsed object from getSessionData()
+          const clientVars = clientDetails;
+          cultureUI = clientVars.CultureUI || clientVars.cultureUI || cultureUI;
+          siteType = clientVars.SiteType || clientVars.siteType || siteType;
+          userId = clientVars.UserID || clientVars.userId || userId;
           
           // Determine NavBarType based on culture and site type
           if (cultureUI === "de-DE" && siteType === "CRM") {
@@ -367,7 +368,7 @@ export const HomeProvider = ({ children, sessionLoaded = false }) => {
           }
           
         } catch (error) {
-          console.error("Error parsing client variables:", error);
+          console.error("Error processing client variables:", error);
         }
       }
       
@@ -454,7 +455,7 @@ export const HomeProvider = ({ children, sessionLoaded = false }) => {
         loadNavigationMenus(),     // Load menu data immediately
         loadDashboards(),          // Load dashboards in parallel
         setupLogoAndMMIntegration(), // Load logo/MM setup in parallel
-        checkTermsAndConditions()   // Check terms in parallel
+       // checkTermsAndConditions()   // Check terms in parallel
       ]);
       
       // Load tabs from localStorage after main data is loaded
@@ -595,7 +596,7 @@ export const HomeProvider = ({ children, sessionLoaded = false }) => {
       loadNavigationMenus(),
       loadDashboards(),
       setupLogoAndMMIntegration(),
-      checkTermsAndConditions()
+      //checkTermsAndConditions()
     ]);
   };
 

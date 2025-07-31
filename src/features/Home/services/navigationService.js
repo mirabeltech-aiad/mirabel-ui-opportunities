@@ -313,13 +313,13 @@ export const navigationService = {
           let url = replaceSessionVarsInUrl(menu.URL);
           
           // Special URL handling for MKM/MES - matches backend exactly
-          if ((menu.URLSource === 'MKM' || menu.URLSource === 'MKM-DATA') && url) {
-            const marketingManagerSiteURL = await navigationService.getMarketingManagerSiteURL();
-            url = insertMenuUrlAtPlaceholder(marketingManagerSiteURL, url);
-          } else if (menu.URLSource === 'MES' && url) {
-            const emailServiceSiteURL = await navigationService.getEmailServiceSiteURL();
-            url = insertMenuUrlAtPlaceholder(emailServiceSiteURL, url);
-          }
+          // if ((menu.URLSource === 'MKM' || menu.URLSource === 'MKM-DATA') && url) {
+          //   const marketingManagerSiteURL = await navigationService.getMarketingManagerSiteURL();
+          //   url = insertMenuUrlAtPlaceholder(marketingManagerSiteURL, url);
+          // } else if (menu.URLSource === 'MES' && url) {
+          //   const emailServiceSiteURL = await navigationService.getEmailServiceSiteURL();
+          //   url = insertMenuUrlAtPlaceholder(emailServiceSiteURL, url);
+          // }
           
           // Tooltip
           const toolTip = menu.ToolTip || '';
