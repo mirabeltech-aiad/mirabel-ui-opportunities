@@ -109,7 +109,7 @@ export const registerCorePages = (): void => {
     name: 'Advanced Search',
     title: 'Advanced Search',
     description: 'Advanced search and filtering capabilities',
-    route: '/advanced-search',
+    route: '/chargebrite/advanced-search',
     icon: Search,
     category: 'management',
     permissions: ['search:read'],

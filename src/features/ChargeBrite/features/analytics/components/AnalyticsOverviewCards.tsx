@@ -12,8 +12,8 @@ import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Users, DollarSign, TrendingUp, AlertTriangle } from 'lucide-react';
 import { AnalyticsOverview } from '../types';
-import { HelpTooltip } from '@/components';
-import MetricTooltip from '@/components/MetricTooltip';
+import HelpTooltip from '../../../components/shared/HelpTooltip';
+import MetricTooltip from '../../../components/MetricTooltip';
 
 /**
  * Component props for AnalyticsOverviewCards

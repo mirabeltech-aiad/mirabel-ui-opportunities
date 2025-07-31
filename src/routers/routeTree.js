@@ -103,7 +103,7 @@ export const routes = [
     exact: true,
   },
   {
-    path: '/chargebrite/analytics',
+    path: '/analytics',
     component: ChargeBriteAnalytics,
     exact: true,
   },

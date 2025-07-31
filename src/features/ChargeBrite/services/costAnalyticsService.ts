@@ -1,6 +1,6 @@
 
 import { USE_MOCK_DATA } from './apiClient';
-import { CostMetrics, AcquisitionCosts, DeliveryExpenses, SubscriberProfitability, CostBreakdown } from '@/types/costAnalytics';
+import { CostMetrics, AcquisitionCosts, DeliveryExpenses, SubscriberProfitability, CostBreakdown } from '../types/costAnalytics';
 
 // Mock data for cost analytics
 const mockCostMetrics: CostMetrics = {

@@ -3,14 +3,14 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from '../../components/ui/chart';
 import { PieChart, Pie, Cell, ResponsiveContainer } from 'recharts';
-import { useDeliveryExpenses } from '@/hooks/useCostAnalytics';
+import { useDeliveryExpenses } from '../../hooks/useCostAnalytics';
 import { TrendingUp, TrendingDown } from 'lucide-react';
-import { HelpTooltip } from '@/components';
-import { useSorting } from '@/hooks/useSorting';
-import { getDataTypeFromColumn } from '@/utils/sortingUtils';
-import { useTableColumnManager } from '@/hooks/useTableColumnManager';
+import HelpTooltip from '../shared/HelpTooltip';
+import { useSorting } from '../../hooks/useSorting';
+import { getDataTypeFromColumn } from '../../utils/sortingUtils';
+import { useTableColumnManager } from '../../hooks/useTableColumnManager';
 
-import { PIE_CHART_COLORS } from '@/constants/chartColors';
+import { PIE_CHART_COLORS } from '../../constants/chartColors';
 
 const DeliveryExpensesAnalysis = () => {
   const { data: deliveryData, isLoading } = useDeliveryExpenses();

@@ -2,15 +2,15 @@
 import { useMemo } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from '../../components/ui/chart';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/enhanced-table';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../../components/ui/enhanced-table';
 import { ScatterChart, Scatter, XAxis, YAxis, ResponsiveContainer } from 'recharts';
-import { useSubscriberProfitability } from '@/hooks/useCostAnalytics';
+import { useSubscriberProfitability } from '../../hooks/useCostAnalytics';
 import { DollarSign, TrendingUp, Users } from 'lucide-react';
-import { Badge } from '@/components/ui/badge';
-import { HelpTooltip } from '@/components';
-import { useSorting } from '@/hooks/useSorting';
-import { getDataTypeFromColumn } from '@/utils/sortingUtils';
-import { useTableColumnManager } from '@/hooks/useTableColumnManager';
+import { Badge } from '../../components/ui/badge';
+import HelpTooltip from '../shared/HelpTooltip';
+import { useSorting } from '../../hooks/useSorting';
+import { getDataTypeFromColumn } from '../../utils/sortingUtils';
+import { useTableColumnManager } from '../../hooks/useTableColumnManager';
 
 const SubscriberProfitabilityAnalysis = () => {
   const { data: profitabilityData, isLoading } = useSubscriberProfitability();

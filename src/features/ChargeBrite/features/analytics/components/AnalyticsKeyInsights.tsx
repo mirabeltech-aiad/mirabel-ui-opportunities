@@ -1,7 +1,7 @@
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { AnalyticsOverview } from '../types';
-import { HelpTooltip } from '@/components';
+import HelpTooltip from '../../../components/shared/HelpTooltip';
 
 interface AnalyticsKeyInsightsProps {
   overview: AnalyticsOverview;

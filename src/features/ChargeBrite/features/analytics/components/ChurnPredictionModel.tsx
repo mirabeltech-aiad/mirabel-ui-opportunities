@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { useChurnPredictions } from '../hooks/useAnalyticsData';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { AlertTriangle, Clock, TrendingDown } from 'lucide-react';
-import { HelpTooltip } from '@/components';
+import HelpTooltip from '../../../components/shared/HelpTooltip';
 
 const ChurnPredictionModel = () => {
   const { data: churnPredictions, isLoading, error } = useChurnPredictions();

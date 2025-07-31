@@ -72,7 +72,7 @@ export const registerCoreModules = () => {
     name: 'Advanced Search',
     description: 'Advanced search and filtering capabilities',
     version: '1.0.0',
-    route: '/advanced-search',
+    route: '/chargebrite/advanced-search',
     icon: 'Search',
     category: 'management',
     permissions: ['search:read']

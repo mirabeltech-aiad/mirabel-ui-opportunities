@@ -4,7 +4,7 @@ import { Badge } from '@/components/ui/badge';
 import { useLifetimeValues } from '../hooks/useAnalyticsData';
 import { ScatterChart, Scatter, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { DollarSign, Users, Calendar } from 'lucide-react';
-import { HelpTooltip } from '@/components';
+import HelpTooltip from '../../../components/shared/HelpTooltip';
 
 const LifetimeValueAnalysis = () => {
   const { data: ltvData, isLoading, error } = useLifetimeValues();

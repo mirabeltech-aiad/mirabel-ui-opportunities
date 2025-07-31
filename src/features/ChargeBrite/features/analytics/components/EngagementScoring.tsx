@@ -4,7 +4,7 @@ import { Badge } from '@/components/ui/badge';
 import { useEngagementMetrics } from '../hooks/useAnalyticsData';
 import { RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar, ResponsiveContainer, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip } from 'recharts';
 import { TrendingUp, Users, MessageSquare, Share2, ThumbsUp } from 'lucide-react';
-import { HelpTooltip } from '@/components';
+import HelpTooltip from '../../../components/shared/HelpTooltip';
 
 const EngagementScoring = () => {
   const { data: engagementData, isLoading, error } = useEngagementMetrics();

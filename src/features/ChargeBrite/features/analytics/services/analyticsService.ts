@@ -22,7 +22,7 @@
  * @since 1.0.0
  */
 
-import { USE_MOCK_DATA } from '@/services/apiClient';
+import { USE_MOCK_DATA } from '../../../services/apiClient';
 import {
   SubscriberDemographics,
   BehavioralSegment,

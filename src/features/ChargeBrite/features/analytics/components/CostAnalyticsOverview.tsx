@@ -1,8 +1,8 @@
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { DollarSign, TrendingDown, Target, Calculator } from 'lucide-react';
-import { useCostMetrics } from '@/hooks/useCostAnalytics';
-import { HelpTooltip } from '@/components';
+import { useCostMetrics } from '../../../hooks/useCostAnalytics';
+import HelpTooltip from '../../../components/shared/HelpTooltip';
 
 const CostAnalyticsOverview = () => {
   const { data: metrics, isLoading } = useCostMetrics();

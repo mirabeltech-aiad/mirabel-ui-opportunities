@@ -1,6 +1,6 @@
-import { useProductFilter } from '@/contexts/ProductFilterContext';
+import { useProductFilter } from '../../../contexts/ProductFilterContext';
 import { analyticsService } from '../services/analyticsService';
-import { useDeferredQuery } from '@/hooks/useDeferredQuery';
+import { useDeferredQuery } from '../../../hooks/useDeferredQuery';
 
 export const useSubscriberDemographics = (defer = false) => {
   const { selectedProducts, selectedBusinessUnits, isAllProductsSelected, isAllBusinessUnitsSelected } = useProductFilter();

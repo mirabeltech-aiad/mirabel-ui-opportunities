@@ -4,11 +4,11 @@ import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
 import { X, Filter } from 'lucide-react';
-import { useProductFilter } from '@/contexts/ProductFilterContext';
-import PeriodFilter from '@/components/filters/PeriodFilter';
-import DateRangeFilterSection from '@/components/filters/DateRangeFilterSection';
-import SearchButton from '@/components/filters/SearchButton';
-import { useProductFilterLogic } from '@/components/filters/useProductFilterLogic';
+import { useProductFilter } from '../../../contexts/ProductFilterContext';
+import PeriodFilter from '../../../components/filters/PeriodFilter';
+import DateRangeFilterSection from '../../../components/filters/DateRangeFilterSection';
+import SearchButton from '../../../components/filters/SearchButton';
+import { useProductFilterLogic } from '../../../components/filters/useProductFilterLogic';
 
 interface AnalyticsFiltersProps {
   dateRange?: {

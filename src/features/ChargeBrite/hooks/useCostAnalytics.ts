@@ -1,7 +1,7 @@
 
 import { useQuery, keepPreviousData } from '@tanstack/react-query';
-import { costAnalyticsService } from '@/services/costAnalyticsService';
-import { useProductFilter } from '@/contexts/ProductFilterContext';
+import { costAnalyticsService } from '../services/costAnalyticsService';
+import { useProductFilter } from '../contexts/ProductFilterContext';
 
 export const useCostMetrics = () => {
   const { selectedProducts, selectedBusinessUnits, isAllProductsSelected, isAllBusinessUnitsSelected } = useProductFilter();

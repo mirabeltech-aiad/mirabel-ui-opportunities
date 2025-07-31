@@ -12,12 +12,12 @@ import {
   ChartTooltipContent 
 } from '../../components/ui/chart';
 import { BarChart, Bar, XAxis, YAxis, ResponsiveContainer } from 'recharts';
-import { useAcquisitionCosts } from '@/hooks/useCostAnalytics';
+import { useAcquisitionCosts } from '../../hooks/useCostAnalytics';
 import { TrendingUp, TrendingDown } from 'lucide-react';
-import { HelpTooltip } from '@/components';
-import { useSorting } from '@/hooks/useSorting';
-import { getDataTypeFromColumn } from '@/utils/sortingUtils';
-import { useTableColumnManager } from '@/hooks/useTableColumnManager';
+import HelpTooltip from '../shared/HelpTooltip';
+import { useSorting } from '../../hooks/useSorting';
+import { getDataTypeFromColumn } from '../../utils/sortingUtils';
+import { useTableColumnManager } from '../../hooks/useTableColumnManager';
 
 const AcquisitionCostsAnalysis = () => {
   const { data: acquisitionData, isLoading } = useAcquisitionCosts();
