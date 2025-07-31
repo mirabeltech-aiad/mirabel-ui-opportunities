@@ -113,7 +113,6 @@ export const handleMessage = (event) => {
 
 // Check if we're in development mode - Vite specific
 export const isDevelopmentMode = () => {
-    alert("13")
     // Vite provides import.meta.env.DEV for development detection
     const isViteDev = import.meta.env.DEV;
     const isDevMode = import.meta.env.MODE === 'development';
@@ -126,7 +125,6 @@ export const isDevelopmentMode = () => {
 // Initialize development environment
 export const initializeDevelopmentEnvironment = () => {
     if (isDevelopmentMode()) {
-        alert("15")
         // Set session data in localStorage
         localStorage.setItem("MMClientVars", JSON.stringify(sessionValues));
         sessionStorage.setItem("ClientID", sessionValues.ClientID);
