@@ -8,4 +8,4 @@
 export { reportsApiService } from './api';
 
 // Re-export from existing services for backward compatibility
-export * from '@/services/reports';
+export * from '../../../services/reports';

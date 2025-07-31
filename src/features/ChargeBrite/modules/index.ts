@@ -4,23 +4,23 @@
  */
 
 import { lazy } from 'react';
-import { moduleRegistry } from '@/core/ModuleRegistry';
-import { createModuleTemplate } from '@/core/BaseModule';
+import { moduleRegistry } from '../core/ModuleRegistry';
+import { createModuleTemplate } from '../core/BaseModule';
 
 // Lazy load module components
-const CirculationModule = lazy(() => import('@/pages/CirculationDashboard'));
-const AnalyticsModule = lazy(() => import('@/pages/AnalyticsDashboard'));
-const PricingModule = lazy(() => import('@/pages/PricingAnalysis'));
-const ReportsModule = lazy(() => import('@/pages/Reports'));
-const AdminModule = lazy(() => import('@/pages/Admin'));
-const AdvancedSearchModule = lazy(() => import('@/pages/AdvancedSearch'));
+const CirculationModule = lazy(() => import('../pages/CirculationDashboard'));
+const AnalyticsModule = lazy(() => import('../pages/AnalyticsDashboard'));
+const PricingModule = lazy(() => import('../pages/PricingAnalysis'));
+const ReportsModule = lazy(() => import('../pages/Reports'));
+const AdminModule = lazy(() => import('../pages/Admin'));
+const AdvancedSearchModule = lazy(() => import('../pages/AdvancedSearch'));
 
 // Register core modules
 export const registerCoreModules = () => {
 
   // Circulation Dashboard Module
   moduleRegistry.register(createModuleTemplate({
-    id: 'circulation-dashboard',
+    id: 'circulation-dashboard-module',
     name: 'Circulation Dashboard',
     description: 'Comprehensive circulation analytics and metrics tracking',
     version: '1.0.0',
@@ -32,7 +32,7 @@ export const registerCoreModules = () => {
 
   // Analytics Dashboard Module
   moduleRegistry.register(createModuleTemplate({
-    id: 'analytics-dashboard',
+    id: 'analytics-dashboard-module',
     name: 'Analytics Dashboard',
     description: 'Advanced analytics and data visualization',
     version: '1.0.0',
@@ -44,7 +44,7 @@ export const registerCoreModules = () => {
 
   // Pricing Analysis Module
   moduleRegistry.register(createModuleTemplate({
-    id: 'pricing-analysis',
+    id: 'pricing-analysis-module',
     name: 'Pricing Analysis',
     description: 'Pricing strategy and analysis tools',
     version: '1.0.0',
@@ -56,7 +56,7 @@ export const registerCoreModules = () => {
 
   // Reports Module
   moduleRegistry.register(createModuleTemplate({
-    id: 'reports',
+    id: 'reports-module',
     name: 'Reports',
     description: 'Generate and manage reports',
     version: '1.0.0',
@@ -68,7 +68,7 @@ export const registerCoreModules = () => {
 
   // Advanced Search Module
   moduleRegistry.register(createModuleTemplate({
-    id: 'advanced-search',
+    id: 'advanced-search-module',
     name: 'Advanced Search',
     description: 'Advanced search and filtering capabilities',
     version: '1.0.0',
@@ -80,7 +80,7 @@ export const registerCoreModules = () => {
 
   // Admin Module
   moduleRegistry.register(createModuleTemplate({
-    id: 'admin',
+    id: 'admin-module',
     name: 'Administration',
     description: 'System administration and management',
     version: '1.0.0',
@@ -92,5 +92,5 @@ export const registerCoreModules = () => {
 };
 
 // Export for external module creation
-export { moduleRegistry } from '@/core/ModuleRegistry';
-export { createModuleTemplate } from '@/core/BaseModule';
+export { moduleRegistry } from '../core/ModuleRegistry';
+export { createModuleTemplate } from '../core/BaseModule';

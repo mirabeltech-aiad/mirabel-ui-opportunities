@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
-import { useBusinessModel } from '@/contexts/BusinessModelContext';
-import { supabase } from '@/integrations/supabase/client';
+import { useBusinessModel } from '../contexts/BusinessModelContext';
+import { supabase } from '../integrations/supabase/client';
 
 export interface ReportTemplate {
   id: string;

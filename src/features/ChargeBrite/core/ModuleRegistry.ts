@@ -37,6 +37,12 @@ class ModuleRegistry {
    * Register a new module
    */
   register(config: ModuleConfig): void {
+    // Check if module already exists
+    if (this.modules.has(config.id)) {
+      console.warn(`Module with ID ${config.id} already exists. Skipping registration.`);
+      return;
+    }
+
     // Validate module configuration
     this.validateModule(config);
     
@@ -97,10 +103,6 @@ class ModuleRegistry {
   private validateModule(config: ModuleConfig): void {
     if (!config.id || !config.name || !config.component) {
       throw new Error('Module must have id, name, and component');
-    }
-    
-    if (this.modules.has(config.id)) {
-      throw new Error(`Module with ID ${config.id} already exists`);
     }
   }
 

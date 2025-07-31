@@ -1,9 +1,9 @@
 
 import { useState, useMemo } from 'react';
-import { reportsConfig } from '@/data/reportsConfig';
-import { PerformanceAnalytics } from '@/utils/performanceAnalytics';
-import { useBusinessModel } from '@/contexts/BusinessModelContext';
-import { filterReportsByBusinessModel, ReportWithBusinessModel } from '@/utils/businessModelFilters';
+import { reportsConfig } from '../data/reportsConfig';
+import { PerformanceAnalytics } from '../utils/performanceAnalytics';
+import { useBusinessModel } from '../contexts/BusinessModelContext';
+import { filterReportsByBusinessModel, ReportWithBusinessModel } from '../utils/businessModelFilters';
 
 export const useReportsFiltering = () => {
   const [searchQuery, setSearchQuery] = useState('');

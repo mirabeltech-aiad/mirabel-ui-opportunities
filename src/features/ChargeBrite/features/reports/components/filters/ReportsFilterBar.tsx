@@ -1,9 +1,9 @@
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import ConnectedFilterDropdown, { FilterOption } from '@/components/filters/ConnectedFilterDropdown';
-import PeriodFilter from '@/components/filters/PeriodFilter';
-import DateRangeFilterSection from '@/components/filters/DateRangeFilterSection';
-import { useProductFilter } from '@/contexts/ProductFilterContext';
+import ConnectedFilterDropdown, { FilterOption } from '../../../../components/filters/ConnectedFilterDropdown';
+import PeriodFilter from '../../../../components/filters/PeriodFilter';
+import DateRangeFilterSection from '../../../../components/filters/DateRangeFilterSection';
+import { useProductFilter } from '../../../../contexts/ProductFilterContext';
 import { Filter, Search } from 'lucide-react';
 
 interface ReportsFilterBarProps {

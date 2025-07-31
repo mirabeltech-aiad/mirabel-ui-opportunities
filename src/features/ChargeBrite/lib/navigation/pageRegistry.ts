@@ -45,6 +45,18 @@ class PageRegistry {
    * Register a page in the registry
    */
   register(pageConfig: PageConfig): void {
+    // Check if page already exists
+    if (this.pages.has(pageConfig.id)) {
+      console.warn(`Page with ID ${pageConfig.id} already exists. Skipping registration.`);
+      return;
+    }
+
+    // Check if route already exists
+    if (this.routes.has(pageConfig.route)) {
+      console.warn(`Page with route ${pageConfig.route} already exists. Skipping registration.`);
+      return;
+    }
+
     this.pages.set(pageConfig.id, pageConfig);
     this.routes.set(pageConfig.route, pageConfig);
     this.notifySubscribers();

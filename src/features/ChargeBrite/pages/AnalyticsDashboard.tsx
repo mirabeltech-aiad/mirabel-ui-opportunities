@@ -1,11 +1,11 @@
 import React, { Suspense } from 'react';
-import { DashboardSkeleton } from '@/components/ui/dashboard-skeleton';
+import { DashboardSkeleton } from '../components/ui/dashboard-skeleton';
 import { ProductFilterProvider } from '../contexts/ProductFilterContext';
-import { PerformanceAnalytics } from '@/utils/performanceAnalytics';
-import ScrollToTopButton from '@/components/ui/ScrollToTopButton';
+import { PerformanceAnalytics } from '../utils/performanceAnalytics';
+import ScrollToTopButton from '../components/ui/ScrollToTopButton';
 
 const AnalyticsDashboardContent = React.lazy(() => 
-  import('@/features/analytics/components/AnalyticsDashboard').then(module => ({
+  import('../features/analytics/components/AnalyticsDashboard').then(module => ({
     default: module.default
   }))
 );

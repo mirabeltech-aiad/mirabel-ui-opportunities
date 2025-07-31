@@ -1,6 +1,6 @@
 
 
-import { useRevenueAttribution } from '@/hooks/useRevenueData';
+import { useRevenueAttribution } from '../../hooks/useRevenueData';
 import TouchpointsAttribution from './revenue/TouchpointsAttribution';
 import ChannelTypeMatrix from './revenue/ChannelTypeMatrix';
 import GeographicAttribution from './revenue/GeographicAttribution';

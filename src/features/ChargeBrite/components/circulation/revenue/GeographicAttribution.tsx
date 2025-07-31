@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { HelpTooltip } from '@/components';
+import HelpTooltip from '../../shared/HelpTooltip';
 
 interface GeographicAttributionProps {
   geographic: Array<{

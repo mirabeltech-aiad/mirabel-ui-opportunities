@@ -5,7 +5,7 @@
  */
 
 // Data management hooks
-export { useReportsFiltering } from '@/hooks/useReportsFiltering';
+export { useReportsFiltering } from '../../../hooks/useReportsFiltering';
 
 // Re-export existing hooks for backward compatibility
-export { useFilteredReports } from '@/hooks/useFilteredReports';
+export { useFilteredReports } from '../../../hooks/useFilteredReports';

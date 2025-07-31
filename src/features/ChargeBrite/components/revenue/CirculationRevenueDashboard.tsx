@@ -2,11 +2,11 @@ import React from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 // Lazy load revenue components
-const RevenueOverview = React.lazy(() => import('@/components/circulation/RevenueOverview'));
+const RevenueOverview = React.lazy(() => import('../../components/circulation/RevenueOverview'));
 const AcquisitionChannelRevenue = React.lazy(() => import('./AcquisitionChannelRevenue'));
-const SubscriptionTypeRevenue = React.lazy(() => import('@/components/circulation/SubscriptionTypeRevenue'));
-const GeographicRevenueDistribution = React.lazy(() => import('@/components/circulation/GeographicRevenueDistribution'));
-const RevenueAttribution = React.lazy(() => import('@/components/circulation/RevenueAttribution'));
+const SubscriptionTypeRevenue = React.lazy(() => import('../../components/circulation/SubscriptionTypeRevenue'));
+const GeographicRevenueDistribution = React.lazy(() => import('../../components/circulation/GeographicRevenueDistribution'));
+const RevenueAttribution = React.lazy(() => import('../../components/circulation/RevenueAttribution'));
 
 const CirculationRevenueDashboard = () => {
   return (

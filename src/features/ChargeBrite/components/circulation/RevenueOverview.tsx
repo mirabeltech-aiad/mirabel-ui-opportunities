@@ -1,9 +1,9 @@
 
 
-import { useRevenueOverview } from '@/hooks/useRevenueData';
+import { useRevenueOverview } from '../../hooks/useRevenueData';
 import RevenueMetricsCards from './revenue/RevenueMetricsCards';
 import { DollarSign, TrendingUp, Users, Calendar } from 'lucide-react';
-import type { RevenueMetrics } from '@/types/revenue';
+import type { RevenueMetrics } from '../../types/revenue';
 
 interface RevenueMetric {
   title: string;

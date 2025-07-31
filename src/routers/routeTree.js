@@ -16,8 +16,14 @@ const Reports = lazy(() => import('../pages/Opportunity/Reports'));
 const Admin = lazy(() => import('../pages/Opportunity/Admin'));
 const Settings = lazy(() => import('../pages/Opportunity/Settings'));
 const NotFound = lazy(() => import('../pages/Opportunity/NotFound'));
-// const CbReportsPage = lazy(() => import('../pages/ChargeBriteReports/Index'));
-const CirculationDashboard = lazy(() => import('../features/ChargeBrite/pages/CirculationDashboard'));
+// ChargeBrite module components
+const ChargeBriteCirculation = lazy(() => import('../features/ChargeBrite/App').then(module => ({ default: module.ChargeBriteCirculation })));
+const ChargeBriteAnalytics = lazy(() => import('../features/ChargeBrite/App').then(module => ({ default: module.ChargeBriteAnalytics })));
+const ChargeBritePricing = lazy(() => import('../features/ChargeBrite/App').then(module => ({ default: module.ChargeBritePricing })));
+const ChargeBriteAdvancedSearch = lazy(() => import('../features/ChargeBrite/App').then(module => ({ default: module.ChargeBriteAdvancedSearch })));
+const ChargeBriteReports = lazy(() => import('../features/ChargeBrite/App').then(module => ({ default: module.ChargeBriteReports })));
+const ChargeBriteAdmin = lazy(() => import('../features/ChargeBrite/App').then(module => ({ default: module.ChargeBriteAdmin })));
+const ChargeBriteSettings = lazy(() => import('../features/ChargeBrite/App').then(module => ({ default: module.ChargeBriteSettings })));
 
 export const routes = [
   {
@@ -93,7 +99,37 @@ export const routes = [
 
   {
     path: '/circulation',
-    component: CirculationDashboard,
+    component: ChargeBriteCirculation,
+    exact: true,
+  },
+  {
+    path: '/chargebrite/analytics',
+    component: ChargeBriteAnalytics,
+    exact: true,
+  },
+  {
+    path: '/chargebrite/pricing',
+    component: ChargeBritePricing,
+    exact: true,
+  },
+  {
+    path: '/chargebrite/advanced-search',
+    component: ChargeBriteAdvancedSearch,
+    exact: true,
+  },
+  {
+    path: '/chargebrite/reports',
+    component: ChargeBriteReports,
+    exact: true,
+  },
+  {
+    path: '/chargebrite/admin',
+    component: ChargeBriteAdmin,
+    exact: true,
+  },
+  {
+    path: '/chargebrite/settings',
+    component: ChargeBriteSettings,
     exact: true,
   },
 

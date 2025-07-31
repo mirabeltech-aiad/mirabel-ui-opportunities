@@ -24,8 +24,8 @@
  * @version 2.0.0 - Enhanced with retry logic and caching
  */
 
-import { BaseService } from '@/lib/services/base';
-import { BusinessModel } from '@/contexts/BusinessModelContext';
+import { BaseService } from '../../../lib/services/base';
+import { BusinessModel } from '../../../contexts/BusinessModelContext';
 import { ReportDataResponse, ReportTemplate, ApiError } from './types';
 import type { Report } from '../types';
 

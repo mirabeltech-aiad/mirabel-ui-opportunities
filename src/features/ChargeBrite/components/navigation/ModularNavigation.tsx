@@ -5,10 +5,10 @@
 
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { useNavigation } from '@/core/NavigationManager';
-import { useModule } from '@/core/ModuleProvider';
-import { Badge } from '@/components/ui/badge';
-import { cn } from '@/lib/utils';
+import { useNavigation } from '../../core/NavigationManager';
+import { useModule } from '../../core/ModuleProvider';
+import { Badge } from '../ui/badge';
+import { cn } from '../../lib/utils';
 
 interface ModularNavigationProps {
   className?: string;

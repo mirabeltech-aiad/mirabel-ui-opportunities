@@ -13,7 +13,7 @@ import { useState } from 'react';
 import { useAnalyticsOverview } from '../hooks/useAnalyticsData';
 import AnalyticsTabNavigation from './AnalyticsTabNavigation';
 import AnalyticsFilters from './AnalyticsFilters';
-import { AnalyticsErrorBoundary } from '@/components/error-boundaries';
+import { AnalyticsErrorBoundary } from '../../../components/error-boundaries';
 
 /**
  * Analytics Dashboard Component

@@ -5,11 +5,11 @@
 
 import React from 'react';
 import { Outlet, useLocation } from 'react-router-dom';
-import ModularNavigation from '@/components/navigation/ModularNavigation';
-import { NavigationProvider } from '@/core/NavigationManager';
-import { ModuleProvider } from '@/core/ModuleProvider';
-import { Card } from '@/components/ui/card';
-import { Separator } from '@/components/ui/separator';
+import ModularNavigation from '../navigation/ModularNavigation';
+import { NavigationProvider } from '../../core/NavigationManager';
+import { ModuleProvider } from '../../core/ModuleProvider';
+import { Card } from '../ui/card';
+import { Separator } from '../ui/separator';
 
 interface AppLayoutProps {
   children?: React.ReactNode;

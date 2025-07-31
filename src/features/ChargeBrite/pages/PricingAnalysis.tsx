@@ -1,9 +1,9 @@
 import React, { Suspense, useState } from 'react';
-import { DashboardSkeleton } from '@/components/ui/dashboard-skeleton';
-import { ProductFilterProvider } from '@/contexts/ProductFilterContext';
-import ProductFilter from '@/components/filters/ProductFilter';
-import ScrollToTopButton from '@/components/ui/ScrollToTopButton';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { DashboardSkeleton } from '../components/ui/dashboard-skeleton';
+import { ProductFilterProvider } from '../contexts/ProductFilterContext';
+import ProductFilter from '../components/filters/ProductFilter';
+import ScrollToTopButton from '../components/ui/ScrollToTopButton';
+import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
 
 const PricingAnalysis = () => {
   const [dateRange, setDateRange] = useState<{

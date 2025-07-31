@@ -7,12 +7,12 @@
 
 import { useEffect } from 'react';
 import { Helmet } from 'react-helmet-async';
-import { useRouteUtils, usePageSEO } from '@/lib/navigation/routeIntegration';
-import { FeatureErrorBoundary } from '@/components/error-boundaries';
-import PageBreadcrumbs from '@/components/navigation/PageBreadcrumbs';
-import { OceanTitle, OceanButton } from '@/components/ui/design-system';
+import { useRouteUtils, usePageSEO } from '../../lib/navigation/routeIntegration';
+import { FeatureErrorBoundary } from '../error-boundaries';
+import PageBreadcrumbs from '../navigation/PageBreadcrumbs';
+import { OceanTitle, OceanButton } from '../ui/design-system';
 import { ArrowLeft, RefreshCw } from 'lucide-react';
-import { cn } from '@/lib/utils';
+import { cn } from '../../lib/utils';
 
 interface PageLayoutProps {
   children: React.ReactNode;

@@ -3,7 +3,7 @@ import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { DollarSign, TrendingUp, Users, Calendar } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
-import { HelpTooltip } from '@/components';
+import HelpTooltip from '../../shared/HelpTooltip';
 
 interface RevenueMetric {
   title: string;

@@ -1,18 +1,18 @@
 import React, { useState, Suspense } from 'react';
-import { ProductFilterProvider } from '@/contexts/ProductFilterContext';
+import { ProductFilterProvider } from '../../../contexts/ProductFilterContext';
 import ReportsFilterBar from '../components/filters/ReportsFilterBar';
-import { CardContent } from '@/components/ui/card';
-import { useReportsFiltering } from '@/hooks/useReportsFiltering';
+import { CardContent } from '../../../components/ui/card';
+import { useReportsFiltering } from '../../../hooks/useReportsFiltering';
 import { 
   OceanTitle, 
   OceanButton, 
   DesignSystemCard, 
   SemanticBadge 
-} from '@/components/ui/design-system';
+} from '../../../components/ui/design-system';
 import { Building2, Zap, AlertCircle, RefreshCw } from 'lucide-react';
 import ReportsHeader from '../components/directory/ReportsHeader';
 import ReportCard from '../components/directory/ReportCard';
-import ReportsDirectory from '@/components/reports/ReportsDirectory';
+import ReportsDirectory from '../../../components/reports/ReportsDirectory';
 
 const ReportsDirectoryPage = () => {
   const [selectedReportId, setSelectedReportId] = useState<string | null>(null);

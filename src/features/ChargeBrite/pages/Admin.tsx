@@ -1,7 +1,7 @@
 
 import React from 'react';
 import AdminDashboard from '../components/AdminDashboard';
-import ScrollToTopButton from '@/components/ui/ScrollToTopButton';
+import ScrollToTopButton from '../components/ui/ScrollToTopButton';
 
 const Admin = () => {
   return (

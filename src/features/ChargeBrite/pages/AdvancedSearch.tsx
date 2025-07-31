@@ -11,8 +11,8 @@ import {
   AccordionItem, 
   AccordionTrigger 
 } from '@/components/ui/accordion';
-import { useProductFilter } from '@/contexts/ProductFilterContext';
-import DateRangeFilterSection from '@/components/filters/DateRangeFilterSection';
+import { useProductFilter } from '../contexts/ProductFilterContext';
+import DateRangeFilterSection from '../components/filters/DateRangeFilterSection';
 
 const AdvancedSearch = () => {
   const navigate = useNavigate();

@@ -1,6 +1,6 @@
 import React from 'react';
-import { ReportsDirectory } from '@/features/reports';
-import PageLayout from '@/components/layout/PageLayout';
+import { ReportsDirectory } from '../features/reports';
+import PageLayout from '../components/layout/PageLayout';
 
 const Reports = () => {
   return (

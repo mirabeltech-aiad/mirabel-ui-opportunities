@@ -1,10 +1,10 @@
 
 import React from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { HoverCard, HoverCardContent, HoverCardTrigger } from '@/components/ui/hover-card';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui/card';
+import { Badge } from '../ui/badge';
+import { HoverCard, HoverCardContent, HoverCardTrigger } from '../ui/hover-card';
 import { FileText, BarChart3, TrendingUp, ArrowRight, Star } from 'lucide-react';
-import { getKeywordColor } from '@/utils/keywordColors';
+import { getKeywordColor } from '../../utils/keywordColors';
 
 interface ReportCardProps {
   report: {

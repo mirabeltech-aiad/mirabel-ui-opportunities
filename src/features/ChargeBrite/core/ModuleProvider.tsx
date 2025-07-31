@@ -5,7 +5,7 @@
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { moduleRegistry, ModuleConfig } from './ModuleRegistry';
-import { PerformanceAnalytics } from '@/utils/performanceAnalytics';
+import { PerformanceAnalytics } from '../utils/performanceAnalytics';
 
 interface ModuleContextType {
   modules: ModuleConfig[];

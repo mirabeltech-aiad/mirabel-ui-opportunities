@@ -9,8 +9,8 @@
  */
 
 import React from 'react';
-import { CardContent } from '@/components/ui/card';
-import { OceanButton, DesignSystemCard, SemanticBadge } from '@/components/ui/design-system';
+import { CardContent } from '../../../../components/ui/card';
+import { OceanButton, DesignSystemCard, SemanticBadge } from '../../../../components/ui/design-system';
 
 /**
  * Report data structure for card display

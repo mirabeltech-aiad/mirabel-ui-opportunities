@@ -9,9 +9,9 @@
  */
 
 import React from 'react';
-import { OceanTitle, OceanButton, SemanticBadge } from '@/components/ui/design-system';
+import { OceanTitle, OceanButton, SemanticBadge } from '../../../../components/ui/design-system';
 import { Building2, Zap, AlertCircle, RefreshCw } from 'lucide-react';
-import { BusinessModel } from '@/contexts/BusinessModelContext';
+import { BusinessModel } from '../../../../contexts/BusinessModelContext';
 
 /**
  * Props interface for ReportsHeader component
