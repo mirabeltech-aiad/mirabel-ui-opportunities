@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useHome } from '../contexts/HomeContext';
 import navigationService from '../services/navigationService';
 import { useAuth } from '@/contexts/AuthContext';
@@ -24,6 +24,8 @@ import {
   Globe,
   MessageSquare,
   ChevronUp,
+  ChevronLeft,
+  ChevronRight,
 } from 'lucide-react';
 import {
   DropdownMenu,
@@ -154,6 +156,11 @@ const Navbar = () => {
   // Add state to track which parent menu is open
   const [openMenuId, setOpenMenuId] = useState(null);
   const [expandedMenus, setExpandedMenus] = React.useState({});
+  
+  // Scroll state for navigation menus
+  const [canScrollLeft, setCanScrollLeft] = useState(false);
+  const [canScrollRight, setCanScrollRight] = useState(false);
+  const menuContainerRef = useRef(null);
 
   // Fallback user info if AuthContext user is null
   const [fallbackUser, setFallbackUser] = useState(null);
@@ -436,6 +443,50 @@ const Navbar = () => {
     setExpandedMenus((prev) => ({ ...prev, [menuId]: false }));
   };
 
+  // Check if menus can scroll
+  const checkScrollState = () => {
+    if (menuContainerRef.current) {
+      const container = menuContainerRef.current;
+      setCanScrollLeft(container.scrollLeft > 0);
+      setCanScrollRight(container.scrollLeft < container.scrollWidth - container.clientWidth);
+    }
+  };
+
+  // Scroll menus left/right
+  const scrollMenus = (direction) => {
+    if (menuContainerRef.current) {
+      const scrollAmount = 200; // pixels to scroll
+      const currentScroll = menuContainerRef.current.scrollLeft;
+      const newScroll = direction === 'left' 
+        ? currentScroll - scrollAmount 
+        : currentScroll + scrollAmount;
+      
+      menuContainerRef.current.scrollTo({
+        left: newScroll,
+        behavior: 'smooth'
+      });
+    }
+  };
+
+  // Check scroll state when menus change or window resizes
+  useEffect(() => {
+    checkScrollState();
+    
+    const handleResize = () => checkScrollState();
+    window.addEventListener('resize', handleResize);
+    
+    return () => window.removeEventListener('resize', handleResize);
+  }, [navigationMenus]);
+
+  // Add scroll event listener to update button states
+  useEffect(() => {
+    const container = menuContainerRef.current;
+    if (container) {
+      container.addEventListener('scroll', checkScrollState);
+      return () => container.removeEventListener('scroll', checkScrollState);
+    }
+  }, [navigationMenus]);
+
   return (
     <>
       <nav className="navbar bg-ocean-gradient shadow-md h-12">
@@ -448,19 +499,43 @@ const Navbar = () => {
                   <img src={logoUrl} alt="Logo" style={{ height: 32, marginRight:0 }} />
                 </div>
               </div>
-            {/* Top Menus */}
-            <div className="ml-4 flex items-center space-x-1 min-h-0">
+            {/* Top Menus with Scrolling */}
+            <div className="ml-4 flex items-center min-h-0 flex-1 max-w-3xl">
               {navigationLoading ? (
                 <div className="flex items-center text-white text-sm">
+                  <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                  Loading menus...
                 </div>
               ) : (
                 <>
                   {navigationMenus && Array.isArray(navigationMenus) && navigationMenus.length > 0 ? (
-                    navigationMenus.map((menu) => (
+                    <div className="flex items-center w-full">
+                      {/* Left Scroll Button */}
+                      {canScrollLeft && (
+                        <button
+                          onClick={() => scrollMenus('left')}
+                          className="flex-shrink-0 p-1 text-white hover:bg-ocean-700 rounded-md mr-1"
+                          title="Scroll menus left"
+                        >
+                          <ChevronLeft className="h-4 w-4" />
+                        </button>
+                      )}
+                      
+                      {/* Scrollable Menu Container */}
+                      <div 
+                        ref={menuContainerRef}
+                        className="flex items-center space-x-1 overflow-x-auto flex-1 scrollbar-hide"
+                        style={{ 
+                          scrollbarWidth: 'none', 
+                          msOverflowStyle: 'none',
+                          WebkitScrollbar: { display: 'none' }
+                        }}
+                      >
+                        {navigationMenus.map((menu) => (
                       <DropdownMenu key={menu.id} onOpenChange={(open) => setOpenMenuId(open ? menu.id : (openMenuId === menu.id ? null : openMenuId))}>
                         <DropdownMenuTrigger asChild>
                           <button
-                            className={`px-2 py-1 rounded-md font-medium text-sm transition flex items-center h-8 min-h-0 ${
+                            className={`flex-shrink-0 px-2 py-1 rounded-md font-medium text-sm transition flex items-center h-8 min-h-0 whitespace-nowrap ${
                               openMenuId === menu.id
                                 ? 'bg-blue-200 text-blue-900 shadow font-semibold' // Professional highlight for active
                                 : 'text-white hover:bg-ocean-700 hover:text-black focus:bg-ocean-800'
@@ -485,7 +560,20 @@ const Navbar = () => {
                           )}
                         </DropdownMenuContent>
                       </DropdownMenu>
-                    ))
+                        ))}
+                      </div>
+                      
+                      {/* Right Scroll Button */}
+                      {canScrollRight && (
+                        <button
+                          onClick={() => scrollMenus('right')}
+                          className="flex-shrink-0 p-1 text-white hover:bg-ocean-700 rounded-md ml-1"
+                          title="Scroll menus right"
+                        >
+                          <ChevronRight className="h-4 w-4" />
+                        </button>
+                      )}
+                    </div>
                   ) : (
                     <div className="text-white text-sm px-2 flex items-center gap-2">
                       <span>
