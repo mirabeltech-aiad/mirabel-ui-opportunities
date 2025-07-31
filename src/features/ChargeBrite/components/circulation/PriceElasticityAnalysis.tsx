@@ -1,7 +1,7 @@
 
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart';
+import { ChartContainer, ChartTooltip, ChartTooltipContent } from '../../components/ui/chart';
 import { LineChart, Line, XAxis, YAxis, ResponsiveContainer, ScatterChart, Scatter, AreaChart, Area } from 'recharts';
 import { usePriceElasticityData } from '@/hooks/usePricingData';
 import { HelpTooltip } from '@/components';

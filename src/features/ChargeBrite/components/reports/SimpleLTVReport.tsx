@@ -3,9 +3,9 @@ import React from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { DollarSign, TrendingUp, Users, AlertTriangle } from 'lucide-react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
-import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart';
-import ScrollToTopButton from '@/components/ui/ScrollToTopButton';
-import HelpTooltip from '@/components/shared/HelpTooltip';
+import { ChartContainer, ChartTooltip, ChartTooltipContent } from '../../components/ui/chart';
+import ScrollToTopButton from '../../components/ui/ScrollToTopButton';
+import HelpTooltip from '../shared/HelpTooltip';
 
 const SimpleLTVReport = () => {
   // Average LTV data

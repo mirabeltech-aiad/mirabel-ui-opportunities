@@ -2,8 +2,8 @@ import React from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { BarChart3 } from 'lucide-react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, ResponsiveContainer, Cell } from 'recharts';
-import { ChartContainer, ChartTooltip } from '@/components/ui/chart';
-import HelpTooltip from '../../../components/shared/HelpTooltip';
+import { ChartContainer, ChartTooltip } from '../../../components/ui/chart';
+import HelpTooltip from '../../shared/HelpTooltip';
 
 interface ChannelData {
   channel: string;

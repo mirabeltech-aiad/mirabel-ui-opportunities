@@ -1,11 +1,11 @@
 
 import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart';
+import { ChartContainer, ChartTooltip, ChartTooltipContent } from '../../components/ui/chart';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { LineChart, Line, XAxis, YAxis, ResponsiveContainer } from 'recharts';
 import { ArrowUpDown, TrendingUp, DollarSign, Users, Target } from 'lucide-react';
-import HelpTooltip from '@/components/shared/HelpTooltip';
+import HelpTooltip from '../shared/HelpTooltip';
 
 const UpsellExpansionRevenueReport = () => {
   const [sortField, setSortField] = useState<string>('upsellAmount');

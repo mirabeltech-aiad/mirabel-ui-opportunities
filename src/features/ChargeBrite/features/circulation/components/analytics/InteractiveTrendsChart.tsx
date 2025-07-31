@@ -1,16 +1,16 @@
 import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { ChartContainer } from '@/components/ui/chart';
+import { ChartContainer } from '../../../../components/ui/chart';
 import { TrendingUp } from 'lucide-react';
-import { HelpTooltip } from '@/components';
-import { useSubscriptionGrowthData } from '@/hooks/useSubscriptionData';
-import { useDateRangeFromPeriod } from '@/hooks/useDateRangeFromPeriod';
-import ChartTooltip from '@/components/ui/ChartTooltip';
-import { useInteractiveTrendsConfig } from '@/components/circulation/interactive-trends/useInteractiveTrendsConfig';
-import InteractiveTrendsControls from '@/components/circulation/interactive-trends/InteractiveTrendsControls';
-import InteractiveTrendsChartRenderer from '@/components/circulation/interactive-trends/InteractiveTrendsChartRenderer';
-import InteractiveTrendsLoading from '@/components/circulation/interactive-trends/InteractiveTrendsLoading';
-import InteractiveTrendsError from '@/components/circulation/interactive-trends/InteractiveTrendsError';
+import HelpTooltip from '../../../../components/shared/HelpTooltip';
+import { useSubscriptionGrowthData } from '../../../../hooks/useSubscriptionData';
+import { useDateRangeFromPeriod } from '../../../../hooks/useDateRangeFromPeriod';
+import ChartTooltip from '../../../../components/ui/ChartTooltip';
+import { useInteractiveTrendsConfig } from '../../../../components/circulation/interactive-trends/useInteractiveTrendsConfig';
+import InteractiveTrendsControls from '../../../../components/circulation/interactive-trends/InteractiveTrendsControls';
+import InteractiveTrendsChartRenderer from '../../../../components/circulation/interactive-trends/InteractiveTrendsChartRenderer';
+import InteractiveTrendsLoading from '../../../../components/circulation/interactive-trends/InteractiveTrendsLoading';
+import InteractiveTrendsError from '../../../../components/circulation/interactive-trends/InteractiveTrendsError';
 
 interface InteractiveTrendsChartProps {
   dateRange?: {

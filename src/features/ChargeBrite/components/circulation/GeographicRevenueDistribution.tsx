@@ -1,6 +1,6 @@
 
 
-import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart';
+import { ChartContainer, ChartTooltip, ChartTooltipContent } from '../../components/ui/chart';
 import { BarChart, Bar, XAxis, YAxis } from 'recharts';
 import { useGeographicRevenue } from '@/hooks/useRevenueData';
 import { HelpTooltip } from '@/components';

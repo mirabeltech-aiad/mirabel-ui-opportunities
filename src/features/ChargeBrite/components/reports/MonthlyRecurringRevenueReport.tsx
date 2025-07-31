@@ -2,14 +2,14 @@
 import React from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart';
+import { ChartContainer, ChartTooltip, ChartTooltipContent } from '../../components/ui/chart';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, ResponsiveContainer } from 'recharts';
 import { TrendingUp, DollarSign } from 'lucide-react';
-import ScrollToTopButton from '@/components/ui/ScrollToTopButton';
-import { HelpTooltip } from '@/components';
+import ScrollToTopButton from '../../components/ui/ScrollToTopButton';
+import HelpTooltip from '../shared/HelpTooltip';
 import { useQuery } from '@tanstack/react-query';
-import { supabaseReportsService } from '@/services/reports';
-import { useProductFilter } from '@/contexts/ProductFilterContext';
+import { supabaseReportsService } from '../../features/reports/services/api';
+import { useProductFilter } from '../../contexts/ProductFilterContext';
 
 interface MonthlyRecurringRevenueReportProps {
   dateRange?: {

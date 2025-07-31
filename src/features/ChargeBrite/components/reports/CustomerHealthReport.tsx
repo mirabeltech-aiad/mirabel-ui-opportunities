@@ -4,11 +4,11 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Heart, TrendingUp, TrendingDown, User } from 'lucide-react';
 import { PieChart, Pie, Cell, ResponsiveContainer, BarChart, Bar, XAxis, YAxis, CartesianGrid } from 'recharts';
-import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart';
-import { HelpTooltip } from '@/components';
-import { useTableColumnManager } from '@/hooks/useTableColumnManager';
-import { useSorting } from '@/hooks/useSorting';
-import { getDataTypeFromColumn } from '@/utils/sortingUtils';
+import { ChartContainer, ChartTooltip, ChartTooltipContent } from '../../components/ui/chart';
+import HelpTooltip from '../shared/HelpTooltip';
+import { useTableColumnManager } from '../../hooks/useTableColumnManager';
+import { useSorting } from '../../hooks/useSorting';
+import { getDataTypeFromColumn } from '../../utils/sortingUtils';
 
 const CustomerHealthReport = () => {
   // Health score distribution data

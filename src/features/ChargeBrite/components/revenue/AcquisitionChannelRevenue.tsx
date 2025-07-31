@@ -1,10 +1,10 @@
 import React from 'react';
-import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart';
+import { ChartContainer, ChartTooltip, ChartTooltipContent } from '../../components/ui/chart';
 import { BarChart, Bar, XAxis, YAxis, PieChart, Pie, Cell } from 'recharts';
-import { useAcquisitionChannelRevenue } from '@/hooks/useRevenueData';
-import { HelpTooltip } from '@/components';
-import RevenueChartSection from '@/components/circulation/revenue/RevenueChartSection';
-import PerformanceTable from '@/components/circulation/revenue/PerformanceTable';
+import { useAcquisitionChannelRevenue } from '../../hooks/useRevenueData';
+import HelpTooltip from '../shared/HelpTooltip';
+import RevenueChartSection from '../circulation/revenue/RevenueChartSection';
+import PerformanceTable from '../circulation/revenue/PerformanceTable';
 
 const COLORS = ['#3b82f6', '#8b5cf6', '#10b981', '#f59e0b', '#ef4444', '#06b6d4'];
 

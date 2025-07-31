@@ -1,9 +1,9 @@
 
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { ChartContainer } from '@/components/ui/chart';
+import { ChartContainer } from '../../../components/ui/chart';
 import { Skeleton } from '@/components/ui/skeleton';
-import { HelpTooltip } from '@/components';
+import HelpTooltip from '../../shared/HelpTooltip';
 
 interface RevenueChartSectionProps {
   title: string;

@@ -1,7 +1,7 @@
 
 
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, ResponsiveContainer, AreaChart, Area } from 'recharts';
-import { ChartTooltip, ChartTooltipContent, ChartLegend, ChartLegendContent } from '@/components/ui/chart';
+import { ChartTooltip, ChartTooltipContent, ChartLegend, ChartLegendContent } from '../../../components/ui/chart';
 
 interface InteractiveTrendsChartRendererProps {
   data: any[];

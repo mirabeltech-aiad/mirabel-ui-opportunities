@@ -10,7 +10,7 @@ import {
   ChartContainer, 
   ChartTooltip, 
   ChartTooltipContent 
-} from '@/components/ui/chart';
+} from '../../components/ui/chart';
 import { BarChart, Bar, XAxis, YAxis, ResponsiveContainer } from 'recharts';
 import { useAcquisitionCosts } from '@/hooks/useCostAnalytics';
 import { TrendingUp, TrendingDown } from 'lucide-react';

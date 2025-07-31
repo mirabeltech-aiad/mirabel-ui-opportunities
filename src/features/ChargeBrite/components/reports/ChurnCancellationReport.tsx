@@ -19,7 +19,7 @@ import {
   ChartContainer, 
   ChartTooltip, 
   ChartTooltipContent 
-} from '@/components/ui/chart';
+} from '../../components/ui/chart';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
 import { UserX, Calendar, DollarSign, AlertTriangle, TrendingDown } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';

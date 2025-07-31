@@ -1,7 +1,7 @@
 
 import { useMemo } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart';
+import { ChartContainer, ChartTooltip, ChartTooltipContent } from '../../components/ui/chart';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/enhanced-table';
 import { ScatterChart, Scatter, XAxis, YAxis, ResponsiveContainer } from 'recharts';
 import { useSubscriberProfitability } from '@/hooks/useCostAnalytics';

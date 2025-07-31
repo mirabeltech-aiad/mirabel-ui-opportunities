@@ -1,11 +1,11 @@
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { ChartContainer } from '@/components/ui/chart';
+import { ChartContainer } from '../../../../components/ui/chart';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, ResponsiveContainer } from 'recharts';
 import { TrendingUp } from 'lucide-react';
-import { HelpTooltip } from '@/components';
-import { useFilteredCirculationData } from '@/hooks/useFilteredData';
-import ChartTooltip from '@/components/ui/ChartTooltip';
+import HelpTooltip from '../../../../components/shared/HelpTooltip';
+import { useFilteredCirculationData } from '../../../../hooks/useFilteredData';
+import ChartTooltip from '../../../../components/ui/ChartTooltip';
 
 const GrowthMetrics = () => {
   const { filteredGrowthData, selectedProductNames } = useFilteredCirculationData();
@@ -18,8 +18,8 @@ const GrowthMetrics = () => {
     print: {
       label: "Print",
       color: "#10b981",
-    },
-    digital: {
+      },
+      digital: {
       label: "Digital",
       color: "#8b5cf6",
     },

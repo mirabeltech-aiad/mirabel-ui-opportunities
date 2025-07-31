@@ -3,9 +3,9 @@ import React from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Target, Info } from 'lucide-react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, ResponsiveContainer } from 'recharts';
-import { ChartContainer } from '@/components/ui/chart';
+import { ChartContainer } from '../../../components/ui/chart';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
-import ChartTooltip from '@/components/ui/ChartTooltip';
+import ChartTooltip from '../../../components/ui/ChartTooltip';
 
 interface CACData {
   channel: string;

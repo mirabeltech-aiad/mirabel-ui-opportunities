@@ -1,9 +1,9 @@
 
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart';
+import { ChartContainer, ChartTooltip, ChartTooltipContent } from '../../../components/ui/chart';
 import { LineChart, Line, XAxis, YAxis } from 'recharts';
-import HelpTooltip from '@/components/shared/HelpTooltip';
+import HelpTooltip from '../../shared/HelpTooltip';
 
 interface RevenueTrend {
   month: string;

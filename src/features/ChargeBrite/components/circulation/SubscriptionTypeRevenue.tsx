@@ -1,6 +1,6 @@
 
 
-import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart';
+import { ChartContainer, ChartTooltip, ChartTooltipContent } from '../../components/ui/chart';
 import { AreaChart, Area, XAxis, YAxis, BarChart, Bar } from 'recharts';
 import { useSubscriptionTypeRevenue } from '@/hooks/useRevenueData';
 import { HelpTooltip } from '@/components';
