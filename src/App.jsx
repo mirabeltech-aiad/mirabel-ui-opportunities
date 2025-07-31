@@ -43,6 +43,7 @@ alert("12")
     alert(localStorage.getItem("MMClientVars"))
     const mmClientVars =  localStorage && localStorage.getItem("MMClientVars");
     if (!mmClientVars && !isDevelopmentMode()) {
+      alert("15")
       window.location.href = `${getTopPath()}/intranet/home/login.aspx`;
       return;
     }
