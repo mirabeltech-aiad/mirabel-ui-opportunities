@@ -46,20 +46,15 @@ const getEnvironmentConfig = () => {
   };
 };
 
-// Create axios instance
+// Create axios instance with environment-specific CORS configuration
 const axiosInstance = axios.create({
   headers: {
     Accept: "application/json",
     "Content-Type": "application/json",
-    "Access-Control-Allow-Origin": "*",
-    "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
-    "Access-Control-Allow-Headers": "Origin, X-Requested-With, Content-Type, Accept, Authorization, Cache-Control, Pragma",
-    "Access-Control-Allow-Credentials": "true",
   },
   timeout: CONFIG.timeout,
-  withCredentials: true,
-  // CORS configuration
-  crossDomain: true,
+  // In development, don't send credentials to avoid CORS issues
+  withCredentials: !isDevelopmentMode(),
 });
 
 // Request Interceptor
@@ -71,15 +66,15 @@ axiosInstance.interceptors.request.use((config) => {
   config.headers.domain = envConfig.domain;
   config.headers['X-Requested-With'] = 'XMLHttpRequest';
   
-  // Additional CORS headers for every request
-  config.headers['Access-Control-Allow-Origin'] = '*';
-  config.headers['Access-Control-Allow-Credentials'] = 'true';
-  config.headers['Cache-Control'] = 'no-cache';
-  config.headers['Pragma'] = 'no-cache';
-
+  // In development mode, adjust configuration for CORS
   if (isDevelopmentMode()) {
     config.metadata = { startTime: new Date() };
     console.log(`🚀 API Request: ${config.method?.toUpperCase()} ${config.url}`);
+    
+    // Remove authorization header in development to avoid CORS preflight
+    if (!envConfig.token) {
+      delete config.headers.Authorization;
+    }
   }
 
   return config;
