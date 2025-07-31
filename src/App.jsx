@@ -35,10 +35,12 @@ alert("12")
   useLayoutEffect(() => {
     // Initialize environment first (sets up localStorage in dev mode)
     if (isDevelopmentMode()) {
+      alert("14")
       initializeDevelopmentEnvironment();
     }
 
     // Check authentication - redirect if MMClientVars is null (only in production)
+    alert(localStorage.getItem("MMClientVars"))
     const mmClientVars = localStorage.getItem("MMClientVars");
     if (!mmClientVars && !isDevelopmentMode()) {
       window.location.href = `${getTopPath()}/intranet/home/login.aspx`;

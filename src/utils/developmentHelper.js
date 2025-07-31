@@ -6,6 +6,11 @@ export const devApiConfig = {
     "domain": "dev",
     "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJMb2dnZWRJblVzZXJJRCI6IjEiLCJMb2dnZWRJblNpdGVDbGllbnRJRCI6IjEwMDA3IiwiTG9nZ2VkSW5TaXRlQ3VsdHVyZVVJIjoiZW4tVVMiLCJEYXRlVGltZSI6IjcvMzEvMjAyNSA3OjQ3OjQwIEFNIiwiTG9nZ2VkSW5TaXRlQ3VycmVuY3lTeW1ib2wiOiIiLCJMb2dnZWRJblNpdGVEYXRlRm9ybWF0IjoiIiwiRG9tYWluIjoic21va2UtZmVhdHVyZTEzIiwiTG9nZ2VkSW5TaXRlVGltZUFkZCI6WyIwIiwiMCJdLCJTb3VyY2UiOiJUTU0iLCJFbWFpbCI6InNhQG1hZ2F6aW5lbWFuYWdlci5jb20iLCJJc0FQSVVzZXIiOiJGYWxzZSIsIm5iZiI6MTc1Mzk0ODA2MCwiZXhwIjoxNzU2OTQ4MDYwLCJpYXQiOjE3NTM5NDgwNjAsImlzcyI6Ik1hZ2F6aW5lTWFuYWdlciIsImF1ZCI6IioifQ.bdt9ZIS2QIw4lZQh8Ju6ObwekJvPTiAlnLClAPxUWDQ"
 };
+// export const devApiConfig = {
+//     "baseUrl":  "http://localhost",
+//     "domain": "localhost",
+//     "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJMb2dnZWRJblVzZXJJRCI6IjEiLCJMb2dnZWRJblNpdGVDbGllbnRJRCI6Ijk5MjAiLCJMb2dnZWRJblNpdGVDdWx0dXJlVUkiOiJlbi11cyIsIkRhdGVUaW1lIjoiMzEtMDctMjAyNSAxMTo0OTowNSIsIkxvZ2dlZEluU2l0ZUN1cnJlbmN5U3ltYm9sIjoiIiwiTG9nZ2VkSW5TaXRlRGF0ZUZvcm1hdCI6IiIsIkRvbWFpbiI6ImxvY2FsaG9zdCIsIkxvZ2dlZEluU2l0ZVRpbWVBZGQiOlsiMCIsIjAiXSwiU291cmNlIjoiVE1NIiwiRW1haWwiOiJzYUBtYWdhemluZW1hbmFnZXIuY29tIiwiSXNBUElVc2VyIjoiRmFsc2UiLCJuYmYiOjE3NTM5NjI1NDUsImV4cCI6MTc1Njk2MjU0NSwiaWF0IjoxNzUzOTYyNTQ1LCJpc3MiOiJNYWdhemluZU1hbmFnZXIiLCJhdWQiOiIqIn0.oYMUH3ttGycmsJxUPZkc57kx-DEKbxuaZl4C_ipTPV8"
+// };
 
 // Development URL (legacy compatibility)
 export const devURL = devApiConfig.Host;
@@ -108,6 +113,7 @@ export const handleMessage = (event) => {
 
 // Check if we're in development mode - Vite specific
 export const isDevelopmentMode = () => {
+    alert("13")
     // Vite provides import.meta.env.DEV for development detection
     const isViteDev = import.meta.env.DEV;
     const isDevMode = import.meta.env.MODE === 'development';
@@ -120,6 +126,7 @@ export const isDevelopmentMode = () => {
 // Initialize development environment
 export const initializeDevelopmentEnvironment = () => {
     if (isDevelopmentMode()) {
+        alert("15")
         // Set session data in localStorage
         localStorage.setItem("MMClientVars", JSON.stringify(sessionValues));
         sessionStorage.setItem("ClientID", sessionValues.ClientID);
