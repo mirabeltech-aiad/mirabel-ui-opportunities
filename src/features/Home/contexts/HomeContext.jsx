@@ -32,14 +32,14 @@ const ACTIONS = {
 // Initial state
 const initialState = {
   tabs: [
-    {
-      id: 'dashboard',
-      title: 'Sales Dashboard',
-      component: 'Dashboard',
-      type: 'component',
-      closable: false,
-      icon: '' // Optionally add an icon for the dashboard tab
-    },
+    // {
+    //   id: 'dashboard',
+    //   title: 'Sales Dashboard',
+    //   component: 'Dashboard',
+    //   type: 'component',
+    //   closable: false,
+    //   icon: '' // Optionally add an icon for the dashboard tab
+    // },
     {
       id: 'inbox',
       title: 'Inbox',
@@ -461,7 +461,9 @@ export const HomeProvider = ({ children, sessionLoaded = false }) => {
       // Load tabs from localStorage after main data is loaded
       loadTabsFromStorage();
     };
+    alert('HomeContext.jsx outside');
     navigationService.loadSessionDetails();
+    alert('HomeContext.jsx inside');
     initializeApp();
   }, [sessionLoaded]);
 
