@@ -2,8 +2,8 @@
 
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from '../../components/ui/chart';
 import { BarChart, Bar, XAxis, YAxis } from 'recharts';
-import { useGeographicRevenue } from '@/hooks/useRevenueData';
-import { HelpTooltip } from '@/components';
+import { useGeographicRevenue } from '../../hooks/useRevenueData';
+import HelpTooltip from '../shared/HelpTooltip';
 import RevenueChartSection from './revenue/RevenueChartSection';
 import PerformanceTable from './revenue/PerformanceTable';
 

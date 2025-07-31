@@ -8,10 +8,10 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger, DropdownMenuIte
 import { Checkbox } from '@/components/ui/checkbox';
 import { Switch } from '@/components/ui/switch';
 import { Settings2 } from 'lucide-react';
-import { HelpTooltip } from '@/components';
-import { useTableColumnManager } from '@/hooks/useTableColumnManager';
-import { useSorting } from '@/hooks/useSorting';
-import { getDataTypeFromColumn } from '@/utils/sortingUtils';
+import HelpTooltip from '../../shared/HelpTooltip';
+import { useTableColumnManager } from '../../../hooks/useTableColumnManager';
+import { useSorting } from '../../../hooks/useSorting';
+import { getDataTypeFromColumn } from '../../../utils/sortingUtils';
 
 interface TableColumn {
   key: string;
