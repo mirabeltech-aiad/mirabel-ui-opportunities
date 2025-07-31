@@ -97,7 +97,7 @@ export const navigationService = {
    */
     loadSessionDetails: async () => {
         try {
-            const response = await axiosService.get(NAVIGATION_API.SESSION_DETAILS);
+            const response = await axiosService.get(NAVIGATION_API.SESSION_DETAILS, { withCredentials: true });
             let sessionDataResponse = null;
             console.log('Loadsessiondetails', response.SessionResponse);
             if (response.SessionResponse) {

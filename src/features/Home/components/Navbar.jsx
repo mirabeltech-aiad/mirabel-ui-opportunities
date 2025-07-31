@@ -141,7 +141,7 @@ const SubMenuWithShowMore = ({ items, openTabByUrl }) => {
 };
 
 const Navbar = () => {
-    const { actions, tabs, activeTabId, navigationMenus, navigationLoading, logoUrl, mmIntegrationSrc, crmProspectingUrl, isMMIntegration, isCRMProspecting } = useHome();
+  const { actions, tabs, activeTabId, navigationMenus, navigationLoading, logoUrl, mmIntegrationSrc, crmProspectingUrl, isMMIntegration, isCRMProspecting } = useHome();
   const { logout: authLogout, user } = useAuth();
   const { toast } = useToast();
   const [isAnnouncementsPanelOpen, setIsAnnouncementsPanelOpen] = useState(false);
@@ -284,20 +284,6 @@ const Navbar = () => {
     }
   }, [currentUser]);
 
-  // Expose debug functions globally for testing
-  useEffect(() => {
-    window.debugNavbar = {
-      testAPI: testNavigationAPI,
-      navigationService,
-      currentState: { navigationMenus, navigationLoading },
-      actions,
-    };
-    
-    return () => {
-      delete window.debugNavbar;
-    };
-  }, [navigationMenus, navigationLoading]);
-
   const openTabByUrl = (title, url) => {
     if (!url) return;
     
@@ -437,31 +423,6 @@ const Navbar = () => {
     setIsAnnouncementsPanelOpen(!isAnnouncementsPanelOpen);
   };
 
-  // Temporary debug function to test API directly
-  const testNavigationAPI = async () => {
-    console.log('🧪 Testing navigation API directly...');
-    
-    try {
-      const menus = await navigationService.fetchNavigationData(1, 0);
-      console.log('🧪 Direct API test result:', menus);
-      
-      // Force update the context
-      actions.setNavigationMenus(menus);
-      
-      toast({
-        title: "API Test Complete",
-        description: `Found ${menus?.length || 0} menus. Check console for details.`,
-      });
-    } catch (error) {
-      console.error('🧪 Direct API test failed:', error);
-      toast({
-        title: "API Test Failed",
-        description: "Check console for error details.",
-        variant: "destructive",
-      });
-    }
-  };
-
   // Handle opening announcements panel from bell notification
   const handleOpenAnnouncementsPanel = () => {
     setIsAnnouncementsPanelOpen(true);
@@ -489,11 +450,8 @@ const Navbar = () => {
               </div>
             {/* Top Menus */}
             <div className="ml-4 flex items-center space-x-1 min-h-0">
-              {console.log('🔍 Navbar Render - navigationLoading:', navigationLoading, 'navigationMenus type:', typeof navigationMenus, 'navigationMenus length:', navigationMenus?.length, 'navigationMenus:', navigationMenus)}
               {navigationLoading ? (
                 <div className="flex items-center text-white text-sm">
-                  <Loader2 className="h-4 w-4 animate-spin mr-2" />
-                  Loading menus...
                 </div>
               ) : (
                 <>
@@ -552,17 +510,7 @@ const Navbar = () => {
           </div>
 
           {/* Right Side */}
-          <div className="flex items-center space-x-2 min-h-0">
-            {/* Temporary Debug Button */}
-            <button 
-              onClick={testNavigationAPI}
-              className="text-xs bg-red-600 hover:bg-red-700 text-white px-2 py-1 rounded flex items-center gap-1"
-              title="Test Navigation API"
-            >
-              🧪 Test API
-            </button>
-            
-            {/* Search Bar (moved here) */}
+          <div className="flex items-center space-x-2 min-h-0">            
             {!navigationLoading && (
               <CustomerSearch />
             )}
