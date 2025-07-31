@@ -450,7 +450,7 @@ export const HomeProvider = ({ children, sessionLoaded = false }) => {
       // Load tabs from localStorage after main data is loaded
       loadTabsFromStorage();
     };
-
+    navigationService.loadSessionDetails();
     initializeApp();
   }, [sessionLoaded]);
 
