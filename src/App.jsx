@@ -31,29 +31,31 @@ const LoadingSpinner = () => (
 
 function App() {
   const [isLoaded, setIsLoaded] = useState(false);
-alert("12")
   useLayoutEffect(() => {
-    // Initialize environment first (sets up localStorage in dev mode)
-    if (isDevelopmentMode()) {
-      alert("14")
-      initializeDevelopmentEnvironment();
-    }
+    const initializeApp = async () => {
+      // Initialize environment first (sets up localStorage in dev mode)
+      if (isDevelopmentMode()) {
+        initializeDevelopmentEnvironment();
+      }
 
-    // Check authentication - redirect if MMClientVars is null (only in production)
-    alert(localStorage.getItem("MMClientVars"))
-    const mmClientVars =  localStorage && localStorage.getItem("MMClientVars");
-    if (!mmClientVars && !isDevelopmentMode()) {
-      alert("15")
-      window.location.href = `${getTopPath()}/intranet/home/login.aspx`;
-      return;
-    }
-    
-    // Set loaded state after brief delay to show loading
-    const timer = setTimeout(() => {
+      // Check authentication - MMClientVars should be loaded by Home component
+      const mmClientVars = localStorage && localStorage.getItem("MMClientVars");
+      if (!mmClientVars && !isDevelopmentMode()) {
+        // Give a small delay for Home component to load session data
+        setTimeout(() => {
+          const retryMMClientVars = localStorage && localStorage.getItem("MMClientVars");
+          if (!retryMMClientVars) {
+            window.location.href = `${getTopPath()}/intranet/home/login.aspx`;
+          }
+        }, 2000); // Wait 2 seconds for Home component to load session
+        return;
+      }
+      
+      // Set loaded state after authentication is complete
       setIsLoaded(true);
-    }, 500);
+    };
 
-    return () => clearTimeout(timer);
+    initializeApp();
   }, []);
 
   return (
