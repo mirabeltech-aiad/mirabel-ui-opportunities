@@ -97,40 +97,50 @@ export const navigationService = {
    */
     loadSessionDetails: async () => {
         try {
+            console.log('🔍 Loading session details from API...');
             const response = await axiosService.get(NAVIGATION_API.SESSION_DETAILS, { withCredentials: true });
-            let sessionDataResponse = null;
-            console.log('Loadsessiondetails', response.SessionResponse);
-            if (response.SessionResponse) {
-                sessionDataResponse = response.SessionResponse;
+            
+            console.log('🔍 Session details API response:', response);
+            
+            if (response && response.SessionResponse) {
+                const sessionDataResponse = response.SessionResponse;
+                console.log('🔍 Session data received:', sessionDataResponse);
 
-              // Store transformed data in localStorage with key 'MMnewclientvars'
-              localStorage.setItem('MMClientVars', JSON.stringify(sessionDataResponse));
-  
-              // Also update the existing MMClientVars for backward compatibility
-              const existingClientVars = localStorage.getItem('MMClientVars');
-              if (existingClientVars) {
-                  try {
-                      const existing = JSON.parse(existingClientVars);
-                      const updatedClientVars = { ...existing, ...sessionDataResponse };
-                      localStorage.setItem('MMClientVars', JSON.stringify(updatedClientVars));
-                  } catch (e) {
-                      console.warn('⚠️ Could not update MMClientVars:', e);
-                  }
-              } else {
-                  // Create MMClientVars if it doesn't exist
-                  localStorage.setItem('MMClientVars', JSON.stringify(sessionDataResponse));
-              }
+                // Validate session data before storing
+                if (typeof sessionDataResponse === 'object' && sessionDataResponse !== null) {
+                    try {
+                        // Store session data safely
+                        localStorage.setItem('MMClientVars', JSON.stringify(sessionDataResponse));
+                        console.log('✅ Session data stored successfully');
+                        return sessionDataResponse;
+                    } catch (storageError) {
+                        console.error('❌ Error storing session data:', storageError);
+                        return sessionDataResponse; // Return data even if storage fails
+                    }
+                } else {
+                    console.warn('⚠️ Invalid session data structure received');
+                    return null;
+                }
             } else {
-                console.log('Logout');
-                // logout();
+                console.warn('⚠️ No SessionResponse in API response');
+                return null;
             }         
-            return sessionDataResponse;
         } catch (error) {
-            console.log('❌ Failed to load session details:', error);
-            debugger;
-            localStorage.setItem('MMClientVars', JSON.stringify(sessionValues));
-            return sessionValues;
-             //logout();
+            console.error('❌ Failed to load session details:', error);
+            
+            // Fallback to sessionValues if available
+            if (typeof sessionValues !== 'undefined' && sessionValues) {
+                try {
+                    localStorage.setItem('MMClientVars', JSON.stringify(sessionValues));
+                    console.log('🔄 Using fallback session values');
+                    return sessionValues;
+                } catch (storageError) {
+                    console.error('❌ Error storing fallback session data:', storageError);
+                    return sessionValues;
+                }
+            }
+            
+            return null;
         }
     },
 
@@ -206,10 +216,27 @@ export const navigationService = {
     try {
       const rawSessionData = localStorage.getItem('MMClientVars');
       console.log('🔍 Raw session data from localStorage:', rawSessionData);
-      sessionVars = JSON.parse(rawSessionData) || {};
-      console.log('🔍 Parsed session vars:', sessionVars);
+      
+      if (rawSessionData && rawSessionData !== 'null' && rawSessionData !== 'undefined') {
+        try {
+          sessionVars = JSON.parse(rawSessionData);
+          // Ensure sessionVars is an object
+          if (typeof sessionVars !== 'object' || sessionVars === null || Array.isArray(sessionVars)) {
+            console.warn('⚠️ Session data is not a valid object, using empty object');
+            sessionVars = {};
+          }
+        } catch (parseError) {
+          console.warn('⚠️ Error parsing session data JSON:', parseError);
+          sessionVars = {};
+        }
+      } else {
+        console.warn('⚠️ No valid session data found in localStorage');
+        sessionVars = {};
+      }
+      
+      console.log('🔍 Final parsed session vars:', sessionVars);
     } catch (e) {
-      console.warn('⚠️ Error parsing session data:', e);
+      console.error('⚠️ Error accessing localStorage:', e);
       sessionVars = {};
     }
 
@@ -417,9 +444,30 @@ export const navigationService = {
   getSessionDetails: () => {
     try {
       const sessionData = localStorage.getItem('MMClientVars');
-      return sessionData ? JSON.parse(sessionData) : null;
+      
+      if (!sessionData || sessionData === 'null' || sessionData === 'undefined') {
+        console.warn('⚠️ getSessionDetails: No valid session data found');
+        return null;
+      }
+      
+      try {
+        const parsed = JSON.parse(sessionData);
+        
+        // Ensure parsed data is a valid object
+        if (typeof parsed !== 'object' || parsed === null || Array.isArray(parsed)) {
+          console.warn('⚠️ getSessionDetails: Session data is not a valid object');
+          return null;
+        }
+        
+        return parsed;
+      } catch (parseError) {
+        console.error('⚠️ getSessionDetails: Error parsing session data JSON:', parseError);
+        // Try to clear corrupted data
+        localStorage.removeItem('MMClientVars');
+        return null;
+      }
     } catch (error) {
-      console.error('Error parsing session data:', error);
+      console.error('⚠️ getSessionDetails: Error accessing localStorage:', error);
       return null;
     }
   },
@@ -431,14 +479,22 @@ export const navigationService = {
    */
   updateSessionData: (updates) => {
     try {
+      if (!updates || typeof updates !== 'object') {
+        console.warn('⚠️ updateSessionData: Invalid updates provided');
+        return null;
+      }
+      
       const existing = navigationService.getSessionDetails() || {};
       const updated = { ...existing, ...updates };
-      localStorage.setItem('MMClientVars', JSON.stringify(updated));
       
-      // Also update MMClientVars for backward compatibility
-      localStorage.setItem('MMClientVars', JSON.stringify(updated));
-      
-      return updated;
+      try {
+        localStorage.setItem('MMClientVars', JSON.stringify(updated));
+        console.log('✅ Session data updated successfully');
+        return updated;
+      } catch (storageError) {
+        console.error('❌ Error storing session data:', storageError);
+        return null;
+      }
     } catch (error) {
       console.error('❌ Error updating session data:', error);
       return null;

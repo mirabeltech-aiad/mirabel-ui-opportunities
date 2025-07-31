@@ -7,6 +7,7 @@ import ChangePasswordManager from './components/ChangePasswordManager';
 import JobFunctionNotification from './components/JobFunctionNotification';
 import axiosService from '../../services/axiosService';
 import navigationService from './services/navigationService';
+import { validateLocalStorage } from '../../utils/sessionHelpers';
 
 const API_USER_ACCOUNTS_CHECKCONDITION = '/services/User/Accounts/CheckCondition/';
 
@@ -19,6 +20,10 @@ const Home = () => {
   useEffect(() => {
     const initializeComponent = async () => {
       try {
+        // Validate localStorage first
+        const isLocalStorageValid = validateLocalStorage();
+        console.log('🔍 localStorage validation result:', isLocalStorageValid);
+        
         const sessionDataResponse = await navigationService.loadSessionDetails();
         
         // Ensure session data is properly loaded and not just fallback values

@@ -7,15 +7,73 @@
 const SESSION_STORAGE_KEY = 'MMClientVars';
 
 /**
+ * Validate and clean localStorage for session data
+ * @returns {boolean} True if localStorage is valid and accessible
+ */
+export const validateLocalStorage = () => {
+  try {
+    // Test localStorage accessibility
+    const testKey = '__localStorage_test__';
+    localStorage.setItem(testKey, 'test');
+    localStorage.removeItem(testKey);
+    
+    // Check MMClientVars specifically
+    const rawData = localStorage.getItem(SESSION_STORAGE_KEY);
+    if (rawData && rawData !== 'null' && rawData !== 'undefined') {
+      try {
+        const parsed = JSON.parse(rawData);
+        if (typeof parsed !== 'object' || parsed === null || Array.isArray(parsed)) {
+          console.warn('⚠️ validateLocalStorage: Corrupted MMClientVars data, clearing...');
+          localStorage.removeItem(SESSION_STORAGE_KEY);
+          return false;
+        }
+      } catch (parseError) {
+        console.warn('⚠️ validateLocalStorage: Invalid JSON in MMClientVars, clearing...');
+        localStorage.removeItem(SESSION_STORAGE_KEY);
+        return false;
+      }
+    }
+    
+    return true;
+  } catch (error) {
+    console.error('❌ validateLocalStorage: localStorage not accessible:', error);
+    return false;
+  }
+};
+
+/**
  * Get session data from localStorage
  * @returns {object|null} Parsed session data or null if not found
  */
 export const getSessionData = () => {
   try {
     const sessionData = localStorage.getItem(SESSION_STORAGE_KEY);
-    return sessionData ? JSON.parse(sessionData) : null;
+    
+    if (!sessionData || sessionData === 'null' || sessionData === 'undefined') {
+      console.warn('⚠️ getSessionData: No valid session data found');
+      return null;
+    }
+    
+    try {
+      const parsed = JSON.parse(sessionData);
+      
+      // Ensure parsed data is a valid object
+      if (typeof parsed !== 'object' || parsed === null || Array.isArray(parsed)) {
+        console.warn('⚠️ getSessionData: Session data is not a valid object');
+        // Clear corrupted data
+        localStorage.removeItem(SESSION_STORAGE_KEY);
+        return null;
+      }
+      
+      return parsed;
+    } catch (parseError) {
+      console.error('⚠️ getSessionData: Error parsing session data JSON:', parseError);
+      // Clear corrupted data
+      localStorage.removeItem(SESSION_STORAGE_KEY);
+      return null;
+    }
   } catch (error) {
-    console.error('Error parsing session data:', error);
+    console.error('⚠️ getSessionData: Error accessing localStorage:', error);
     return null;
   }
 };
@@ -26,9 +84,17 @@ export const getSessionData = () => {
  */
 export const setSessionData = (sessionData) => {
   try {
+    if (!sessionData || typeof sessionData !== 'object') {
+      console.warn('⚠️ setSessionData: Invalid session data provided');
+      return false;
+    }
+    
     localStorage.setItem(SESSION_STORAGE_KEY, JSON.stringify(sessionData));
+    console.log('✅ Session data stored successfully');
+    return true;
   } catch (error) {
-    console.error('Error setting session data:', error);
+    console.error('❌ Error setting session data:', error);
+    return false;
   }
 };
 
@@ -38,8 +104,18 @@ export const setSessionData = (sessionData) => {
  * @returns {any} Session value or null if not found
  */
 export const getSessionValue = (key) => {
-  const sessionData = getSessionData();
-  return sessionData ? sessionData[key] : null;
+  try {
+    if (!key || typeof key !== 'string') {
+      console.warn('⚠️ getSessionValue: Invalid key provided');
+      return null;
+    }
+    
+    const sessionData = getSessionData();
+    return sessionData && sessionData[key] !== undefined ? sessionData[key] : null;
+  } catch (error) {
+    console.error('⚠️ getSessionValue: Error getting session value:', error);
+    return null;
+  }
 };
 
 /**
