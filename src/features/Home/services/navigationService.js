@@ -99,9 +99,9 @@ export const navigationService = {
         try {
             const response = await axiosService.get(NAVIGATION_API.SESSION_DETAILS, { withCredentials: true });
             let sessionDataResponse = null;
-            console.log('Loadsessiondetails', response.content.SessionResponse);
-            if (response.content.SessionResponse) {
-                sessionDataResponse = response.content.SessionResponse;
+            console.log('Loadsessiondetails', response.SessionResponse);
+            if (response.SessionResponse) {
+                sessionDataResponse = response.SessionResponse;
 
               // Store transformed data in localStorage with key 'MMnewclientvars'
               localStorage.setItem('MMClientVars', JSON.stringify(sessionDataResponse));
