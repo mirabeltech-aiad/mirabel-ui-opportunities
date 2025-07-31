@@ -96,6 +96,7 @@ export const navigationService = {
    * @returns {Promise<Object>} Session details response
    */
     loadSessionDetails: async () => {
+       alert("4")
         try {
             console.log('🔍 Loading session details from API...');
             const response = await axiosService.get(NAVIGATION_API.SESSION_DETAILS, { withCredentials: true });

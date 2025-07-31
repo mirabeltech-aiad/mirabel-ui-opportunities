@@ -442,9 +442,10 @@ export const HomeProvider = ({ children, sessionLoaded = false }) => {
 
   // Main initialization effect - runs in parallel for speed
   useEffect(() => {
+    alert("1")
     // Only initialize if session is loaded
     if (!sessionLoaded) return;
-    
+     alert("2")
     const initializeApp = async () => {
       // Clear localStorage first
       localStorage.removeItem('home-tabs');
@@ -461,6 +462,7 @@ export const HomeProvider = ({ children, sessionLoaded = false }) => {
       // Load tabs from localStorage after main data is loaded
       loadTabsFromStorage();
     };
+     alert("3")
     navigationService.loadSessionDetails();
     initializeApp();
   }, [sessionLoaded]);
