@@ -112,7 +112,7 @@ const IframeContainer = ({
       )}
 
       {/* Iframe */}
-      <iframe
+      {/* <iframe
         key={refreshKey}
         src={fullUrl}
         title={title}
@@ -122,7 +122,7 @@ const IframeContainer = ({
         sandbox="allow-same-origin allow-scripts allow-forms allow-popups allow-top-navigation"
         referrerPolicy="strict-origin-when-cross-origin"
         loading="lazy"
-      />
+      /> */}
     </div>
       );
   };

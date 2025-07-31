@@ -40,12 +40,13 @@ const TabContent = () => {
       default:
         if (activeTab.type === 'iframe' && activeTab.url) {
           return (
-            <iframe
-              src={activeTab.url}
-              className="w-full h-full border-0"
-              title={activeTab.title}
-              data-tab-id={activeTab.id}
-            />
+            <></>
+            // <iframe
+            //   src={activeTab.url}
+            //   className="w-full h-full border-0"
+            //   title={activeTab.title}
+            //   data-tab-id={activeTab.id}
+            // />
           );
         }
         return (
