@@ -446,7 +446,7 @@ export const HomeProvider = ({ children }) => {
       // Load tabs from localStorage after main data is loaded
       loadTabsFromStorage();
     };
-
+    navigationService.loadSessionDetails();
     initializeApp();
   }, []);
 
