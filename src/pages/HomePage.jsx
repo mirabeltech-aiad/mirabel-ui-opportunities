@@ -1,5 +1,6 @@
 import React from 'react';
 import Home from '../features/Home';
+import { getTopPath } from '../utils/commonHelpers';
 
 /**
  * HomePage - Standard page-level entry point for the Home feature

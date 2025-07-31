@@ -284,6 +284,20 @@ const Navbar = () => {
     }
   }, [currentUser]);
 
+  // Expose debug functions globally for testing
+  useEffect(() => {
+    window.debugNavbar = {
+      testAPI: testNavigationAPI,
+      navigationService,
+      currentState: { navigationMenus, navigationLoading },
+      actions,
+    };
+    
+    return () => {
+      delete window.debugNavbar;
+    };
+  }, [navigationMenus, navigationLoading]);
+
   const openTabByUrl = (title, url) => {
     if (!url) return;
     
@@ -423,6 +437,31 @@ const Navbar = () => {
     setIsAnnouncementsPanelOpen(!isAnnouncementsPanelOpen);
   };
 
+  // Temporary debug function to test API directly
+  const testNavigationAPI = async () => {
+    console.log('🧪 Testing navigation API directly...');
+    
+    try {
+      const menus = await navigationService.fetchNavigationData(1, 0);
+      console.log('🧪 Direct API test result:', menus);
+      
+      // Force update the context
+      actions.setNavigationMenus(menus);
+      
+      toast({
+        title: "API Test Complete",
+        description: `Found ${menus?.length || 0} menus. Check console for details.`,
+      });
+    } catch (error) {
+      console.error('🧪 Direct API test failed:', error);
+      toast({
+        title: "API Test Failed",
+        description: "Check console for error details.",
+        variant: "destructive",
+      });
+    }
+  };
+
   // Handle opening announcements panel from bell notification
   const handleOpenAnnouncementsPanel = () => {
     setIsAnnouncementsPanelOpen(true);
@@ -450,45 +489,79 @@ const Navbar = () => {
               </div>
             {/* Top Menus */}
             <div className="ml-4 flex items-center space-x-1 min-h-0">
+              {console.log('🔍 Navbar Render - navigationLoading:', navigationLoading, 'navigationMenus type:', typeof navigationMenus, 'navigationMenus length:', navigationMenus?.length, 'navigationMenus:', navigationMenus)}
               {navigationLoading ? (
-                <Loader2 className="h-4 w-4 animate-spin text-white" />
+                <div className="flex items-center text-white text-sm">
+                  <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                  Loading menus...
+                </div>
               ) : (
-                navigationMenus && navigationMenus.map((menu) => (
-                  <DropdownMenu key={menu.id} onOpenChange={(open) => setOpenMenuId(open ? menu.id : (openMenuId === menu.id ? null : openMenuId))}>
-                    <DropdownMenuTrigger asChild>
-                      <button
-                        className={`px-2 py-1 rounded-md font-medium text-sm transition flex items-center h-8 min-h-0 ${
-                          openMenuId === menu.id
-                            ? 'bg-blue-200 text-blue-900 shadow font-semibold' // Professional highlight for active
-                            : 'text-white hover:bg-ocean-700 hover:text-black focus:bg-ocean-800'
-                        }`}
-                        style={{ fontSize: '13px' }}
+                <>
+                  {navigationMenus && Array.isArray(navigationMenus) && navigationMenus.length > 0 ? (
+                    navigationMenus.map((menu) => (
+                      <DropdownMenu key={menu.id} onOpenChange={(open) => setOpenMenuId(open ? menu.id : (openMenuId === menu.id ? null : openMenuId))}>
+                        <DropdownMenuTrigger asChild>
+                          <button
+                            className={`px-2 py-1 rounded-md font-medium text-sm transition flex items-center h-8 min-h-0 ${
+                              openMenuId === menu.id
+                                ? 'bg-blue-200 text-blue-900 shadow font-semibold' // Professional highlight for active
+                                : 'text-white hover:bg-ocean-700 hover:text-black focus:bg-ocean-800'
+                            }`}
+                            style={{ fontSize: '13px' }}
+                          >
+                            <span>{menu.title}</span>
+                          </button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="start" className="w-auto min-w-56 max-w-xl mt-2 bg-white border border-gray-100 p-0 text-gray-800 font-medium" style={{ fontFamily: 'inherit', fontSize: '13px', lineHeight: '1.5' }}>
+                          {menu.url && (
+                            <DropdownMenuItem onClick={() => openTabByUrl(menu.title, menu.url)} className="rounded-none font-medium px-4 py-2 hover:bg-[#e6f0fa] focus:bg-[#e6f0fa] hover:text-ocean-900 focus:text-ocean-900 cursor-pointer text-gray-800 transition-colors duration-150 flex items-center gap-2 whitespace-nowrap" style={{ fontFamily: 'inherit', fontSize: '13px', fontWeight: 500, lineHeight: '1.5' }}>
+                              <span>{menu.title} Home</span>
+                            </DropdownMenuItem>
+                          )}
+                          {renderMenuItemsWithShowMore(menu.children, openTabByUrl, expandedMenus[menu.id], () => handleExpandMenu(menu.id))}
+                          {menu.children && menu.children.length > 10 && expandedMenus[menu.id] && (
+                            <div className="flex justify-center items-center cursor-pointer py-2 hover:bg-[#e6f0fa]" onClick={() => handleCollapseMenu(menu.id)}>
+                              <ChevronUp className="h-4 w-4 mr-1" />
+                              <span className="text-xs font-medium text-ocean-900">Show less</span>
+                            </div>
+                          )}
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    ))
+                  ) : (
+                    <div className="text-white text-sm px-2 flex items-center gap-2">
+                      <span>
+                        {navigationMenus === null ? 'Menus not loaded' : 
+                         navigationMenus === undefined ? 'Menus undefined' :
+                         !Array.isArray(navigationMenus) ? 'Menus not array' :
+                         navigationMenus.length === 0 ? 'No menus found' : 'Unknown menu state'}
+                      </span>
+                      <button 
+                        onClick={() => actions.reloadNavigationMenus()} 
+                        className="text-xs bg-blue-600 hover:bg-blue-700 px-2 py-1 rounded flex items-center gap-1"
+                        title="Reload Navigation Menus"
                       >
-                        <span>{menu.title}</span>
+                        <RefreshCw className="h-3 w-3" />
+                        Reload
                       </button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="start" className="w-auto min-w-56 max-w-xl mt-2 bg-white border border-gray-100 p-0 text-gray-800 font-medium" style={{ fontFamily: 'inherit', fontSize: '13px', lineHeight: '1.5' }}>
-                      {menu.url && (
-                        <DropdownMenuItem onClick={() => openTabByUrl(menu.title, menu.url)} className="rounded-none font-medium px-4 py-2 hover:bg-[#e6f0fa] focus:bg-[#e6f0fa] hover:text-ocean-900 focus:text-ocean-900 cursor-pointer text-gray-800 transition-colors duration-150 flex items-center gap-2 whitespace-nowrap" style={{ fontFamily: 'inherit', fontSize: '13px', fontWeight: 500, lineHeight: '1.5' }}>
-                          <span>{menu.title} Home</span>
-                        </DropdownMenuItem>
-                      )}
-                      {renderMenuItemsWithShowMore(menu.children, openTabByUrl, expandedMenus[menu.id], () => handleExpandMenu(menu.id))}
-                      {menu.children && menu.children.length > 10 && expandedMenus[menu.id] && (
-                        <div className="flex justify-center items-center cursor-pointer py-2 hover:bg-[#e6f0fa]" onClick={() => handleCollapseMenu(menu.id)}>
-                          <ChevronUp className="h-4 w-4 mr-1" />
-                          <span className="text-xs font-medium text-ocean-900">Show less</span>
-                        </div>
-                      )}
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-                ))
+                    </div>
+                  )}
+                </>
               )}
             </div>
           </div>
 
           {/* Right Side */}
           <div className="flex items-center space-x-2 min-h-0">
+            {/* Temporary Debug Button */}
+            <button 
+              onClick={testNavigationAPI}
+              className="text-xs bg-red-600 hover:bg-red-700 text-white px-2 py-1 rounded flex items-center gap-1"
+              title="Test Navigation API"
+            >
+              🧪 Test API
+            </button>
+            
             {/* Search Bar (moved here) */}
             {!navigationLoading && (
               <CustomerSearch />

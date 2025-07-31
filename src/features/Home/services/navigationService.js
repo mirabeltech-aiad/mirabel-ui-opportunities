@@ -62,15 +62,31 @@ export const navigationService = {
    */
   fetchNavigationData: async (userId = 1, siteId = 0) => {
     try {     
+      console.log('🔍 Fetching navigation data for userId:', userId, 'siteId:', siteId);
+      
       // Then fetch navigation menus
       const response = await axiosService.get(`${NAVIGATION_API.USER_MENUS}/${userId}/${siteId}`);        
+      console.log('🔍 Navigation API response:', response);
+      
       // Check if response has the expected structure
-      if (response?.content?.List) {
-        const menus = response.content.List;
-        return await navigationService.processNavigationMenus(menus);
+      if (response?.List) {
+        const menus = response.List;
+        console.log('🔍 Raw navigation menus from API:', menus.length, menus);
+        console.log('🔍 First few menu items:', menus.slice(0, 3));
+        
+        const processedMenus = await navigationService.processNavigationMenus(menus);
+        console.log('🔍 Processed navigation menus:', processedMenus.length, processedMenus);
+        console.log('🔍 First processed menu:', processedMenus[0]);
+        
+        return processedMenus;
+      } else {
+        console.warn('⚠️ Navigation API response missing content.List:', response);
+        console.log('🔍 Full response structure:', JSON.stringify(response, null, 2));
+        return [];
       }
     } catch (error) {
       console.error('❌ Error fetching navigation data:', error);
+      console.error('❌ Error details:', error.response?.data || error.message);
       return [];
     }
   },
@@ -173,15 +189,27 @@ export const navigationService = {
    * Recursively build menu tree for unlimited depth
    */
   processNavigationMenus: async (menus, apiData = null) => {
+    console.log('🔍 processNavigationMenus called with:', menus?.length, 'menus');
+    
     if (!Array.isArray(menus)) {
+      console.warn('⚠️ processNavigationMenus: menus is not an array:', typeof menus, menus);
+      return [];
+    }
+    
+    if (menus.length === 0) {
+      console.warn('⚠️ processNavigationMenus: menus array is empty');
       return [];
     }
 
     // Get session data from localStorage (MMClientVars)
     let sessionVars = {};
     try {
-      sessionVars = JSON.parse(localStorage.getItem('MMClientVars')) || {};
+      const rawSessionData = localStorage.getItem('MMClientVars');
+      console.log('🔍 Raw session data from localStorage:', rawSessionData);
+      sessionVars = JSON.parse(rawSessionData) || {};
+      console.log('🔍 Parsed session vars:', sessionVars);
     } catch (e) {
+      console.warn('⚠️ Error parsing session data:', e);
       sessionVars = {};
     }
 
@@ -324,9 +352,17 @@ export const navigationService = {
     }
 
     // Top-level menus have ParentID === -1 or null
+    console.log('🔍 Building menu tree for ParentID -1 and null');
     const topLevelMenus1 = await buildMenuTree(-1);
     const topLevelMenus2 = await buildMenuTree(null);
-    return topLevelMenus1.concat(topLevelMenus2);
+    
+    console.log('🔍 Top-level menus with ParentID -1:', topLevelMenus1.length, topLevelMenus1);
+    console.log('🔍 Top-level menus with ParentID null:', topLevelMenus2.length, topLevelMenus2);
+    
+    const finalMenus = topLevelMenus1.concat(topLevelMenus2);
+    console.log('🔍 Final combined menus:', finalMenus.length, finalMenus);
+    
+    return finalMenus;
   },
 
   /**

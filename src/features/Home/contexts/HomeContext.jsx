@@ -372,9 +372,19 @@ export const HomeProvider = ({ children, sessionLoaded = false }) => {
       }
       
       const menus = await navigationService.fetchNavigationData(userId, navBarType);
-      setNavigationMenus(menus);
+      console.log('🔍 Navigation menus loaded:', menus.length, menus);
+      
+      // Ensure we always set some menu data, even if empty
+      setNavigationMenus(menus || []);
+      
+      // Force a small re-render delay to ensure state updates properly
+      setTimeout(() => {
+        console.log('🔄 Post-API state check - navigationMenus set to:', menus?.length || 0, 'items');
+      }, 100);
     } catch (error) {
       console.error('Error loading navigation menus:', error);
+      // Set empty array on error to prevent undefined state
+      setNavigationMenus([]);
     } finally {
       setNavigationLoading(false);
     }
@@ -459,6 +469,17 @@ export const HomeProvider = ({ children, sessionLoaded = false }) => {
     localStorage.setItem('home-tabs', JSON.stringify(state.tabs));
     localStorage.setItem('home-active-tab', state.activeTabId);
   }, [state.tabs, state.activeTabId]);
+
+  // Debug navigation menus state changes
+  useEffect(() => {
+    console.log('🔍 HomeContext navigationMenus state changed:', {
+      type: typeof state.navigationMenus,
+      isArray: Array.isArray(state.navigationMenus),
+      length: state.navigationMenus?.length,
+      loading: state.navigationLoading,
+      menus: state.navigationMenus
+    });
+  }, [state.navigationMenus, state.navigationLoading]);
 
   // Actions
   const addTab = (tabData) => {
@@ -559,6 +580,25 @@ export const HomeProvider = ({ children, sessionLoaded = false }) => {
     dispatch({ type: ACTIONS.SET_CRM_PROSPECTING, payload: isCRMProspecting });
   };
 
+  // Force reload navigation menus
+  const reloadNavigationMenus = async () => {
+    console.log('🔄 Manually reloading navigation menus...');
+    await loadNavigationMenus();
+  };
+
+  // Force full context refresh
+  const refreshHomeContext = async () => {
+    console.log('🔄 Refreshing entire HomeContext...');
+    
+    // Run all initialization tasks again
+    await Promise.all([
+      loadNavigationMenus(),
+      loadDashboards(),
+      setupLogoAndMMIntegration(),
+      checkTermsAndConditions()
+    ]);
+  };
+
 
 
   const value = {
@@ -582,7 +622,9 @@ export const HomeProvider = ({ children, sessionLoaded = false }) => {
       hideTermsModal,
       setLogoUrl,
       setMMIntegration,
-      setCRMProspecting
+      setCRMProspecting,
+      reloadNavigationMenus,
+      refreshHomeContext
     }
   };
 
