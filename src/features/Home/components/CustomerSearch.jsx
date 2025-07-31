@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { Search } from 'lucide-react';
 import { customerSearchService } from '@/services/customerSearchService';
 import { useHome } from '../contexts/HomeContext';
-import { useToast } from '@/features/Opportunity/hooks/use-toast';
+import { useToast } from '@/components/ui/use-toast';
 import { navigationService } from '../services/navigationService';
 
 const CustomerSearch = () => {

@@ -3,7 +3,7 @@ import { X, Check, Printer, LogOut } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Checkbox } from '@/components/ui/checkbox';
-import { useToast } from '@/features/Opportunity/hooks/use-toast';
+import { useToast } from '@/components/ui/use-toast';
 import { termsAndConditionsService } from '../services/termsAndConditionsService';
 
 const TermsAndConditionsModal = ({ isOpen, onClose, onAccept }) => {

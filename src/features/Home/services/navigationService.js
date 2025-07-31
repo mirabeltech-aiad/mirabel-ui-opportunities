@@ -1,6 +1,7 @@
-import AxiosService from '@/services/AxiosService';
-import { apiCall } from '@/services/httpClient';
-import { decrypt, authEncryptDecryptKey, logout } from '@/utils/authHelpers';
+import axiosService from '../../../services/axiosService';
+import { decrypt, authEncryptDecryptKey, logout } from '../../../utils/authHelpers';
+import { NAVIGATION_API, STATIC_URLS } from '../../../utils/apiUrls';
+import { getTopPath } from '@/utils/commonHelpers';
 
 /**
  * Navigation service for fetching dynamic navigation menus from the API
@@ -9,7 +10,7 @@ export const navigationService = {
   /**
    * Base domain for navigation URLs
    */
-  BASE_DOMAIN: 'https://smoke-feature13.magazinemanager.com',
+  
 
   /**
    * Cache for API response data
@@ -26,7 +27,7 @@ export const navigationService = {
       if (navigationService._apiDataCache) {
         return navigationService._apiDataCache;
       }
-      const response = await apiCall('/services/admin/common/k/8', 'GET');      
+      const response = await axiosService.get(NAVIGATION_API.ENCRYPTION_KEY);      
       if (response?.content?.Data) {       
         // Decrypt the response data
         const decryptedData = decrypt(response.content.Data, authEncryptDecryptKey);    
@@ -61,7 +62,7 @@ export const navigationService = {
   fetchNavigationData: async (userId = 1, siteId = 0) => {
     try {     
       // Then fetch navigation menus
-      const response = await apiCall(`/services/admin/navigations/users/${userId}/${siteId}`, 'GET');        
+      const response = await axiosService.get(`${NAVIGATION_API.USER_MENUS}/${userId}/${siteId}`);        
       // Check if response has the expected structure
       if (response?.content?.List) {
         const menus = response.content.List;
@@ -79,11 +80,11 @@ export const navigationService = {
    */
     loadSessionDetails: async () => {
         try {
-            const response = await apiCall('/services/admin/common/SessionDetailsGet','GET');
+            const response = await axiosService.get(NAVIGATION_API.SESSION_DETAILS);
             let sessionDataResponse = null;
-           console.log('Loadsessiondetails',response.content.SessionResponse);
-            if(response.content.SessionResponse){
-               sessionDataResponse = response.content.SessionResponse;
+            console.log('Loadsessiondetails', response.content.SessionResponse);
+            if (response.content.SessionResponse) {
+                sessionDataResponse = response.content.SessionResponse;
 
               // Store transformed data in localStorage with key 'MMnewclientvars'
               localStorage.setItem('MMClientVars', JSON.stringify(sessionDataResponse));
@@ -102,14 +103,14 @@ export const navigationService = {
                   // Create MMClientVars if it doesn't exist
                   localStorage.setItem('MMClientVars', JSON.stringify(sessionDataResponse));
               }
-            }else{
-              console.log('Logout');
-             // logout();
+            } else {
+                console.log('Logout');
+                // logout();
             }         
             return sessionDataResponse;
         } catch (error) {
             console.error('❌ Failed to load session details:', error);
-          //  logout();
+            // logout();
         }
     },
 
@@ -292,7 +293,7 @@ export const navigationService = {
           const toolTip = menu.ToolTip || '';
           // Special click handling
           const isNewWindow = !!menu.IsNewWindow;
-          const isCalendar = url && url.toLowerCase().includes('calendar.aspx');
+          const isCalendar = url && url.toLowerCase().includes(STATIC_URLS.CALENDAR);
           // Children
           const children = await buildMenuTree(menu.ID);
           // Compose menu item
@@ -340,7 +341,7 @@ export const navigationService = {
     }
     
     // Combine with base domain
-    const baseUrl = navigationService.BASE_DOMAIN;
+    const baseUrl = getTopPath();
     const url = relativeUrl.startsWith('/') ? relativeUrl : `/${relativeUrl}`;
     return `${baseUrl}${url}`;
   },
@@ -370,7 +371,7 @@ export const navigationService = {
   },
 
   /**
-  
+   * Get session details from localStorage
    * @returns {Object|null} Session details or null
    */
   getSessionDetails: () => {

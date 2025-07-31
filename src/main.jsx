@@ -7,7 +7,7 @@ import { initializeDesignSystem } from "./lib/styleManager";
 // Initialize design system on app start - ensures knowledge base styling is applied
 initializeDesignSystem();
 
-// Listen for auth logout events from httpClient/axios interceptor (matches mirabel.mm.ui pattern)
+// Listen for auth logout events from axiosService interceptor (matches mirabel.mm.ui pattern)
 window.addEventListener("auth:logout", (event) => {
 
   // Import session helpers dynamically to clear authentication data

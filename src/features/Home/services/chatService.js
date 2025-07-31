@@ -1,10 +1,6 @@
 import { getSessionValue } from '../../../utils/sessionHelpers';
-import { 
-  API_FRONTCHAT_CONFIG, 
-  API_FRONTCHAT_HMAC, 
-  API_FRONTCHAT_INIT 
-} from '../../../config/apiUrls';
-import httpClient from '../../../services/httpClient';
+import { FRONTCHAT_API } from '../../../utils/apiUrls';
+import axiosService from '../../../services/axiosService';
 
 /**
  * Chat service for Front Chat integration
@@ -18,7 +14,7 @@ export const chatService = {
    */
   async getFrontChatConfig() {
     try {
-      const data = await httpClient.get(API_FRONTCHAT_CONFIG);
+      const data = await axiosService.get(FRONTCHAT_API.CONFIG);
       return data.content || data;
     } catch (error) {
       console.error('Failed to get Front Chat config:', error);
@@ -36,7 +32,7 @@ export const chatService = {
    */
   async generateHMAC(email) {
     try {
-      const data = await httpClient.get(API_FRONTCHAT_HMAC, { email });
+      const data = await axiosService.getWithParams(FRONTCHAT_API.HMAC, { email });
       return data.content?.userHash || data.userHash || '';
     } catch (error) {
       console.error('Failed to generate HMAC:', error);
@@ -50,7 +46,7 @@ export const chatService = {
    */
   async getFrontChatInitData() {
     try {
-      const data = await httpClient.get(API_FRONTCHAT_INIT);
+      const data = await axiosService.get(FRONTCHAT_API.INIT);
       return data.content || data;
     } catch (error) {
       console.error('Failed to get Front Chat init data:', error);
@@ -83,8 +79,6 @@ export const chatService = {
           customFields: { Title: companyName }
         };
       }
-
-
 
       // Check if Front Chat is available
       if (typeof window.FrontChat === 'undefined') {

@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Loader2, ExternalLink, RefreshCw } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useHome } from '../contexts/HomeContext';
-
+import { getTopPath } from '@/utils/commonHelpers';
 /**
  * Common iframe container component for loading dashboard and menu URLs
  * @param {Object} props - Component props
@@ -27,13 +27,8 @@ const IframeContainer = ({
   // Get actions from HomeContext
   const { actions } = useHome();
 
-  // Base domain for all iframe URLs
-  const BASE_DOMAIN ='https://smoke-feature13.magazinemanager.com';
-
-
-
   // Construct full URL by combining base domain with relative URL
-  const fullUrl = url ? `${BASE_DOMAIN}${url.startsWith('/') ? '' : '/'}${url}` : '';
+  const fullUrl = url ? `${getTopPath()}${url.startsWith('/') ? '' : '/'}${url}` : '';
 
   const handleIframeLoad = () => {
     setLoading(false);

@@ -5,7 +5,7 @@ import HelpSystem from './components/HelpSystem';
 import TermsAndConditionsModal from './components/TermsAndConditionsModal';
 import ChangePasswordManager from './components/ChangePasswordManager';
 import JobFunctionNotification from './components/JobFunctionNotification';
-import { apiCall } from '@/services/httpClient';
+import axiosService from '../../services/axiosService';
 import navigationService from './services/navigationService';
 
 const API_USER_ACCOUNTS_CHECKCONDITION = '/services/User/Accounts/CheckCondition/';
@@ -17,7 +17,7 @@ const Home = () => {
     // On mount, check if we need to show the Job Function Notification
     const checkJobFunctionCondition = async () => {
       try {
-        const res = await apiCall(`${API_USER_ACCOUNTS_CHECKCONDITION}${1}/-1`, 'GET');
+        const res = await axiosService.get(`${API_USER_ACCOUNTS_CHECKCONDITION}${1}/-1`);
         if (res?.Data || res?.content?.Data) {
           setShowJobFunction(true);
         }

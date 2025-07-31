@@ -2,8 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Dialog, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
-import { useToast } from '@/features/Opportunity/hooks/use-toast';
-import { apiCall } from '@/services/httpClient';
+import { useToast } from '@/components/ui/use-toast';
+import axiosService from '../../../services/axiosService';
 import navigationService from '../services/navigationService';
 import * as DialogPrimitive from '@radix-ui/react-dialog';
 
@@ -34,7 +34,7 @@ const JobFunctionNotification = ({ isOpen, onClose }) => {
     setLoading(true);
     setError(null);
     try {
-      const res = await apiCall(JOB_FUNCTIONS_API, 'GET');
+      const res = await axiosService.get(JOB_FUNCTIONS_API);
       const list = res?.content?.Data?.JobFunction || [];
       setJobFunctions(list);
     } catch (e) {
@@ -58,9 +58,8 @@ const JobFunctionNotification = ({ isOpen, onClose }) => {
     setSaving(true);
     setError(null);
     try {
-      await apiCall(
+      await axiosService.post(
         SAVE_JOB_FUNCTIONS_API,
-        'POST',
         {
           loggedInUser: String(1),
           jobFunctionIDs: selected.join(',')

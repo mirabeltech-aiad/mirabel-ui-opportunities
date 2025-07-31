@@ -4,7 +4,7 @@ import { CheckCircle, AlertTriangle, XCircle, Wifi, Database, Zap, Clock } from 
 import { Badge } from '@/components/ui/badge';
 import stageService from '@/features/Opportunity/Services/stageService';
 import reportsService from '@/features/Opportunity/Services/reports/reportsService';
-import { userId } from '@/services/httpClient';
+import { getCurrentUserId } from '@/utils/userUtils';
 
 const SystemStatus = () => {
   const [systemChecks, setSystemChecks] = useState({
@@ -50,6 +50,7 @@ const SystemStatus = () => {
       }
 
       // Check User Authentication
+      const userId = getCurrentUserId();
       const hasUserId = userId && userId !== null;
       setSystemChecks(prev => ({
         ...prev,

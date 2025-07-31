@@ -1,4 +1,5 @@
-import { encrypt, authEncryptDecryptKey } from '@/utils/authHelpers';
+import { encrypt, authEncryptDecryptKey } from '../../../utils/authHelpers';
+import { STATIC_URLS } from '../../../utils/apiUrls';
 
 /**
  * Change Password Service
@@ -8,7 +9,6 @@ export const changePasswordService = {
   /**
    * Constants for change password functionality
    */
-  CHANGE_PASSWORD_PAGE_URL: '/Intranet/Members/Account/ChangePassword.aspx',
   CHANGEPASSWORD_PASSWORDWEAK: 'PASSWORDWEAK', // Matches backend constant
 
   /**
@@ -34,7 +34,7 @@ export const changePasswordService = {
       const resetTypeValue = changePasswordValue === changePasswordService.CHANGEPASSWORD_PASSWORDWEAK ? "true" : "false";
       
       // Build the URL with query parameters matching backend logic
-      const url = `${changePasswordService.CHANGE_PASSWORD_PAGE_URL}?loginId=${encodeURIComponent(encryptedLoginId)}&enabled=true&rtype=${resetTypeValue}&CUI=${encodeURIComponent(cultureUI)}`;
+      const url = `${STATIC_URLS.CHANGE_PASSWORD}?loginId=${encodeURIComponent(encryptedLoginId)}&enabled=true&rtype=${resetTypeValue}&CUI=${encodeURIComponent(cultureUI)}`;
       
       console.log('Generated change password URL:', {
         email,

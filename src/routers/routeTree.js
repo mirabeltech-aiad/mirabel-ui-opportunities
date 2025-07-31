@@ -1,18 +1,18 @@
 // src/Routers/routeTree.js
 import { lazy } from 'react';
-import Home from '../features/Home';
 
+const HomePage = lazy(() => import('../pages/HomePage'));
 const WelcomePage = lazy(() => import('../pages/Welcome'));
 
 export const routes = [
   {
     path: '/',
-    component: Home,
+    component: HomePage,
     exact: true,
   },
   {
     path: '/home',
-    component: Home,
+    component: HomePage,
     exact: true,
   },
   {

@@ -6,12 +6,12 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
-import { apiCall } from '@/services/httpClient';
+import axiosService from '../../../services/axiosService';
 import {
   API_CONSULTANT_INFO_GET,
   HELPDESK_API_SALESREP_CREATEREQUEST,
   HELPDESK_API_ATTACHTEMPORARY_FILE
-} from '@/config/apiUrls';
+} from '../../../utils/apiUrls';
 import { getUserInfo, getSessionValue } from '@/utils/sessionHelpers';
 import { toast } from '@/components/ui/sonner';
 
@@ -49,7 +49,7 @@ const ContactSalesRepForm = ({ isOpen, onClose }) => {
         throw new Error('Client ID not found in session');
       }
 
-      const res = await apiCall(`${API_CONSULTANT_INFO_GET}${clientID}`, 'GET');
+      const res = await axiosService.get(`${API_CONSULTANT_INFO_GET}${clientID}`);
       if (res && res.content && res.content.Messages) {
         // Extract sales reps from Messages field (matches legacy implementation)
         const salesRepsList = res.content.Messages.map(rep => ({
@@ -181,7 +181,7 @@ const ContactSalesRepForm = ({ isOpen, onClose }) => {
       
       const endpoint = `${HELPDESK_API_SALESREP_CREATEREQUEST}${reporterName}/${reporterEmail}/${assigneeName}/${assigneeEmail}`;
       
-      const res = await apiCall(endpoint, 'POST', request);
+      const res = await axiosService.post(endpoint, request);
       
       if (res && res.content && res.content.Data && res.content.Data.issueKey) {
         toast.success(

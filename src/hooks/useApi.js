@@ -1,6 +1,6 @@
 // src/hooks/useApi.js
 import { useQuery, useMutation } from "@tanstack/react-query";
-import axiosInstance from "../../../services/axiosInstance";
+import axiosService from "../services/axiosService";
 
 // GET method
 export const useApiGet = (key, endpoint, options = {}) => {
@@ -8,8 +8,8 @@ export const useApiGet = (key, endpoint, options = {}) => {
     queryKey: [key],
     queryFn: async () => {
       try {
-        const response = await axiosInstance.get(endpoint);
-        return response.data.content;
+        const response = await axiosService.get(endpoint);
+        return response.content;
       } catch (error) {
         // Centralized error handler (optional)
         handleApiError(error);
@@ -24,7 +24,7 @@ export const useApiGet = (key, endpoint, options = {}) => {
 export const useApiMutation = (method = "post", options = {}) => {
   return useMutation({
     mutationFn: async ({ endpoint, payload }) => {
-      const { data } = await axiosInstance[method](endpoint, payload);
+      const data = await axiosService[method](endpoint, payload);
       return data;
     },
     ...options,

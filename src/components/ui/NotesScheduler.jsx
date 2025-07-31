@@ -6,7 +6,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Mic, Calendar, Clock } from "lucide-react";
-import { toast } from "@/features/Opportunity/hooks/use-toast";
+import { toast } from "@/components/ui/use-toast";
 import TimeSelector from "./TimeSelector";
 
 const NotesScheduler = ({ onAddNote }) => {

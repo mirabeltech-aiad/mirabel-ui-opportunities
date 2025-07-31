@@ -45,7 +45,7 @@ This is an enterprise React application that serves as a modern replacement for 
 - **Multiple HTTP Clients**:
   - `axiosInstance.js` - Modern Axios client with interceptors
   - `httpClient.js` - Legacy fetch-based client for backward compatibility
-  - `AxiosService.js` - Service wrapper class
+  - `axiosService.js` - Service wrapper class
 - **Token Management**: Automatic JWT token refresh with request queue management
 - **Development Proxy**: Uses iframe messaging to bypass CORS restrictions
 - **Error Handling**: Comprehensive error interceptors and retry logic

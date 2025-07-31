@@ -41,7 +41,8 @@ const HelpSystem = () => {
   const buttonRef = useRef(null);
   const [showLivePhoneModal, setShowLivePhoneModal] = useState(false);
   const [showSalesRepForm, setShowSalesRepForm] = useState(false);
-  const { isAdmin } = getUserInfo();
+  const userInfo = getUserInfo();
+  const isAdmin = userInfo?.isAdmin || userInfo?.IsAdmin || false;
   const [consultantInfo, setConsultantInfo] = useState(null);
   const { toast } = useToast();
 

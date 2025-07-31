@@ -1,8 +1,5 @@
-import httpClient from '../../../services/httpClient';
-import { 
-  API_MM_AGREEMENTS_BYUSER_GET, 
-  API_MM_AGREEMENTS_ACCEPT_POST 
-} from '../../../config/apiUrls';
+import axiosService from '../../../services/axiosService';
+import { TERMS_API } from '../../../utils/apiUrls';
 import { getUserInfo } from '../../../utils/sessionHelpers';
 
 /**
@@ -24,8 +21,8 @@ export const termsAndConditionsService = {
         throw new Error('Session data not available');
       }
 
-      const response = await httpClient.get(
-        `${API_MM_AGREEMENTS_BYUSER_GET}${clientId}/${userId}`
+      const response = await axiosService.get(
+        `${TERMS_API.AGREEMENTS_BY_USER}${clientId}/${userId}`
       );
       
       // Extract the agreement text from the response structure
@@ -50,11 +47,11 @@ export const termsAndConditionsService = {
         throw new Error('Session data not available');
       }
 
-      const response = await httpClient.post(
-        `${API_MM_AGREEMENTS_ACCEPT_POST}${clientId}/${userId}`
+      const response = await axiosService.post(
+        `${TERMS_API.AGREEMENTS_ACCEPT}${clientId}/${userId}`
       );
       
-      return response.data;
+      return response;
     } catch (error) {
       throw error;
     }

@@ -1,5 +1,5 @@
-import httpClient from '../../../services/httpClient';
-import { API_CONSULTANT_INFO_GET, HELPDESK_API_CONSULTANT_CREATEEMAIL } from '../../../config/apiUrls';
+import axiosService from '../../../services/axiosService';
+import { CONSULTANT_API } from '../../../utils/apiUrls';
 import { getSessionValue } from '../../../utils/sessionHelpers';
 
 /**
@@ -21,9 +21,9 @@ export const consultantService = {
         throw new Error('Client ID not found in session');
       }
 
-      const endpoint = `${API_CONSULTANT_INFO_GET}${clientID}`;
+      const endpoint = `${CONSULTANT_API.INFO_GET}${clientID}`;
       
-      const response = await httpClient.get(endpoint);
+      const response = await axiosService.get(endpoint);
       return response;
     } catch (error) {
       console.error('❌ ConsultantService: Error getting consultant info:', error);
@@ -61,8 +61,8 @@ export const consultantService = {
         EmailType: 'smtp' // Optional field for backend DTO
       };
 
-      const response = await httpClient.post(
-        `${HELPDESK_API_CONSULTANT_CREATEEMAIL}${clientID}/softwareconsultant`,
+      const response = await axiosService.post(
+        `${CONSULTANT_API.CREATE_EMAIL}${clientID}/softwareconsultant`,
         payload
       );
       

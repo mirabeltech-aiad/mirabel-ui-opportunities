@@ -3,7 +3,7 @@ import { useHome } from '../contexts/HomeContext';
 import navigationService from '../services/navigationService';
 import { useAuth } from '@/contexts/AuthContext';
 import { refreshIframeByTabId, printIframeByTabId } from '@/services/iframeService';
-import { getUserPermissions } from '@/services/userService';
+import { getUserPermissions } from '../../../services/userService';
 import { getUserInfo, getSessionValue } from '@/utils/sessionHelpers';
 import CustomerSearch from './CustomerSearch';
 import AnnouncementsSidePanel from './AnnouncementsSidePanel';
@@ -37,7 +37,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { useToast } from '@/features/Opportunity/hooks/use-toast';
+import { useToast } from '@/components/ui/use-toast';
 
 // Recursive menu renderer
 const renderMenuItems = (items, openTabByUrl) => {

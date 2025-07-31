@@ -15,12 +15,12 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { toast } from '@/components/ui/sonner';
 import { getUserInfo, getSessionValue } from '@/utils/sessionHelpers';
-import httpClient, { apiCall } from '@/services/httpClient';
+import axiosService from '../../../services/axiosService';
 import {
   HELPDESK_API_ERROR_CATEGORY,
   HELPDESK_API_TECHSUPPORT_CREATEREQUEST,
   HELPDESK_API_ATTACHTEMPORARY_FILE
-} from '@/config/apiUrls';
+} from '../../../utils/apiUrls';
 
 const JiraTicketForm = ({ onClose }) => {
   const user = getUserInfo();
@@ -57,7 +57,7 @@ const JiraTicketForm = ({ onClose }) => {
 
   const fetchCategories = async () => {
     try {
-      const res = await apiCall(HELPDESK_API_ERROR_CATEGORY, 'GET');
+      const res = await axiosService.get(HELPDESK_API_ERROR_CATEGORY);
       if (res && res.content && res.content.List) {
         setCategories(res.content.List);
       }
@@ -107,7 +107,7 @@ const JiraTicketForm = ({ onClose }) => {
       const formDataObj = new FormData();
       validFiles.forEach(f => formDataObj.append('fileInput', f));
       
-      const baseUrl = httpClient.getBaseURL();
+      const baseUrl = axiosService.getBaseURL();
       const uploadUrl = baseUrl.replace(/\/$/, '') + HELPDESK_API_ATTACHTEMPORARY_FILE;
       
       // Get authentication token
@@ -222,7 +222,7 @@ const JiraTicketForm = ({ onClose }) => {
       console.log('Making API call to:', endpoint);
       console.log('Request payload:', request);
       
-      const res = await apiCall(endpoint, 'POST', request);
+      const res = await axiosService.post(endpoint, request);
       
       console.log('API response:', res);
       

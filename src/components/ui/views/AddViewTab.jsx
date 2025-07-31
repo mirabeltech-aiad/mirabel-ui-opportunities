@@ -9,7 +9,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { useAvailableColumns } from "@/features/Opportunity/hooks/useAvailableColumns";
 import apiService from "@/features/Opportunity/Services/apiService";
 import { proposalService } from "@/features/Opportunity/Services/proposalService";
-import { userId } from "@/services/httpClient";
+import { getCurrentUserId } from "@/utils/userUtils";
 import Loader from "@/components/ui/loader";
 
 const AddViewTab = ({ 
@@ -146,7 +146,7 @@ const AddViewTab = ({
             NameOfView: viewName.trim(),
             PageType: 1,
             ProductType: 2, // 2 for proposals
-            User: { ID: userId },
+            User: { ID: getCurrentUserId() },
             ViewType: isPublicView ? 2 : 0, // 0 if public view checkbox is unchecked
             VisibleColumns: visibleColumns
           };

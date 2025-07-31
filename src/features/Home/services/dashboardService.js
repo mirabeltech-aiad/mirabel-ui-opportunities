@@ -1,5 +1,5 @@
-import AxiosService from '@/services/AxiosService';
-import { apiCall } from '@/services/httpClient';
+import axiosService from '../../../services/axiosService';
+import { DASHBOARD_API } from '../../../utils/apiUrls';
 
 /**
  * Dashboard service for fetching dashboard data from the API
@@ -11,21 +11,22 @@ export const dashboardService = {
    */
   getDashboards: async () => {
     try {
-      const response = await apiCall('/services/User/Dashboards/false', 'GET');
-      // Check if response has the expected structure
+      const response = await axiosService.get(DASHBOARD_API.USER_DASHBOARDS);
+      
+      // Handle response structure variations
       if (response?.content?.Status === 'Success' && response?.content?.List) {
         return response.content.List;
       }
       
-      // Fallback: check if data is directly in response.data
-      if (response?.data?.content?.Status === 'Success' && response?.data?.content?.List) {
-        return response.data.content.List;
+      if (response?.Status === 'Success' && response?.List) {
+        return response.List;
       }
       
       console.warn('Unexpected API response structure:', response);
       return [];
     } catch (error) {
       console.error('Error fetching dashboards:', error);
+      return [];
     }
   },
 
