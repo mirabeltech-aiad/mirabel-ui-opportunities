@@ -36,25 +36,30 @@ function App() {
       // Initialize environment first (sets up localStorage in dev mode)
       if (isDevelopmentMode()) {
         initializeDevelopmentEnvironment();
-        setIsLoaded(true);
-        return;
       }
 
-      // In production, wait for session data to be loaded
-      const waitForSessionData = () => {
-        const mmClientVars = localStorage && localStorage.getItem("MMClientVars");
-        if (mmClientVars) {
-          console.log('✅ Session data found, loading app');
-          setIsLoaded(true);
-        } else {
-          console.log('⏳ Waiting for session data...');
-          // Check again in 500ms
-          setTimeout(waitForSessionData, 500);
-        }
-      };
+      // In production, monitor for session data and redirect if needed
+      if (!isDevelopmentMode()) {
+        const checkSessionAndRedirect = () => {
+          const mmClientVars = localStorage && localStorage.getItem("MMClientVars");
+          if (!mmClientVars) {
+            console.log('⏳ No session data found, checking again in 5 seconds...');
+            // Give more time for the API call to complete
+            setTimeout(() => {
+              const retryMMClientVars = localStorage && localStorage.getItem("MMClientVars");
+              if (!retryMMClientVars) {
+                console.log('❌ No session data after 5 seconds, redirecting to login');
+                window.location.href = `${getTopPath()}/intranet/home/login.aspx`;
+              }
+            }, 5000);
+          } else {
+            console.log('✅ Session data found');
+          }
+        };
 
-      // Start waiting for session data
-      waitForSessionData();
+        // Start monitoring after a short delay to let Home component load
+        setTimeout(checkSessionAndRedirect, 1000);
+      }
     };
 
     initializeApp();
@@ -71,7 +76,7 @@ function App() {
             <TooltipProvider>
               <BrowserRouter basename="/ui60">
                 <div className="min-h-screen bg-background font-sans antialiased">
-                  {isLoaded ? <AppRoutes /> : <LoadingSpinner />}
+                  <AppRoutes />
                 </div>
               </BrowserRouter>
             </TooltipProvider>
