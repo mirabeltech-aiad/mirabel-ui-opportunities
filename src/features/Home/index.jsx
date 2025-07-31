@@ -11,6 +11,8 @@ import navigationService from './services/navigationService';
 const API_USER_ACCOUNTS_CHECKCONDITION = '/services/User/Accounts/CheckCondition/';
 
 const Home = () => {
+
+  debugger;
   const [showJobFunction, setShowJobFunction] = useState(false);
   const [isSessionLoaded, setIsSessionLoaded] = useState(false);
   
