@@ -36,23 +36,25 @@ function App() {
       // Initialize environment first (sets up localStorage in dev mode)
       if (isDevelopmentMode()) {
         initializeDevelopmentEnvironment();
-      }
-
-      // Check authentication - MMClientVars should be loaded by Home component
-      const mmClientVars = localStorage && localStorage.getItem("MMClientVars");
-      if (!mmClientVars && !isDevelopmentMode()) {
-        // Give a small delay for Home component to load session data
-        setTimeout(() => {
-          const retryMMClientVars = localStorage && localStorage.getItem("MMClientVars");
-          if (!retryMMClientVars) {
-            window.location.href = `${getTopPath()}/intranet/home/login.aspx`;
-          }
-        }, 2000); // Wait 2 seconds for Home component to load session
+        setIsLoaded(true);
         return;
       }
-      
-      // Set loaded state after authentication is complete
-      setIsLoaded(true);
+
+      // In production, wait for session data to be loaded
+      const waitForSessionData = () => {
+        const mmClientVars = localStorage && localStorage.getItem("MMClientVars");
+        if (mmClientVars) {
+          console.log('✅ Session data found, loading app');
+          setIsLoaded(true);
+        } else {
+          console.log('⏳ Waiting for session data...');
+          // Check again in 500ms
+          setTimeout(waitForSessionData, 500);
+        }
+      };
+
+      // Start waiting for session data
+      waitForSessionData();
     };
 
     initializeApp();

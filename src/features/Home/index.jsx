@@ -20,11 +20,15 @@ const Home = () => {
   useEffect(() => {
     const initializeComponent = async () => {
       try {
+        console.log('🚀 Home component initializing...');
+        
         // Validate localStorage first
         const isLocalStorageValid = validateLocalStorage();
         console.log('🔍 localStorage validation result:', isLocalStorageValid);
 
+        console.log('📞 Calling loadSessionDetails API...');
         const sessionDataResponse = await navigationService.loadSessionDetails();
+        console.log('📞 API response received:', sessionDataResponse);
 
 
         // Ensure session data is properly loaded and not just fallback values

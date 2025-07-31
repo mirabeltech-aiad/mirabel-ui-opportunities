@@ -98,7 +98,10 @@ export const navigationService = {
     loadSessionDetails: async () => {
         try {
             console.log('🔍 Loading session details from API...');
+            console.log('🔍 API URL:', NAVIGATION_API.SESSION_DETAILS);
+            console.log('🔍 Making API call...');
             const response = await axiosService.get(NAVIGATION_API.SESSION_DETAILS, { withCredentials: true });
+            console.log('🔍 API call completed, response:', response);
             
             console.log('🔍 Session details API response:', response);
             
@@ -127,6 +130,13 @@ export const navigationService = {
             }         
         } catch (error) {
             console.error('❌ Failed to load session details:', error);
+            console.error('❌ Error details:', {
+                message: error.message,
+                status: error.response?.status,
+                statusText: error.response?.statusText,
+                data: error.response?.data,
+                url: error.config?.url
+            });
             
             // Fallback to sessionValues if available
             if (typeof sessionValues !== 'undefined' && sessionValues) {
