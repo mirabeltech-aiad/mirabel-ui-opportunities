@@ -23,9 +23,12 @@ const Home = () => {
         // Validate localStorage first
         const isLocalStorageValid = validateLocalStorage();
         console.log('🔍 localStorage validation result:', isLocalStorageValid);
-        
+
+        alert('index.jsx outside');
         const sessionDataResponse = await navigationService.loadSessionDetails();
-        
+        alert("index.jsx inside: " + JSON.stringify(sessionDataResponse));
+
+
         // Ensure session data is properly loaded and not just fallback values
         if (sessionDataResponse && typeof sessionDataResponse === 'object') {
           // Wait a bit to ensure localStorage write is complete
