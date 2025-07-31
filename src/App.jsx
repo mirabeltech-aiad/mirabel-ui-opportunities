@@ -31,7 +31,7 @@ const LoadingSpinner = () => (
 
 function App() {
   const [isLoaded, setIsLoaded] = useState(false);
-
+alert("12")
   useLayoutEffect(() => {
     // Initialize environment first (sets up localStorage in dev mode)
     if (isDevelopmentMode()) {
