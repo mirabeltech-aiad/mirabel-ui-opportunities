@@ -41,7 +41,7 @@ alert("12")
 
     // Check authentication - redirect if MMClientVars is null (only in production)
     alert(localStorage.getItem("MMClientVars"))
-    const mmClientVars = localStorage.getItem("MMClientVars");
+    const mmClientVars =  localStorage && localStorage.getItem("MMClientVars");
     if (!mmClientVars && !isDevelopmentMode()) {
       window.location.href = `${getTopPath()}/intranet/home/login.aspx`;
       return;
