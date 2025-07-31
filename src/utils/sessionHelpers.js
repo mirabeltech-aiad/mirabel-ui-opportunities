@@ -89,6 +89,7 @@ export const resetSession = clearSession;
  * @returns {object|null} User info object or null
  */
 export const getUserInfo = () => {
+  debugger;
   const sessionData = getSessionData();
   if (!sessionData) return null;
 

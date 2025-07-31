@@ -46,15 +46,14 @@ const getEnvironmentConfig = () => {
   };
 };
 
-// Create axios instance with environment-specific CORS configuration
+// Create axios instance with environment-aware credentials
 const axiosInstance = axios.create({
   headers: {
     Accept: "application/json",
     "Content-Type": "application/json",
   },
   timeout: CONFIG.timeout,
-  // In development, don't send credentials to avoid CORS issues
-  withCredentials: !isDevelopmentMode(),
+  withCredentials: !isDevelopmentMode(), // Always send credentials (needed for production)
 });
 
 // Request Interceptor
@@ -307,6 +306,7 @@ const axiosService = {
       throw handleError(error);
     }
   },
+
 
   // Convenience methods
   async getWithParams(url, params = {}, config = {}) {

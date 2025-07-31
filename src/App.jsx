@@ -9,6 +9,7 @@ import { TooltipProvider } from "./components/ui/tooltip";
 import { Toaster } from "./components/ui/sonner";
 import AppRoutes from "./routers/routes.jsx";
 import { isDevelopmentMode, initializeDevelopmentEnvironment } from "./utils/developmentHelper";
+import { getTopPath } from "./utils/commonHelpers";
 
 const queryClient = new QueryClient();
 
@@ -40,7 +41,7 @@ function App() {
     // Check authentication - redirect if MMClientVars is null (only in production)
     const mmClientVars = localStorage.getItem("MMClientVars");
     if (!mmClientVars && !isDevelopmentMode()) {
-      window.location.href = `${window.location.origin}/intranet/home/login.aspx`;
+      window.location.href = `${getTopPath()}/intranet/home/login.aspx`;
       return;
     }
     

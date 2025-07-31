@@ -2,7 +2,8 @@ import React, { createContext, useContext, useReducer, useEffect } from 'react';
 import dashboardService from '../services/dashboardService';
 import navigationService from '../services/navigationService';
 import { termsAndConditionsService } from '../services/termsAndConditionsService';
-
+import { getSessionData } from '@/utils/sessionHelpers';
+import { getTopPath } from '@/utils/commonHelpers';
 const HomeContext = createContext();
 
 // Action types
@@ -44,7 +45,7 @@ const initialState = {
       title: 'Inbox',
       component: 'Inbox',
       type: 'iframe',
-      url: (typeof window !== 'undefined' ? window.location.origin : '') + '/intranet/Members/Home/InboxNotifications.aspx',
+      url: (typeof window !== 'undefined' ?getTopPath() : '') + '/intranet/Members/Home/InboxNotifications.aspx',
       closable: false,
       icon: '📥'
     },
@@ -53,7 +54,7 @@ const initialState = {
       title: 'Search',
       component: 'Search',
       type: 'iframe',
-      url:  (typeof window !== 'undefined' ? window.location.origin : '') + '/ui/Search',
+      url:  (typeof window !== 'undefined' ? getTopPath() : '') + '/ui/Search',
       closable: false,
       icon: '🔍'
     }
@@ -218,7 +219,7 @@ const homeReducer = (state, action) => {
 };
 
 // Provider component
-export const HomeProvider = ({ children }) => {
+export const HomeProvider = ({ children, sessionLoaded = false }) => {
   const [state, dispatch] = useReducer(homeReducer, initialState);
   
   // Check for Terms and Conditions
@@ -341,7 +342,7 @@ export const HomeProvider = ({ children }) => {
     try {
       setNavigationLoading(true);
       
-      const clientDetails = localStorage.getItem("MMClientVars");
+      const clientDetails = getSessionData();
       let cultureUI = "en-US"; // Default value
       let siteType = "TMM"; // Default value
       let navBarType = 0; // Default to General
@@ -430,6 +431,9 @@ export const HomeProvider = ({ children }) => {
 
   // Main initialization effect - runs in parallel for speed
   useEffect(() => {
+    // Only initialize if session is loaded
+    if (!sessionLoaded) return;
+    
     const initializeApp = async () => {
       // Clear localStorage first
       localStorage.removeItem('home-tabs');
@@ -448,7 +452,7 @@ export const HomeProvider = ({ children }) => {
     };
 
     initializeApp();
-  }, []);
+  }, [sessionLoaded]);
 
   // Save tabs to localStorage when they change
   useEffect(() => {

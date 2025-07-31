@@ -17,54 +17,61 @@ export const promises = {};
 export const getValue = () => {
     return Math.random().toString(36).substr(2, 9) + Date.now().toString(36);
 };
-
 // Development session values - references devApiConfig
 export const sessionValues = {
-    // Core API credentials - referenced from devApiConfig
-    "UserID": 23,
-    "Email": "techsupport@magazinemanager.com",
-    "Token": devApiConfig.token,
-    "Domain": devApiConfig.domain,
-    "Host": devApiConfig.baseUrl,
-    
-    // Authentication flags
-    "IsAuthenticated": true,
-    "IsAdmin": false,
-    "IsSA": "false",
-    "IsChangePassword": "false",
-    
-    // User details
-    "UserName": "Support Tech",
-    "DisplayName": "Support,Tech", 
-    "UserNameID": "tsupport",
-    "FullName": "Tech Support (Development)",
-    
-    // Client configuration
-    "ClientID": "5",
-    "CompanyName": "Mirabel Technologies, Inc. (DEV)",
-    "ContentVersion": "5.22.3",
-    "ProductType": "10178",
-    
-    // Session settings
-    "AccessTokenTimeOut": "1/30/2026 9:00:00 AM",
-    "TimeAdd": "0",
-    "DepartmentID": "2",
-    
-    // Feature flags
-    "IsMKMEnabled": "True",
-    "CanSendCRMEmail": "true",
-    
-    // URLs and external resources
-    "PageList": "Invoices,Dashboards,Home",
-    "HelpSite": "https://help.mirabeltechnologies.com",
-    "CustomerPortalUrl": "http://portal.mirabeltechnologies.de",
-    
-    // Unused legacy fields
-    "PASubProductTypeId": "0",
-    "PASubProductTypeName": "",
-    "BSASubProductTypeId": "0", 
-    "BSASubProductTypeName": ""
+  // Core API credentials - referenced from devApiConfig
+  "UserID": 1,
+  "Email": "sa@magazinemanager.com",
+  "Token": devApiConfig.token,
+  "Domain": devApiConfig.domain,
+  "Host": devApiConfig.baseUrl,
+  
+  // Authentication & Session
+  "AccessTokenTimeOut": "2025-09-04T01:47:49.87",
+  "IsAuthenticated": false,
+  "ChangePassword": false,
+  
+  // Client & Company Information
+  "ClientID": 9920,
+  "CompanyName": "Mirabel Development | Test site",
+  "CultureUI": "en-us",
+  "SiteType": "",
+  "TimeAdd": 0,
+  
+  // Package & Product Configuration
+  "PackageTypeID": 3,
+  "ProductType": "10182",
+  "PASubProductTypeId": 0,
+  "PASubProductTypeName": "",
+  "BSASubProductTypeId": 21,
+  "BSASubProductTypeName": "Broadstreet",
+  
+  // Feature Flags & Permissions
+  "IsMKMEnabled": true,
+  "IsUserHasMKMAccess": true,
+  "IsSiteDataPackEnabled": false,
+  "IsUserHasDataPackAccess": false,
+  "IsMirabelEmailServiceEnabled": false,
+  "IsRepNotificationEnabled": false,
+  "CanSendCRMEmail": true,
+  
+  // User Profile Information
+  "UserName": "sa@magazinemanager.com",
+  "EmployeeID": 1,
+  "FirstName": "System",
+  "LastName": "Administrator",
+  "FullName": "System Administrator",
+  "DisplayName": "System Administrator",
+  "IsAdmin": true,
+  "IsSA": true,
+  "UserNameID": 1,
+  "SalesRepName": "System Administrator",
+  "DepartmentID": "1",
+  
+  // Content & Version
+  "ContentVersion": null
 };
+
 
 // Message handler for iframe communication
 export const handleMessage = (event) => {

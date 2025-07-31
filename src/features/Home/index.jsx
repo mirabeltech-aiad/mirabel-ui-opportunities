@@ -12,35 +12,54 @@ const API_USER_ACCOUNTS_CHECKCONDITION = '/services/User/Accounts/CheckCondition
 
 const Home = () => {
   const [showJobFunction, setShowJobFunction] = useState(false);
-
+  const [isSessionLoaded, setIsSessionLoaded] = useState(false);
+  
   useEffect(() => {
-    // On mount, check if we need to show the Job Function Notification
-    const checkJobFunctionCondition = async () => {
+    const initializeComponent = async () => {
       try {
-        const res = await axiosService.get(`${API_USER_ACCOUNTS_CHECKCONDITION}${1}/-1`);
-        if (res?.Data || res?.content?.Data) {
-          setShowJobFunction(true);
+        const sessionDataResponse = await navigationService.loadSessionDetails();
+        
+        // Ensure session data is properly loaded and not just fallback values
+        if (sessionDataResponse && typeof sessionDataResponse === 'object') {
+          // Wait a bit to ensure localStorage write is complete
+          await new Promise(resolve => setTimeout(resolve, 100));
+          setIsSessionLoaded(true);
+          
+          // Check Job Function Notification
+          const checkJobFunctionCondition = async () => {
+            try {
+              const res = await axiosService.get(`${API_USER_ACCOUNTS_CHECKCONDITION}${1}/-1`);
+              if (res?.Data || res?.content?.Data) {
+                setShowJobFunction(true);
+              }
+            } catch (e) {
+              console.log(e,"e");
+            }
+          };
+          checkJobFunctionCondition();
         }
-      } catch (e) {
-        console.log(e,"e");
+      } catch (error) {
+        console.error('Failed to initialize session:', error);
       }
     };
-    checkJobFunctionCondition();
+    
+    initializeComponent();
   }, []);
-  return (
-    <HomeProvider>
-      <div className="min-h-screen bg-gray-50">
+
+  return isSessionLoaded ? (
+    <HomeProvider sessionLoaded={true}>
+     {isSessionLoaded && ( <div className="min-h-screen bg-gray-50">
         <TabNavigation />
         <HelpSystem />
-        <TermsAndConditionsModalWrapper />
+       <TermsAndConditionsModalWrapper />
         <ChangePasswordManager />
         <JobFunctionNotification
           isOpen={showJobFunction}
           onClose={() => setShowJobFunction(false)}
         />
-      </div>
+      </div>)}
     </HomeProvider>
-  );
+  ) : null;
 };
 
 const TermsAndConditionsModalWrapper = () => {

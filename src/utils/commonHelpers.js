@@ -1,4 +1,4 @@
 export const getTopPath = () => {
-    return window.location.pathname.split('/')[1];
+    return window.location.origin;
     // what it returns is the top path of the url
 }

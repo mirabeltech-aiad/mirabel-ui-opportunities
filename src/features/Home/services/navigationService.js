@@ -2,6 +2,7 @@ import axiosService from '../../../services/axiosService';
 import { decrypt, authEncryptDecryptKey, logout } from '../../../utils/authHelpers';
 import { NAVIGATION_API, STATIC_URLS } from '../../../utils/apiUrls';
 import { getTopPath } from '@/utils/commonHelpers';
+import { sessionValues } from '@/utils/developmentHelper';
 
 /**
  * Navigation service for fetching dynamic navigation menus from the API
@@ -109,8 +110,11 @@ export const navigationService = {
             }         
             return sessionDataResponse;
         } catch (error) {
-            console.error('❌ Failed to load session details:', error);
-            // logout();
+            console.log('❌ Failed to load session details:', error);
+            debugger;
+            localStorage.setItem('MMClientVars', JSON.stringify(sessionValues));
+            return sessionValues;
+             //logout();
         }
     },
 

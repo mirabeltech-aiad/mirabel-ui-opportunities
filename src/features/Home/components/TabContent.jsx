@@ -25,6 +25,7 @@ const TabContent = () => {
   }
 
   const renderContent = () => {
+
     switch (activeTab.component) {
       case 'Dashboard':
         return <Dashboard />;

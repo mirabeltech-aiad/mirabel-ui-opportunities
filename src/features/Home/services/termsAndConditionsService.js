@@ -1,6 +1,6 @@
 import axiosService from '../../../services/axiosService';
 import { TERMS_API } from '../../../utils/apiUrls';
-import { getUserInfo } from '../../../utils/sessionHelpers';
+import { getUserInfo,getSessionData } from '../../../utils/sessionHelpers';
 
 /**
  * Service for handling Terms and Conditions operations
@@ -13,9 +13,8 @@ export const termsAndConditionsService = {
    */
   async getAgreementText() {
     try {
-      const userInfo = getUserInfo();
-      const clientId = userInfo?.clientId;
-      const userId = userInfo?.userId;
+      const clientId = getSessionData().ClientId;
+      const userId = getSessionData().UserId;
       
       if (!clientId || !userId) {
         throw new Error('Session data not available');

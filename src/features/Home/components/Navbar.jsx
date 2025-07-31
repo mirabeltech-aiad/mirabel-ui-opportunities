@@ -453,7 +453,7 @@ const Navbar = () => {
               {navigationLoading ? (
                 <Loader2 className="h-4 w-4 animate-spin text-white" />
               ) : (
-                navigationMenus.map((menu) => (
+                navigationMenus && navigationMenus.map((menu) => (
                   <DropdownMenu key={menu.id} onOpenChange={(open) => setOpenMenuId(open ? menu.id : (openMenuId === menu.id ? null : openMenuId))}>
                     <DropdownMenuTrigger asChild>
                       <button
