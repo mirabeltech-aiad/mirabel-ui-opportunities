@@ -186,13 +186,10 @@ export const navigationService = {
    * Recursively build menu tree for unlimited depth
    */
   processNavigationMenus: async (menus, apiData = null) => {
-    if (!Array.isArray(menus)) {
-          return [];
-    }
-    
-    if (menus.length === 0) {
+    if (!Array.isArray(menus) || menus.length === 0) {
       return [];
     }
+    
 
     // Get session data from localStorage (MMClientVars)
     let sessionVars = {};
@@ -314,10 +311,10 @@ export const navigationService = {
           
           // Special URL handling for MKM/MES - matches backend exactly
           if ((menu.URLSource === 'MKM' || menu.URLSource === 'MKM-DATA') && url) {
-            const marketingManagerSiteURL = await navigationService.getMarketingManagerSiteURL();
+            const marketingManagerSiteURL = apiData.MarketingManagerURL || '';
             url = insertMenuUrlAtPlaceholder(marketingManagerSiteURL, url);
           } else if (menu.URLSource === 'MES' && url) {
-            const emailServiceSiteURL = await navigationService.getEmailServiceSiteURL();
+            const emailServiceSiteURL = apiData.EmailServiceSiteURL || '';
             url = insertMenuUrlAtPlaceholder(emailServiceSiteURL, url);
           }
           
