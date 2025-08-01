@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useReducer, useEffect } from 'react';
+import React, { createContext, useContext, useReducer, useEffect, useMemo } from 'react';
 import dashboardService from '../services/dashboardService';
 import navigationService from '../services/navigationService';
 import { termsAndConditionsService } from '../services/termsAndConditionsService';
@@ -599,33 +599,55 @@ export const HomeProvider = ({ children, sessionLoaded = false }) => {
     ]);
   };
 
-
+  const actions = useMemo(() => ({
+    addTab,
+    removeTab,
+    reorderTabs,
+    setActiveTab,
+    updateTab,
+    toggleHelp,
+    setHelpPosition,
+    setSessionData,
+    clearSession,
+    setDashboards,
+    setSelectedDashboard,
+    setDashboardsLoading,
+    setNavigationMenus,
+    setNavigationLoading,
+    showTermsModal,
+    hideTermsModal,
+    setLogoUrl,
+    setMMIntegration,
+    setCRMProspecting,
+    reloadNavigationMenus,
+    refreshHomeContext
+  }), [
+    addTab,
+    removeTab,
+    reorderTabs,
+    setActiveTab,
+    updateTab,
+    toggleHelp,
+    setHelpPosition,
+    setSessionData,
+    clearSession,
+    setDashboards,
+    setSelectedDashboard,
+    setDashboardsLoading,
+    setNavigationMenus,
+    setNavigationLoading,
+    showTermsModal,
+    hideTermsModal,
+    setLogoUrl,
+    setMMIntegration,
+    setCRMProspecting,
+    reloadNavigationMenus,
+    refreshHomeContext
+  ]);
 
   const value = {
     ...state,
-    actions: {
-      addTab,
-      removeTab,
-      reorderTabs,
-      setActiveTab,
-      updateTab,
-      toggleHelp,
-      setHelpPosition,
-      setSessionData,
-      clearSession,
-      setDashboards,
-      setSelectedDashboard,
-      setDashboardsLoading,
-      setNavigationMenus,
-      setNavigationLoading,
-      showTermsModal,
-      hideTermsModal,
-      setLogoUrl,
-      setMMIntegration,
-      setCRMProspecting,
-      reloadNavigationMenus,
-      refreshHomeContext
-    }
+    actions: actions
   };
 
   return (

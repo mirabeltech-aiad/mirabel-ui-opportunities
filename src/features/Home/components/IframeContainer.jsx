@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, memo, useEffect } from 'react';
 import { Loader2, ExternalLink, RefreshCw } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useHome } from '../contexts/HomeContext';
 import { getTopPath } from '@/utils/commonHelpers';
+
 /**
  * Common iframe container component for loading dashboard and menu URLs
  * @param {Object} props - Component props
@@ -12,7 +13,7 @@ import { getTopPath } from '@/utils/commonHelpers';
  * @param {Object} props.style - Inline styles
  * @returns {React.ReactElement} IframeContainer component
  */
-const IframeContainer = ({ 
+const IframeContainer = memo(({ 
   url, 
   title = 'Content', 
   className = '', 
@@ -27,22 +28,33 @@ const IframeContainer = ({
   // Get actions from HomeContext
   const { actions } = useHome();
 
+  // Debug logging to track component lifecycle
+  useEffect(() => {
+    console.log('🔄 IframeContainer: Mounted for', title, 'with URL:', url);
+    return () => {
+      console.log('🔄 IframeContainer: Unmounted for', title);
+    };
+  }, [title, url]);
+
   // Construct full URL by combining base domain with relative URL
   const fullUrl = url ? `${getTopPath()}${url.startsWith('/') ? '' : '/'}${url}` : '';
 
   const handleIframeLoad = () => {
+    console.log('🔄 IframeContainer: Loaded', title);
     setLoading(false);
     setError(false);
     onLoad && onLoad();
   };
 
   const handleIframeError = () => {
+    console.log('🔄 IframeContainer: Error loading', title);
     setLoading(false);
     setError(true);
     onError && onError();
   };
 
   const handleRefresh = () => {
+    console.log('🔄 IframeContainer: Refreshing', title);
     setLoading(true);
     setError(false);
     setRefreshKey(prev => prev + 1);
@@ -124,7 +136,10 @@ const IframeContainer = ({
         loading="lazy"
       />
     </div>
-      );
-  };
+  );
+});
+
+// Add display name for debugging
+IframeContainer.displayName = 'IframeContainer';
 
 export default IframeContainer; 

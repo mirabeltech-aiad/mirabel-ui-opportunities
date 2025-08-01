@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { useHome } from '../contexts/HomeContext';
 import IframeContainer from './IframeContainer';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -17,6 +17,21 @@ import {
 const Dashboard = () => {
   const { actions, selectedDashboard, dashboardsLoading } = useHome();
 
+  // Memoize the iframe content to prevent unnecessary re-renders
+  const iframeContent = useMemo(() => {
+    if (selectedDashboard && selectedDashboard.URL) {
+      return (
+        <IframeContainer 
+          url={selectedDashboard.URL}
+          title={selectedDashboard.DashBoardName}
+          className="h-full"
+          key={selectedDashboard.ID} // Use dashboard ID as key to preserve state
+        />
+      );
+    }
+    return null;
+  }, [selectedDashboard?.ID, selectedDashboard?.URL, selectedDashboard?.DashBoardName]);
+
   // Show loading state while dashboards are being fetched
   if (dashboardsLoading) {
     return (
@@ -27,14 +42,8 @@ const Dashboard = () => {
   }
 
   // If a dashboard is selected and has a URL, show it in iframe
-  if (selectedDashboard && selectedDashboard.URL) {
-    return (
-      <IframeContainer 
-        url={selectedDashboard.URL}
-        title={selectedDashboard.DashBoardName}
-        className="h-full"
-      />
-    );
+  if (iframeContent) {
+    return iframeContent;
   }
 
   const quickActions = [

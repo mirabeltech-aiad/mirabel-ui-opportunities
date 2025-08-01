@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState, useRef, memo } from 'react';
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import { useHome } from '../contexts/HomeContext';
 import { initializePageNavigation, cleanupPageNavigation } from '@/utils/pageNavigation';
@@ -14,8 +14,16 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { getSessionValue } from '@/utils/sessionHelpers';
 
-const TabNavigation = () => {
+const TabNavigation = memo(() => {
   const { tabs, activeTabId, actions, dashboards, selectedDashboard, dashboardsLoading } = useHome();
+
+  // Debug logging to track component lifecycle
+  useEffect(() => {
+    console.log('🔄 TabNavigation: Component mounted');
+    return () => {
+      console.log('🔄 TabNavigation: Component unmounted');
+    };
+  }, []);
 
   // Context menu state
   const [contextMenu, setContextMenu] = useState({ visible: false, x: 0, y: 0, tabId: null });
@@ -53,7 +61,7 @@ const TabNavigation = () => {
       console.log('Cleaning up page navigation helpers in TabNavigation');
       cleanupPageNavigation();
     };
-  }, [actions]);
+  }, []); // Remove actions dependency to prevent unnecessary re-initialization
 
   // Split tabs into fixed and draggable
   // First three tabs: dropdown (dashboard), Inbox, Search are fixed
@@ -374,6 +382,9 @@ const TabNavigation = () => {
       </div>
     </div>
   );
-};
+});
+
+// Add display name for debugging
+TabNavigation.displayName = 'TabNavigation';
 
 export default TabNavigation; 
