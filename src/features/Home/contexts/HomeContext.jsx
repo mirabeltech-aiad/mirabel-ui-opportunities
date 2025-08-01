@@ -339,9 +339,7 @@ export const HomeProvider = ({ children, sessionLoaded = false }) => {
 
   // Load navigation menus (optimized - no caching)
   const loadNavigationMenus = async () => {
-    try {
-      setNavigationLoading(true);
-      
+    try {      
       const clientDetails = getSessionData();
       let cultureUI = "en-US"; // Default value
       let siteType = "TMM"; // Default value
@@ -373,15 +371,9 @@ export const HomeProvider = ({ children, sessionLoaded = false }) => {
       }
       
       const menus = await navigationService.fetchNavigationData(userId, navBarType);
-      console.log('🔍 Navigation menus loaded:', menus.length, menus);
       
       // Ensure we always set some menu data, even if empty
       setNavigationMenus(menus || []);
-      
-      // Force a small re-render delay to ensure state updates properly
-      setTimeout(() => {
-        console.log('🔄 Post-API state check - navigationMenus set to:', menus?.length || 0, 'items');
-      }, 100);
     } catch (error) {
       console.error('Error loading navigation menus:', error);
       // Set empty array on error to prevent undefined state
