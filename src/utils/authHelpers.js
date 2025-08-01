@@ -10,7 +10,9 @@ export const AUTH_ERRORS = {
 };
 
 // Encryption/decryption key for auth operations
-export const authEncryptDecryptKey = 'MirabelAuthKey2024!';
+export const authEncryptDecryptKey = "20SA16ED";
+export const crmEncryptDecryptKey = "$%x@#~$a";
+
 
 /**
  * Get the main login URL with return URL parameter
