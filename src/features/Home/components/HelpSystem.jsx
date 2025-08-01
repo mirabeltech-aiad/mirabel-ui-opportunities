@@ -54,7 +54,7 @@ const HelpSystem = () => {
     }
   }, [consultantInfo]);
 
-  const defaultHelpPosition = { x: typeof window !== 'undefined' ? window.innerWidth - 100 : 1320, y: typeof window !== 'undefined' ? window.innerHeight - 100 : 620 };
+  const defaultHelpPosition = { x: typeof window !== 'undefined' ? window.innerWidth - 76 : 1320, y: typeof window !== 'undefined' ? window.innerHeight - 76 : 620 };
 
   const helpOptions = [
     {
@@ -207,9 +207,9 @@ const HelpSystem = () => {
     const newX = e.clientX - dragOffset.x;
     const newY = e.clientY - dragOffset.y;
 
-    // Constrain to viewport
-    const maxX = window.innerWidth - 60;
-    const maxY = window.innerHeight - 60;
+    // Constrain to viewport (button is 56px x 56px)
+    const maxX = window.innerWidth - 56;
+    const maxY = window.innerHeight - 56;
     
     actions.setHelpPosition({
       x: Math.max(0, Math.min(newX, maxX)),
@@ -277,7 +277,7 @@ const HelpSystem = () => {
           className="bg-ocean-600 hover:bg-ocean-700 text-white border-2 border-white shadow-lg rounded-full w-14 h-14 p-0 transition-all duration-200"
           onClick={handleClick}
         >
-          <HelpCircle className="h-6 w-6" />
+          <HelpCircle className="h-10 w-10" />
         </Button>
         
         {/* Tooltip */}
