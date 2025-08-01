@@ -16,23 +16,21 @@ const Home = () => {
     const initializeComponent = async () => {
       try {
         const sessionDataResponse = await navigationService.loadSessionDetails();
-        // Ensure session data is properly loaded and not just fallback values
+  
         if (sessionDataResponse && typeof sessionDataResponse === 'object') {
-          // Wait a bit to ensure localStorage write is complete
-          await new Promise(resolve => setTimeout(resolve, 100));
           setIsSessionLoaded(true);
-          
-          // Check Job Function Notification
+
+           // Check Job Function Notification
           const shouldShowJobFunction = await navigationService.checkJobFunctionCondition(sessionDataResponse.UserID);
           setShowJobFunction(shouldShowJobFunction);
         }
       } catch (error) {
         console.error('Failed to initialize session:', error);
       }
-    };
-    
+    };  
     initializeComponent();
   }, []);
+  
 
   return isSessionLoaded ? (
     <HomeProvider sessionLoaded={true}>
