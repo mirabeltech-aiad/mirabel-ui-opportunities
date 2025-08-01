@@ -583,6 +583,17 @@ const Navbar = () => {
             {!navigationLoading && (
               <CustomerSearch />
             )}
+            {/* Help Icon */}
+            <Button
+              variant="ghost"
+              size="sm"
+              className="h-9 w-9 rounded-full p-0 hover:bg-ocean-700 text-white"
+              onClick={actions.toggleHelp}
+              title="Help & Support"
+            >
+              <HelpCircle className="h-5 w-5" />
+            </Button>
+
             {/* Bell Notification */}
             <BellNotification 
               onOpenAnnouncementsPanel={handleOpenAnnouncementsPanel} 
