@@ -525,7 +525,7 @@ const Navbar = () => {
                     }}
                   >
                     {navigationMenus.map((menu) => (
-                  <DropdownMenu key={menu.id} onOpenChange={(open) => setOpenMenuId(open ? menu.id : (openMenuId === menu.id ? null : openMenuId))}>
+                  <DropdownMenu key={menu.id} open={openMenuId === menu.id} onOpenChange={(open) => setOpenMenuId(open ? menu.id : null)}>
                     <DropdownMenuTrigger asChild>
                       <button
                         className={`flex-shrink-0 px-2 py-1 rounded-md font-medium text-sm transition flex items-center h-8 min-h-0 whitespace-nowrap ${
@@ -534,11 +534,18 @@ const Navbar = () => {
                             : 'text-white hover:bg-ocean-700 hover:text-black focus:bg-ocean-800'
                         }`}
                         style={{ fontSize: '13px' }}
+                        onMouseEnter={() => setOpenMenuId(menu.id)}
                       >
                         <span>{menu.title}</span>
                       </button>
                     </DropdownMenuTrigger>
-                    <DropdownMenuContent align="start" className="w-auto min-w-56 max-w-xl mt-2 bg-white border border-gray-100 p-0 text-gray-800 font-medium" style={{ fontFamily: 'inherit', fontSize: '13px', lineHeight: '1.5' }}>
+                    <DropdownMenuContent 
+                      align="start" 
+                      className="w-auto min-w-56 max-w-xl mt-2 bg-white border border-gray-100 p-0 text-gray-800 font-medium" 
+                      style={{ fontFamily: 'inherit', fontSize: '13px', lineHeight: '1.5' }}
+                      onMouseEnter={() => setOpenMenuId(menu.id)}
+                      onMouseLeave={() => setOpenMenuId(null)}
+                    >
                       {menu.url && (
                         <DropdownMenuItem onClick={() => openTabByUrl(menu.title, menu.url)} className="rounded-none font-medium px-4 py-2 hover:bg-[#e6f0fa] focus:bg-[#e6f0fa] hover:text-ocean-900 focus:text-ocean-900 cursor-pointer text-gray-800 transition-colors duration-150 flex items-center gap-2 whitespace-nowrap" style={{ fontFamily: 'inherit', fontSize: '13px', fontWeight: 500, lineHeight: '1.5' }}>
                           <span>{menu.title} Home</span>
