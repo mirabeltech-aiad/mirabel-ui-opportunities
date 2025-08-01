@@ -25,8 +25,8 @@ export const termsAndConditionsService = {
       );
       
       // Extract the agreement text from the response structure
-      // API returns: { responseHeader: null, content: { Status: "Success", Data: "<html>..." } }
-      return response.content?.Data || '';
+      // AxiosService already extracts content: { Status: "Success", Data: "<html>..." }
+      return response.Data || '';
     } catch (error) {
       throw error;
     }
