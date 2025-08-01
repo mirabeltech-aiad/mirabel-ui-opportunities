@@ -86,8 +86,8 @@ export const logout = (returnUrl = null) => {
     
     // Redirect to logout page in production
     const logoutUrl = returnUrl 
-      ? `/logout.aspx?ReturnUrl=${encodeURIComponent(returnUrl)}`
-      : '/logout.aspx';
+      ? `/intranet/Members/Home/Logout.aspx?ReturnUrl=${encodeURIComponent(returnUrl)}`
+      : '/intranet/Members/Home/Logout.aspx';
     
     console.log('🔄 Auth: Redirecting to logout:', logoutUrl);
     window.location.href = logoutUrl;
