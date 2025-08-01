@@ -15,7 +15,7 @@ export const chatService = {
   async getFrontChatConfig() {
     try {
       const data = await axiosService.get(FRONTCHAT_API.CONFIG);
-      return data.content || data;
+      return data;
     } catch (error) {
       console.error('Failed to get Front Chat config:', error);
       // Fallback to environment variable if API fails
@@ -33,7 +33,7 @@ export const chatService = {
   async generateHMAC(email) {
     try {
       const data = await axiosService.getWithParams(FRONTCHAT_API.HMAC, { email });
-      return data.content?.userHash || data.userHash || '';
+      return data.userHash || '';
     } catch (error) {
       console.error('Failed to generate HMAC:', error);
       return '';
@@ -47,7 +47,7 @@ export const chatService = {
   async getFrontChatInitData() {
     try {
       const data = await axiosService.get(FRONTCHAT_API.INIT);
-      return data.content || data;
+      return data;
     } catch (error) {
       console.error('Failed to get Front Chat init data:', error);
       return null;

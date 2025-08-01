@@ -58,8 +58,8 @@ const JiraTicketForm = ({ onClose }) => {
   const fetchCategories = async () => {
     try {
       const res = await axiosService.get(HELPDESK_API_ERROR_CATEGORY);
-      if (res && res.content && res.content.List) {
-        setCategories(res.content.List);
+      if (res && res.List) {
+        setCategories(res.List);
       }
     } catch (e) {
       setCategories([]);
@@ -226,13 +226,13 @@ const JiraTicketForm = ({ onClose }) => {
       
       console.log('API response:', res);
       
-      if (res && res.content && res.content.Data && res.content.Data.issueKey) {
+      if (res && res.Data && res.Data.issueKey) {
         toast.success(
-          `Your request ${res.content.Data.issueKey} has been created.`,
+          `Your request ${res.Data.issueKey} has been created.`,
           {
             action: {
               label: 'View Ticket',
-              onClick: () => window.open(`https://mirabel.atlassian.net/browse/${res.content.Data.issueKey}`, '_blank')
+              onClick: () => window.open(`https://mirabel.atlassian.net/browse/${res.Data.issueKey}`, '_blank')
             }
           }
         );

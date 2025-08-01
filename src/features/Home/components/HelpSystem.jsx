@@ -85,8 +85,8 @@ const HelpSystem = () => {
         try {
           const consultantData = await consultantService.getConsultantInfo();
           
-          if (consultantData?.content?.Status === 'Success') {
-            setConsultantInfo(consultantData.content);
+          if (consultantData?.Status === 'Success') {
+            setConsultantInfo(consultantData);
             // Form will be opened by useEffect when consultant info is set
           } else {
             toast({

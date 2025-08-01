@@ -50,9 +50,9 @@ const ContactSalesRepForm = ({ isOpen, onClose }) => {
       }
 
       const res = await axiosService.get(`${API_CONSULTANT_INFO_GET}${clientID}`);
-      if (res && res.content && res.content.Messages) {
+      if (res && res.Messages) {
         // Extract sales reps from Messages field (matches legacy implementation)
-        const salesRepsList = res.content.Messages.map(rep => ({
+        const salesRepsList = res.Messages.map(rep => ({
           Name: rep.Message || '',
           Email: rep.Field || ''
         }));
@@ -183,13 +183,13 @@ const ContactSalesRepForm = ({ isOpen, onClose }) => {
       
       const res = await axiosService.post(endpoint, request);
       
-      if (res && res.content && res.content.Data && res.content.Data.issueKey) {
+      if (res && res.Data && res.Data.issueKey) {
         toast.success(
-          `Your request ${res.content.Data.issueKey} has been created. Your Sales Rep will respond back to you shortly.`,
+          `Your request ${res.Data.issueKey} has been created. Your Sales Rep will respond back to you shortly.`,
           {
             action: {
               label: 'View Ticket',
-              onClick: () => window.open(`https://mirabel.atlassian.net/browse/${res.content.Data.issueKey}`, '_blank')
+              onClick: () => window.open(`https://mirabel.atlassian.net/browse/${res.Data.issueKey}`, '_blank')
             }
           }
         );

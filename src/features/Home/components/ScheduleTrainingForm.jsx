@@ -52,13 +52,12 @@ const ScheduleTrainingForm = ({ isOpen, onClose }) => {
       setLoading(true);
       setError(null);
       const response = await consultantService.getConsultantInfo();
-      const content = response.content;
-      if (content && content.Status === 'Success') {
+      if (response && response.Status === 'Success') {
         let primary = null;
-        let others = content.List || [];
+        let others = response.List || [];
         // Prefer Data if valid, else use first from List
-        if (isValidConsultant(content.Data)) {
-          primary = content.Data;
+        if (isValidConsultant(response.Data)) {
+          primary = response.Data;
           // Remove from others if present
           others = others.filter(c => c.Name !== primary.Name);
         } else if (others.length > 0) {
