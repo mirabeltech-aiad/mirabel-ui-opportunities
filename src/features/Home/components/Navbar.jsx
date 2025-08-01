@@ -501,98 +501,72 @@ const Navbar = () => {
               </div>
             {/* Top Menus with Scrolling */}
             <div className="ml-4 flex items-center min-h-0 flex-1 max-w-3xl">
-              {navigationLoading ? (
-                <div className="flex items-center text-white text-sm">
-                  <Loader2 className="h-4 w-4 animate-spin mr-2" />
-                  Loading menus...
-                </div>
-              ) : (
-                <>
-                  {navigationMenus && Array.isArray(navigationMenus) && navigationMenus.length > 0 ? (
-                    <div className="flex items-center w-full">
-                      {/* Left Scroll Button */}
-                      {canScrollLeft && (
-                        <button
-                          onClick={() => scrollMenus('left')}
-                          className="flex-shrink-0 p-1 text-white hover:bg-ocean-700 rounded-md mr-1"
-                          title="Scroll menus left"
-                        >
-                          <ChevronLeft className="h-4 w-4" />
-                        </button>
-                      )}
-                      
-                      {/* Scrollable Menu Container */}
-                      <div 
-                        ref={menuContainerRef}
-                        className="flex items-center space-x-1 overflow-x-auto flex-1 scrollbar-hide"
-                        style={{ 
-                          scrollbarWidth: 'none', 
-                          msOverflowStyle: 'none',
-                          WebkitScrollbar: { display: 'none' }
-                        }}
-                      >
-                        {navigationMenus.map((menu) => (
-                      <DropdownMenu key={menu.id} onOpenChange={(open) => setOpenMenuId(open ? menu.id : (openMenuId === menu.id ? null : openMenuId))}>
-                        <DropdownMenuTrigger asChild>
-                          <button
-                            className={`flex-shrink-0 px-2 py-1 rounded-md font-medium text-sm transition flex items-center h-8 min-h-0 whitespace-nowrap ${
-                              openMenuId === menu.id
-                                ? 'bg-blue-200 text-blue-900 shadow font-semibold' // Professional highlight for active
-                                : 'text-white hover:bg-ocean-700 hover:text-black focus:bg-ocean-800'
-                            }`}
-                            style={{ fontSize: '13px' }}
-                          >
-                            <span>{menu.title}</span>
-                          </button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="start" className="w-auto min-w-56 max-w-xl mt-2 bg-white border border-gray-100 p-0 text-gray-800 font-medium" style={{ fontFamily: 'inherit', fontSize: '13px', lineHeight: '1.5' }}>
-                          {menu.url && (
-                            <DropdownMenuItem onClick={() => openTabByUrl(menu.title, menu.url)} className="rounded-none font-medium px-4 py-2 hover:bg-[#e6f0fa] focus:bg-[#e6f0fa] hover:text-ocean-900 focus:text-ocean-900 cursor-pointer text-gray-800 transition-colors duration-150 flex items-center gap-2 whitespace-nowrap" style={{ fontFamily: 'inherit', fontSize: '13px', fontWeight: 500, lineHeight: '1.5' }}>
-                              <span>{menu.title} Home</span>
-                            </DropdownMenuItem>
-                          )}
-                          {renderMenuItemsWithShowMore(menu.children, openTabByUrl, expandedMenus[menu.id], () => handleExpandMenu(menu.id))}
-                          {menu.children && menu.children.length > 10 && expandedMenus[menu.id] && (
-                            <div className="flex justify-center items-center cursor-pointer py-2 hover:bg-[#e6f0fa]" onClick={() => handleCollapseMenu(menu.id)}>
-                              <ChevronUp className="h-4 w-4 mr-1" />
-                              <span className="text-xs font-medium text-ocean-900">Show less</span>
-                            </div>
-                          )}
-                        </DropdownMenuContent>
-                      </DropdownMenu>
-                        ))}
-                      </div>
-                      
-                      {/* Right Scroll Button */}
-                      {canScrollRight && (
-                        <button
-                          onClick={() => scrollMenus('right')}
-                          className="flex-shrink-0 p-1 text-white hover:bg-ocean-700 rounded-md ml-1"
-                          title="Scroll menus right"
-                        >
-                          <ChevronRight className="h-4 w-4" />
-                        </button>
-                      )}
-                    </div>
-                  ) : (
-                    <div className="text-white text-sm px-2 flex items-center gap-2">
-                      <span>
-                        {navigationMenus === null ? 'Menus not loaded' : 
-                         navigationMenus === undefined ? 'Menus undefined' :
-                         !Array.isArray(navigationMenus) ? 'Menus not array' :
-                         navigationMenus.length === 0 ? 'No menus found' : 'Unknown menu state'}
-                      </span>
-                      <button 
-                        onClick={() => actions.reloadNavigationMenus()} 
-                        className="text-xs bg-blue-600 hover:bg-blue-700 px-2 py-1 rounded flex items-center gap-1"
-                        title="Reload Navigation Menus"
-                      >
-                        <RefreshCw className="h-3 w-3" />
-                        Reload
-                      </button>
-                    </div>
+              {navigationMenus && Array.isArray(navigationMenus) && navigationMenus.length > 0 && (
+                <div className="flex items-center w-full">
+                  {/* Left Scroll Button */}
+                  {canScrollLeft && (
+                    <button
+                      onClick={() => scrollMenus('left')}
+                      className="flex-shrink-0 p-1 text-white hover:bg-ocean-700 rounded-md mr-1"
+                      title="Scroll menus left"
+                    >
+                      <ChevronLeft className="h-4 w-4" />
+                    </button>
                   )}
-                </>
+                  
+                  {/* Scrollable Menu Container */}
+                  <div 
+                    ref={menuContainerRef}
+                    className="flex items-center space-x-1 overflow-x-auto flex-1 scrollbar-hide"
+                    style={{ 
+                      scrollbarWidth: 'none', 
+                      msOverflowStyle: 'none',
+                      WebkitScrollbar: { display: 'none' }
+                    }}
+                  >
+                    {navigationMenus.map((menu) => (
+                  <DropdownMenu key={menu.id} onOpenChange={(open) => setOpenMenuId(open ? menu.id : (openMenuId === menu.id ? null : openMenuId))}>
+                    <DropdownMenuTrigger asChild>
+                      <button
+                        className={`flex-shrink-0 px-2 py-1 rounded-md font-medium text-sm transition flex items-center h-8 min-h-0 whitespace-nowrap ${
+                          openMenuId === menu.id
+                            ? 'bg-blue-200 text-blue-900 shadow font-semibold' // Professional highlight for active
+                            : 'text-white hover:bg-ocean-700 hover:text-black focus:bg-ocean-800'
+                        }`}
+                        style={{ fontSize: '13px' }}
+                      >
+                        <span>{menu.title}</span>
+                      </button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="start" className="w-auto min-w-56 max-w-xl mt-2 bg-white border border-gray-100 p-0 text-gray-800 font-medium" style={{ fontFamily: 'inherit', fontSize: '13px', lineHeight: '1.5' }}>
+                      {menu.url && (
+                        <DropdownMenuItem onClick={() => openTabByUrl(menu.title, menu.url)} className="rounded-none font-medium px-4 py-2 hover:bg-[#e6f0fa] focus:bg-[#e6f0fa] hover:text-ocean-900 focus:text-ocean-900 cursor-pointer text-gray-800 transition-colors duration-150 flex items-center gap-2 whitespace-nowrap" style={{ fontFamily: 'inherit', fontSize: '13px', fontWeight: 500, lineHeight: '1.5' }}>
+                          <span>{menu.title} Home</span>
+                        </DropdownMenuItem>
+                      )}
+                      {renderMenuItemsWithShowMore(menu.children, openTabByUrl, expandedMenus[menu.id], () => handleExpandMenu(menu.id))}
+                      {menu.children && menu.children.length > 10 && expandedMenus[menu.id] && (
+                        <div className="flex justify-center items-center cursor-pointer py-2 hover:bg-[#e6f0fa]" onClick={() => handleCollapseMenu(menu.id)}>
+                          <ChevronUp className="h-4 w-4 mr-1" />
+                          <span className="text-xs font-medium text-ocean-900">Show less</span>
+                        </div>
+                      )}
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                    ))}
+                  </div>
+                  
+                  {/* Right Scroll Button */}
+                  {canScrollRight && (
+                    <button
+                      onClick={() => scrollMenus('right')}
+                      className="flex-shrink-0 p-1 text-white hover:bg-ocean-700 rounded-md ml-1"
+                      title="Scroll menus right"
+                    >
+                      <ChevronRight className="h-4 w-4" />
+                    </button>
+                  )}
+                </div>
               )}
             </div>
           </div>
