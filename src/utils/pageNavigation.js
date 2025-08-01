@@ -4,7 +4,6 @@
  * to open pages either in new browser tabs or in the Shell app's tab system
  */
 
-import { isWindowTopAccessible } from './windowHelpers';
 
 /**
  * Opens a page in a new browser tab
@@ -97,8 +96,62 @@ export const initializePageNavigation = (homeActions) => {
   } else {
     console.warn('window.top not available, cannot expose navigation helpers');
   }
+
+  // Load the localizer script
+  loadLocalizerScript();
 };
 
+/**
+ * Loads the localizer script with the correct domain path
+ */
+const loadLocalizerScript = async () => {
+  try {
+    const version = '1.0.0';
+    console.log("📦 Loading localizer script with Content Version:", version);
+
+    const script = document.createElement("script");
+    
+    // Get the complete domain and remove everything after /ui60
+    const currentUrl = window.location.href;
+    const ui60Index = currentUrl.indexOf('/ui60');
+    const baseUrl = ui60Index !== -1 ? currentUrl.substring(0, ui60Index + 5) : window.location.origin;
+    
+    script.src = `${baseUrl}/intranet/localizer.js.axd?v=${version}`;
+    script.async = true;
+    console.log('script', script);
+    
+    document.head.appendChild(script);
+    console.log("✅ Localizer script loaded successfully");
+
+  } catch (err) {
+    console.error("❌ Failed to load localizer script:", err);
+  }
+};
+export const isWindowTopAccessible = () => {
+  try {
+    // Try to access window.top and a property on it
+    if (window.top && window.top !== window) {
+      // Try to access a property to test if it's really accessible
+      window.top.location.href;
+      return true;
+    }
+    return false;
+  } catch (error) {
+    // If we get a security error, window.top is not accessible
+    return false;
+  }
+};
+
+/**
+ * Safely gets window.top if accessible
+ * @returns {Window|null} window.top if accessible, null otherwise
+ */
+export const getTopWindow = () => {
+  if (isWindowTopAccessible()) {
+    return window.top;
+  }
+  return null;
+}; 
 /**
  * Cleans up the page navigation helpers
  * This should be called when the Shell app unmounts
