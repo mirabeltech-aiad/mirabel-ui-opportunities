@@ -47,7 +47,7 @@ const initialState = {
       type: 'iframe',
       url: (typeof window !== 'undefined' ?getTopPath() : '') + '/intranet/Members/Home/InboxNotifications.aspx',
       closable: false,
-      icon: '📥'
+      icon: ''
     },
     {
       id: 'search',
@@ -56,7 +56,7 @@ const initialState = {
       type: 'iframe',
       url:  (typeof window !== 'undefined' ? getTopPath() : '') + '/ui/Search',
       closable: false,
-      icon: '🔍'
+      icon: ''
     }
   ],
   activeTabId: 'dashboard', // Set default to 'dashboard' (not in tabs array)

@@ -137,18 +137,23 @@ export const navigationService = {
    * @param {Object} sessionVars - Optional session variables to reuse
    * @returns {Promise<string>} Constructed MKM URL
    */
-  getMarketingManagerSiteURL: async (mkmSiteURL, sessionVars = null) => {
+  getMarketingManagerSiteURL: async () => {
     try {
-      // Get session data for parameters (reuse if provided)
-      const sessionData = sessionVars || navigationService.getSessionDetails() || {};
-      const isSiteMKMEnabled = sessionData.IsSiteMKMEnabled === true || sessionData.IsSiteMKMEnabled === 'True';
-      const isUserHasMKMAccess = sessionData.IsUserHasMKMAccess === true || sessionData.IsUserHasMKMAccess === 'True';
-      const isSiteDataPackEnabled = sessionData.IsSiteDataPackEnabled === true || sessionData.IsSiteDataPackEnabled === 'True';
-      const isUserHasDataPackAccess = sessionData.IsUserHasDataPackAccess === true || sessionData.IsUserHasDataPackAccess === 'True';
+      // Get API data for base URL
+      const apiData = await navigationService.fetchApiData();
+      const marketingManagerURL = apiData.MarketingManagerURL || '';
+      
+      // Get session data for parameters
+      const sessionVars = navigationService.getSessionDetails() || {};
+      const isSiteMKMEnabled = sessionVars.IsSiteMKMEnabled === true || sessionVars.IsSiteMKMEnabled === 'True';
+      const isUserHasMKMAccess = sessionVars.IsUserHasMKMAccess === true || sessionVars.IsUserHasMKMAccess === 'True';
+      const isSiteDataPackEnabled = sessionVars.IsSiteDataPackEnabled === true || sessionVars.IsSiteDataPackEnabled === 'True';
+      const isUserHasDataPackAccess = sessionVars.IsUserHasDataPackAccess === true || sessionVars.IsUserHasDataPackAccess === 'True';
       
       // Construct URL exactly as backend does
-      const constructedMkmSiteURL = `${mkmSiteURL}{0}ISMKM=1&FE=${isSiteMKMEnabled ? "1" : "0"}&MKMFE=${isSiteMKMEnabled ? "1" : "0"}&MKMUA=${isUserHasMKMAccess ? "1" : "0"}&DPFE=${isSiteDataPackEnabled ? "1" : "0"}&DPUA=${isUserHasDataPackAccess ? "1" : "0"}`;
-      return constructedMkmSiteURL;
+      const mkmSiteURL = `${marketingManagerURL}{0}ISMKM=1&FE=${isSiteMKMEnabled ? "1" : "0"}&MKMFE=${isSiteMKMEnabled ? "1" : "0"}&MKMUA=${isUserHasMKMAccess ? "1" : "0"}&DPFE=${isSiteDataPackEnabled ? "1" : "0"}&DPUA=${isUserHasDataPackAccess ? "1" : "0"}`;
+
+      return mkmSiteURL;
     } catch (error) {
       console.error('❌ Error getting MarketingManagerSiteURL:', error);
       return '';
@@ -161,15 +166,20 @@ export const navigationService = {
    * @param {Object} sessionVars - Optional session variables to reuse
    * @returns {Promise<string>} Constructed MES URL
    */
-  getEmailServiceSiteURL: async (emailServiceSiteURL, sessionVars = null) => {
-    try {     
-      // Get session data for parameters (reuse if provided)
-      const sessionData = sessionVars || navigationService.getSessionDetails() || {};
-      const isMirabelEmailServiceEnabled = sessionData.IsMirabelEmailServiceEnabled === true || sessionData.IsMirabelEmailServiceEnabled === 'True';
-      const isUserHasMKMAccess = sessionData.IsUserHasMKMAccess === true || sessionData.IsUserHasMKMAccess === 'True';
+  getEmailServiceSiteURL: async () => {
+    try {
+      // Get API data for base URL
+      const apiData = await navigationService.fetchApiData();
+      const emailServiceSiteURL = apiData.EmailServiceSiteURL || '';
+      
+      // Get session data for parameters
+      const sessionVars = navigationService.getSessionDetails() || {};
+      const isMirabelEmailServiceEnabled = sessionVars.IsMirabelEmailServiceEnabled === true || sessionVars.IsMirabelEmailServiceEnabled === 'True';
+      const isUserHasMKMAccess = sessionVars.IsUserHasMKMAccess === true || sessionVars.IsUserHasMKMAccess === 'True';
       
       // Construct URL exactly as backend does
       const mesSiteURL = `${emailServiceSiteURL}{0}ISMKM=1&ISMES=1&FE=${isMirabelEmailServiceEnabled ? "1" : "0"}&ESFE=${isMirabelEmailServiceEnabled ? "1" : "0"}&MKMUA=${isUserHasMKMAccess ? "1" : "0"}`;
+      
       return mesSiteURL;
     } catch (error) {
       return '';
@@ -305,10 +315,10 @@ export const navigationService = {
           
           // Special URL handling for MKM/MES - matches backend exactly
           if ((menu.URLSource === 'MKM' || menu.URLSource === 'MKM-DATA') && url) {
-            const marketingManagerSiteURL = navigationService.getMarketingManagerSiteURL(apiData.MarketingManagerURL, sessionVars);
+            const marketingManagerSiteURL = apiData.MarketingManagerURL || '';
             url = insertMenuUrlAtPlaceholder(marketingManagerSiteURL, url);
           } else if (menu.URLSource === 'MES' && url) {
-            const emailServiceSiteURL = navigationService.getEmailServiceSiteURL(apiData.EmailServiceSiteURL, sessionVars);
+            const emailServiceSiteURL = apiData.EmailServiceSiteURL || '';
             url = insertMenuUrlAtPlaceholder(emailServiceSiteURL, url);
           }
           
