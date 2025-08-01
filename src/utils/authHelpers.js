@@ -1,6 +1,6 @@
 import { getSessionValue } from './sessionHelpers';
 import { isDevelopmentMode } from './developmentHelper';
-
+import CryptoJS from 'crypto-js';
 // Auth error constants
 export const AUTH_ERRORS = {
   INVALID_SESSION: 'Invalid session',
@@ -45,25 +45,26 @@ export const encrypt = (text) => {
 
 /**
  * Simple decryption function for auth data
- * @param {string} encryptedText - Text to decrypt
+ * @param {string} message - Text to decrypt
+ * @param {string} key - Decryption key
  * @returns {string} Decrypted text
  */
-export const decrypt = (encryptedText) => {
-  if (!encryptedText) return '';
-  
+export const decrypt = (message, key) => {
   try {
-    // Simple base64 decoding with key removal
-    const decoded = atob(encryptedText);
-    if (decoded.startsWith(authEncryptDecryptKey)) {
-      return decoded.substring(authEncryptDecryptKey.length);
-    }
-    return decoded;
-  } catch (error) {
-    console.error('Decryption error:', error);
-    return encryptedText;
+    let keyHex = CryptoJS.enc.Utf8.parse(key);
+    let ivHex = CryptoJS.enc.Utf8.parse(key);
+    keyHex = CryptoJS.SHA1(keyHex);
+    ivHex = CryptoJS.SHA1(ivHex);
+    var decrypted = CryptoJS.DES.decrypt(message, keyHex, {
+      mode: CryptoJS.mode.CBC,
+      iv: ivHex,
+      padding: CryptoJS.pad.Pkcs7,
+    });
+    return decrypted.toString(CryptoJS.enc.Utf8);
+  } catch {
+    return "";
   }
 };
-
 /**
  * Logout function - clears session and redirects
  * @param {string} returnUrl - Optional return URL after logout
