@@ -5,11 +5,8 @@ import HelpSystem from './components/HelpSystem';
 import TermsAndConditionsModal from './components/TermsAndConditionsModal';
 import ChangePasswordManager from './components/ChangePasswordManager';
 import JobFunctionNotification from './components/JobFunctionNotification';
-import axiosService from '../../services/axiosService';
 import navigationService from './services/navigationService';
 import { validateLocalStorage } from '../../utils/sessionHelpers';
-
-const API_USER_ACCOUNTS_CHECKCONDITION = '/services/User/Accounts/CheckCondition/';
 
 const Home = () => {
   const [showJobFunction, setShowJobFunction] = useState(false);
@@ -26,17 +23,8 @@ const Home = () => {
           setIsSessionLoaded(true);
           
           // Check Job Function Notification
-          const checkJobFunctionCondition = async () => {
-            try {
-              const res = await axiosService.get(`${API_USER_ACCOUNTS_CHECKCONDITION}${sessionDataResponse.UserID}/-1`);
-              if (res?.Data || res?.content?.Data) {
-                setShowJobFunction(true);
-              }
-            } catch (e) {
-              console.log(e,"e");
-            }
-          };
-          checkJobFunctionCondition();
+          const shouldShowJobFunction = await navigationService.checkJobFunctionCondition(sessionDataResponse.UserID);
+          setShowJobFunction(shouldShowJobFunction);
         }
       } catch (error) {
         console.error('Failed to initialize session:', error);

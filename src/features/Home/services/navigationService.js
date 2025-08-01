@@ -130,6 +130,21 @@ export const navigationService = {
     },
 
   /**
+   * Check job function condition for a user
+   * @param {number} userId - User ID to check
+   * @returns {Promise<boolean>} Whether job function notification should be shown
+   */
+  checkJobFunctionCondition: async (userId) => {
+    try {
+      const response = await axiosService.get(`/services/User/Accounts/CheckCondition/${userId}/-1`);
+      return !!(response?.Data || response?.content?.Data);
+    } catch (error) {
+      console.log('Job function check failed:', error);
+      return false;
+    }
+  },
+
+  /**
    * Get MarketingManagerSiteURL - matches backend logic exactly
    * @returns {Promise<string>} Constructed MKM URL
    */
