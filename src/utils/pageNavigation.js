@@ -106,7 +106,7 @@ export const initializePageNavigation = (homeActions) => {
  */
 const loadLocalizerScript = async () => {
   try {
-    const version = '638896304468465380';
+    const version = '1.0.0';
     console.log("📦 Loading localizer script with Content Version:", version);
 
     const script = document.createElement("script");
