@@ -28,10 +28,10 @@ export const navigationService = {
       if (navigationService._apiDataCache) {
         return navigationService._apiDataCache;
       }
-      const response = await axiosService.get(NAVIGATION_API.ENCRYPTION_KEY);      
-      if (response?.content?.Data) {       
+      const response = await axiosService.get(NAVIGATION_API.ENCRYPTION_KEY);  
+      if (response?.Data) {       
         // Decrypt the response data
-        const decryptedData = decrypt(response.content.Data, authEncryptDecryptKey);    
+        const decryptedData = decrypt(response?.Data, authEncryptDecryptKey);    
         if (decryptedData && decryptedData.trim() !== '') {
           try {
             const data = JSON.parse(decryptedData);
@@ -62,31 +62,18 @@ export const navigationService = {
    */
   fetchNavigationData: async (userId = 1, siteId = 0) => {
     try {     
-      console.log('🔍 Fetching navigation data for userId:', userId, 'siteId:', siteId);
-      
       // Then fetch navigation menus
       const response = await axiosService.get(`${NAVIGATION_API.USER_MENUS}/${userId}/${siteId}`);        
-      console.log('🔍 Navigation API response:', response);
-      
+    
       // Check if response has the expected structure
       if (response?.List) {
         const menus = response.List;
-        console.log('🔍 Raw navigation menus from API:', menus.length, menus);
-        console.log('🔍 First few menu items:', menus.slice(0, 3));
-        
-        const processedMenus = await navigationService.processNavigationMenus(menus);
-        console.log('🔍 Processed navigation menus:', processedMenus.length, processedMenus);
-        console.log('🔍 First processed menu:', processedMenus[0]);
-        
+        const processedMenus = await navigationService.processNavigationMenus(menus);      
         return processedMenus;
       } else {
-        console.warn('⚠️ Navigation API response missing content.List:', response);
-        console.log('🔍 Full response structure:', JSON.stringify(response, null, 2));
         return [];
       }
     } catch (error) {
-      console.error('❌ Error fetching navigation data:', error);
-      console.error('❌ Error details:', error.response?.data || error.message);
       return [];
     }
   },
@@ -199,44 +186,31 @@ export const navigationService = {
    * Recursively build menu tree for unlimited depth
    */
   processNavigationMenus: async (menus, apiData = null) => {
-    console.log('🔍 processNavigationMenus called with:', menus?.length, 'menus');
-    
     if (!Array.isArray(menus)) {
-      console.warn('⚠️ processNavigationMenus: menus is not an array:', typeof menus, menus);
-      return [];
+          return [];
     }
     
     if (menus.length === 0) {
-      console.warn('⚠️ processNavigationMenus: menus array is empty');
       return [];
     }
 
     // Get session data from localStorage (MMClientVars)
     let sessionVars = {};
     try {
-      const rawSessionData = localStorage.getItem('MMClientVars');
-      console.log('🔍 Raw session data from localStorage:', rawSessionData);
-      
+      const rawSessionData = localStorage.getItem('MMClientVars');     
       if (rawSessionData && rawSessionData !== 'null' && rawSessionData !== 'undefined') {
         try {
           sessionVars = JSON.parse(rawSessionData);
-          // Ensure sessionVars is an object
           if (typeof sessionVars !== 'object' || sessionVars === null || Array.isArray(sessionVars)) {
-            console.warn('⚠️ Session data is not a valid object, using empty object');
             sessionVars = {};
           }
         } catch (parseError) {
-          console.warn('⚠️ Error parsing session data JSON:', parseError);
           sessionVars = {};
         }
       } else {
-        console.warn('⚠️ No valid session data found in localStorage');
         sessionVars = {};
       }
-      
-      console.log('🔍 Final parsed session vars:', sessionVars);
-    } catch (e) {
-      console.error('⚠️ Error accessing localStorage:', e);
+    } catch (e) {      
       sessionVars = {};
     }
 
@@ -245,7 +219,6 @@ export const navigationService = {
       try {
         apiData = await navigationService.fetchApiData();
       } catch (error) {
-        console.warn('⚠️ Failed to fetch API data for navigation URLs:', error);
         apiData = {};
       }
     }
@@ -340,13 +313,13 @@ export const navigationService = {
           let url = replaceSessionVarsInUrl(menu.URL);
           
           // Special URL handling for MKM/MES - matches backend exactly
-          // if ((menu.URLSource === 'MKM' || menu.URLSource === 'MKM-DATA') && url) {
-          //   const marketingManagerSiteURL = await navigationService.getMarketingManagerSiteURL();
-          //   url = insertMenuUrlAtPlaceholder(marketingManagerSiteURL, url);
-          // } else if (menu.URLSource === 'MES' && url) {
-          //   const emailServiceSiteURL = await navigationService.getEmailServiceSiteURL();
-          //   url = insertMenuUrlAtPlaceholder(emailServiceSiteURL, url);
-          // }
+          if ((menu.URLSource === 'MKM' || menu.URLSource === 'MKM-DATA') && url) {
+            const marketingManagerSiteURL = await navigationService.getMarketingManagerSiteURL();
+            url = insertMenuUrlAtPlaceholder(marketingManagerSiteURL, url);
+          } else if (menu.URLSource === 'MES' && url) {
+            const emailServiceSiteURL = await navigationService.getEmailServiceSiteURL();
+            url = insertMenuUrlAtPlaceholder(emailServiceSiteURL, url);
+          }
           
           // Tooltip
           const toolTip = menu.ToolTip || '';
@@ -378,17 +351,9 @@ export const navigationService = {
       return Promise.all(menuPromises);
     }
 
-    // Top-level menus have ParentID === -1 or null
-    console.log('🔍 Building menu tree for ParentID -1 and null');
     const topLevelMenus1 = await buildMenuTree(-1);
     const topLevelMenus2 = await buildMenuTree(null);
-    
-    console.log('🔍 Top-level menus with ParentID -1:', topLevelMenus1.length, topLevelMenus1);
-    console.log('🔍 Top-level menus with ParentID null:', topLevelMenus2.length, topLevelMenus2);
-    
     const finalMenus = topLevelMenus1.concat(topLevelMenus2);
-    console.log('🔍 Final combined menus:', finalMenus.length, finalMenus);
-    
     return finalMenus;
   },
 
