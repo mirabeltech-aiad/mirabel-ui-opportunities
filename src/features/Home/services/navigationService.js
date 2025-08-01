@@ -97,59 +97,34 @@ export const navigationService = {
    */
     loadSessionDetails: async () => {
         try {
-            console.log('🔍 Loading session details from API...');
-            console.log('🔍 API URL:', NAVIGATION_API.SESSION_DETAILS);
-            console.log('🔍 Making API call...');
-            const response = await axiosService.get(NAVIGATION_API.SESSION_DETAILS, { withCredentials: true });
-            console.log('🔍 API call completed, response:', response);
-            
-            console.log('🔍 Session details API response:', response);
-            
+            const response = await axiosService.get(NAVIGATION_API.SESSION_DETAILS, { withCredentials: true });          
             if (response && response.SessionResponse) {
                 const sessionDataResponse = response.SessionResponse;
-                console.log('🔍 Session data received:', sessionDataResponse);
-
                 // Validate session data before storing
                 if (typeof sessionDataResponse === 'object' && sessionDataResponse !== null) {
                     try {
                         // Store session data safely
                         localStorage.setItem('MMClientVars', JSON.stringify(sessionDataResponse));
-                        console.log('✅ Session data stored successfully');
                         return sessionDataResponse;
                     } catch (storageError) {
-                        console.error('❌ Error storing session data:', storageError);
                         return sessionDataResponse; // Return data even if storage fails
                     }
                 } else {
-                    console.warn('⚠️ Invalid session data structure received');
                     return null;
                 }
             } else {
-                console.warn('⚠️ No SessionResponse in API response');
                 return null;
             }         
-        } catch (error) {
-            console.error('❌ Failed to load session details:', error);
-            console.error('❌ Error details:', {
-                message: error.message,
-                status: error.response?.status,
-                statusText: error.response?.statusText,
-                data: error.response?.data,
-                url: error.config?.url
-            });
-            
+        } catch (error) {           
             // Fallback to sessionValues if available
             if (typeof sessionValues !== 'undefined' && sessionValues) {
                 try {
                     localStorage.setItem('MMClientVars', JSON.stringify(sessionValues));
-                    console.log('🔄 Using fallback session values');
                     return sessionValues;
                 } catch (storageError) {
-                    console.error('❌ Error storing fallback session data:', storageError);
                     return sessionValues;
                 }
             }
-            
             return null;
         }
     },
