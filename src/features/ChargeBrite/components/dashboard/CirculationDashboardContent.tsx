@@ -1,6 +1,6 @@
 import React from 'react';
 import ProductFilter from '../../components/filters/ProductFilter';
-import { Tabs, TabsContent } from '../../components/ui/tabs';
+import { Tabs, TabsContent } from '@/components/ui/tabs';
 import { PerformanceAnalytics } from '../../utils/performanceAnalytics';
 import ScrollToTopButton from '../../components/ui/ScrollToTopButton';
 import { BarChart3, DollarSign } from 'lucide-react';

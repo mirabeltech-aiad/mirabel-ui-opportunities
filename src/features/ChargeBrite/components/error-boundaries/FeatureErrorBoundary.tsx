@@ -15,8 +15,7 @@
 
 import React, { Component, ErrorInfo, ReactNode } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { AlertTriangle, RefreshCw, ArrowLeft, Settings } from 'lucide-react';
-import { OceanButton } from '../../components/ui/design-system';
+import { AlertTriangle } from 'lucide-react';
 import { toast } from '../../hooks/use-toast';
 import StandardErrorMessage from './StandardErrorMessage';
 import ErrorRecoveryStrategies from './ErrorRecoveryStrategies';
