@@ -40,37 +40,13 @@ export const registerCoreModules = () => {
     permissions: ['analytics:read']
   }, AnalyticsModule));
 
-  // Pricing Analysis Module
-  moduleRegistry.register(createModuleTemplate({
-    id: 'pricing-analysis-module',
-    name: 'Pricing Analysis',
-    description: 'Pricing strategy and analysis tools',
-    version: '1.0.0',
-    route: '/chargebrite/pricing',
-    icon: 'DollarSign',
-    category: 'analytics',
-    permissions: ['pricing:read']
-  }, PricingModule));
-
-  // Reports Module
-  moduleRegistry.register(createModuleTemplate({
-    id: 'reports-module',
-    name: 'Reports',
-    description: 'Generate and manage reports',
-    version: '1.0.0',
-    route: '/reports',
-    icon: 'FileText',
-    category: 'reporting',
-    permissions: ['reports:read']
-  }, ReportsModule));
-
   // Advanced Search Module
   moduleRegistry.register(createModuleTemplate({
     id: 'advanced-search-module',
     name: 'Advanced Search',
     description: 'Advanced search and filtering capabilities',
     version: '1.0.0',
-    route: '/chargebrite/advanced-search',
+    route: '/subscriptions/advanced-search',
     icon: 'Search',
     category: 'management',
     permissions: ['search:read']

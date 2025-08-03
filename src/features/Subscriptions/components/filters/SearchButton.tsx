@@ -8,7 +8,7 @@ const SearchButton: React.FC = () => {
   const navigate = useNavigate();
 
   const handleSearchClick = () => {
-    navigate('/chargebrite/advanced-search');
+    navigate('/subscriptions/advanced-search');
   };
 
   return (

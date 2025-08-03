@@ -67,47 +67,13 @@ export const registerCorePages = (): void => {
     seoDescription: 'Comprehensive analytics dashboard with advanced data visualization and insights.'
   }, AnalyticsDashboard));
 
-  // Pricing Analysis
-  pageRegistry.register(createPageConfig({
-    id: 'pricing-analysis',
-    name: 'Pricing Analysis',
-    title: 'Pricing Analysis',
-    description: 'Pricing strategy analysis and optimization tools',
-    route: '/chargebrite/pricing',
-    icon: DollarSign,
-    category: 'analytics',
-    permissions: ['pricing:read'],
-    breadcrumbs: [
-      { label: 'Pricing Analysis' }
-    ],
-    seoTitle: 'Pricing Analysis - Strategic Insights',
-    seoDescription: 'Analyze pricing strategies and optimize revenue with comprehensive pricing tools.'
-  }, PricingAnalysis));
-
-  // Reports
-  pageRegistry.register(createPageConfig({
-    id: 'reports',
-    name: 'Reports',
-    title: 'Reports Directory',
-    description: 'Generate and manage comprehensive reports and analytics',
-    route: '/reports',
-    icon: FileText,
-    category: 'reporting',
-    permissions: ['reports:read'],
-    breadcrumbs: [
-      { label: 'Reports' }
-    ],
-    seoTitle: 'Reports Directory - Analytics Reports',
-    seoDescription: 'Access comprehensive reports and analytics for business insights and data analysis.'
-  }, Reports));
-
   // Advanced Search
   pageRegistry.register(createPageConfig({
     id: 'advanced-search',
     name: 'Advanced Search',
     title: 'Advanced Search',
     description: 'Advanced search and filtering capabilities',
-    route: '/chargebrite/advanced-search',
+    route: '/subscriptions/advanced-search',
     icon: Search,
     category: 'management',
     permissions: ['search:read'],

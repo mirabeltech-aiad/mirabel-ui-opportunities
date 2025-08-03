@@ -49,7 +49,7 @@ const FilterBar: React.FC<FilterBarProps> = ({
   };
 
   const handleSearchClick = () => {
-    navigate('/chargebrite/advanced-search');
+    navigate('/subscriptions/advanced-search');
   };
 
   const handleViewsClick = () => {

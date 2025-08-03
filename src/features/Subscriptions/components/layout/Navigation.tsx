@@ -39,7 +39,6 @@ const Navigation: React.FC<NavigationProps> = ({ activeTab, onTabChange }) => {
   const rightNavItems = [
     { id: 'circulation', label: 'Circulation Dashboard', path: '/circulation' },
     { id: 'analytics', label: 'Subscriber Dashboard', path: '/analytics' },
-    { id: 'pricing', label: 'Pricing', path: '/chargebrite/pricing' },
     { id: 'reports', label: 'Reports', path: '/reports' },
     { id: 'admin', label: 'Admin', path: '/admin' },
     { id: 'settings', label: 'Settings', path: '/settings' }
