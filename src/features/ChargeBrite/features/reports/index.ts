@@ -58,10 +58,8 @@
  * Primary page components for reports feature integration.
  * These components provide complete reporting interfaces.
  */
-export { default as ReportsDirectoryPage } from './pages/ReportsDirectory';  // Main reports directory page
 
 // Backward compatibility export
-export { default as ReportsDirectory } from './pages/ReportsDirectory';     // Legacy export alias
 
 // === DIRECTORY COMPONENTS ===
 /**

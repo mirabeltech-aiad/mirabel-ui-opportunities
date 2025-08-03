@@ -75,7 +75,7 @@ export const registerCorePages = (): void => {
     name: 'Pricing Analysis',
     title: 'Pricing Analysis',
     description: 'Pricing strategy analysis and optimization tools',
-    route: '/pricing',
+    route: '/chargebrite/pricing',
     icon: DollarSign,
     category: 'analytics',
     permissions: ['pricing:read'],

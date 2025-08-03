@@ -55,13 +55,13 @@ This feature follows the enhanced project structure guidelines for agent-readabl
 ## Usage
 
 ```tsx
-import { ReportsDirectory } from '@/features/reports';
+// import { ReportsDirectory } from '@/features/reports';
 
-function App() {
-  return (
-    <ReportsDirectory />
-  );
-}
+// function App() {
+//   return (
+//     <ReportsDirectory />
+//   );
+// }
 ```
 
 ## Business Model Support

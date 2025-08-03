@@ -48,7 +48,7 @@ export const registerCoreModules = () => {
     name: 'Pricing Analysis',
     description: 'Pricing strategy and analysis tools',
     version: '1.0.0',
-    route: '/pricing',
+    route: '/chargebrite/pricing',
     icon: 'DollarSign',
     category: 'analytics',
     permissions: ['pricing:read']

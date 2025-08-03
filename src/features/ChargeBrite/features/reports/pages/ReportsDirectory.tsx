@@ -12,7 +12,6 @@ import {
 import { Building2, Zap, AlertCircle, RefreshCw } from 'lucide-react';
 import ReportsHeader from '../components/directory/ReportsHeader';
 import ReportCard from '../components/directory/ReportCard';
-import ReportsDirectory from '../../../components/reports/ReportsDirectory';
 
 const ReportsDirectoryPage = () => {
   const [selectedReportId, setSelectedReportId] = useState<string | null>(null);
@@ -101,13 +100,6 @@ const ReportsDirectoryPage = () => {
           
           <ReportsFilterBar onSearchChange={handleSearch} />
           
-          <div className="mt-8">
-            <ReportsDirectory
-              reports={filteredReports}
-              filteredReports={displayedReports}
-              onReportSelect={handleReportSelect}
-            />
-          </div>
         </main>
       </div>
     </ProductFilterProvider>

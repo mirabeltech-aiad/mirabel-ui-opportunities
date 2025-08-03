@@ -24,7 +24,6 @@ import CirculationDashboard from "./pages/CirculationDashboard";
 import AnalyticsDashboard from "./pages/AnalyticsDashboard";
 import PricingAnalysis from "./pages/PricingAnalysis";
 import AdvancedSearch from "./pages/AdvancedSearch";
-import Reports from "./pages/Reports";
 import SettingsPage from "./components/SettingsPage";
 import NotFound from "./pages/NotFound";
 
@@ -105,12 +104,6 @@ export const ChargeBritePricing = () => (
 export const ChargeBriteAdvancedSearch = () => (
   <ChargeBriteProvider>
     <AppLayout><AdvancedSearch /></AppLayout>
-  </ChargeBriteProvider>
-);
-
-export const ChargeBriteReports = () => (
-  <ChargeBriteProvider>
-    <AppLayout><Reports /></AppLayout>
   </ChargeBriteProvider>
 );
 

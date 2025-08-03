@@ -1,6 +1,5 @@
 
 import { useState, useMemo } from 'react';
-import { reportsConfig } from '../data/reportsConfig';
 import { PerformanceAnalytics } from '../utils/performanceAnalytics';
 import { useBusinessModel } from '../contexts/BusinessModelContext';
 import { filterReportsByBusinessModel, ReportWithBusinessModel } from '../utils/businessModelFilters';
@@ -14,7 +13,7 @@ export const useReportsFiltering = () => {
   // Memoize business model filtered reports first
   const businessModelFilteredReports = useMemo(() => {
     PerformanceAnalytics.startMeasurement('Business model filtering');
-    const filtered = filterReportsByBusinessModel(reportsConfig as ReportWithBusinessModel[], businessModel);
+    const filtered = filterReportsByBusinessModel([] as ReportWithBusinessModel[], businessModel);
     PerformanceAnalytics.endMeasurement('Business model filtering');
     return filtered;
   }, [businessModel]);

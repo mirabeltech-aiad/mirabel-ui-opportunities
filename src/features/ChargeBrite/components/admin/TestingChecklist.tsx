@@ -12,7 +12,6 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import { reportsConfig } from '../../data/reports';
 
 interface TestItem {
   id: string;
@@ -38,15 +37,6 @@ const TestingChecklist: React.FC = () => {
       { id: 'settings-dashboard', name: 'Settings Dashboard', type: 'dashboard', category: 'Settings', route: '/settings', tested: false },
       { id: 'business-model-settings', name: 'Business Model Settings', type: 'dashboard', category: 'Settings', route: '/settings', tested: false },
       { id: 'reports-directory', name: 'Reports Directory', type: 'dashboard', category: 'Reports', route: '/reports', tested: false },
-      
-      // Reports from actual reports config
-      ...reportsConfig.map(report => ({
-        id: report.id,
-        name: report.title,
-        type: 'report' as const,
-        category: report.category,
-        tested: false
-      }))
     ];
 
     // Load saved test status from localStorage
