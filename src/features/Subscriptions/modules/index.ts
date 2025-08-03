@@ -10,8 +10,6 @@ import { createModuleTemplate } from '../core/BaseModule';
 // Lazy load module components
 const CirculationModule = lazy(() => import('../pages/CirculationDashboard'));
 const AnalyticsModule = lazy(() => import('../pages/AnalyticsDashboard'));
-const PricingModule = lazy(() => import('../pages/PricingAnalysis'));
-const ReportsModule = lazy(() => import('../pages/Reports'));
 const AdminModule = lazy(() => import('../pages/Admin'));
 const AdvancedSearchModule = lazy(() => import('../pages/AdvancedSearch'));
 

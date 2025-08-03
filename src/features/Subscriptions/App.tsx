@@ -1,6 +1,5 @@
 
 import React, { useEffect } from 'react';
-import { Routes, Route } from "react-router-dom";
 import { EditModeProvider } from "./contexts/EditModeContext";
 import { HelpProvider } from "./contexts/HelpContext";
 import { ProductFilterProvider } from "./contexts/ProductFilterContext";
@@ -22,7 +21,6 @@ import AppLayout from "./components/layout/AppLayout";
 import Admin from "./pages/Admin";
 import CirculationDashboard from "./pages/CirculationDashboard";
 import AnalyticsDashboard from "./pages/AnalyticsDashboard";
-import PricingAnalysis from "./pages/PricingAnalysis";
 import AdvancedSearch from "./pages/AdvancedSearch";
 import SettingsPage from "./components/SettingsPage";
 import NotFound from "./pages/NotFound";
@@ -92,12 +90,6 @@ export const ChargeBriteCirculation = () => (
 export const ChargeBriteAnalytics = () => (
   <ChargeBriteProvider>
     <AppLayout><AnalyticsDashboard /></AppLayout>
-  </ChargeBriteProvider>
-);
-
-export const ChargeBritePricing = () => (
-  <ChargeBriteProvider>
-    <AppLayout><PricingAnalysis /></AppLayout>
   </ChargeBriteProvider>
 );
 

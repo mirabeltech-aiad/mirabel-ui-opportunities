@@ -17,13 +17,12 @@ const Admin = lazy(() => import('../pages/Opportunity/Admin'));
 const Settings = lazy(() => import('../pages/Opportunity/Settings'));
 const NotFound = lazy(() => import('../pages/Opportunity/NotFound'));
 // ChargeBrite module components
-const ChargeBriteCirculation = lazy(() => import('../features/ChargeBrite/App').then(module => ({ default: module.ChargeBriteCirculation })));
-const ChargeBriteAnalytics = lazy(() => import('../features/ChargeBrite/App').then(module => ({ default: module.ChargeBriteAnalytics })));
-const ChargeBritePricing = lazy(() => import('../features/ChargeBrite/App').then(module => ({ default: module.ChargeBritePricing })));
-const ChargeBriteAdvancedSearch = lazy(() => import('../features/ChargeBrite/App').then(module => ({ default: module.ChargeBriteAdvancedSearch })));
-const ChargeBriteReports = lazy(() => import('../features/ChargeBrite/App').then(module => ({ default: module.ChargeBriteReports })));
-const ChargeBriteAdmin = lazy(() => import('../features/ChargeBrite/App').then(module => ({ default: module.ChargeBriteAdmin })));
-const ChargeBriteSettings = lazy(() => import('../features/ChargeBrite/App').then(module => ({ default: module.ChargeBriteSettings })));
+const SubscriptionsCirculation = lazy(() => import('../features/Subscriptions/App').then(module => ({ default: module.ChargeBriteCirculation })));
+const SubscriptionsAnalytics = lazy(() => import('../features/Subscriptions/App').then(module => ({ default: module.ChargeBriteAnalytics })));
+const SubscriptionsAdvancedSearch = lazy(() => import('../features/Subscriptions/App').then(module => ({ default: module.ChargeBriteAdvancedSearch })));
+const SubscriptionsReports = lazy(() => import('../features/Subscriptions/App').then(module => ({ default: module.ChargeBriteReports })));
+const SubscriptionsAdmin = lazy(() => import('../features/Subscriptions/App').then(module => ({ default: module.ChargeBriteAdmin })));
+const SubscriptionsSettings = lazy(() => import('../features/Subscriptions/App').then(module => ({ default: module.ChargeBriteSettings })));
 
 export const routes = [
   {
@@ -97,51 +96,37 @@ export const routes = [
     exact: true,
   },
 
-  {
-    path: '/circulation',
-    component: ChargeBriteCirculation,
-    exact: true,
-  },
-  {
-    path: '/analytics',
-    component: ChargeBriteAnalytics,
-    exact: true,
-  },
-  {
-    path: '/chargebrite/pricing',
-    component: ChargeBritePricing,
-    exact: true,
-  },
-  {
-    path: '/chargebrite/advanced-search',
-    component: ChargeBriteAdvancedSearch,
-    exact: true,
-  },
-  {
-    path: '/chargebrite/reports',
-    component: ChargeBriteReports,
-    exact: true,
-  },
-  {
-    path: '/chargebrite/admin',
-    component: ChargeBriteAdmin,
-    exact: true,
-  },
-  {
-    path: '/chargebrite/settings',
-    component: ChargeBriteSettings,
-    exact: true,
-  },
 
 
-  // {
-  //   path: '/sitewidesettings',
-  //   component: SiteWideSettingsPage,
-  //   exact: true,
-  // },
-  // {
-  //   path: '/reportsdashboard',
-  //   component: ReportsDashboardPage,
-  //   exact: true,
-  // }
+
+  {
+    path: '/subscriptions/circulation',
+    component: SubscriptionsCirculation,
+    exact: true,
+  },
+  {
+    path: '/subscriptions/analytics',
+    component: SubscriptionsAnalytics,
+    exact: true,
+  },
+  {
+    path: '/subscriptions/advanced-search',
+    component: SubscriptionsAdvancedSearch,
+    exact: true,
+  },
+  {
+    path: '/subscriptions/reports',
+    component: SubscriptionsReports,
+    exact: true,
+  },
+  {
+    path: '/subscriptions/admin',
+    component: SubscriptionsAdmin,
+    exact: true,
+  },
+  {
+    path: '/subscriptions/settings',
+    component: SubscriptionsSettings,
+    exact: true,
+  },
 ];

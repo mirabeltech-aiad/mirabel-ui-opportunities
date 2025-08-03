@@ -12,8 +12,6 @@ import { pageRegistry, createPageConfig } from './pageRegistry';
 // Lazy load page components
 const CirculationDashboard = lazy(() => import('../../pages/CirculationDashboard'));
 const AnalyticsDashboard = lazy(() => import('../../pages/AnalyticsDashboard'));
-const PricingAnalysis = lazy(() => import('../../pages/PricingAnalysis'));
-const Reports = lazy(() => import('../../pages/Reports'));
 const AdvancedSearch = lazy(() => import('../../pages/AdvancedSearch'));
 const Admin = lazy(() => import('../../pages/Admin'));
 const Settings = lazy(() => import('../../components/SettingsPage'));
