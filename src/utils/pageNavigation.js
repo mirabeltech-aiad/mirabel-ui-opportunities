@@ -106,7 +106,17 @@ export const initializePageNavigation = (homeActions) => {
  */
 const loadLocalizerScript = async () => {
   try {
-    const version = '638896304468465380';
+    // Get ContentVersion from MMClientVars in localStorage
+    let version = '638896304468465380'; // fallback version
+    try {
+      const mmClientVars = JSON.parse(localStorage.getItem('MMClientVars') || '{}');
+      if (mmClientVars.ContentVersion) {
+        version = mmClientVars.ContentVersion;
+      }
+    } catch (error) {
+      console.warn('Failed to get ContentVersion from MMClientVars, using fallback:', error);
+    }
+    
     console.log("📦 Loading localizer script with Content Version:", version);
 
     const script = document.createElement("script");
