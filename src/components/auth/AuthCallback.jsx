@@ -187,118 +187,118 @@ const AuthCallback = () => {
     handleAuthCallback();
   }, [searchParams, navigate, updateUser]);
 
-  const renderStatus = () => {
-    switch (status) {
-      case "processing":
-        return (
-          <div className="flex flex-col items-center">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500 mb-4"></div>
-            <p className="text-gray-600">Processing authentication...</p>
-            {import.meta.env.DEV && Object.keys(debugInfo).length > 0 && (
-              <div className="mt-4 p-3 bg-gray-100 rounded text-xs w-full">
-                <div className="font-semibold mb-2">Debug Info:</div>
-                <pre className="whitespace-pre-wrap">
-                  {JSON.stringify(debugInfo, null, 2)}
-                </pre>
-              </div>
-            )}
-          </div>
-        );
-      case "success":
-        return (
-          <div className="flex flex-col items-center">
-            <div className="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center mb-4">
-              <svg
-                className="w-5 h-5 text-white"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M5 13l4 4L19 7"
-                />
-              </svg>
-            </div>
-            <p className="text-green-600 mb-2">Authentication successful!</p>
-            <p className="text-gray-600">Redirecting to your dashboard...</p>
-          </div>
-        );
-      case "error":
-        return (
-          <div className="flex flex-col items-center">
-            <div className="w-8 h-8 bg-red-500 rounded-full flex items-center justify-center mb-4">
-              <svg
-                className="w-5 h-5 text-white"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M6 18L18 6M6 6l12 12"
-                />
-              </svg>
-            </div>
-            <p className="text-red-600 mb-2">Authentication failed</p>
-            <p className="text-gray-600 text-sm text-center mb-4">{error}</p>
+  // const renderStatus = () => {
+  //   switch (status) {
+  //     case "processing":
+  //       return (
+  //         <div className="flex flex-col items-center">
+  //           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500 mb-4"></div>
+  //           <p className="text-gray-600">Processing authentication...</p>
+  //           {import.meta.env.DEV && Object.keys(debugInfo).length > 0 && (
+  //             <div className="mt-4 p-3 bg-gray-100 rounded text-xs w-full">
+  //               <div className="font-semibold mb-2">Debug Info:</div>
+  //               <pre className="whitespace-pre-wrap">
+  //                 {JSON.stringify(debugInfo, null, 2)}
+  //               </pre>
+  //             </div>
+  //           )}
+  //         </div>
+  //       );
+  //     case "success":
+  //       return (
+  //         <div className="flex flex-col items-center">
+  //           <div className="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center mb-4">
+  //             <svg
+  //               className="w-5 h-5 text-white"
+  //               fill="none"
+  //               stroke="currentColor"
+  //               viewBox="0 0 24 24"
+  //             >
+  //               <path
+  //                 strokeLinecap="round"
+  //                 strokeLinejoin="round"
+  //                 strokeWidth={2}
+  //                 d="M5 13l4 4L19 7"
+  //               />
+  //             </svg>
+  //           </div>
+  //           <p className="text-green-600 mb-2">Authentication successful!</p>
+  //           <p className="text-gray-600">Redirecting to your dashboard...</p>
+  //         </div>
+  //       );
+  //     case "error":
+  //       return (
+  //         <div className="flex flex-col items-center">
+  //           <div className="w-8 h-8 bg-red-500 rounded-full flex items-center justify-center mb-4">
+  //             <svg
+  //               className="w-5 h-5 text-white"
+  //               fill="none"
+  //               stroke="currentColor"
+  //               viewBox="0 0 24 24"
+  //             >
+  //               <path
+  //                 strokeLinecap="round"
+  //                 strokeLinejoin="round"
+  //                 strokeWidth={2}
+  //                 d="M6 18L18 6M6 6l12 12"
+  //               />
+  //             </svg>
+  //           </div>
+  //           <p className="text-red-600 mb-2">Authentication failed</p>
+  //           <p className="text-gray-600 text-sm text-center mb-4">{error}</p>
 
-            {import.meta.env.DEV && (
-              <div className="mb-4 p-3 bg-red-50 rounded text-xs w-full">
-                <div className="font-semibold mb-2 text-red-700">
-                  Debug Info:
-                </div>
-                <div>
-                  <strong>Current URL:</strong> {window.location.href}
-                </div>
-                <div>
-                  <strong>URL Parameters:</strong> {JSON.stringify(debugInfo)}
-                </div>
-                <div>
-                  <strong>LocalStorage MMClientVars:</strong>{" "}
-                  {localStorage.getItem("MMClientVars") || "null"}
-                </div>
-              </div>
-            )}
+  //           {import.meta.env.DEV && (
+  //             <div className="mb-4 p-3 bg-red-50 rounded text-xs w-full">
+  //               <div className="font-semibold mb-2 text-red-700">
+  //                 Debug Info:
+  //               </div>
+  //               <div>
+  //                 <strong>Current URL:</strong> {window.location.href}
+  //               </div>
+  //               <div>
+  //                 <strong>URL Parameters:</strong> {JSON.stringify(debugInfo)}
+  //               </div>
+  //               <div>
+  //                 <strong>LocalStorage MMClientVars:</strong>{" "}
+  //                 {localStorage.getItem("MMClientVars") || "null"}
+  //               </div>
+  //             </div>
+  //           )}
 
-            <div className="flex gap-2">
-              <button
-                onClick={() => {
-                  if (isDevelopmentMode()) {
-                    // In development mode, just reload instead of redirecting to login
-                    window.location.reload();
-                  } else {
-                    navigate("/login");
-                  }
-                }}
-                className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
-              >
-                {isDevelopmentMode() ? "Reload" : "Try Again"}
-              </button>
+  //           <div className="flex gap-2">
+  //             <button
+  //               onClick={() => {
+  //                 if (isDevelopmentMode()) {
+  //                   // In development mode, just reload instead of redirecting to login
+  //                   window.location.reload();
+  //                 } else {
+  //                   navigate("/login");
+  //                 }
+  //               }}
+  //               className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+  //             >
+  //               {isDevelopmentMode() ? "Reload" : "Try Again"}
+  //             </button>
 
-              {import.meta.env.DEV && (
-                <button
-                  onClick={() => {
-                    localStorage.clear();
-                    sessionStorage.clear();
-                    window.location.reload();
-                  }}
-                  className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600"
-                >
-                  Clear & Reload
-                </button>
-              )}
-            </div>
-          </div>
-        );
-      default:
-        return null;
-    }
-  };
+  //             {import.meta.env.DEV && (
+  //               <button
+  //                 onClick={() => {
+  //                   localStorage.clear();
+  //                   sessionStorage.clear();
+  //                   window.location.reload();
+  //                 }}
+  //                 className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600"
+  //               >
+  //                 Clear & Reload
+  //               </button>
+  //             )}
+  //           </div>
+  //         </div>
+  //       );
+  //     default:
+  //       return null;
+  //   }
+  // };
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50">
@@ -325,7 +325,7 @@ const AuthCallback = () => {
           </div>
         </div>
 
-        {renderStatus()}
+        {/* {renderStatus()} */}
       </div>
     </div>
   );
