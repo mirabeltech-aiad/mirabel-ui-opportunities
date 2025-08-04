@@ -107,35 +107,13 @@ const JiraTicketForm = ({ onClose }) => {
       const formDataObj = new FormData();
       validFiles.forEach(f => formDataObj.append('fileInput', f));
       
-      const baseUrl = axiosService.getBaseURL();
-      const uploadUrl = baseUrl.replace(/\/$/, '') + HELPDESK_API_ATTACHTEMPORARY_FILE;
+      const data = await axiosService.postForm(HELPDESK_API_ATTACHTEMPORARY_FILE, formDataObj);
       
-      // Get authentication token
-      const token = getSessionValue("Token");
-      const domain = getSessionValue("Domain") || window.location.hostname;
-      
-      // Use proper headers for file upload with authentication
-      const res = await fetch(uploadUrl, {
-        method: 'POST',
-        headers: {
-          'Accept': 'application/json',
-          'Authorization': token ? `Bearer ${token}` : '',
-          'domain': domain
-        },
-        body: formDataObj // Don't set Content-Type header, let browser set it with boundary
-      });
-      
-      if (!res.ok) {
-        throw new Error(`Upload failed with status: ${res.status}`);
-      }
-      
-      const data = await res.json();
-      
-      if (data && data.content && data.content.Data && data.content.Data.temporaryAttachments) {
+      if (data && data.Data && data.Data.temporaryAttachments) {
         // Replace temp attachments with actual uploaded ones
         setAttachments(prev => [
           ...prev.filter(a => !a.uploading),
-          ...data.content.Data.temporaryAttachments
+          ...data.Data.temporaryAttachments
         ]);
         
         toast.success(`${validFiles.length} file(s) uploaded successfully.`);
