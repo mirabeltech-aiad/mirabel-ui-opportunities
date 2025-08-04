@@ -99,6 +99,9 @@ export const initializePageNavigation = (homeActions) => {
 
   // Load the localizer script
   loadLocalizerScript();
+  
+  // Initialize message event listeners for iframe communication
+  initializeMessageListeners();
 };
 
 /**
@@ -106,7 +109,17 @@ export const initializePageNavigation = (homeActions) => {
  */
 const loadLocalizerScript = async () => {
   try {
-    const version = '638896304468465380';
+    // Get ContentVersion from MMClientVars in localStorage
+    let version = '638896304468465380'; // fallback version
+    try {
+      const mmClientVars = JSON.parse(localStorage.getItem('MMClientVars') || '{}');
+      if (mmClientVars.ContentVersion) {
+        version = mmClientVars.ContentVersion;
+      }
+    } catch (error) {
+      console.warn('Failed to get ContentVersion from MMClientVars, using fallback:', error);
+    }
+    
     console.log("📦 Loading localizer script with Content Version:", version);
 
     const script = document.createElement("script");
@@ -127,6 +140,129 @@ const loadLocalizerScript = async () => {
     console.error("❌ Failed to load localizer script:", err);
   }
 };
+
+/**
+ * Initialize message event listeners for iframe communication
+ */
+export const initializeMessageListeners = () => {
+  console.log('Initializing message event listeners');
+  
+  if (window.addEventListener) {
+    window.addEventListener("message", displayMessage, false);
+  } else {
+    window.attachEvent("onmessage", displayMessage);
+  }
+};
+
+/**
+ * Display and handle messages from iframes
+ * @param {MessageEvent} evt - The message event
+ */
+function displayMessage(evt) {
+  const validOrigins = ["localhost", ".magazinemanager.", ".mirabelsmarketingmanager.", ".newspapermanager.", ".mirabeltechnologies.", ".chargebrite."];
+
+  if (validOrigins.some(origin => evt.origin.includes(origin))) {
+    const eventData = evt.data;
+    if (eventData === "pasteClicked") {
+      handlePasteClicked(evt);
+    } else if (eventData && eventData.Source && eventData.Source.toUpperCase() == "AD") {
+      //If the request from Analytics Dashboard, refresh Home Dashboard list
+      if (window.App && window.App.direct && window.App.direct.SetupDashboard) {
+        window.App.direct.SetupDashboard(eventData.Source.toUpperCase(), eventData.isReload);
+      }
+    } else if (eventData === "closeActTab") {
+      //Close active tab
+      closeTab();
+    } else if (eventData && JSON.stringify(eventData).indexOf("MKM_Page_Reload") > -1) {
+      //send passed data to MKM website pages
+      document.querySelectorAll("iframe").forEach(function (el) {
+        if (el.src.toLocaleLowerCase().indexOf('ismkm=1') > -1) {
+          el.contentWindow.postMessage(eventData, "*")
+        }
+      });
+    } else {
+      openAPageFromMKM(eventData);
+    }
+  } else {
+    return false;
+  }
+}
+
+/**
+ * Handle paste clicked event from iframes
+ * @param {MessageEvent} evt - The message event
+ */
+async function handlePasteClicked(evt) {
+  try {
+    const clipBoardAccess = await navigator.permissions.query({
+      name: "clipboard-read"
+    });
+
+    if (clipBoardAccess.state == "prompt" || clipBoardAccess.state == "granted") {
+      const clipBoardData = await navigator.clipboard.readText();
+      const updatedClipBoardAccess = await navigator.permissions.query({ name: "clipboard-read" });
+      if (updatedClipBoardAccess.state == "granted") {
+        const sendDataToPasteSection = {
+          source: "pasteClicked",
+          clipBoardData
+        };
+        evt.source.postMessage(sendDataToPasteSection, "*");
+      }
+    } else {
+      throw new Error("Clipboard permissions denied");
+    }
+  } catch (error) {
+    // Handle the error gracefully, e.g., display a notification or log the error.
+    showMsg('Denying the "Copy Clipboard" permission will prevent copying a section from one landing page and pasting it into other landing pages.');
+  }
+}
+
+/**
+ * Close the active tab
+ */
+function closeTab() {
+  if (window.homeActions && window.homeActions.closeActiveTab) {
+    window.homeActions.closeActiveTab();
+  } else if (window.App && window.App.tabpnlMain) {
+    var activeIndex = window.App.tabpnlMain.items.indexOf(window.App.tabpnlMain.getActiveTab());
+    window.App.tabpnlMain.remove(activeIndex);
+  }
+}
+
+/**
+ * Open a page from MKM (Mirabel Knowledge Management)
+ * @param {Object} recvData - The received data containing page information
+ */
+function openAPageFromMKM(recvData) {
+  if (!isNullOrEmpty(recvData) && !isNullOrEmpty(recvData.pgUrl)) {
+    if (!(recvData.hasOwnProperty('isMM') || recvData.hasOwnProperty('isMKM'))) {
+      const pageTitle = isNullOrEmpty(recvData.pgTitle) ? "Contact Details" : recvData.pgTitle;
+      
+      // Use the existing openPageInNextTab function
+      openPageInNextTab(recvData.pgUrl, pageTitle, false, true);
+    }
+  }
+}
+
+/**
+ * Utility function to check if a value is null or empty
+ * @param {*} value - The value to check
+ * @returns {boolean} - True if null or empty, false otherwise
+ */
+function isNullOrEmpty(value) {
+  return value === null || value === undefined || value === '';
+}
+
+/**
+ * Show a message to the user (placeholder for now)
+ * @param {string} message - The message to display
+ */
+function showMsg(message) {
+  console.warn('Message:', message);
+  // TODO: Implement proper message display mechanism
+  // This could be integrated with a toast notification system or modal
+}
+
 export const isWindowTopAccessible = () => {
   try {
     // Try to access window.top and a property on it
@@ -158,6 +294,13 @@ export const getTopWindow = () => {
  */
 export const cleanupPageNavigation = () => {
   console.log('Cleaning up page navigation helpers');
+  
+  // Remove message event listeners
+  if (window.removeEventListener) {
+    window.removeEventListener("message", displayMessage, false);
+  } else {
+    window.detachEvent("onmessage", displayMessage);
+  }
   
   if (window.top) {
     delete window.top.openPage;
