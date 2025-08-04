@@ -133,25 +133,21 @@ export const navigationService = {
 
   /**
    * Get MarketingManagerSiteURL - matches backend logic exactly
+   * @param {string} mkmSiteURL - Base MKM site URL
+   * @param {Object} sessionVars - Optional session variables to reuse
    * @returns {Promise<string>} Constructed MKM URL
    */
-  getMarketingManagerSiteURL: async () => {
+  getMarketingManagerSiteURL: async (mkmSiteURL='',sessionVars=null) => {
     try {
-      // Get API data for base URL
-      const apiData = await navigationService.fetchApiData();
-      const marketingManagerURL = apiData.MarketingManagerURL || '';
-      
-      // Get session data for parameters
-      const sessionVars = navigationService.getSessionDetails() || {};
       const isSiteMKMEnabled = sessionVars.IsSiteMKMEnabled === true || sessionVars.IsSiteMKMEnabled === 'True';
       const isUserHasMKMAccess = sessionVars.IsUserHasMKMAccess === true || sessionVars.IsUserHasMKMAccess === 'True';
       const isSiteDataPackEnabled = sessionVars.IsSiteDataPackEnabled === true || sessionVars.IsSiteDataPackEnabled === 'True';
       const isUserHasDataPackAccess = sessionVars.IsUserHasDataPackAccess === true || sessionVars.IsUserHasDataPackAccess === 'True';
       
       // Construct URL exactly as backend does
-      const mkmSiteURL = `${marketingManagerURL}{0}ISMKM=1&FE=${isSiteMKMEnabled ? "1" : "0"}&MKMFE=${isSiteMKMEnabled ? "1" : "0"}&MKMUA=${isUserHasMKMAccess ? "1" : "0"}&DPFE=${isSiteDataPackEnabled ? "1" : "0"}&DPUA=${isUserHasDataPackAccess ? "1" : "0"}`;
+      const mkmURL = `${mkmSiteURL}{0}ISMKM=1&FE=${isSiteMKMEnabled ? "1" : "0"}&MKMFE=${isSiteMKMEnabled ? "1" : "0"}&MKMUA=${isUserHasMKMAccess ? "1" : "0"}&DPFE=${isSiteDataPackEnabled ? "1" : "0"}&DPUA=${isUserHasDataPackAccess ? "1" : "0"}`;
 
-      return mkmSiteURL;
+      return mkmURL;
     } catch (error) {
       console.error('❌ Error getting MarketingManagerSiteURL:', error);
       return '';
@@ -160,16 +156,12 @@ export const navigationService = {
 
   /**
    * Get EmailServiceSiteURL - matches backend logic exactly
+   * @param {string} emailServiceSiteURL - Base email service site URL
+   * @param {Object} sessionVars - Optional session variables to reuse
    * @returns {Promise<string>} Constructed MES URL
    */
-  getEmailServiceSiteURL: async () => {
+  getEmailServiceSiteURL: async (emailServiceSiteURL='',sessionVars=null) => {
     try {
-      // Get API data for base URL
-      const apiData = await navigationService.fetchApiData();
-      const emailServiceSiteURL = apiData.EmailServiceSiteURL || '';
-      
-      // Get session data for parameters
-      const sessionVars = navigationService.getSessionDetails() || {};
       const isMirabelEmailServiceEnabled = sessionVars.IsMirabelEmailServiceEnabled === true || sessionVars.IsMirabelEmailServiceEnabled === 'True';
       const isUserHasMKMAccess = sessionVars.IsUserHasMKMAccess === true || sessionVars.IsUserHasMKMAccess === 'True';
       
@@ -186,13 +178,10 @@ export const navigationService = {
    * Recursively build menu tree for unlimited depth
    */
   processNavigationMenus: async (menus, apiData = null) => {
-    if (!Array.isArray(menus)) {
-          return [];
-    }
-    
-    if (menus.length === 0) {
+    if (!Array.isArray(menus) || menus.length === 0) {
       return [];
     }
+    
 
     // Get session data from localStorage (MMClientVars)
     let sessionVars = {};
@@ -314,10 +303,11 @@ export const navigationService = {
           
           // Special URL handling for MKM/MES - matches backend exactly
           if ((menu.URLSource === 'MKM' || menu.URLSource === 'MKM-DATA') && url) {
-            const marketingManagerSiteURL = await navigationService.getMarketingManagerSiteURL();
+            const marketingManagerSiteURL = await navigationService.getMarketingManagerSiteURL(apiData.MarketingManagerURL,sessionVars);
             url = insertMenuUrlAtPlaceholder(marketingManagerSiteURL, url);
           } else if (menu.URLSource === 'MES' && url) {
-            const emailServiceSiteURL = await navigationService.getEmailServiceSiteURL();
+            // const emailServiceSiteURL = apiData.EmailServiceSiteURL || '';
+            const emailServiceSiteURL = await navigationService.getEmailServiceSiteURL(apiData.EmailServiceSiteURL,sessionVars);
             url = insertMenuUrlAtPlaceholder(emailServiceSiteURL, url);
           }
           

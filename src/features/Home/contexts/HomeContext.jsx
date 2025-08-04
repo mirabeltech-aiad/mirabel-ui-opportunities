@@ -47,7 +47,7 @@ const initialState = {
       type: 'iframe',
       url: (typeof window !== 'undefined' ?getTopPath() : '') + '/intranet/Members/Home/InboxNotifications.aspx',
       closable: false,
-      icon: '📥'
+      icon: ''
     },
     {
       id: 'search',
@@ -56,7 +56,7 @@ const initialState = {
       type: 'iframe',
       url:  (typeof window !== 'undefined' ? getTopPath() : '') + '/ui/Search',
       closable: false,
-      icon: '🔍'
+      icon: ''
     }
   ],
   activeTabId: 'dashboard', // Set default to 'dashboard' (not in tabs array)
@@ -238,6 +238,7 @@ export const HomeProvider = ({ children, sessionLoaded = false }) => {
   const setupLogoAndMMIntegration = async () => {
     try {
       const clientDetails = localStorage.getItem("MMClientVars");
+      const apiData = await navigationService.fetchApiData();
       let mmClientVars = {};
       
       if (clientDetails) {
@@ -247,7 +248,6 @@ export const HomeProvider = ({ children, sessionLoaded = false }) => {
           console.error("Error parsing client variables:", error);
         }
       }
-
       // Hostname and SiteType logic for logo selection (matching legacy ASP.NET)
       const hostname = typeof window !== 'undefined' ? window.location.hostname : '';
       const isNewspaperManager = hostname.includes('.newspapermanager');
@@ -286,17 +286,13 @@ export const HomeProvider = ({ children, sessionLoaded = false }) => {
       let mmIntegrationSrc = null;
       if (showMMIntegration && mmClientVars.Token) {
         try {
-          // Fetch MarketingManagerSiteURL from API (robust approach)
-          const marketingManagerSiteURL = await navigationService.getMarketingManagerSiteURL();
+          const mkmSite=apiData.MarketingManagerURL;
+          const marketingManagerSiteURL = await navigationService.getMarketingManagerSiteURL(mkmSite,mmClientVars);
           if (marketingManagerSiteURL) {
             mmIntegrationSrc = insertMenuUrlAtPlaceholder(marketingManagerSiteURL, '/AssignData.aspx?') + '&accesstoken=' + mmClientVars.Token;
           }
         } catch (error) {
           console.error('Error fetching MarketingManagerSiteURL:', error);
-          // Fallback to localStorage if API fails
-          if (mmClientVars.MarketingManagerSiteURL) {
-            mmIntegrationSrc = insertMenuUrlAtPlaceholder(mmClientVars.MarketingManagerSiteURL, '/AssignData.aspx?') + '&accesstoken=' + mmClientVars.Token;
-          }
         }
       }
 
@@ -306,17 +302,13 @@ export const HomeProvider = ({ children, sessionLoaded = false }) => {
       
       if (showProspecting) {
         try {
-          // Fetch MarketingManagerSiteURL from API (robust approach)
-          const marketingManagerSiteURL = await navigationService.getMarketingManagerSiteURL();
+          const mkmsiteurl=apiData.MarketingManagerURL;
+          const marketingManagerSiteURL = await navigationService.getMarketingManagerSiteURL(mkmsiteurl,mmClientVars);
           if (marketingManagerSiteURL) {
             crmProspectingUrl = insertMenuUrlAtPlaceholder(marketingManagerSiteURL, '/midashboard.aspx?');
           }
         } catch (error) {
           console.error('Error fetching MarketingManagerSiteURL for prospecting:', error);
-          // Fallback to localStorage if API fails
-          if (mmClientVars.MarketingManagerSiteURL) {
-            crmProspectingUrl = insertMenuUrlAtPlaceholder(mmClientVars.MarketingManagerSiteURL, '/midashboard.aspx?');
-          }
         }
       }
 
@@ -339,9 +331,7 @@ export const HomeProvider = ({ children, sessionLoaded = false }) => {
 
   // Load navigation menus (optimized - no caching)
   const loadNavigationMenus = async () => {
-    try {
-      setNavigationLoading(true);
-      
+    try {      
       const clientDetails = getSessionData();
       let cultureUI = "en-US"; // Default value
       let siteType = "TMM"; // Default value
@@ -373,15 +363,9 @@ export const HomeProvider = ({ children, sessionLoaded = false }) => {
       }
       
       const menus = await navigationService.fetchNavigationData(userId, navBarType);
-      console.log('🔍 Navigation menus loaded:', menus.length, menus);
       
       // Ensure we always set some menu data, even if empty
       setNavigationMenus(menus || []);
-      
-      // Force a small re-render delay to ensure state updates properly
-      setTimeout(() => {
-        console.log('🔄 Post-API state check - navigationMenus set to:', menus?.length || 0, 'items');
-      }, 100);
     } catch (error) {
       console.error('Error loading navigation menus:', error);
       // Set empty array on error to prevent undefined state
@@ -470,18 +454,7 @@ export const HomeProvider = ({ children, sessionLoaded = false }) => {
     localStorage.setItem('home-active-tab', state.activeTabId);
   }, [state.tabs, state.activeTabId]);
 
-  // Debug navigation menus state changes
-  useEffect(() => {
-    console.log('🔍 HomeContext navigationMenus state changed:', {
-      type: typeof state.navigationMenus,
-      isArray: Array.isArray(state.navigationMenus),
-      length: state.navigationMenus?.length,
-      loading: state.navigationLoading,
-      menus: state.navigationMenus
-    });
-  }, [state.navigationMenus, state.navigationLoading]);
-
-  // Actions
+   // Actions
   const addTab = (tabData) => {
     // Handle URL based on whether it contains ui60 or not
     let processedUrl = tabData.url;
