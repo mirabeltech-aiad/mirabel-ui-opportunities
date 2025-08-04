@@ -3,7 +3,6 @@ import type { AliasOptions } from 'vite'
 
 export const aliases: AliasOptions = {
   '@': path.resolve(__dirname, 'src'),
-  // Opportunity feature
   '@OpportunityUtils': path.resolve(__dirname, 'src/features/Opportunity/utils'),
   '@OpportunityConstants': path.resolve(__dirname, 'src/features/Opportunity/constants'),
   '@OpportunityContexts': path.resolve(__dirname, 'src/features/Opportunity/contexts'),
