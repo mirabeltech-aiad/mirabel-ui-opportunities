@@ -4,7 +4,7 @@
 export const APP_CONFIG = {
   NAME: 'Mirabel UI',
   VERSION: '3.0.0',
-  BASE_PATH: '/ui60',
+  BASE_PATH: '/app',
   API_TIMEOUT: 30000, // 30 seconds
   DEBOUNCE_DELAY: 300, // 300ms for search inputs
   PAGINATION_SIZE: 20,

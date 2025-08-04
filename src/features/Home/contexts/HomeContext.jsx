@@ -456,12 +456,12 @@ export const HomeProvider = ({ children, sessionLoaded = false }) => {
 
    // Actions
   const addTab = (tabData) => {
-    // Handle URL based on whether it contains ui60 or not
+    // Handle URL based on whether it contains app or not
     let processedUrl = tabData.url;
     if (tabData.url && tabData.type === 'iframe') {
       // For iframe tabs, use URL as provided
-      // - URLs with 'ui60' are React app routes (keep as is)
-      // - URLs without 'ui60' are legacy ASP.NET routes (use as is)
+      // - URLs with 'app' are React app routes (keep as is)
+      // - URLs without 'app' are legacy ASP.NET routes (use as is)
       processedUrl = tabData.url;
     }
 

@@ -3,7 +3,7 @@ import react from '@vitejs/plugin-react-swc'
 import path from 'path'
 
 export default defineConfig({
-  base: '/ui60/', // required for production to work from sub-path
+  base: '/app/', // required for production to work from sub-path
   plugins: [react()],
   server: {
     port: 3000,

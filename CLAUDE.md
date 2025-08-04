@@ -23,7 +23,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ## Architecture Overview
 
 ### Application Structure
-This is an enterprise React application that serves as a modern replacement for legacy ASP.NET components while maintaining backward compatibility. The app runs under the `/ui60/` subpath and features sophisticated environment detection and authentication flows.
+This is an enterprise React application that serves as a modern replacement for legacy ASP.NET components while maintaining backward compatibility. The app runs under the `/app/` subpath and features sophisticated environment detection and authentication flows.
 
 ### Key Architectural Patterns
 
@@ -58,9 +58,9 @@ This is an enterprise React application that serves as a modern replacement for 
 
 ### Routing & Navigation
 - **React Router v6**: Client-side routing with lazy loading
-- **Base Path**: All routes prefixed with `/ui60/`
+- **Base Path**: All routes prefixed with `/app/`
 - **Route Tree**: Centralized configuration in `routeTree.js`
-- **Auth Handling**: Special routes for OAuth callbacks (`/ui60/auth/callback`)
+- **Auth Handling**: Special routes for OAuth callbacks (`/app/auth/callback`)
 - **URL State**: Search parameters synchronized with filter contexts
 
 ### Development Experience
