@@ -314,24 +314,14 @@ export const HomeProvider = ({ children, sessionLoaded = false }) => {
         mmClientVars.isMirableEmailTransEnabled === true
       );
 
-      // Helper to insert menu URL at {0} placeholder
-      function insertMenuUrlAtPlaceholder(baseUrl, menuUrl) {
-        if (!baseUrl || !menuUrl) return baseUrl || menuUrl;
-        const urlWithQuery = menuUrl + (menuUrl.includes('?') ? '&' : '?');
-        if (baseUrl.includes('{0}')) {
-          return baseUrl.replace('{0}', urlWithQuery);
-        }
-        return baseUrl.replace(/\/$/, '') + '/' + menuUrl.replace(/^\//, '');
-      }
-
       // MM Integration iframe src (matching legacy ASP.NET)
       let mmIntegrationSrc = null;
-      if (showMMIntegration && mmClientVars.Token) {
+        if (showMMIntegration && mmClientVars.Token) {
         try {
           const mkmSite=apiData.MarketingManagerURL;
-          const marketingManagerSiteURL = await navigationService.getMarketingManagerSiteURL(mkmSite,mmClientVars);
+          const marketingManagerSiteURL = await navigationService.getMarketingManagerSiteURL(mkmSite,mmClientVars,'/AssignData.aspx');
           if (marketingManagerSiteURL) {
-            mmIntegrationSrc = insertMenuUrlAtPlaceholder(marketingManagerSiteURL, '/AssignData.aspx?') + '&accesstoken=' + mmClientVars.Token;
+            mmIntegrationSrc = marketingManagerSiteURL + '&accesstoken=' + mmClientVars.Token;
           }
         } catch (error) {
           console.error('Error fetching MarketingManagerSiteURL:', error);
@@ -342,12 +332,12 @@ export const HomeProvider = ({ children, sessionLoaded = false }) => {
       let crmProspectingUrl = null;
       const showProspecting = isCRM && mmClientVars.IsUserHasDataPackAccess === true;
       
-      if (showProspecting) {
+        if (showProspecting) {
         try {
           const mkmsiteurl=apiData.MarketingManagerURL;
-          const marketingManagerSiteURL = await navigationService.getMarketingManagerSiteURL(mkmsiteurl,mmClientVars);
+          const marketingManagerSiteURL = await navigationService.getMarketingManagerSiteURL(mkmsiteurl,mmClientVars,'/midashboard.aspx');
           if (marketingManagerSiteURL) {
-            crmProspectingUrl = insertMenuUrlAtPlaceholder(marketingManagerSiteURL, '/midashboard.aspx?');
+            crmProspectingUrl = marketingManagerSiteURL;
           }
         } catch (error) {
           console.error('Error fetching MarketingManagerSiteURL for prospecting:', error);
@@ -445,17 +435,7 @@ export const HomeProvider = ({ children, sessionLoaded = false }) => {
           const isCompleteUrl = dashboard.URL.startsWith('http://') || dashboard.URL.startsWith('https://');
           const baseUrl = isCompleteUrl ? '' : mkmDomain;
           const updatedUrl = `${baseUrl}${dashboard.URL}&accesstoken=${accessToken}`;
-          
-          // Debug logging for MKM URL processing
-          console.log('🔄 HomeContext: MKM URL processing debug:', {
-            dashboardName: dashboard.DashBoardName,
-            originalUrl: dashboard.URL,
-            isCompleteUrl,
-            mkmDomain,
-            baseUrl,
-            updatedUrl
-          });
-          
+      
           return {
             ...dashboard,
             URL: updatedUrl

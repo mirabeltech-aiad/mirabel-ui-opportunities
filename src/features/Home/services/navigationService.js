@@ -137,7 +137,7 @@ export const navigationService = {
    * @param {Object} sessionVars - Optional session variables to reuse
    * @returns {Promise<string>} Constructed MKM URL
    */
-  getMarketingManagerSiteURL: async (mkmSiteURL='',sessionVars=null) => {
+  getMarketingManagerSiteURL: async (mkmSiteURL='',sessionVars=null,url='') => {
     try {
       const isSiteMKMEnabled = sessionVars.IsSiteMKMEnabled === true || sessionVars.IsSiteMKMEnabled === 'True';
       const isUserHasMKMAccess = sessionVars.IsUserHasMKMAccess === true || sessionVars.IsUserHasMKMAccess === 'True';
@@ -145,7 +145,7 @@ export const navigationService = {
       const isUserHasDataPackAccess = sessionVars.IsUserHasDataPackAccess === true || sessionVars.IsUserHasDataPackAccess === 'True';
       
       // Construct URL exactly as backend does
-      const mkmURL = `${mkmSiteURL}{0}ISMKM=1&FE=${isSiteMKMEnabled ? "1" : "0"}&MKMFE=${isSiteMKMEnabled ? "1" : "0"}&MKMUA=${isUserHasMKMAccess ? "1" : "0"}&DPFE=${isSiteDataPackEnabled ? "1" : "0"}&DPUA=${isUserHasDataPackAccess ? "1" : "0"}`;
+      const mkmURL = `${mkmSiteURL}${url}?ISMKM=1&FE=${isSiteMKMEnabled ? "1" : "0"}&MKMFE=${isSiteMKMEnabled ? "1" : "0"}&MKMUA=${isUserHasMKMAccess ? "1" : "0"}&DPFE=${isSiteDataPackEnabled ? "1" : "0"}&DPUA=${isUserHasDataPackAccess ? "1" : "0"}`;
 
       return mkmURL;
     } catch (error) {
@@ -160,13 +160,13 @@ export const navigationService = {
    * @param {Object} sessionVars - Optional session variables to reuse
    * @returns {Promise<string>} Constructed MES URL
    */
-  getEmailServiceSiteURL: async (emailServiceSiteURL='',sessionVars=null) => {
+  getEmailServiceSiteURL: async (emailServiceSiteURL='',sessionVars=null,url='') => {
     try {
       const isMirabelEmailServiceEnabled = sessionVars.IsMirabelEmailServiceEnabled === true || sessionVars.IsMirabelEmailServiceEnabled === 'True';
       const isUserHasMKMAccess = sessionVars.IsUserHasMKMAccess === true || sessionVars.IsUserHasMKMAccess === 'True';
       
       // Construct URL exactly as backend does
-      const mesSiteURL = `${emailServiceSiteURL}{0}ISMKM=1&ISMES=1&FE=${isMirabelEmailServiceEnabled ? "1" : "0"}&ESFE=${isMirabelEmailServiceEnabled ? "1" : "0"}&MKMUA=${isUserHasMKMAccess ? "1" : "0"}`;
+      const mesSiteURL = `${emailServiceSiteURL}${url}?ISMKM=1&ISMES=1&FE=${isMirabelEmailServiceEnabled ? "1" : "0"}&ESFE=${isMirabelEmailServiceEnabled ? "1" : "0"}&MKMUA=${isUserHasMKMAccess ? "1" : "0"}`;
       
       return mesSiteURL;
     } catch (error) {
@@ -277,19 +277,7 @@ export const navigationService = {
       return menu.IconCls || '';
     }
 
-    // Helper: Insert menu URL into base URL at {0} placeholder - matches backend exactly
-    function insertMenuUrlAtPlaceholder(baseUrl, menuUrl) {
-      if (!baseUrl || !menuUrl) return baseUrl || menuUrl;
-      // Add ? or & as in C# logic
-      const urlWithQuery = menuUrl + (menuUrl.includes('?') ? '&' : '?');
-      if (baseUrl.includes('{0}')) {
-        return baseUrl.replace('{0}', urlWithQuery);
-      }
-      // fallback: just concatenate
-      return baseUrl.replace(/\/$/, '') + '/' + menuUrl.replace(/^\//, '');
-    }
-
-    // Helper: recursively build children
+   // Helper: recursively build children
     async function buildMenuTree(parentId) {
       const menuPromises = menus
         .filter(menu => menu.ParentID === parentId)
@@ -303,12 +291,11 @@ export const navigationService = {
           
           // Special URL handling for MKM/MES - matches backend exactly
           if ((menu.URLSource === 'MKM' || menu.URLSource === 'MKM-DATA') && url) {
-            const marketingManagerSiteURL = await navigationService.getMarketingManagerSiteURL(apiData.MarketingManagerURL,sessionVars);
-            url = insertMenuUrlAtPlaceholder(marketingManagerSiteURL, url);
+            const marketingManagerSiteURL = await navigationService.getMarketingManagerSiteURL(apiData.MarketingManagerURL,sessionVars,menu.URL);
+            url = marketingManagerSiteURL;
           } else if (menu.URLSource === 'MES' && url) {
-            // const emailServiceSiteURL = apiData.EmailServiceSiteURL || '';
-            const emailServiceSiteURL = await navigationService.getEmailServiceSiteURL(apiData.EmailServiceSiteURL,sessionVars);
-            url = insertMenuUrlAtPlaceholder(emailServiceSiteURL, url);
+            const emailServiceSiteURL = await navigationService.getEmailServiceSiteURL(apiData.EmailServiceSiteURL,sessionVars,menu.URL);
+            url = emailServiceSiteURL;
           }
           
           // Tooltip
