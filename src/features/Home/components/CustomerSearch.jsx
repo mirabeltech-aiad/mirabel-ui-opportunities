@@ -189,11 +189,13 @@ const CustomerSearch = () => {
   const selectCustomer = (customerId, displayName) => {
     if (isNaN(customerId) || !customerId) {
       // Text search
+      console.log("Text Search page");
       const encodedSearch = encodeURIComponent(displayName || searchQuery);
       const url = `/ui/ContactSearch?okToRun=YES&customer=${encodedSearch}`;
       openTabByUrl('Advanced Search', url);
     } else {
       // Direct customer page
+      console.log("Direct customer page");
       const url = `/ui/contactedit?edit=1&Search=1&gscustomerid=${customerId}`;
       openTabByUrl('Customer', url);
     }
