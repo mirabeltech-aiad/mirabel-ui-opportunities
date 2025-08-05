@@ -37,7 +37,9 @@ const TabNavigation = memo(() => {
       if (tabBarRef.current) {
         const tabBarWidth = tabBarRef.current.offsetWidth;
         // Reserve space for fixed tabs, overflow menu, and padding
-        const reservedSpace = 300; // Reduced reserved space to allow more tabs
+        // Responsive reserved space based on screen size
+        const isSmallScreen = window.innerWidth < 768;
+        const reservedSpace = isSmallScreen ? 200 : 300; // Less space reserved on small screens
         setAvailableWidth(Math.max(0, tabBarWidth - reservedSpace));
       }
     };
@@ -88,7 +90,8 @@ const TabNavigation = memo(() => {
   const draggableTabs = tabs.slice(fixedTabsCount); // tabs after the first three are draggable
 
   // Calculate which draggable tabs should be visible based on available space
-  const estimatedTabWidth = 120; // Reduced width per tab to fit more tabs
+  const isSmallScreen = window.innerWidth < 768;
+  const estimatedTabWidth = isSmallScreen ? 100 : 120; // Smaller tabs on small screens
   const maxVisibleDraggableTabs = Math.floor(availableWidth / estimatedTabWidth);
   const visibleDraggableTabs = draggableTabs.slice(0, maxVisibleDraggableTabs);
   const overflowDraggableTabs = draggableTabs.slice(maxVisibleDraggableTabs);
@@ -183,7 +186,7 @@ const TabNavigation = memo(() => {
       {/* Tab Bar */}
       <div 
         ref={tabBarRef}
-        className="bg-white border-b border-gray-200 flex items-center px-2 py-0 h-9 min-h-0 overflow-hidden" 
+        className="bg-white border-b border-gray-200 flex items-center px-1 sm:px-2 py-0 h-9 min-h-0 overflow-hidden w-full" 
         style={{ 
           boxShadow: '0 1px 0 0 #e5e7eb', 
           height: '28px', 
@@ -192,7 +195,7 @@ const TabNavigation = memo(() => {
           fontSize: '13px', 
           fontWeight: 500, 
           lineHeight: '1.5',
-          maxWidth: '100%'
+          maxWidth: '100vw'
         }}
       >
         {/* Sales Dashboard Dropdown as first fixed tab */}
@@ -302,7 +305,7 @@ const TabNavigation = memo(() => {
                               ? 'bg-blue-100 text-blue-900 font-bold shadow-sm'
                               : 'bg-transparent hover:bg-gray-100 text-gray-700'
                           }${snapshot.isDragging ? ' opacity-90 shadow-lg' : ''}`}
-                          style={{ fontFamily: 'inherit', fontSize: '13px', fontWeight: 500, lineHeight: '1.5', border: 'none', boxShadow: activeTabId === tab.id ? '0 2px 8px rgba(0,0,0,0.04)' : 'none', marginRight: '0px', height: '24px', minHeight: '24px', paddingTop: '0', paddingBottom: '0', maxWidth: '120px', minWidth: '80px' }}
+                          style={{ fontFamily: 'inherit', fontSize: '13px', fontWeight: 500, lineHeight: '1.5', border: 'none', boxShadow: activeTabId === tab.id ? '0 2px 8px rgba(0,0,0,0.04)' : 'none', marginRight: '0px', height: '24px', minHeight: '24px', paddingTop: '0', paddingBottom: '0', maxWidth: isSmallScreen ? '100px' : '120px', minWidth: isSmallScreen ? '60px' : '80px' }}
                         >
                           <div
                             {...provided.dragHandleProps}
@@ -311,7 +314,7 @@ const TabNavigation = memo(() => {
                             style={{ fontSize: '13px' }}
                           >
                             <span className="mr-0.5 text-xs flex items-center flex-shrink-0" style={{ fontSize: '13px' }}>{tab.icon}</span>
-                            <span className="text-xs font-medium truncate flex items-center" style={{ fontSize: '12px', marginRight: '2px' }}>
+                            <span className="text-xs font-medium truncate flex items-center" style={{ fontSize: isSmallScreen ? '11px' : '12px', marginRight: '2px' }}>
                               {tab.title}
                             </span>
                           </div>
