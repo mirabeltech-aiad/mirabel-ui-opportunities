@@ -130,10 +130,19 @@ const CustomerSearch = () => {
   const handleTextSearch = (searchText) => {
     if (!searchText.trim()) return;
 
-    // Encode search value and navigate to search page
-    const encodedSearch = encodeURIComponent(searchText);
-    const url = `/ui/ContactSearch?okToRun=YES&customer=${encodedSearch}`;
-    openTabByUrl('Advanced Search', url);
+    // Check if the search text is a numeric contact ID
+    const trimmedText = searchText.trim();
+    const isNumericId = /^\d+$/.test(trimmedText) && !isNaN(parseInt(trimmedText));
+    
+    if (isNumericId) {
+      // Direct contact record for numeric IDs
+      selectCustomer(parseInt(trimmedText), trimmedText);
+    } else {
+      // Encode search value and navigate to search page for text searches
+      const encodedSearch = encodeURIComponent(searchText);
+      const url = `/ui/ContactSearch?okToRun=YES&customer=${encodedSearch}`;
+      openTabByUrl('Advanced Search', url);
+    }
   };
 
   // Handle focus (clear search flag)
