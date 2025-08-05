@@ -4,6 +4,9 @@ import navigationService from '../services/navigationService';
 import { termsAndConditionsService } from '../services/termsAndConditionsService';
 import { getSessionData } from '@/utils/sessionHelpers';
 import { getTopPath } from '@/utils/commonHelpers';
+import { PACKAGE_TYPES } from '@/utils/enums';
+import { DASHBOARD_API } from '@/utils/apiUrls';
+import portalService from '../services/portalService';
 const HomeContext = createContext();
 
 // Action types
@@ -12,6 +15,7 @@ const ACTIONS = {
   REMOVE_TAB: 'REMOVE_TAB',
   REORDER_TABS: 'REORDER_TABS',
   SET_ACTIVE_TAB: 'SET_ACTIVE_TAB',
+  SET_TABS: 'SET_TABS',
   UPDATE_TAB: 'UPDATE_TAB',
   TOGGLE_HELP: 'TOGGLE_HELP',
   SET_HELP_POSITION: 'SET_HELP_POSITION',
@@ -26,7 +30,11 @@ const ACTIONS = {
   HIDE_TERMS_MODAL: 'HIDE_TERMS_MODAL',
   SET_LOGO_URL: 'SET_LOGO_URL',
   SET_MM_INTEGRATION: 'SET_MM_INTEGRATION',
-  SET_CRM_PROSPECTING: 'SET_CRM_PROSPECTING'
+  SET_CRM_PROSPECTING: 'SET_CRM_PROSPECTING',
+  SET_MKM_MENU_VISIBLE: 'SET_MKM_MENU_VISIBLE',
+  SET_PORTALS: 'SET_PORTALS',
+  SET_PORTALS_LOADING: 'SET_PORTALS_LOADING',
+  SET_DASHBOARD_MENU_ITEMS: 'SET_DASHBOARD_MENU_ITEMS'
 };
 
 // Initial state
@@ -74,7 +82,11 @@ const initialState = {
   mmIntegrationSrc: null,
   crmProspectingUrl: null,
   isMMIntegration: false,
-  isCRMProspecting: false
+  isCRMProspecting: false,
+  isMKMMenuVisible: false,
+  portals: [],
+  portalsLoading: false,
+  dashboardMenuItems: [] // Store dashboard menu items (similar to C# menuDashboard.Items)
 };
 
 // Reducer
@@ -109,6 +121,12 @@ const homeReducer = (state, action) => {
       return {
         ...state,
         activeTabId: action.payload
+      };
+    
+    case ACTIONS.SET_TABS:
+      return {
+        ...state,
+        tabs: action.payload
       };
     
     case ACTIONS.UPDATE_TAB:
@@ -213,7 +231,31 @@ const homeReducer = (state, action) => {
         isCRMProspecting: action.payload.isCRMProspecting
       };
     
-    default:
+    case ACTIONS.SET_MKM_MENU_VISIBLE:
+      return {
+        ...state,
+        isMKMMenuVisible: action.payload
+      };
+    
+    case ACTIONS.SET_PORTALS:
+      return {
+        ...state,
+        portals: action.payload
+      };
+    
+    case ACTIONS.SET_PORTALS_LOADING:
+      return {
+        ...state,
+        portalsLoading: action.payload
+      };
+    
+    case ACTIONS.SET_DASHBOARD_MENU_ITEMS:
+      return {
+        ...state,
+        dashboardMenuItems: action.payload
+      };
+    
+       default:
       return state;
   }
 };
@@ -330,7 +372,7 @@ export const HomeProvider = ({ children, sessionLoaded = false }) => {
   };
 
   // Load navigation menus (optimized - no caching)
-  const loadNavigationMenus = async () => {
+  const SetupNavigation = async () => {
     try {      
       const clientDetails = getSessionData();
       let cultureUI = "en-US"; // Default value
@@ -375,23 +417,268 @@ export const HomeProvider = ({ children, sessionLoaded = false }) => {
     }
   };
 
-  // Load dashboards
-  const loadDashboards = async () => {
+  /**
+   * Setup Dashboard - mirrors C# SetupDashboard logic
+   * @param {string} source - Source of the setup call (e.g., "AD" for admin)
+   * @param {boolean} isReload - Whether this is a reload operation
+   */
+  const setupDashboard = async (source = "", isReload = false) => {
     try {
       setDashboardsLoading(true);
+      
+      // Get session data for MKM domain and package type
+      const sessionData = getSessionData();
+      const apiData = await navigationService.fetchApiData();
+      const mkmDomain = apiData.MarketingManagerURL;
+      const packageTypeId = sessionData?.PackageTypeID || 0;
+      const isAdmin = sessionData?.IsAdmin || false;
+      const accessToken = sessionData?.Token || '';
+      const employeeId = sessionData?.EmployeeID || 1;
+      
+      // Fetch dashboards from API (matching C# API call)
       const dashboards = await dashboardService.getDashboards();
-      const activeDashboards = dashboardService.getActiveDashboards(dashboards);
+      
+      // Update URLs for MKM dashboards (matching C# logic)
+      const updatedDashboards = dashboards.map(dashboard => {
+        if (dashboard.URL && dashboard.URL.toUpperCase().includes('ISMKM=1')) {
+          return {
+            ...dashboard,
+            URL: `${mkmDomain}${dashboard.URL}&accesstoken=${accessToken}`
+          };
+        }
+        return dashboard;
+      });
+      
+      // Set active dashboards
+      const activeDashboards = updatedDashboards.filter(dashboard => dashboard.IsActive === true);
       setDashboards(activeDashboards);
       
-      // Set default dashboard
-      if (activeDashboards && activeDashboards.length > 0) {
-        setSelectedDashboard(activeDashboards[0]);
-        dispatch({ type: ACTIONS.SET_ACTIVE_TAB, payload: 'dashboard' }); // Set active tab to dashboard
+        // Select default dashboard (matching C# logic)
+        let selectedDashboard = activeDashboards.find(dashboard => dashboard.IsDefault === true);
+        if (!selectedDashboard) {
+          selectedDashboard = activeDashboards[0];
+        }
+      
+      if (selectedDashboard) {
+        setSelectedDashboard(selectedDashboard);
+               
+        // Update dashboard tab with selected dashboard info (matching C# pnlDashboard.Loader.Url and pnlDashboard.Title)
+        const dashboardTab = {
+          id: 'dashboard',
+          title: selectedDashboard.DashBoardName || 'Sales Dashboard',
+          component: 'Dashboard',
+          type: 'component',
+          closable: false,
+          icon: '',
+          dashboardUrl: selectedDashboard.URL,
+          dashboardId: selectedDashboard.ID
+        };
+        
+        // Update the dashboard tab in the tabs array
+        const updatedTabs = state.tabs.map(tab => 
+          tab.id === 'dashboard' ? dashboardTab : tab
+        );
+        dispatch({ type: ACTIONS.SET_TABS, payload: updatedTabs });
       }
+
+      // Create dashboard menu items (matching C# menuDashboard.Items.Add logic)
+      const dashboardMenuItems = activeDashboards.map(dashboard => ({
+        id: `DashBoard_${dashboard.ID}`,
+        text: dashboard.DashBoardName,
+        title: dashboard.DashBoardName,
+        url: dashboard.URL,
+        type: 'dashboard',
+        isDefault: dashboard.IsDefault
+      }));
+
+      // Add MKM dashboard menu item for CRM_Int package type (matching C# logic)
+      if ([PACKAGE_TYPES.CRM_MKM, PACKAGE_TYPES.CRM_MKM_DATA, PACKAGE_TYPES.CRM_INT].includes(packageTypeId)) {
+        const mkmDashboardUrl = isAdmin 
+          ? `${mkmDomain}/WebsiteSetup.aspx&ISMKM=1`
+          : `${mkmDomain}/DataUsageReport.aspx&ISMKM=1`;
+        
+        const mkmMenuItem = {
+          id: 'MKM_Dashboard',
+          text: 'Settings', // GetClassGlobalResourceObject("Settings")
+          title: 'MKM Settings',
+          url: mkmDashboardUrl,
+          type: 'mkm'
+        };
+        
+        dashboardMenuItems.push(mkmMenuItem);
+      }
+
+      // Store dashboard menu items in state (similar to C# menuDashboard.Items)
+      dispatch({ type: ACTIONS.SET_DASHBOARD_MENU_ITEMS, payload: dashboardMenuItems });
+      
+      // Create portals (mirrors C# CreateAllPortals logic)
+      await createAllPortals(employeeId);
+      
+      // Handle source-specific logic
+      if (source.toUpperCase() === 'AD') {
+        if (isReload) {
+          // Reload dashboard content by refreshing the dashboard tab
+          const dashboardTab = state.tabs.find(tab => tab.id === 'dashboard');
+          if (dashboardTab) {
+            const updatedTab = {
+              ...dashboardTab,
+              key: Date.now() // Force reload by changing key
+            };
+            dispatch({ type: ACTIONS.UPDATE_TAB, payload: updatedTab });
+          }
+        }
+        // Update dashboard menu items to reflect any changes
+        dispatch({ type: ACTIONS.SET_DASHBOARD_MENU_ITEMS, payload: dashboardMenuItems });
+      } else {
+        // Set active tab to dashboard
+        dispatch({ type: ACTIONS.SET_ACTIVE_TAB, payload: 'dashboard' });
+      }
+      
     } catch (error) {
-      console.error('Failed to load dashboards:', error);
+      console.error('Failed to setup dashboard:', error);
     } finally {
       setDashboardsLoading(false);
+    }
+  };
+
+  /**
+   * Show Dashboard - mirrors C# showDashboard function
+   * @param {Object} dashboardItem - Dashboard item with id, title, URL
+   * @param {string} loadUrl - URL to load in dashboard
+   */
+  const showDashboard = async (dashboardItem, loadUrl) => {
+    try {
+      // Update default dashboard as Selected (only Dashboards)
+      if (dashboardItem.id && dashboardItem.id.indexOf("DashBoard_") > -1) {
+        const id = dashboardItem.id.replace("DashBoard_", '');
+        let refID = null;
+        
+        if (parseInt(id) < 0) {
+          // Find dashboard by ID to get RefID
+          const dashboard = state.dashboards.find(d => d.ID.toString() === id);
+          if (dashboard) {
+            refID = dashboard.RefID;
+          }
+          if (!refID) {
+            console.error("Invalid Analytics Dashboard ID.");
+            return;
+          }
+        }
+        
+        // Save active dashboard to API
+        try {
+          const endpoint = `${DASHBOARD_API.SAVE_ACTIVE_DASHBOARD}${id}/${refID || ''}`;
+          await dashboardService.saveActiveDashboard(endpoint);
+        } catch (error) {
+          console.error('Failed to save active dashboard:', error);
+        }
+      }
+
+      // Don't load the page if the last selection and current URLs are same
+      const currentDashboardTab = state.tabs.find(tab => tab.id === 'dashboard');
+      if (currentDashboardTab && currentDashboardTab.dashboardUrl === loadUrl) {
+        return;
+      }
+
+      // Update dashboard tab title and URL
+      const updatedDashboardTab = {
+        id: 'dashboard',
+        title: dashboardItem.title || dashboardItem.DashBoardName || 'Dashboard',
+        component: 'Dashboard',
+        type: 'component',
+        closable: false,
+        icon: '',
+        dashboardUrl: loadUrl,
+        dashboardId: dashboardItem.ID || dashboardItem.id
+      };
+
+      // Update the dashboard tab
+      const updatedTabs = state.tabs.map(tab => 
+        tab.id === 'dashboard' ? updatedDashboardTab : tab
+      );
+      dispatch({ type: ACTIONS.SET_TABS, payload: updatedTabs });
+
+      // Set dashboard as active tab
+      dispatch({ type: ACTIONS.SET_ACTIVE_TAB, payload: 'dashboard' });
+
+      // Toggle MKM website menu based on URL
+      toggleMKMWebsiteMenu(loadUrl);
+
+    } catch (error) {
+      console.error('Failed to show dashboard:', error);
+    }
+  };
+
+  /**
+   * Toggle MKM Website Menu - mirrors C# toggleMKMWebsiteMenu function
+   * @param {string} currentURL - Current URL to check for MKM
+   */
+  const toggleMKMWebsiteMenu = (currentURL) => {
+    try {
+      if (!currentURL) {
+        // Hide MKM menu if no URL
+        dispatch({ type: ACTIONS.SET_MKM_MENU_VISIBLE, payload: false });
+        return;
+      }
+
+      const urlLower = currentURL.toLowerCase();
+      const isMKM = urlLower.indexOf("ismkm=1") > -1;
+      
+      // Show/hide MKM menu based on URL
+      dispatch({ type: ACTIONS.SET_MKM_MENU_VISIBLE, payload: isMKM });
+      
+    } catch (error) {
+      console.error('Error toggling MKM menu:', error);
+      // Hide MKM menu on error
+      dispatch({ type: ACTIONS.SET_MKM_MENU_VISIBLE, payload: false });
+    }
+  };
+
+  /**
+   * Create All Portals - mirrors C# CreateAllPortals function
+   */
+  const createAllPortals = async (employeeId) => {
+    try {
+      dispatch({ type: ACTIONS.SET_PORTALS_LOADING, payload: true });
+      
+      // Get all portal information for this user
+      const availablePortals = await portalService.getPortalDetails(employeeId);
+      
+      if (!availablePortals || availablePortals.length <= 0) {
+        console.log('No portals available for user');
+        return;
+      }
+
+      // Store portals in state
+      dispatch({ type: ACTIONS.SET_PORTALS, payload: availablePortals });
+
+      // Create portal menu items (matching C# menuDashboard.Items.Add logic)
+      const portalMenuItems = availablePortals.map(portal => ({
+        id: `portal${portal.PortalIndex}`,
+        text: portal.Title,
+        title: portal.Title,
+        url: `/intranet/Members/Home/Dashboard.aspx?PortalIndex=${portal.PortalIndex}`,
+        type: 'portal',
+        portalIndex: portal.PortalIndex
+      }));
+      // Add portal menu items to existing dashboard menu items (matching C# logic)
+      const currentMenuItems = state.dashboardMenuItems;      
+      // Add separator if there are existing menu items (matching C# MenuSeparator)
+      const updatedMenuItems = [...currentMenuItems];
+      if (currentMenuItems.length > 0 && portalMenuItems.length > 0) {
+        updatedMenuItems.push({
+          id: 'separator',
+          type: 'separator'
+        });
+      }      
+      // Add portal menu items
+      updatedMenuItems.push(...portalMenuItems);      
+      // Update dashboard menu items in state
+      dispatch({ type: ACTIONS.SET_DASHBOARD_MENU_ITEMS, payload: updatedMenuItems });      
+    } catch (error) {
+      console.error('Failed to create portals:', error);
+    } finally {
+      dispatch({ type: ACTIONS.SET_PORTALS_LOADING, payload: false });
     }
   };
 
@@ -436,8 +723,8 @@ export const HomeProvider = ({ children, sessionLoaded = false }) => {
       
       // Run all initialization tasks in parallel for faster loading
       await Promise.all([
-        loadNavigationMenus(),     // Load menu data immediately
-        loadDashboards(),          // Load dashboards in parallel
+        SetupNavigation(),     // Load menu data immediately
+        setupDashboard(),          // Setup dashboard (replaces loadDashboards)
         setupLogoAndMMIntegration(), // Load logo/MM setup in parallel
         checkTermsAndConditions()   // Check terms in parallel
       ]);
@@ -553,10 +840,22 @@ export const HomeProvider = ({ children, sessionLoaded = false }) => {
     dispatch({ type: ACTIONS.SET_CRM_PROSPECTING, payload: isCRMProspecting });
   };
 
+  const setPortals = (portals) => {
+    dispatch({ type: ACTIONS.SET_PORTALS, payload: portals });
+  };
+
+  const setPortalsLoading = (loading) => {
+    dispatch({ type: ACTIONS.SET_PORTALS_LOADING, payload: loading });
+  };
+
+  const setDashboardMenuItems = (menuItems) => {
+    dispatch({ type: ACTIONS.SET_DASHBOARD_MENU_ITEMS, payload: menuItems });
+  };
+
   // Force reload navigation menus
   const reloadNavigationMenus = async () => {
     console.log('🔄 Manually reloading navigation menus...');
-    await loadNavigationMenus();
+    await SetupNavigation();
   };
 
   // Force full context refresh
@@ -565,8 +864,8 @@ export const HomeProvider = ({ children, sessionLoaded = false }) => {
     
     // Run all initialization tasks again
     await Promise.all([
-      loadNavigationMenus(),
-      loadDashboards(),
+      SetupNavigation(),
+      setupDashboard(),
       setupLogoAndMMIntegration(),
       checkTermsAndConditions()
     ]);
@@ -592,8 +891,15 @@ export const HomeProvider = ({ children, sessionLoaded = false }) => {
     setLogoUrl,
     setMMIntegration,
     setCRMProspecting,
+    setPortals,
+    setPortalsLoading,
+    setDashboardMenuItems,
     reloadNavigationMenus,
-    refreshHomeContext
+    refreshHomeContext,
+    setupDashboard,
+    showDashboard,
+    toggleMKMWebsiteMenu,
+    createAllPortals
   }), [
     addTab,
     removeTab,
@@ -614,8 +920,15 @@ export const HomeProvider = ({ children, sessionLoaded = false }) => {
     setLogoUrl,
     setMMIntegration,
     setCRMProspecting,
+    setPortals,
+    setPortalsLoading,
+    setDashboardMenuItems,
     reloadNavigationMenus,
-    refreshHomeContext
+    refreshHomeContext,
+    setupDashboard,
+    showDashboard,
+    toggleMKMWebsiteMenu,
+    createAllPortals
   ]);
 
   const value = {
