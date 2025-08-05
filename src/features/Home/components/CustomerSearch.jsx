@@ -134,21 +134,11 @@ const CustomerSearch = () => {
     const trimmedText = searchText.trim();
     const isNumericId = /^\d+$/.test(trimmedText) && !isNaN(parseInt(trimmedText));
     
-    // Debug logging - remove after testing
-    console.log('CustomerSearch Debug:', {
-      searchText,
-      trimmedText,
-      isNumericId,
-      parsed: parseInt(trimmedText)
-    });
-    
     if (isNumericId) {
       // Direct contact record for numeric IDs
-      console.log('Opening contact record for ID:', parseInt(trimmedText));
       selectCustomer(parseInt(trimmedText), trimmedText);
     } else {
       // Encode search value and navigate to search page for text searches
-      console.log('Opening advanced search for text:', trimmedText);
       const encodedSearch = encodeURIComponent(searchText);
       const url = `/ui/ContactSearch?okToRun=YES&customer=${encodedSearch}`;
       openTabByUrl('Advanced Search', url);
