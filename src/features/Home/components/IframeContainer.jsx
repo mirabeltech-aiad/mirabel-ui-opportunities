@@ -37,7 +37,10 @@ const IframeContainer = memo(({
   }, [title, url]);
 
   // Construct full URL by combining base domain with relative URL
-  const fullUrl = url ? `${getTopPath()}${url.startsWith('/') ? '' : '/'}${url}` : '';
+  // Check if URL is already a complete URL (starts with http:// or https://)
+  const isCompleteUrl = url && (url.startsWith('http://') || url.startsWith('https://'));
+  const fullUrl = url ? (isCompleteUrl ? url : `${getTopPath()}${url.startsWith('/') ? '' : '/'}${url}`) : '';
+
 
   const handleIframeLoad = () => {
     console.log('🔄 IframeContainer: Loaded', title);

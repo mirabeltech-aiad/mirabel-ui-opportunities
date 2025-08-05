@@ -441,9 +441,24 @@ export const HomeProvider = ({ children, sessionLoaded = false }) => {
       // Update URLs for MKM dashboards (matching C# logic)
       const updatedDashboards = dashboards.map(dashboard => {
         if (dashboard.URL && dashboard.URL.toUpperCase().includes('ISMKM=1')) {
+          // Check if URL is already a complete URL (starts with http:// or https://)
+          const isCompleteUrl = dashboard.URL.startsWith('http://') || dashboard.URL.startsWith('https://');
+          const baseUrl = isCompleteUrl ? '' : mkmDomain;
+          const updatedUrl = `${baseUrl}${dashboard.URL}&accesstoken=${accessToken}`;
+          
+          // Debug logging for MKM URL processing
+          console.log('🔄 HomeContext: MKM URL processing debug:', {
+            dashboardName: dashboard.DashBoardName,
+            originalUrl: dashboard.URL,
+            isCompleteUrl,
+            mkmDomain,
+            baseUrl,
+            updatedUrl
+          });
+          
           return {
             ...dashboard,
-            URL: `${mkmDomain}${dashboard.URL}&accesstoken=${accessToken}`
+            URL: updatedUrl
           };
         }
         return dashboard;
