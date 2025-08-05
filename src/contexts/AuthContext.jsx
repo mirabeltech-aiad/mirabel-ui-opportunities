@@ -16,6 +16,7 @@ import {
 } from "../utils/sessionHelpers";
 import { AUTH_ERRORS, getMainLoginUrl, logout } from "../utils/authHelpers";
 import { isDevelopmentMode, sessionValues } from '../utils/developmentHelper';
+import { AUTH_API } from "@/utils/apiUrls";
 
 const AuthContext = createContext();
 
@@ -134,7 +135,7 @@ export const AuthProvider = ({ children }) => {
       }
 
       const response = await fetch(
-        "/intranet/Members/Home/Home.aspx/GenerateTokenByRefreshToken",
+        AUTH_API.REFRESH_TOKEN,
         {
           method: "POST",
           headers: {

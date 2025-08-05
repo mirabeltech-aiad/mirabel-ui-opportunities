@@ -76,7 +76,7 @@ export const HOME_API = {
 export const AUTH_API = {
   LOGIN: '/services/auth/login',
   LOGOUT: '/services/auth/logout',
-  REFRESH_TOKEN: '/intranet/Members/Home/Home.aspx/GenerateTokenByRefreshToken',
+  REFRESH_TOKEN: '/intranet/Members/Home/Home.aspx/auth/refresh',
   VALIDATE_SESSION: '/services/auth/validate'
 };
 
