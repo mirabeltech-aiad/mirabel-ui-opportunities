@@ -372,7 +372,7 @@ export const HomeProvider = ({ children, sessionLoaded = false }) => {
   };
 
   // Load navigation menus (optimized - no caching)
-  const loadNavigationMenus = async () => {
+  const SetupNavigation = async () => {
     try {      
       const clientDetails = getSessionData();
       let cultureUI = "en-US"; // Default value
@@ -723,7 +723,7 @@ export const HomeProvider = ({ children, sessionLoaded = false }) => {
       
       // Run all initialization tasks in parallel for faster loading
       await Promise.all([
-        loadNavigationMenus(),     // Load menu data immediately
+        SetupNavigation(),     // Load menu data immediately
         setupDashboard(),          // Setup dashboard (replaces loadDashboards)
         setupLogoAndMMIntegration(), // Load logo/MM setup in parallel
         checkTermsAndConditions()   // Check terms in parallel
@@ -855,7 +855,7 @@ export const HomeProvider = ({ children, sessionLoaded = false }) => {
   // Force reload navigation menus
   const reloadNavigationMenus = async () => {
     console.log('🔄 Manually reloading navigation menus...');
-    await loadNavigationMenus();
+    await SetupNavigation();
   };
 
   // Force full context refresh
@@ -864,7 +864,7 @@ export const HomeProvider = ({ children, sessionLoaded = false }) => {
     
     // Run all initialization tasks again
     await Promise.all([
-      loadNavigationMenus(),
+      SetupNavigation(),
       setupDashboard(),
       setupLogoAndMMIntegration(),
       checkTermsAndConditions()
