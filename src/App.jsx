@@ -74,7 +74,7 @@ function App() {
         <GlobalProvider>
           <AuthProvider>
             <TooltipProvider>
-              <BrowserRouter basename="/ui60">
+              <BrowserRouter basename="/app">
                 <div className="min-h-screen bg-background font-sans antialiased">
                   <AppRoutes />
                 </div>

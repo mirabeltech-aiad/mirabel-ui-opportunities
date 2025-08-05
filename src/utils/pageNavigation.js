@@ -124,11 +124,11 @@ const loadLocalizerScript = async () => {
 
     const script = document.createElement("script");
     
-    // Get the complete domain and remove everything after /ui60
+    // Get the complete domain and remove everything after /app
     const currentUrl = window.location.href;
-    const ui60Index = currentUrl.indexOf('/ui60');
-    // Remove '/ui60' from the URL if present, to get the base domain path
-    const baseUrl = ui60Index !== -1 ? currentUrl.substring(0, ui60Index) : window.location.origin;
+    const appIndex = currentUrl.indexOf('/app');
+    // Remove '/app' from the URL if present, to get the base domain path
+    const baseUrl = appIndex !== -1 ? currentUrl.substring(0, appIndex) : window.location.origin;
     script.src = `${baseUrl}/intranet/localizer.js.axd?v=${version}`;
     script.async = true;
     console.log('script', script);
