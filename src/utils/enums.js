@@ -209,6 +209,40 @@ export const ENUMS = {
   CHART_TYPES
 };
 
+/**
+ * Client Type Enum - matches server-side ClientType enum exactly
+ */
+export const CLIENT_TYPE = {
+  /**
+   * The Magazine Manager
+   */
+  TMM: 'TMM',
+  /**
+   * Marketing Manager
+   */
+  MKM: 'MKM',
+  /**
+   * News Paper Manager
+   */
+  NPM: 'NPM',
+  /**
+   * Mirabel Customer Portal
+   */
+  MCP: 'MCP',
+  /**
+   * Mirabel Subscription Checkout Page
+   */
+  MSCP: 'MSCP',
+  /**
+   * Mirabel Self Service Portal
+   */
+  MSSP: 'MSSP',
+  /**
+   * Mirabel Subscription Page (MM)
+   */
+  MSP: 'MSP'
+};
+
 // Package Types - matching C# PackageTypes enum
 export const PACKAGE_TYPES = {
     CRM: 1,

@@ -64,7 +64,7 @@ const renderMenuItems = (items, openTabByUrl) => {
       return (
         <DropdownMenuItem
           key={item.id}
-          onClick={() => openTabByUrl(item.title, item.url)}
+          onClick={() => openTabByUrl(item.title, item.url, item)}
           className="rounded-none font-medium px-4 py-2 hover:bg-[#e6f0fa] focus:bg-[#e6f0fa] hover:text-ocean-900 focus:text-ocean-900 cursor-pointer text-gray-800 transition-colors duration-150 flex items-center gap-2 whitespace-nowrap"
           style={{ fontFamily: 'inherit', fontSize: '13px', fontWeight: 500, lineHeight: '1.5' }}
         >
@@ -121,7 +121,7 @@ const renderMenuItemOrSub = (item, openTabByUrl, expanded, setExpanded) => {
     return (
       <DropdownMenuItem
         key={item.id}
-        onClick={() => openTabByUrl(item.title, item.url)}
+        onClick={() => openTabByUrl(item.title, item.url, item)}
         className="rounded-none font-medium px-4 py-2 hover:bg-[#e6f0fa] focus:bg-[#e6f0fa] hover:text-ocean-900 focus:text-ocean-900 cursor-pointer text-gray-800 transition-colors duration-150 flex items-center gap-2 whitespace-nowrap"
         style={{ fontFamily: 'inherit', fontSize: '13px', fontWeight: 500, lineHeight: '1.5' }}
       >
@@ -291,22 +291,27 @@ const Navbar = () => {
     }
   }, [currentUser]);
 
-  const openTabByUrl = (title, url) => {
+  const openTabByUrl = (title, url, menuItem = null) => {
     if (!url) return;
     
+    // Use the same logic as server-side menuItemClick function
     const fullUrl = navigationService.getFullUrl(url);
-    const existingTab = tabs.find(tab => tab.url === fullUrl);
-    if (existingTab) {
-      actions.setActiveTab(existingTab.id);
-    } else {
-      actions.addTab({
-        title,
-        url: fullUrl,
-        type: 'iframe',
-        icon: '🌐',
-        closable: true,
-      });
+    
+    // Check if it's a calendar URL
+    if (url.toLowerCase().indexOf('calendar.aspx') > -1) {
+      navigationService.openCalendar(fullUrl);
+      return;
     }
+    
+    // Check if it should open in new window (from menu item properties)
+    const isNewWindow = menuItem?.isNewWindow || false;
+    if (isNewWindow) {
+      navigationService.menuItemClickNewWindow(fullUrl);
+      return;
+    }
+    
+    // Use the standard menuItemClick function
+    navigationService.menuItemClick(fullUrl, title);
   };
 
   // Handle profile menu item clicks
@@ -549,7 +554,7 @@ const Navbar = () => {
                       onMouseLeave={() => setOpenMenuId(null)}
                     >
                       {menu.url && (
-                        <DropdownMenuItem onClick={() => openTabByUrl(menu.title, menu.url)} className="rounded-none font-medium px-4 py-2 hover:bg-[#e6f0fa] focus:bg-[#e6f0fa] hover:text-ocean-900 focus:text-ocean-900 cursor-pointer text-gray-800 transition-colors duration-150 flex items-center gap-2 whitespace-nowrap" style={{ fontFamily: 'inherit', fontSize: '13px', fontWeight: 500, lineHeight: '1.5' }}>
+                        <DropdownMenuItem onClick={() => openTabByUrl(menu.title, menu.url, menu)} className="rounded-none font-medium px-4 py-2 hover:bg-[#e6f0fa] focus:bg-[#e6f0fa] hover:text-ocean-900 focus:text-ocean-900 cursor-pointer text-gray-800 transition-colors duration-150 flex items-center gap-2 whitespace-nowrap" style={{ fontFamily: 'inherit', fontSize: '13px', fontWeight: 500, lineHeight: '1.5' }}>
                           <span>{menu.title} Home</span>
                         </DropdownMenuItem>
                       )}
