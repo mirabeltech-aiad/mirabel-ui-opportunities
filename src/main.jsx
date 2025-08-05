@@ -1,48 +1,42 @@
-import { StrictMode, Suspense, lazy } from 'react';
-import ReactDOM from 'react-dom/client';
-// import App from './App.jsx';
-import './styles/index.css';
-import { BrowserRouter } from 'react-router-dom';
-import AppRoutes from './routers/routes.jsx';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { ErrorBoundary } from 'react-error-boundary';
-import ErrorFallback from './components/shared/ErrorBoundary';
-import { GlobalProvider } from './store/GlobalContext';
-import { ThemeProvider } from './components/theme/ThemeProvider';
-const queryClient = new QueryClient();
+import { StrictMode } from "react";
+import ReactDOM from "react-dom/client";
+import App from "./App.jsx";
+import "../src/styles/index.css";
+import { initializeDesignSystem } from "./lib/styleManager";
 
-// Lazy-load Devtools only in development
-const ReactQueryDevtools =
-  import.meta.env.DEV &&
-  lazy(() =>
-    import('@tanstack/react-query-devtools').then((mod) => ({
-      default: mod.ReactQueryDevtools,
-    }))
-  );
+// Initialize design system on app start - ensures knowledge base styling is applied
+initializeDesignSystem();
 
-ReactDOM.createRoot(document.getElementById('root')).render(
+// Listen for auth logout events from axiosService interceptor (matches mirabel.mm.ui pattern)
+window.addEventListener("auth:logout", (event) => {
+
+  // Import session helpers dynamically to clear authentication data
+  import("./utils/sessionHelpers.js").then(({ resetSession }) => {
+    import("./utils/authHelpers.js").then(({ getMainLoginUrl }) => {
+      import("./utils/developmentHelper.js").then(({ isDevelopmentMode }) => {
+        resetSession();
+
+        // In development mode, don't redirect to login - just reload
+        if (isDevelopmentMode()) {
+          console.log(
+            "🔧 Development mode: Reloading instead of redirecting to login"
+          );
+          window.location.reload();
+          return;
+        }
+
+        // Redirect to login page using the helper function (production only)
+        const returnUrl = window.location.href;
+        const mainLoginUrl = getMainLoginUrl(returnUrl);
+        console.log("🔄 Main: Redirecting to login:", mainLoginUrl);
+        window.location.href = mainLoginUrl;
+      });
+    });
+  });
+});
+
+ReactDOM.createRoot(document.getElementById("root")).render(
   <StrictMode>
-    <ErrorBoundary
-      FallbackComponent={ErrorFallback}
-      onReset={() => {
-        // Optional: Reset logic (like clearing error state or retrying)
-        window.location.reload();
-      }}
-    >
-      <QueryClientProvider client={queryClient}>
-        <ThemeProvider>
-          <GlobalProvider>
-            <BrowserRouter basename="/modern">
-              <AppRoutes />
-            </BrowserRouter>
-            {import.meta.env.DEV && (
-              <Suspense fallback={null}>
-                <ReactQueryDevtools initialIsOpen={false} />
-              </Suspense>
-            )}
-          </GlobalProvider>
-        </ThemeProvider>
-      </QueryClientProvider>
-    </ErrorBoundary>
+    <App />
   </StrictMode>
 );

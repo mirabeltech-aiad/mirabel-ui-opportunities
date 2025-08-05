@@ -1,25 +1,23 @@
 // src/Routers/routeTree.js
 import { lazy } from 'react';
 
+const HomePage = lazy(() => import('../pages/HomePage'));
 const WelcomePage = lazy(() => import('../pages/Welcome'));
-const SiteWideSettingsPage = lazy(() => import('../pages/SiteWideSettingsPage'));
-const ReportsDashboardPage = lazy(() => import('../pages/ReportsDashboard'));
 
 export const routes = [
   {
     path: '/',
-    component: WelcomePage,
-    children: [],
+    component: HomePage,
     exact: true,
   },
-  // {
-  //   path: '/sitewidesettings',
-  //   component: SiteWideSettingsPage,
-  //   exact: true,
-  // },
-  // {
-  //   path: '/reportsdashboard',
-  //   component: ReportsDashboardPage,
-  //   exact: true,
-  // }
+  {
+    path: '/home',
+    component: HomePage,
+    exact: true,
+  },
+  {
+    path: '/welcome',
+    component: WelcomePage,
+    exact: true,
+  }
 ];
