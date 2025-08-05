@@ -401,7 +401,7 @@ export const HomeProvider = ({ children, sessionLoaded = false }) => {
       }
       
       const menus = await navigationService.fetchNavigationData(userId, navBarType);
-      
+      console.log('🔗 Navigation menus:', menus);
       // Ensure we always set some menu data, even if empty
       setNavigationMenus(menus || []);
     } catch (error) {
