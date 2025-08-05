@@ -89,7 +89,15 @@ export const NAVIGATION_API = {
 
 // Dashboard APIs
 export const DASHBOARD_API = {
-  USER_DASHBOARDS: '/services/User/Dashboards/false'
+  USER_DASHBOARDS: '/services/User/Dashboards/false',
+  SAVE_ACTIVE_DASHBOARD: '/services/User/Dashboard/SaveActiveDashboard/'
+};
+
+// Portal/Widget APIs
+export const PORTAL_API = {
+  USER_WIDGETS_GET_DETAILS: '/services/User/Widgets/',
+  GET_TITLES: 'GetTitles', // SPACTION_GETTITLES
+  PORTAL_INDEX_ALL: '-1' // For all portals
 };
 
 // FrontChat APIs

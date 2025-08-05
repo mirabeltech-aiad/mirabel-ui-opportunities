@@ -12,18 +12,11 @@ export const dashboardService = {
   getDashboards: async () => {
     try {
       const response = await axiosService.get(DASHBOARD_API.USER_DASHBOARDS);
-      
-      // Handle response structure variations
-      if (response?.content?.Status === 'Success' && response?.content?.List) {
-        return response.content.List;
-      }
-      
       if (response?.Status === 'Success' && response?.List) {
         return response.List;
-      }
-      
-      console.warn('Unexpected API response structure:', response);
-      return [];
+      }else{
+        return [];
+      }      
     } catch (error) {
       console.error('Error fetching dashboards:', error);
       return [];
@@ -46,6 +39,21 @@ export const dashboardService = {
    */
   getActiveDashboards: (dashboards) => {
     return dashboards.filter(dashboard => dashboard.IsActive === true);
+  },
+
+  /**
+   * Save active dashboard to API
+   * @param {string} endpoint - API endpoint for saving active dashboard
+   * @returns {Promise} API response
+   */
+  saveActiveDashboard: async (endpoint) => {
+    try {
+      const response = await axiosService.post(endpoint);
+      return response;
+    } catch (error) {
+      console.error('Error saving active dashboard:', error);
+      throw error;
+    }
   }
 };
 

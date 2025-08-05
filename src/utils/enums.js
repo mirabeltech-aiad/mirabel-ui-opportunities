@@ -208,3 +208,12 @@ export const ENUMS = {
   WIDGET_TYPES,
   CHART_TYPES
 };
+
+// Package Types - matching C# PackageTypes enum
+export const PACKAGE_TYPES = {
+    CRM: 1,
+    CRM_INT: 2,  // CRM_Int
+    MM: 3,
+    MES: 4,
+    // Add other package types as needed
+};
