@@ -28,6 +28,26 @@ const TabNavigation = memo(() => {
   // Context menu state
   const [contextMenu, setContextMenu] = useState({ visible: false, x: 0, y: 0, tabId: null });
   const contextMenuRef = useRef(null);
+  const tabBarRef = useRef(null);
+  const [availableWidth, setAvailableWidth] = useState(0);
+
+  // Calculate available width for tabs
+  useEffect(() => {
+    const updateAvailableWidth = () => {
+      if (tabBarRef.current) {
+        const tabBarWidth = tabBarRef.current.offsetWidth;
+        // Reserve space for fixed tabs, overflow menu, and padding
+        // Responsive reserved space based on screen size
+        const isSmallScreen = window.innerWidth < 768;
+        const reservedSpace = isSmallScreen ? 200 : 300; // Less space reserved on small screens
+        setAvailableWidth(Math.max(0, tabBarWidth - reservedSpace));
+      }
+    };
+
+    updateAvailableWidth();
+    window.addEventListener('resize', updateAvailableWidth);
+    return () => window.removeEventListener('resize', updateAvailableWidth);
+  }, []);
 
   // Hide context menu on click outside, scroll, or blur
   useEffect(() => {
@@ -68,6 +88,13 @@ const TabNavigation = memo(() => {
   const fixedTabsCount = 3; // Dropdown, Inbox, Search
   const fixedTabs = tabs.slice(0, fixedTabsCount); // first three tabs are fixed
   const draggableTabs = tabs.slice(fixedTabsCount); // tabs after the first three are draggable
+
+  // Calculate which draggable tabs should be visible based on available space
+  const isSmallScreen = window.innerWidth < 768;
+  const estimatedTabWidth = isSmallScreen ? 100 : 120; // Smaller tabs on small screens
+  const maxVisibleDraggableTabs = Math.floor(availableWidth / estimatedTabWidth);
+  const visibleDraggableTabs = draggableTabs.slice(0, maxVisibleDraggableTabs);
+  const overflowDraggableTabs = draggableTabs.slice(maxVisibleDraggableTabs);
 
   const handleDragEnd = (result) => {
     if (!result.destination) return;
@@ -141,11 +168,6 @@ const TabNavigation = memo(() => {
     setContextMenu((prev) => ({ ...prev, visible: false }));
   };
 
-  // Split tabs into visible and overflow
-  const maxVisibleTabs = 8;
-  const visibleTabs = tabs.slice(0, maxVisibleTabs);
-  const overflowTabs = tabs.slice(maxVisibleTabs);
-
   const handleDashboardSelect = async (dashboard) => {
     if (!dashboard) return;
     let url = dashboard.URL;
@@ -162,13 +184,26 @@ const TabNavigation = memo(() => {
       {/* Navbar */}
       <Navbar />
       {/* Tab Bar */}
-      <div className="bg-white border-b border-gray-200 flex items-center px-2 py-0 h-9 min-h-0" style={{ boxShadow: '0 1px 0 0 #e5e7eb', height: '28px', minHeight: '28px', fontFamily: 'inherit', fontSize: '13px', fontWeight: 500, lineHeight: '1.5' }}>
+      <div 
+        ref={tabBarRef}
+        className="bg-white border-b border-gray-200 flex items-center px-1 sm:px-2 py-0 h-9 min-h-0 overflow-hidden w-full" 
+        style={{ 
+          boxShadow: '0 1px 0 0 #e5e7eb', 
+          height: '28px', 
+          minHeight: '28px', 
+          fontFamily: 'inherit', 
+          fontSize: '13px', 
+          fontWeight: 500, 
+          lineHeight: '1.5',
+          maxWidth: '100vw'
+        }}
+      >
         {/* Sales Dashboard Dropdown as first fixed tab */}
         {fixedTabs.length > 0 && (
           <div
             key={fixedTabs[0].id}
             onContextMenu={(e) => handleContextMenu(e, fixedTabs[0].id)}
-            className={`flex items-center rounded transition-all duration-200 h-8 min-h-0 px-1 text-xs ${
+            className={`flex items-center rounded transition-all duration-200 h-8 min-h-0 px-1 text-xs flex-shrink-0 ${
               activeTabId === fixedTabs[0].id
                 ? 'bg-blue-100 text-blue-900 font-bold shadow-sm'
                 : 'bg-transparent hover:bg-gray-100 text-gray-700'
@@ -215,12 +250,12 @@ const TabNavigation = memo(() => {
           <div
             key={tab.id}
             onContextMenu={(e) => handleContextMenu(e, tab.id)}
-            className={`flex items-center rounded transition-all duration-200 h-8 min-h-0 px-1 text-xs ${
+            className={`flex items-center rounded transition-all duration-200 h-8 min-h-0 px-1 text-xs flex-shrink-0 ${
               activeTabId === tab.id
                 ? 'bg-blue-100 text-blue-900 font-bold shadow-sm'
                 : 'bg-transparent hover:bg-gray-100 text-gray-700'
             }`}
-            style={{ fontFamily: 'inherit', fontSize: '13px', fontWeight: 500, lineHeight: '1.5', border: 'none', boxShadow: activeTabId === tab.id ? '0 2px 8px rgba(0,0,0,0.04)' : 'none', marginRight: '1px', height: '24px', minHeight: '24px', paddingTop: '0', paddingBottom: '0' }}
+                                      style={{ fontFamily: 'inherit', fontSize: '13px', fontWeight: 500, lineHeight: '1.5', border: 'none', boxShadow: activeTabId === tab.id ? '0 2px 8px rgba(0,0,0,0.04)' : 'none', marginRight: '0px', height: '24px', minHeight: '24px', paddingTop: '0', paddingBottom: '0' }}
           >
             <div
               className="flex items-center px-1 py-0 cursor-pointer flex-1 h-8 min-h-0"
@@ -247,38 +282,39 @@ const TabNavigation = memo(() => {
           </div>
         ))}
 
-          {/* Draggable tabs (after the first two) */}
+        {/* Draggable tabs container with proper overflow handling */}
+        <div className="flex items-center flex-1 min-w-0 overflow-hidden">
           <DragDropContext onDragEnd={handleDragEnd}>
             <Droppable droppableId="tabs" direction="horizontal">
               {(provided) => (
                 <div
                   ref={provided.innerRef}
                   {...provided.droppableProps}
-                  className="flex items-center space-x-0.5 flex-1 min-w-0"
-                  style={{ gap: '1px' }}
+                  className="flex items-center space-x-0.5 min-w-0 overflow-hidden"
+                  style={{ gap: '0px' }}
                 >
-                  {draggableTabs.map((tab, index) => (
+                  {visibleDraggableTabs.map((tab, index) => (
                     <Draggable key={tab.id} draggableId={tab.id} index={index}>
                       {(provided, snapshot) => (
                         <div
                           ref={provided.innerRef}
                           {...provided.draggableProps}
                           onContextMenu={(e) => handleContextMenu(e, tab.id)}
-                          className={`flex items-center rounded transition-all duration-100 h-8 min-h-0 px-1 text-xs ${
+                          className={`flex items-center rounded transition-all duration-100 h-8 min-h-0 px-1 text-xs flex-shrink-0 ${
                             activeTabId === tab.id
                               ? 'bg-blue-100 text-blue-900 font-bold shadow-sm'
                               : 'bg-transparent hover:bg-gray-100 text-gray-700'
                           }${snapshot.isDragging ? ' opacity-90 shadow-lg' : ''}`}
-                          style={{ fontFamily: 'inherit', fontSize: '13px', fontWeight: 500, lineHeight: '1.5', border: 'none', boxShadow: activeTabId === tab.id ? '0 2px 8px rgba(0,0,0,0.04)' : 'none', marginRight: '1px', height: '24px', minHeight: '24px', paddingTop: '0', paddingBottom: '0' }}
+                          style={{ fontFamily: 'inherit', fontSize: '13px', fontWeight: 500, lineHeight: '1.5', border: 'none', boxShadow: activeTabId === tab.id ? '0 2px 8px rgba(0,0,0,0.04)' : 'none', marginRight: '0px', height: '24px', minHeight: '24px', paddingTop: '0', paddingBottom: '0', maxWidth: isSmallScreen ? '100px' : '120px', minWidth: isSmallScreen ? '60px' : '80px' }}
                         >
                           <div
                             {...provided.dragHandleProps}
-                            className="flex items-center px-1 py-0 cursor-pointer flex-1 h-8 min-h-0"
+                            className="flex items-center px-1 py-0 cursor-pointer flex-1 h-8 min-h-0 min-w-0"
                             onClick={() => handleTabClick(tab.id)}
                             style={{ fontSize: '13px' }}
                           >
-                            <span className="mr-0.5 text-xs flex items-center" style={{ fontSize: '13px' }}>{tab.icon}</span>
-                            <span className="text-xs font-medium truncate max-w-32 flex items-center" style={{ fontSize: '13px', marginRight: '2px' }}>
+                            <span className="mr-0.5 text-xs flex items-center flex-shrink-0" style={{ fontSize: '13px' }}>{tab.icon}</span>
+                            <span className="text-xs font-medium truncate flex items-center" style={{ fontSize: isSmallScreen ? '11px' : '12px', marginRight: '2px' }}>
                               {tab.title}
                             </span>
                           </div>
@@ -302,20 +338,22 @@ const TabNavigation = memo(() => {
               )}
             </Droppable>
           </DragDropContext>
+        </div>
 
-          {/* Overflow Menu */}
-          {overflowTabs.length > 0 && (
+        {/* Overflow Menu */}
+        {overflowDraggableTabs.length > 0 && (
+          <div className="flex-shrink-0">
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <button className="flex items-center px-2 py-1 rounded hover:bg-gray-100 transition-colors text-gray-600 bg-transparent" style={{ fontFamily: 'inherit', fontSize: '13px', fontWeight: 500, lineHeight: '1.5', height: '24px', minHeight: '24px', paddingTop: '0', paddingBottom: '0' }}>
                   <ChevronDown className="h-4 w-4" />
                   <span className="ml-1 text-xs" style={{ fontSize: '13px' }}>
-                    +{overflowTabs.length}
+                    +{overflowDraggableTabs.length}
                   </span>
                 </button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-48">
-                {overflowTabs.map((tab) => (
+                {overflowDraggableTabs.map((tab) => (
                   <DropdownMenuItem
                     key={tab.id}
                     onClick={() => handleTabClick(tab.id)}
@@ -342,8 +380,9 @@ const TabNavigation = memo(() => {
                 ))}
               </DropdownMenuContent>
             </DropdownMenu>
-          )}
-        </div>
+          </div>
+        )}
+      </div>
       {/* Context Menu */}
       {contextMenu.visible && (
         <div
