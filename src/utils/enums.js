@@ -251,3 +251,33 @@ export const PACKAGE_TYPES = {
     MES: 4,
     // Add other package types as needed
 };
+
+/**
+ * Email Sender Types - matches server-side EmailSender enum exactly
+ */
+export const EMAIL_SENDER = {
+  /**
+   * Contactology
+   */
+  CONTACTOLOGY: 1,
+  /**
+   * Campaigner
+   */
+  CAMPAIGNER: 2,
+  /**
+   * MailChimp
+   */
+  MAILCHIMP: 3,
+  /**
+   * Smtp
+   */
+  SMTP: 4,
+  /**
+   * Mirabel Email
+   */
+  MIRABEL_EMAIL: 5,
+  /**
+   * MailChimp Plus MKM
+   */
+  MAILCHIMP_PLUS_MKM: 6
+};

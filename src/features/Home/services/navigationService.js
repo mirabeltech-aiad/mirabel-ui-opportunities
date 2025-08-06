@@ -1,9 +1,9 @@
 import axiosService from '../../../services/axiosService';
 import { decrypt, authEncryptDecryptKey, logout } from '../../../utils/authHelpers';
-import { NAVIGATION_API, STATIC_URLS } from '../../../utils/apiUrls';
+import { NAVIGATION_API, STATIC_URLS, ADMIN_API } from '../../../utils/apiUrls';
 import { getTopPath } from '@/utils/commonHelpers';
 import { sessionValues } from '@/utils/developmentHelper';
-import { CLIENT_TYPE } from '@/utils/enums';
+import { CLIENT_TYPE, EMAIL_SENDER } from '@/utils/enums';
 
 /**
  * Navigation service for fetching dynamic navigation menus from the API
@@ -18,6 +18,120 @@ export const navigationService = {
    * Cache for API response data
    */
    _apiDataCache: null,
+
+
+
+  /**
+   * Verify if Mirabel Email Service is enabled - matches backend VerifyIsMirabelEmailServiceEnabled exactly
+   * @returns {Promise<Object>} Object with isMirabelEmailServiceEnabled, isRepNotificationEnabled, isMirabelEmailTransEnabled
+   */
+  verifyIsMirabelEmailServiceEnabled: async () => {
+    try {
+      // Get EmailSenderType, IsRepNotificationsEnabled, IsMirabelEmailTransSendEnabled from sitewide defaults
+      const response = await axiosService.post(ADMIN_API.SITEWIDE_SETTINGS_GET_COLUMNNAMES, "EmailSenderType,IsRepNotificationsEnabled,IsMirabelEmailTransSendEnabled");
+      if (response?.content?.JSONContent) {
+        // Parse the JSONContent string to get the actual data
+        const sitewideDefaults = JSON.parse(response.content.JSONContent);
+        
+        const isRepNotificationEnabled = sitewideDefaults.IsRepNotificationsEnabled === true || sitewideDefaults.IsRepNotificationsEnabled === 'True';
+        const isMirabelEmailTransEnabled = sitewideDefaults.IsMirabelEmailTransSendEnabled === true || sitewideDefaults.IsMirabelEmailTransSendEnabled === 'True';
+        
+        // EmailSenderType logic - matches backend EmailSenderType function exactly
+        const emailSenderType = parseInt(sitewideDefaults.EmailSenderType) || 0;
+        const isMKM = true; // We're in MKM context
+        
+        let emailSender;
+        if (isMKM) {
+          emailSender = emailSenderType === EMAIL_SENDER.MAILCHIMP_PLUS_MKM ? EMAIL_SENDER.MIRABEL_EMAIL : emailSenderType;
+        } else {
+          emailSender = emailSenderType === EMAIL_SENDER.MAILCHIMP_PLUS_MKM ? EMAIL_SENDER.MAILCHIMP : emailSenderType;
+        }
+        
+        // Determine if Mirabel Email Service is enabled - matches backend logic exactly
+        const isMirabelEmailServiceEnabled = emailSender === EMAIL_SENDER.MIRABEL_EMAIL || isRepNotificationEnabled;
+        
+        const result = {
+          isMirabelEmailServiceEnabled,
+          isRepNotificationEnabled,
+          isMirabelEmailTransEnabled
+        };
+        
+        // Update localStorage MMClientVars with the new values
+        navigationService.updateSessionData({
+          isMirabelEmailServiceEnabled: isMirabelEmailServiceEnabled,
+          isRepNotificationEnabled: isRepNotificationEnabled,
+          isMirabelEmailTransEnabled: isMirabelEmailTransEnabled
+        });
+        
+        return result;
+      } else {
+        return {
+          isMirabelEmailServiceEnabled: false,
+          isRepNotificationEnabled: false,
+          isMirabelEmailTransEnabled: false
+        };
+      }
+    } catch (error) {
+      return {
+        isMirabelEmailServiceEnabled: false,
+        isRepNotificationEnabled: false,
+        isMirabelEmailTransEnabled: false
+      };
+    }
+  },
+
+  /**
+   * Verify if Call Disposition is enabled - matches backend IsCallDispositionEnabled property exactly
+   * @returns {Promise<boolean>} Whether call disposition is enabled
+   */
+  verifyIsCallDispositionEnabled: async () => {
+    try {
+      // Get IsCallDispositionEnabled from sitewide defaults
+      const response = await axiosService.post(ADMIN_API.SITEWIDE_SETTINGS_GET_COLUMNNAMES, "IsCallDispositionEnabled");
+      if (response?.content?.JSONContent) {
+        const sitewideDefaults = JSON.parse(response.content.JSONContent);
+        const isCallDispositionEnabled = sitewideDefaults.IsCallDispositionEnabled === true || sitewideDefaults.IsCallDispositionEnabled === 'True';
+        
+        // Update localStorage MMClientVars with the new value
+        navigationService.updateSessionData({
+          isCallDispositionEnabled: isCallDispositionEnabled
+        });
+        
+        return isCallDispositionEnabled;
+      } else {
+        return false;
+      }
+    } catch (error) {
+      return false;
+    }
+  },
+
+  /**
+   * Initialize session data with new keys if they don't exist
+   * This ensures the new keys are available in localStorage
+   */
+  initializeSessionData: async () => {
+    try {
+      const sessionVars = navigationService.getSessionDetails();
+      
+      // Check if new keys exist, if not fetch them
+      if (sessionVars && 
+          sessionVars.isMirabelEmailServiceEnabled === undefined && 
+          sessionVars.isRepNotificationEnabled === undefined && 
+          sessionVars.isMirabelEmailTransEnabled === undefined &&
+          sessionVars.isCallDispositionEnabled === undefined) {
+        
+        // Fetch email service settings
+        await navigationService.verifyIsMirabelEmailServiceEnabled();
+        
+        // Fetch call disposition settings
+        await navigationService.verifyIsCallDispositionEnabled();
+        
+      }
+    } catch (error) {
+      console.error('❌ Error initializing session data:', error);
+    }
+  },
 
   /**
    * Fetch and decrypt API data for MarketingManagerSiteURL and EmailServiceSiteURL
@@ -163,7 +277,9 @@ export const navigationService = {
    */
   getEmailServiceSiteURL: async (emailServiceSiteURL='',sessionVars=null,url='') => {
     try {
-      const isMirabelEmailServiceEnabled = sessionVars.IsMirabelEmailServiceEnabled === true || sessionVars.IsMirabelEmailServiceEnabled === 'True';
+      // Get email service settings from localStorage - matches backend IsMirabelEmailServiceEnabled property
+      const isMirabelEmailServiceEnabled = sessionVars.isMirabelEmailServiceEnabled === true || sessionVars.isMirabelEmailServiceEnabled === 'True';
+      
       const isUserHasMKMAccess = sessionVars.IsUserHasMKMAccess === true || sessionVars.IsUserHasMKMAccess === 'True';
       const urlWithQuery = url + (url.includes("?") ? "&" : "?");
       const mesSiteURL = `${emailServiceSiteURL}${urlWithQuery}ISMKM=1&ISMES=1&FE=${isMirabelEmailServiceEnabled ? "1" : "0"}&ESFE=${isMirabelEmailServiceEnabled ? "1" : "0"}&MKMUA=${isUserHasMKMAccess ? "1" : "0"}`;
@@ -182,6 +298,8 @@ export const navigationService = {
       return [];
     }
     
+    // Initialize session data with new keys if needed
+    await navigationService.initializeSessionData();
 
     // Get session data from localStorage (MMClientVars)
     let sessionVars = {};
@@ -235,13 +353,15 @@ export const navigationService = {
     }
 
     // Helper: Permission/lock icon logic - matches backend logic exactly
-    function getMenuLockStatus(menu) {
+    async function getMenuLockStatus(menu) {
       let isLocked = false;
       let lockReason = '';
       
       // Call Disposition Report - check first as backend does
       if (menu.Caption === 'Call Disposition Report' || menu.URL === '/ui/Reports/CallDisposition') {
-        if (!sessionVars.IsCallDispositionEnabled) {
+        // Get call disposition settings from localStorage - matches backend IsCallDispositionEnabled property
+        const isCallDispositionEnabled = sessionVars.isCallDispositionEnabled === true || sessionVars.isCallDispositionEnabled === 'True';
+        if (!isCallDispositionEnabled) {
           isLocked = true;
           lockReason = 'CallDisposition';
         }
@@ -258,8 +378,12 @@ export const navigationService = {
       
       // MES logic - matches backend exactly
       if (menu.URLSource === 'MES') {
-        if ((sessionVars.IsMirabelEmailServiceEnabled === false || sessionVars.IsRepNotificationEnabled) || !sessionVars.IsUserHasMKMAccess) {
-          if (!(sessionVars.IsRepNotificationEnabled && (menu.Caption === 'Email Builder' || menu.Caption === 'Workflows'))) {
+        // Get email service settings from localStorage - matches backend IsMirabelEmailServiceEnabled property
+        const isMirabelEmailServiceEnabled = sessionVars.isMirabelEmailServiceEnabled === true || sessionVars.isMirabelEmailServiceEnabled === 'True';
+        const isRepNotificationEnabled = sessionVars.isRepNotificationEnabled === true || sessionVars.isRepNotificationEnabled === 'True';
+        
+        if ((isMirabelEmailServiceEnabled === false || isRepNotificationEnabled) || !sessionVars.IsUserHasMKMAccess) {
+          if (!(isRepNotificationEnabled && (menu.Caption === 'Email Builder' || menu.Caption === 'Workflows'))) {
             isLocked = true;
             lockReason = 'MES';
           }
@@ -283,7 +407,7 @@ export const navigationService = {
         .filter(menu => menu.ParentID === parentId)
         .map(async menu => {
           // Lock/permission logic
-          const { isLocked } = getMenuLockStatus(menu);
+          const { isLocked } = await getMenuLockStatus(menu);
           // Icon class
           const iconCls = getIconClass(menu, isLocked);
           // URL replacement
@@ -296,6 +420,16 @@ export const navigationService = {
             const marketingManagerSiteURL = await navigationService.getMarketingManagerSiteURL(apiData.MarketingManagerURL, sessionVars, menu.URL);
             url = marketingManagerSiteURL;
           } else if (urlSource === "MES") {
+            //Show the Lock Icon for MES links if MES is NOT Enabled OR logged in user has NO access to MKM
+            // Get email service settings from localStorage - matches backend IsMirabelEmailServiceEnabled property
+            const isMirabelEmailServiceEnabled = sessionVars.isMirabelEmailServiceEnabled === true || sessionVars.isMirabelEmailServiceEnabled === 'True';
+            const isRepNotificationEnabled = sessionVars.isRepNotificationEnabled === true || sessionVars.isRepNotificationEnabled === 'True';
+            
+            if ((isMirabelEmailServiceEnabled === false || isRepNotificationEnabled) || !sessionVars.IsUserHasMKMAccess) {
+              if (!(isRepNotificationEnabled && (menu.Caption === 'Email Builder' || menu.Caption === 'Workflows'))) {
+                // Lock icon is already handled in getMenuLockStatus
+              }
+            }
             // URL construction matches server-side: URL = string.Format(EmailServiceSiteURL, URL + (URL.Contains("?") ? "&" : "?"));
             const emailServiceSiteURL = await navigationService.getEmailServiceSiteURL(apiData.EmailServiceSiteURL, sessionVars, menu.URL);
             url = emailServiceSiteURL;
@@ -581,7 +715,7 @@ export const navigationService = {
     }
   },
 
-  /**
+   /**
    * Initialize navigation service with React tab system
    * This should be called when the Home component mounts
    * @param {Object} homeActions - The actions object from HomeContext

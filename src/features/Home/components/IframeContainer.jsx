@@ -28,14 +28,6 @@ const IframeContainer = memo(({
   // Get actions from HomeContext
   const { actions } = useHome();
 
-  // Debug logging to track component lifecycle
-  useEffect(() => {
-    console.log('🔄 IframeContainer: Mounted for', title, 'with URL:', url);
-    return () => {
-      console.log('🔄 IframeContainer: Unmounted for', title);
-    };
-  }, [title, url]);
-
   // Construct full URL by combining base domain with relative URL
   // Check if URL is already a complete URL (starts with http:// or https://)
   const isCompleteUrl = url && (url.startsWith('http://') || url.startsWith('https://'));

@@ -17,6 +17,7 @@ export const API_BASE = {
 export const ADMIN_API = {
   SITEWIDE_SETTINGS_GET: `${API_BASE.ADMIN}/SiteSettings/All`,
   SITEWIDE_SETTINGS_SAVE: `${API_BASE.ADMIN}/SiteSettings/DetailsSave`,
+  SITEWIDE_SETTINGS_GET_COLUMNNAMES: `${API_BASE.ADMIN}/SiteSettings/ColumnNames/`,
   CIRCULATION_TYPES: `${API_BASE.ADMIN}/Circulations/Types`,
   NAVIGATION_SETUP_GET: `${API_BASE.ADMIN}/Navigation/Setup/`,
   NAVIGATION_SETUP_UPDATE: `${API_BASE.ADMIN}/Navigation/Setup/Update`,
