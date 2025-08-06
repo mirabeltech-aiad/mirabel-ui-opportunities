@@ -211,19 +211,28 @@ const TabNavigation = memo(() => {
             style={{ fontFamily: 'inherit', fontSize: '13px', fontWeight: 500, lineHeight: '1.5', border: 'none', boxShadow: activeTabId === fixedTabs[0].id ? '0 2px 8px rgba(0,0,0,0.04)' : 'none', marginRight: '1px', height: '24px', minHeight: '24px', paddingTop: '0', paddingBottom: '0' }}
           >
             <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <button
-                  className={`px-2 py-1 rounded font-medium text-xs transition flex items-center h-8 min-h-0 ${
-                    activeTabId === 'dashboard' ? 'bg-blue-100 text-blue-900 font-bold shadow-sm' : 'bg-transparent text-gray-700 hover:bg-gray-100'
-                  }`}
-                  style={{ fontFamily: 'inherit', fontSize: '13px', fontWeight: 500, lineHeight: '1.5', minWidth: 120, border: 'none', boxShadow: activeTabId === 'dashboard' ? '0 2px 8px rgba(0,0,0,0.04)' : 'none', height: '24px', minHeight: '24px', paddingTop: '0', paddingBottom: '0' }}
+              <div
+                className={`px-2 py-1 rounded font-medium text-xs transition flex items-center h-8 min-h-0 ${
+                  activeTabId === 'dashboard' ? 'bg-blue-100 text-blue-900 font-bold shadow-sm' : 'bg-transparent text-gray-700 hover:bg-gray-100'
+                }`}
+                style={{ fontFamily: 'inherit', fontSize: '13px', fontWeight: 500, lineHeight: '1.5', minWidth: 120, border: 'none', boxShadow: activeTabId === 'dashboard' ? '0 2px 8px rgba(0,0,0,0.04)' : 'none', height: '24px', minHeight: '24px', paddingTop: '0', paddingBottom: '0' }}
+              >
+                <span
+                  className="flex-1 cursor-pointer"
                   onClick={() => handleTabClick('dashboard')}
                 >
                   {selectedDashboard ? selectedDashboard.DashBoardName : 'Sales Dashboard'}
-                  <ChevronDown className="ml-2 h-4 w-4" />
-                </button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="start" className="w-56 mt-2 bg-white border border-gray-100 p-0 text-gray-800 font-medium">
+                </span>
+                <DropdownMenuTrigger asChild>
+                  <button
+                    className="ml-2 p-0 hover:bg-gray-200 rounded transition-colors"
+                    style={{ background: 'none', border: 'none' }}
+                  >
+                    <ChevronDown className="h-4 w-4" />
+                  </button>
+                </DropdownMenuTrigger>
+              </div>
+              <DropdownMenuContent align="start" side="bottom" className="w-56 mt-1 bg-white border border-gray-100 p-0 text-gray-800 font-medium">
                 {dashboardsLoading ? (
                   <DropdownMenuItem disabled>Loading...</DropdownMenuItem>
                 ) : (
