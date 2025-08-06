@@ -496,7 +496,7 @@ const Navbar = () => {
     <>
       <nav className="navbar bg-ocean-gradient shadow-md h-12 overflow-hidden">
         <div className="w-full px-2 sm:px-4 lg:px-6 min-w-0">
-          <div className="flex items-center justify-between h-12 min-h-0 min-w-0">
+          <div className="flex items-center h-12 min-h-0 min-w-0">
             {/* Logo */}
             <div className="flex items-center min-h-0 flex-shrink-0">
               <div className="flex-shrink-0">
@@ -507,7 +507,7 @@ const Navbar = () => {
             </div>
             
             {/* Top Menus with Scrolling */}
-            <div className="ml-2 sm:ml-4 flex items-center min-h-0 flex-1 min-w-0 max-w-3xl">
+            <div className="flex items-center min-h-0 flex-1 min-w-0">
               {navigationMenus && Array.isArray(navigationMenus) && navigationMenus.length > 0 && (
                 <div className="flex items-center w-full min-w-0">
                   {/* Left Scroll Button */}
@@ -585,7 +585,7 @@ const Navbar = () => {
             </div>
 
             {/* Right Side */}
-            <div className="flex items-center space-x-1 sm:space-x-2 min-h-0 flex-shrink-0">            
+            <div className="flex items-center space-x-1 sm:space-x-2 min-h-0 flex-shrink-0 ml-auto">            
               {!navigationLoading && (
                 <div className="hidden sm:block">
                   <CustomerSearch />
