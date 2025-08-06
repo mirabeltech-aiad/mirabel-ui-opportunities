@@ -69,7 +69,7 @@ export const openPageInNextTab = (url, pageTitle, isQueryStrValEncoded, addTabAf
       icon: '🌐',
       closable: true
     };
-    
+    window.name = id;
     // Add the tab using the home context actions
     window.homeActions.addTab(tabData);
     
