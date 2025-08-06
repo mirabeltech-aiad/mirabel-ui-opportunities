@@ -64,7 +64,7 @@ const renderMenuItems = (items, openTabByUrl) => {
       return (
         <DropdownMenuItem
           key={item.id}
-          onClick={() => openTabByUrl(item.title, item.url)}
+          onClick={() => openTabByUrl(item.title, item.url, item)}
           className="rounded-none font-medium px-4 py-2 hover:bg-[#e6f0fa] focus:bg-[#e6f0fa] hover:text-ocean-900 focus:text-ocean-900 cursor-pointer text-gray-800 transition-colors duration-150 flex items-center gap-2 whitespace-nowrap"
           style={{ fontFamily: 'inherit', fontSize: '13px', fontWeight: 500, lineHeight: '1.5' }}
         >
@@ -121,7 +121,7 @@ const renderMenuItemOrSub = (item, openTabByUrl, expanded, setExpanded) => {
     return (
       <DropdownMenuItem
         key={item.id}
-        onClick={() => openTabByUrl(item.title, item.url)}
+        onClick={() => openTabByUrl(item.title, item.url, item)}
         className="rounded-none font-medium px-4 py-2 hover:bg-[#e6f0fa] focus:bg-[#e6f0fa] hover:text-ocean-900 focus:text-ocean-900 cursor-pointer text-gray-800 transition-colors duration-150 flex items-center gap-2 whitespace-nowrap"
         style={{ fontFamily: 'inherit', fontSize: '13px', fontWeight: 500, lineHeight: '1.5' }}
       >
@@ -291,22 +291,27 @@ const Navbar = () => {
     }
   }, [currentUser]);
 
-  const openTabByUrl = (title, url) => {
+  const openTabByUrl = (title, url, menuItem = null) => {
     if (!url) return;
     
+    // Use the same logic as server-side menuItemClick function
     const fullUrl = navigationService.getFullUrl(url);
-    const existingTab = tabs.find(tab => tab.url === fullUrl);
-    if (existingTab) {
-      actions.setActiveTab(existingTab.id);
-    } else {
-      actions.addTab({
-        title,
-        url: fullUrl,
-        type: 'iframe',
-        icon: '🌐',
-        closable: true,
-      });
+    
+    // Check if it's a calendar URL
+    if (url.toLowerCase().indexOf('calendar.aspx') > -1) {
+      navigationService.openCalendar(fullUrl);
+      return;
     }
+    
+    // Check if it should open in new window (from menu item properties)
+    const isNewWindow = menuItem?.isNewWindow || false;
+    if (isNewWindow) {
+      navigationService.menuItemClickNewWindow(fullUrl);
+      return;
+    }
+    
+    // Use the standard menuItemClick function
+    navigationService.menuItemClick(fullUrl, title);
   };
 
   // Handle profile menu item clicks
@@ -489,20 +494,22 @@ const Navbar = () => {
 
   return (
     <>
-      <nav className="navbar bg-ocean-gradient shadow-md h-12">
-        <div className="max-w-full px-2 sm:px-4 lg:px-6">
-          <div className="flex items-center justify-between h-12 min-h-0">
+      <nav className="navbar bg-ocean-gradient shadow-md h-12 overflow-hidden">
+        <div className="w-full px-2 sm:px-4 lg:px-6 min-w-0">
+          <div className="flex items-center h-12 min-h-0 min-w-0">
             {/* Logo */}
-            <div className="flex items-center min-h-0">
+            <div className="flex items-center min-h-0 flex-shrink-0">
               <div className="flex-shrink-0">
                 <div className="flex items-center">
                   <img src={logoUrl} alt="Logo" style={{ height: 32, marginRight:0 }} />
                 </div>
               </div>
+            </div>
+            
             {/* Top Menus with Scrolling */}
-            <div className="ml-4 flex items-center min-h-0 flex-1 max-w-3xl">
+            <div className="flex items-center min-h-0 flex-1 min-w-0">
               {navigationMenus && Array.isArray(navigationMenus) && navigationMenus.length > 0 && (
-                <div className="flex items-center w-full">
+                <div className="flex items-center w-full min-w-0">
                   {/* Left Scroll Button */}
                   {canScrollLeft && (
                     <button
@@ -517,7 +524,7 @@ const Navbar = () => {
                   {/* Scrollable Menu Container */}
                   <div 
                     ref={menuContainerRef}
-                    className="flex items-center space-x-1 overflow-x-auto flex-1 scrollbar-hide"
+                    className="flex items-center space-x-1 overflow-x-auto flex-1 scrollbar-hide min-w-0"
                     style={{ 
                       scrollbarWidth: 'none', 
                       msOverflowStyle: 'none',
@@ -536,7 +543,7 @@ const Navbar = () => {
                         style={{ fontSize: '13px' }}
                         onMouseEnter={() => setOpenMenuId(menu.id)}
                       >
-                        <span>{menu.title}</span>
+                        <span className="truncate">{menu.title}</span>
                       </button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent 
@@ -547,7 +554,7 @@ const Navbar = () => {
                       onMouseLeave={() => setOpenMenuId(null)}
                     >
                       {menu.url && (
-                        <DropdownMenuItem onClick={() => openTabByUrl(menu.title, menu.url)} className="rounded-none font-medium px-4 py-2 hover:bg-[#e6f0fa] focus:bg-[#e6f0fa] hover:text-ocean-900 focus:text-ocean-900 cursor-pointer text-gray-800 transition-colors duration-150 flex items-center gap-2 whitespace-nowrap" style={{ fontFamily: 'inherit', fontSize: '13px', fontWeight: 500, lineHeight: '1.5' }}>
+                        <DropdownMenuItem onClick={() => openTabByUrl(menu.title, menu.url, menu)} className="rounded-none font-medium px-4 py-2 hover:bg-[#e6f0fa] focus:bg-[#e6f0fa] hover:text-ocean-900 focus:text-ocean-900 cursor-pointer text-gray-800 transition-colors duration-150 flex items-center gap-2 whitespace-nowrap" style={{ fontFamily: 'inherit', fontSize: '13px', fontWeight: 500, lineHeight: '1.5' }}>
                           <span>{menu.title} Home</span>
                         </DropdownMenuItem>
                       )}
@@ -576,93 +583,96 @@ const Navbar = () => {
                 </div>
               )}
             </div>
-          </div>
 
-          {/* Right Side */}
-          <div className="flex items-center space-x-2 min-h-0">            
-            {!navigationLoading && (
-              <CustomerSearch />
-            )}
-            {/* Help Icon */}
-            <Button
-              variant="ghost"
-              size="sm"
-              className="h-9 w-9 rounded-full p-0 hover:bg-ocean-700 text-white"
-              onClick={actions.toggleHelp}
-              title="Help & Support"
-            >
-              <HelpCircle className="h-5 w-5" />
-            </Button>
+            {/* Right Side */}
+            <div className="flex items-center space-x-1 sm:space-x-2 min-h-0 flex-shrink-0 ml-auto">            
+              {!navigationLoading && (
+                <div className="hidden sm:block">
+                  <CustomerSearch />
+                </div>
+              )}
+              {/* Help Icon */}
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-9 w-9 rounded-full p-0 hover:bg-ocean-700 text-white flex-shrink-0"
+                onClick={actions.toggleHelp}
+                title="Help & Support"
+              >
+                <HelpCircle className="h-5 w-5" />
+              </Button>
 
-            {/* Bell Notification */}
-            <BellNotification 
-              onOpenAnnouncementsPanel={handleOpenAnnouncementsPanel} 
-              unreadCount={unreadCount}
-            />
+              {/* Bell Notification */}
+              <div className="flex-shrink-0">
+                <BellNotification 
+                  onOpenAnnouncementsPanel={handleOpenAnnouncementsPanel} 
+                  unreadCount={unreadCount}
+                />
+              </div>
 
-            {/* User Menu - Professional round profile icon */}
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <button 
-                  data-testid="profile-menu-button"
-                  className="flex items-center justify-center w-8 h-8 rounded-full bg-ocean-600 hover:bg-ocean-700 text-white font-semibold shadow border border-ocean-500 focus:outline-none focus:ring-0 transition-all duration-200 min-h-0"
-                >
-                  <User className="h-4 w-4" />
-                </button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-56 mt-2 rounded-lg shadow-lg border border-gray-200 p-0">
-                {/* Dark blue header section matching ASP.NET */}
-                <div className="bg-ocean-600 text-white px-4 py-3 rounded-t-lg">
-                  <div className="font-bold text-base">Welcome</div>
-                  <div className="text-sm text-ocean-100 mt-1">
-                    {currentUser?.fullName || currentUser?.FullName || getSessionValue('FullName') || getSessionValue('UserName') || 'System Administrator'}
+              {/* User Menu - Professional round profile icon */}
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <button 
+                    data-testid="profile-menu-button"
+                    className="flex items-center justify-center w-8 h-8 rounded-full bg-ocean-600 hover:bg-ocean-700 text-white font-semibold shadow border border-ocean-500 focus:outline-none focus:ring-0 transition-all duration-200 min-h-0 flex-shrink-0"
+                  >
+                    <User className="h-4 w-4" />
+                  </button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-56 mt-2 rounded-lg shadow-lg border border-gray-200 p-0">
+                  {/* Dark blue header section matching ASP.NET */}
+                  <div className="bg-ocean-600 text-white px-4 py-3 rounded-t-lg">
+                    <div className="font-bold text-base">Welcome</div>
+                    <div className="text-sm text-ocean-100 mt-1">
+                      {currentUser?.fullName || currentUser?.FullName || getSessionValue('FullName') || getSessionValue('UserName') || 'System Administrator'}
+                    </div>
                   </div>
-                </div>
-                
-                {/* White background menu items */}
-                <div className="bg-white rounded-b-lg">
-                  {getProfileMenus().map((item, idx) => {
-                    return item.separator ? (
-                      <DropdownMenuSeparator key={idx} className="my-1" />
-                    ) : (
-                      <DropdownMenuItem
-                        key={item.id}
-                        onClick={() => handleProfileMenuClick(item)}
-                        className="rounded-none font-medium cursor-pointer flex items-center text-gray-800 hover:bg-ocean-50 hover:text-ocean-700 px-4 py-2 mx-0"
-                        style={{ fontSize: '13px' }}
-                      >
-                        {item.icon && <item.icon className="h-4 w-4 mr-3 text-gray-600" />}
-                        <span>{item.title}</span>
-                      </DropdownMenuItem>
-                    );
-                  })}
-                </div>
-              </DropdownMenuContent>
-            </DropdownMenu>
+                  
+                  {/* White background menu items */}
+                  <div className="bg-white rounded-b-lg">
+                    {getProfileMenus().map((item, idx) => {
+                      return item.separator ? (
+                        <DropdownMenuSeparator key={idx} className="my-1" />
+                      ) : (
+                        <DropdownMenuItem
+                          key={item.id}
+                          onClick={() => handleProfileMenuClick(item)}
+                          className="rounded-none font-medium cursor-pointer flex items-center text-gray-800 hover:bg-ocean-50 hover:text-ocean-700 px-4 py-2 mx-0"
+                          style={{ fontSize: '13px' }}
+                        >
+                          {item.icon && <item.icon className="h-4 w-4 mr-3 text-gray-600" />}
+                          <span>{item.title}</span>
+                        </DropdownMenuItem>
+                      );
+                    })}
+                  </div>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </div>
           </div>
         </div>
-      </div>
+      </nav>
       
       {/* Announcements Side Panel */}
       <AnnouncementsSidePanel 
         isOpen={isAnnouncementsPanelOpen} 
         onClose={() => setIsAnnouncementsPanelOpen(false)} 
       />
-    </nav>
-    
-    {/* MM Integration Iframe (matching legacy ASP.NET) */}
-    {isMMIntegration && mmIntegrationSrc && (
-      <div>
-        <iframe src={mmIntegrationSrc} title="MM Integration" style={{ width: 0, height: 0, border: 0, display: 'none' }} />
-      </div>
-    )}
-    
-    {/* CRM Prospecting Panel (matching legacy ASP.NET) */}
-    {isCRMProspecting && crmProspectingUrl && (
-      <div>
-        <iframe src={crmProspectingUrl} title="Prospecting Dashboard" style={{ width: '100%', height: 400, border: '1px solid #ccc' }} />
-      </div>
-    )}
+      
+      {/* MM Integration Iframe (matching legacy ASP.NET) */}
+      {isMMIntegration && mmIntegrationSrc && (
+        <div>
+          <iframe src={mmIntegrationSrc} title="MM Integration" style={{ width: 0, height: 0, border: 0, display: 'none' }} />
+        </div>
+      )}
+      
+      {/* CRM Prospecting Panel (matching legacy ASP.NET) */}
+      {isCRMProspecting && crmProspectingUrl && (
+        <div>
+          <iframe src={crmProspectingUrl} title="Prospecting Dashboard" style={{ width: '100%', height: 400, border: '1px solid #ccc' }} />
+        </div>
+      )}
     </>
   );
 };

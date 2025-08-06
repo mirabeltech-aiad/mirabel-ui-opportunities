@@ -101,11 +101,11 @@ const CustomerSearch = () => {
   // Handle result selection
   const handleSelectResult = (result) => {
     
-    // Set the search query to the selected result's display name
-    setSearchQuery(result.DisplayName);
+    // Clear the search box immediately after selection
+    setSearchQuery('');
     setShowDropdown(false);
     setSelectedIndex(-1);
-    setSearchFlag(result.DisplayName);
+    setSearchFlag('');
     
     // Clear the input focus and move focus to menu button (matching legacy behavior)
     if (inputRef.current) {
@@ -143,6 +143,10 @@ const CustomerSearch = () => {
       const url = `/ui/ContactSearch?okToRun=YES&customer=${encodedSearch}`;
       openTabByUrl('Advanced Search', url);
     }
+    
+    // Clear the search box after navigation
+    setSearchQuery('');
+    setSearchFlag('');
   };
 
   // Handle focus (clear search flag)

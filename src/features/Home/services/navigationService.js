@@ -1,8 +1,9 @@
 import axiosService from '../../../services/axiosService';
 import { decrypt, authEncryptDecryptKey, logout } from '../../../utils/authHelpers';
-import { NAVIGATION_API, STATIC_URLS } from '../../../utils/apiUrls';
+import { NAVIGATION_API, STATIC_URLS, ADMIN_API } from '../../../utils/apiUrls';
 import { getTopPath } from '@/utils/commonHelpers';
 import { sessionValues } from '@/utils/developmentHelper';
+import { CLIENT_TYPE, EMAIL_SENDER } from '@/utils/enums';
 
 /**
  * Navigation service for fetching dynamic navigation menus from the API
@@ -17,6 +18,111 @@ export const navigationService = {
    * Cache for API response data
    */
    _apiDataCache: null,
+
+
+
+  /**
+   * Verify if Mirabel Email Service is enabled - matches backend VerifyIsMirabelEmailServiceEnabled exactly
+   * @returns {Promise<Object>} Object with isMirabelEmailServiceEnabled, isRepNotificationEnabled, isMirabelEmailTransEnabled
+   */
+  verifyIsMirabelEmailServiceEnabled: async () => {
+    try {
+      // Get EmailSenderType, IsRepNotificationsEnabled, IsMirabelEmailTransSendEnabled from sitewide defaults
+      const response = await axiosService.post(ADMIN_API.SITEWIDE_SETTINGS_GET_COLUMNNAMES, "EmailSenderType,IsRepNotificationsEnabled,IsMirabelEmailTransSendEnabled");
+      if (response?.content?.JSONContent) {
+        // Parse the JSONContent string to get the actual data
+        const sitewideDefaults = JSON.parse(response.content.JSONContent);
+        
+        const isRepNotificationEnabled = sitewideDefaults.IsRepNotificationsEnabled === true || sitewideDefaults.IsRepNotificationsEnabled === 'True';
+        const isMirabelEmailTransEnabled = sitewideDefaults.IsMirabelEmailTransSendEnabled === true || sitewideDefaults.IsMirabelEmailTransSendEnabled === 'True';
+        
+        // EmailSenderType logic - matches backend EmailSenderType function exactly
+        const emailSenderType = parseInt(sitewideDefaults.EmailSenderType) || 0;
+        const isMKM = true; // We're in MKM context
+        
+        let emailSender;
+        if (isMKM) {
+          emailSender = emailSenderType === EMAIL_SENDER.MAILCHIMP_PLUS_MKM ? EMAIL_SENDER.MIRABEL_EMAIL : emailSenderType;
+        } else {
+          emailSender = emailSenderType === EMAIL_SENDER.MAILCHIMP_PLUS_MKM ? EMAIL_SENDER.MAILCHIMP : emailSenderType;
+        }
+        
+        // Determine if Mirabel Email Service is enabled - matches backend logic exactly
+        const isMirabelEmailServiceEnabled = emailSender === EMAIL_SENDER.MIRABEL_EMAIL || isRepNotificationEnabled;
+        
+        const result = {
+          isMirabelEmailServiceEnabled,
+          isRepNotificationEnabled,
+          isMirabelEmailTransEnabled
+        };
+        
+        // Update localStorage MMClientVars with the new values
+        navigationService.updateSessionData({
+          isMirabelEmailServiceEnabled: isMirabelEmailServiceEnabled,
+          isRepNotificationEnabled: isRepNotificationEnabled,
+          isMirabelEmailTransEnabled: isMirabelEmailTransEnabled
+        });
+        
+        return result;
+      } else {
+        return {
+          isMirabelEmailServiceEnabled: false,
+          isRepNotificationEnabled: false,
+          isMirabelEmailTransEnabled: false
+        };
+      }
+    } catch (error) {
+      return {
+        isMirabelEmailServiceEnabled: false,
+        isRepNotificationEnabled: false,
+        isMirabelEmailTransEnabled: false
+      };
+    }
+  },
+
+  /**
+   * Verify if Call Disposition is enabled - matches backend IsCallDispositionEnabled property exactly
+   * @returns {Promise<boolean>} Whether call disposition is enabled
+   */
+  verifyIsCallDispositionEnabled: async () => {
+    try {
+      // Get IsCallDispositionEnabled from sitewide defaults
+      const response = await axiosService.post(ADMIN_API.SITEWIDE_SETTINGS_GET_COLUMNNAMES, "IsCallDispositionEnabled");
+      if (response?.content?.JSONContent) {
+        const sitewideDefaults = JSON.parse(response.content.JSONContent);
+        const isCallDispositionEnabled = sitewideDefaults.IsCallDispositionEnabled === true || sitewideDefaults.IsCallDispositionEnabled === 'True';
+        
+        // Update localStorage MMClientVars with the new value
+        navigationService.updateSessionData({
+          isCallDispositionEnabled: isCallDispositionEnabled
+        });
+        
+        return isCallDispositionEnabled;
+      } else {
+        return false;
+      }
+    } catch (error) {
+      return false;
+    }
+  },
+
+  /**
+   * Initialize session data with new keys if they don't exist
+   * This ensures the new keys are available in localStorage
+   */
+  initializeSessionData: async () => {
+    try {
+     
+        // Fetch email service settings
+        await navigationService.verifyIsMirabelEmailServiceEnabled();
+        
+        // Fetch call disposition settings
+        await navigationService.verifyIsCallDispositionEnabled();
+        
+    } catch (error) {
+      console.error('❌ Error initializing session data:', error);
+    }
+  },
 
   /**
    * Fetch and decrypt API data for MarketingManagerSiteURL and EmailServiceSiteURL
@@ -135,18 +241,17 @@ export const navigationService = {
    * Get MarketingManagerSiteURL - matches backend logic exactly
    * @param {string} mkmSiteURL - Base MKM site URL
    * @param {Object} sessionVars - Optional session variables to reuse
+   * @param {string} url - The menu URL to append
    * @returns {Promise<string>} Constructed MKM URL
    */
-  getMarketingManagerSiteURL: async (mkmSiteURL='',sessionVars=null) => {
+  getMarketingManagerSiteURL: async (mkmSiteURL='',sessionVars=null,url='') => {
     try {
       const isSiteMKMEnabled = sessionVars.IsSiteMKMEnabled === true || sessionVars.IsSiteMKMEnabled === 'True';
       const isUserHasMKMAccess = sessionVars.IsUserHasMKMAccess === true || sessionVars.IsUserHasMKMAccess === 'True';
       const isSiteDataPackEnabled = sessionVars.IsSiteDataPackEnabled === true || sessionVars.IsSiteDataPackEnabled === 'True';
-      const isUserHasDataPackAccess = sessionVars.IsUserHasDataPackAccess === true || sessionVars.IsUserHasDataPackAccess === 'True';
-      
-      // Construct URL exactly as backend does
-      const mkmURL = `${mkmSiteURL}{0}ISMKM=1&FE=${isSiteMKMEnabled ? "1" : "0"}&MKMFE=${isSiteMKMEnabled ? "1" : "0"}&MKMUA=${isUserHasMKMAccess ? "1" : "0"}&DPFE=${isSiteDataPackEnabled ? "1" : "0"}&DPUA=${isUserHasDataPackAccess ? "1" : "0"}`;
-
+      const isUserHasDataPackAccess = sessionVars.IsUserHasDataPackAccess === true || sessionVars.IsUserHasDataPackAccess === 'True';      
+      const urlWithQuery = url + (url.includes("?") ? "&" : "?");
+      const mkmURL = `${mkmSiteURL}${urlWithQuery}ISMKM=1&FE=${isSiteMKMEnabled ? "1" : "0"}&MKMFE=${isSiteMKMEnabled ? "1" : "0"}&MKMUA=${isUserHasMKMAccess ? "1" : "0"}&DPFE=${isSiteDataPackEnabled ? "1" : "0"}&DPUA=${isUserHasDataPackAccess ? "1" : "0"}`;
       return mkmURL;
     } catch (error) {
       console.error('❌ Error getting MarketingManagerSiteURL:', error);
@@ -158,18 +263,20 @@ export const navigationService = {
    * Get EmailServiceSiteURL - matches backend logic exactly
    * @param {string} emailServiceSiteURL - Base email service site URL
    * @param {Object} sessionVars - Optional session variables to reuse
+   * @param {string} url - The menu URL to append
    * @returns {Promise<string>} Constructed MES URL
    */
-  getEmailServiceSiteURL: async (emailServiceSiteURL='',sessionVars=null) => {
+  getEmailServiceSiteURL: async (emailServiceSiteURL='',sessionVars=null,url='') => {
     try {
-      const isMirabelEmailServiceEnabled = sessionVars.IsMirabelEmailServiceEnabled === true || sessionVars.IsMirabelEmailServiceEnabled === 'True';
+      // Get email service settings from localStorage - matches backend IsMirabelEmailServiceEnabled property
+      const isMirabelEmailServiceEnabled = sessionVars.isMirabelEmailServiceEnabled === true || sessionVars.isMirabelEmailServiceEnabled === 'True';
+      
       const isUserHasMKMAccess = sessionVars.IsUserHasMKMAccess === true || sessionVars.IsUserHasMKMAccess === 'True';
-      
-      // Construct URL exactly as backend does
-      const mesSiteURL = `${emailServiceSiteURL}{0}ISMKM=1&ISMES=1&FE=${isMirabelEmailServiceEnabled ? "1" : "0"}&ESFE=${isMirabelEmailServiceEnabled ? "1" : "0"}&MKMUA=${isUserHasMKMAccess ? "1" : "0"}`;
-      
+      const urlWithQuery = url + (url.includes("?") ? "&" : "?");
+      const mesSiteURL = `${emailServiceSiteURL}${urlWithQuery}ISMKM=1&ISMES=1&FE=${isMirabelEmailServiceEnabled ? "1" : "0"}&ESFE=${isMirabelEmailServiceEnabled ? "1" : "0"}&MKMUA=${isUserHasMKMAccess ? "1" : "0"}`;
       return mesSiteURL;
     } catch (error) {
+      console.error('❌ Error getting EmailServiceSiteURL:', error);
       return '';
     }
   },
@@ -182,6 +289,8 @@ export const navigationService = {
       return [];
     }
     
+    // Initialize session data with new keys if needed
+    await navigationService.initializeSessionData();
 
     // Get session data from localStorage (MMClientVars)
     let sessionVars = {};
@@ -235,13 +344,15 @@ export const navigationService = {
     }
 
     // Helper: Permission/lock icon logic - matches backend logic exactly
-    function getMenuLockStatus(menu) {
+    async function getMenuLockStatus(menu) {
       let isLocked = false;
       let lockReason = '';
       
       // Call Disposition Report - check first as backend does
       if (menu.Caption === 'Call Disposition Report' || menu.URL === '/ui/Reports/CallDisposition') {
-        if (!sessionVars.IsCallDispositionEnabled) {
+        // Get call disposition settings from localStorage - matches backend IsCallDispositionEnabled property
+        const isCallDispositionEnabled = sessionVars.isCallDispositionEnabled === true || sessionVars.isCallDispositionEnabled === 'True';
+        if (!isCallDispositionEnabled) {
           isLocked = true;
           lockReason = 'CallDisposition';
         }
@@ -258,8 +369,12 @@ export const navigationService = {
       
       // MES logic - matches backend exactly
       if (menu.URLSource === 'MES') {
-        if ((sessionVars.IsMirabelEmailServiceEnabled === false || sessionVars.IsRepNotificationEnabled) || !sessionVars.IsUserHasMKMAccess) {
-          if (!(sessionVars.IsRepNotificationEnabled && (menu.Caption === 'Email Builder' || menu.Caption === 'Workflows'))) {
+        // Get email service settings from localStorage - matches backend IsMirabelEmailServiceEnabled property
+        const isMirabelEmailServiceEnabled = sessionVars.isMirabelEmailServiceEnabled === true || sessionVars.isMirabelEmailServiceEnabled === 'True';
+        const isRepNotificationEnabled = sessionVars.isRepNotificationEnabled === true || sessionVars.isRepNotificationEnabled === 'True';
+        
+        if ((isMirabelEmailServiceEnabled === false || isRepNotificationEnabled) || !sessionVars.IsUserHasMKMAccess) {
+          if (!(isRepNotificationEnabled && (menu.Caption === 'Email Builder' || menu.Caption === 'Workflows'))) {
             isLocked = true;
             lockReason = 'MES';
           }
@@ -277,40 +392,39 @@ export const navigationService = {
       return menu.IconCls || '';
     }
 
-    // Helper: Insert menu URL into base URL at {0} placeholder - matches backend exactly
-    function insertMenuUrlAtPlaceholder(baseUrl, menuUrl) {
-      if (!baseUrl || !menuUrl) return baseUrl || menuUrl;
-      // Add ? or & as in C# logic
-      const urlWithQuery = menuUrl + (menuUrl.includes('?') ? '&' : '?');
-      if (baseUrl.includes('{0}')) {
-        return baseUrl.replace('{0}', urlWithQuery);
-      }
-      // fallback: just concatenate
-      return baseUrl.replace(/\/$/, '') + '/' + menuUrl.replace(/^\//, '');
-    }
-
-    // Helper: recursively build children
+   // Helper: recursively build children
     async function buildMenuTree(parentId) {
       const menuPromises = menus
         .filter(menu => menu.ParentID === parentId)
         .map(async menu => {
           // Lock/permission logic
-          const { isLocked } = getMenuLockStatus(menu);
+          const { isLocked } = await getMenuLockStatus(menu);
           // Icon class
           const iconCls = getIconClass(menu, isLocked);
           // URL replacement
           let url = replaceSessionVarsInUrl(menu.URL);
           
           // Special URL handling for MKM/MES - matches backend exactly
-          if ((menu.URLSource === 'MKM' || menu.URLSource === 'MKM-DATA') && url) {
-            const marketingManagerSiteURL = await navigationService.getMarketingManagerSiteURL(apiData.MarketingManagerURL,sessionVars);
-            url = insertMenuUrlAtPlaceholder(marketingManagerSiteURL, url);
-          } else if (menu.URLSource === 'MES' && url) {
-            // const emailServiceSiteURL = apiData.EmailServiceSiteURL || '';
-            const emailServiceSiteURL = await navigationService.getEmailServiceSiteURL(apiData.EmailServiceSiteURL,sessionVars);
-            url = insertMenuUrlAtPlaceholder(emailServiceSiteURL, url);
-          }
-          
+          const urlSource = (menu.URLSource || '').toString().toUpperCase();
+          if (urlSource === CLIENT_TYPE.MKM || urlSource === "MKM-DATA") {
+            // URL construction matches server-side: URL = string.Format(MarketingManagerSiteURL, URL + (URL.Contains("?") ? "&" : "?"));
+            const marketingManagerSiteURL = await navigationService.getMarketingManagerSiteURL(apiData.MarketingManagerURL, sessionVars, menu.URL);
+            url = marketingManagerSiteURL;
+          } else if (urlSource === "MES") {
+            //Show the Lock Icon for MES links if MES is NOT Enabled OR logged in user has NO access to MKM
+            // Get email service settings from localStorage - matches backend IsMirabelEmailServiceEnabled property
+            const isMirabelEmailServiceEnabled = sessionVars.isMirabelEmailServiceEnabled === true || sessionVars.isMirabelEmailServiceEnabled === 'True';
+            const isRepNotificationEnabled = sessionVars.isRepNotificationEnabled === true || sessionVars.isRepNotificationEnabled === 'True';
+            
+            if ((isMirabelEmailServiceEnabled === false || isRepNotificationEnabled) || !sessionVars.IsUserHasMKMAccess) {
+              if (!(isRepNotificationEnabled && (menu.Caption === 'Email Builder' || menu.Caption === 'Workflows'))) {
+                // Lock icon is already handled in getMenuLockStatus
+              }
+            }
+            // URL construction matches server-side: URL = string.Format(EmailServiceSiteURL, URL + (URL.Contains("?") ? "&" : "?"));
+            const emailServiceSiteURL = await navigationService.getEmailServiceSiteURL(apiData.EmailServiceSiteURL, sessionVars, menu.URL);
+            url = emailServiceSiteURL;
+          }           
           // Tooltip
           const toolTip = menu.ToolTip || '';
           // Special click handling
@@ -325,7 +439,7 @@ export const navigationService = {
             url,
             sortOrder: menu.SortOrder,
             isAdmin: menu.IsAdmin,
-            isNewWindow,
+            isNewWindow: !!menu.IsNewWindow,
             isVisible: menu.IsVisible,
             icon: menu.Icon,
             iconCls,
@@ -334,7 +448,13 @@ export const navigationService = {
             isCalendar,
             urlSource: menu.URLSource,
             children,
-            fullUrl: navigationService.getFullUrl(url)
+            fullUrl: navigationService.getFullUrl(url),
+            // Additional properties to match server-side CreateMenu function
+            caption: menu.Caption,
+            toolTip: menu.ToolTip || '',
+            iconClass: iconCls,
+            hideOnClick: children.length > 0 ? false : true,
+            menuHideDelay: children.length > 0 ? 0 : 1000
           };
         });
       
@@ -463,7 +583,7 @@ export const navigationService = {
     // Decode URL
     const decodedURL = decodeURIComponent(pageURL);
     
-    // Check if it's a tablet/phone (you'll need to implement this)
+    // Check if it's a tablet/phone
     const isTabletOrPhone = navigationService.checkAndOpenPageForTablet(decodedURL, caption);
     
     if (!isTabletOrPhone) {
@@ -488,14 +608,34 @@ export const navigationService = {
     const isTabletOrPhone = navigationService.checkAndOpenPageForTablet(decodedURL, 'Calendar');
     
     if (!isTabletOrPhone) {
-      // Check if calendar tab already exists
-      const existingCalendarTab = document.getElementById('TabCalendar');
-      if (existingCalendarTab) {
-        // Calendar tab already open - activate it
-        // TODO: Implement tab activation logic
+      // Check if calendar tab already exists using React tab system
+      if (window.homeActions) {
+        const existingTabs = window.homeActions.getTabs ? window.homeActions.getTabs() : [];
+        const existingCalendarTab = existingTabs.find(tab => tab.id === 'TabCalendar');
+        
+        if (existingCalendarTab) {
+          // Calendar tab already open - activate it
+          window.homeActions.setActiveTab('TabCalendar');
+          // Refresh the calendar content
+          if (window.homeActions.refreshTab) {
+            window.homeActions.refreshTab('TabCalendar');
+          }
+        } else {
+          // Create new calendar tab
+          const calendarTabData = {
+            id: 'TabCalendar',
+            title: 'Calendar',
+            url: decodedURL,
+            type: 'iframe',
+            icon: '📅',
+            closable: true
+          };
+          window.homeActions.addTab(calendarTabData);
+          window.homeActions.setActiveTab('TabCalendar');
+        }
       } else {
-        // Create new calendar tab
-        // TODO: Implement calendar tab creation logic
+        // Fallback to opening in new window if home actions not available
+        window.open(decodedURL, '_blank', '');
       }
     }
   },
@@ -507,8 +647,16 @@ export const navigationService = {
    * @returns {boolean} True if handled for tablet/phone
    */
   checkAndOpenPageForTablet: (url, caption) => {
-    // Detect if device is tablet or phone
-    const isTabletOrPhone = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+    // Get tablet/phone status from session or detect
+    let isTabletOrPhone = false;
+    
+    try {
+      const mmClientVars = JSON.parse(localStorage.getItem('MMClientVars') || '{}');
+      isTabletOrPhone = mmClientVars.isTabletOrPhone === 'True' || mmClientVars.isTabletOrPhone === true;
+    } catch (error) {
+      // Fallback to user agent detection
+      isTabletOrPhone = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+    }
     
     if (isTabletOrPhone) {
       // For tablet/phone, open in new window
@@ -520,16 +668,28 @@ export const navigationService = {
   },
 
   /**
-   * Add new tab to home panel
+   * Add new tab to home panel - integrates with React tab system
    * @param {string} url - URL to open
    * @param {string} caption - Tab caption
    */
   addNewTabToHomePanel: (url, caption) => {
-    // TODO: Implement tab management logic
-    // This should integrate with your React tab system
-    
-    // For now, just open in new window
-    window.open(url, '_blank', '');
+    if (window.homeActions && window.homeActions.addTab) {
+      // Use React tab system
+      const tabData = {
+        title: caption || 'New Tab',
+        url: url,
+        type: 'iframe',
+        icon: '🌐',
+        closable: true
+      };
+      
+      window.homeActions.addTab(tabData);
+      console.log('✅ Added tab to home panel:', tabData);
+    } else {
+      // Fallback to opening in new window
+      console.warn('⚠️ Home actions not available, opening in new window');
+      window.open(url, '_blank', '');
+    }
   },
 
   /**
@@ -546,6 +706,47 @@ export const navigationService = {
     }
   },
 
+   /**
+   * Initialize navigation service with React tab system
+   * This should be called when the Home component mounts
+   * @param {Object} homeActions - The actions object from HomeContext
+   */
+  initializeWithReactTabs: (homeActions) => {
+    // Store home actions globally for access by navigation functions
+    window.homeActions = homeActions;
+    
+    // Expose navigation functions globally to match server-side behavior
+    window.menuItemClick = navigationService.menuItemClick;
+    window.menuItemClickNewWindow = navigationService.menuItemClickNewWindow;
+    window.openCalendar = navigationService.openCalendar;
+    window.checkAndOpenPageForTablet = navigationService.checkAndOpenPageForTablet;
+    window.addNewTabToHomePanel = navigationService.addNewTabToHomePanel;
+    window.getDecodedURI = navigationService.getDecodedURI;
+    
+    // Expose test function for URL construction verification
+    window.testUrlConstruction = navigationService.testUrlConstruction;
+    
+    console.log('✅ Navigation service initialized with React tab system');
+    console.log('🧪 To test URL construction, run: testUrlConstruction()');
+  },
+
+  /**
+   * Cleanup navigation service
+   * This should be called when the Home component unmounts
+   */
+  cleanup: () => {
+    // Remove global references
+    delete window.homeActions;
+    delete window.menuItemClick;
+    delete window.menuItemClickNewWindow;
+    delete window.openCalendar;
+    delete window.checkAndOpenPageForTablet;
+    delete window.addNewTabToHomePanel;
+    delete window.getDecodedURI;
+    
+    console.log('✅ Navigation service cleaned up');
+  },
+
 getSessionValue: (key) => {
   try {
     const mmClientVarsRaw = JSON.parse(localStorage.getItem("MMClientVars"));
@@ -554,7 +755,7 @@ getSessionValue: (key) => {
   } catch {
     return '';
   }
-}
+  }
 };
 
 export default navigationService; 

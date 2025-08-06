@@ -209,6 +209,40 @@ export const ENUMS = {
   CHART_TYPES
 };
 
+/**
+ * Client Type Enum - matches server-side ClientType enum exactly
+ */
+export const CLIENT_TYPE = {
+  /**
+   * The Magazine Manager
+   */
+  TMM: 'TMM',
+  /**
+   * Marketing Manager
+   */
+  MKM: 'MKM',
+  /**
+   * News Paper Manager
+   */
+  NPM: 'NPM',
+  /**
+   * Mirabel Customer Portal
+   */
+  MCP: 'MCP',
+  /**
+   * Mirabel Subscription Checkout Page
+   */
+  MSCP: 'MSCP',
+  /**
+   * Mirabel Self Service Portal
+   */
+  MSSP: 'MSSP',
+  /**
+   * Mirabel Subscription Page (MM)
+   */
+  MSP: 'MSP'
+};
+
 // Package Types - matching C# PackageTypes enum
 export const PACKAGE_TYPES = {
     CRM: 1,
@@ -216,4 +250,34 @@ export const PACKAGE_TYPES = {
     MM: 3,
     MES: 4,
     // Add other package types as needed
+};
+
+/**
+ * Email Sender Types - matches server-side EmailSender enum exactly
+ */
+export const EMAIL_SENDER = {
+  /**
+   * Contactology
+   */
+  CONTACTOLOGY: 1,
+  /**
+   * Campaigner
+   */
+  CAMPAIGNER: 2,
+  /**
+   * MailChimp
+   */
+  MAILCHIMP: 3,
+  /**
+   * Smtp
+   */
+  SMTP: 4,
+  /**
+   * Mirabel Email
+   */
+  MIRABEL_EMAIL: 5,
+  /**
+   * MailChimp Plus MKM
+   */
+  MAILCHIMP_PLUS_MKM: 6
 };

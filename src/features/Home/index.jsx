@@ -34,7 +34,7 @@ const Home = () => {
 
   return isSessionLoaded ? (
     <HomeProvider sessionLoaded={true}>
-     {isSessionLoaded && ( <div className="min-h-screen bg-gray-50">
+     {isSessionLoaded && ( <div className="min-h-screen bg-gray-50 w-full overflow-x-hidden">
         <TabNavigation />
         <HelpSystem />
        <TermsAndConditionsModalWrapper />

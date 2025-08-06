@@ -59,10 +59,11 @@ const TabContent = () => {
             contentMap[tab.id] = (
               <iframe
                 src={tab.url}
-                className="w-full h-full border-0"
+                className="w-full h-full border-0 min-w-0"
                 title={tab.title}
                 data-tab-id={tab.id}
                 key={tab.id} // Use tab.id as key to preserve iframe state
+                style={{ maxWidth: '100vw', overflow: 'hidden' }}
               />
             );
           } else {

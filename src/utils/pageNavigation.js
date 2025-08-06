@@ -47,10 +47,23 @@ export const openPageInNextTab = (url, pageTitle, isQueryStrValEncoded, addTabAf
     return null;
   }
   
+  // Generate unique tab ID using timestamp
+  const time = new Date();
+  const index = "_" + time.getYear() + time.getMonth() + time.getDay() + time.getHours() + time.getMinutes() + time.getSeconds() + "";
+  const id = "Tab" + index;
+  
+  // Get page title from MMClientMessage if empty
+  if (pageTitle == '' || pageTitle == undefined) {
+    const messageWindow =  window.top ;
+    const magazineManagerText = (messageWindow.MMClientMessage && messageWindow.MMClientMessage.MagazineManager);
+    pageTitle = magazineManagerText + " " + index;
+  }
+  
   // Get the tab system actions from the global context
   if (window.homeActions && window.homeActions.addTab) {
     const tabData = {
-      title: pageTitle || 'New Tab',
+      id: id,
+      title: pageTitle,
       url: url,
       type: 'iframe',
       icon: '🌐',
@@ -91,6 +104,7 @@ export const initializePageNavigation = (homeActions) => {
     window.top.openPage = openPage;
     window.top.openPageInNextTab = openPageInNextTab;
     window.top.isWindowTopAccessible = isWindowTopAccessible;
+    window.top.renameTab = renameTab;
     
     console.log('Page navigation helpers exposed on window.top');
   } else {
@@ -102,6 +116,50 @@ export const initializePageNavigation = (homeActions) => {
   
   // Initialize message event listeners for iframe communication
   initializeMessageListeners();
+};
+
+/**
+ * Renames a tab by updating its title
+ * @param {string} newName - The new name/title for the tab
+ * @param {string} tabId - The ID of the tab to rename (optional, uses active tab if not provided)
+ */
+export const renameTab = (newName, tabId) => {
+  console.log('renameTab called with:', { newName, tabId });
+  
+
+  
+  // Get the tab system actions from the global context
+  if (window.homeActions && window.homeActions.updateTab) {
+    // If tabId is provided, update that specific tab
+    if (tabId) {
+      const success = window.homeActions.updateTab(tabId, { title: newName });
+      if (success) {
+        console.log('renameTab: Tab renamed successfully:', { tabId, newName });
+        return true;
+      } else {
+        console.warn('renameTab: Failed to find tab with ID:', tabId);
+        return false;
+      }
+    } else {
+      // If no tabId provided, update the active tab
+      if (window.homeActions.updateActiveTab) {
+        const success = window.homeActions.updateActiveTab({ title: newName });
+        if (success) {
+          console.log('renameTab: Active tab renamed successfully:', newName);
+          return true;
+        } else {
+          console.warn('renameTab: Failed to rename active tab');
+          return false;
+        }
+      } else {
+        console.warn('renameTab: updateActiveTab action not available');
+        return false;
+      }
+    }
+  } else {
+    console.error('renameTab: Home actions not available or updateTab method missing');
+    return false;
+  }
 };
 
 /**
@@ -306,6 +364,7 @@ export const cleanupPageNavigation = () => {
     delete window.top.openPage;
     delete window.top.openPageInNextTab;
     delete window.top.isWindowTopAccessible;
+    delete window.top.renameTab;
   }
   
   delete window.homeActions;
