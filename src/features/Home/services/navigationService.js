@@ -112,22 +112,13 @@ export const navigationService = {
    */
   initializeSessionData: async () => {
     try {
-      const sessionVars = navigationService.getSessionDetails();
-      
-      // Check if new keys exist, if not fetch them
-      if (sessionVars && 
-          sessionVars.isMirabelEmailServiceEnabled === undefined && 
-          sessionVars.isRepNotificationEnabled === undefined && 
-          sessionVars.isMirabelEmailTransEnabled === undefined &&
-          sessionVars.isCallDispositionEnabled === undefined) {
-        
+     
         // Fetch email service settings
         await navigationService.verifyIsMirabelEmailServiceEnabled();
         
         // Fetch call disposition settings
         await navigationService.verifyIsCallDispositionEnabled();
         
-      }
     } catch (error) {
       console.error('❌ Error initializing session data:', error);
     }
