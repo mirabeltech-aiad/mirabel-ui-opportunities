@@ -271,7 +271,6 @@ const TabNavigation = memo(() => {
               onClick={() => handleTabClick(tab.id)}
               style={{ fontSize: '13px' }}
             >
-              <span className="mr-0.5 text-xs flex items-center" style={{ fontSize: '13px' }}>{tab.icon}</span>
               <span className="text-xs font-medium truncate max-w-32 flex items-center" style={{ fontSize: '13px', marginRight: '2px' }}>
                 {tab.title}
               </span>
@@ -322,7 +321,6 @@ const TabNavigation = memo(() => {
                             onClick={() => handleTabClick(tab.id)}
                             style={{ fontSize: '13px' }}
                           >
-                            <span className="mr-0.5 text-xs flex items-center flex-shrink-0" style={{ fontSize: '13px' }}>{tab.icon}</span>
                             <span className="text-xs font-medium truncate flex items-center" style={{ fontSize: isSmallScreen ? '11px' : '12px', marginRight: '2px' }}>
                               {tab.title}
                             </span>
