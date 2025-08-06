@@ -314,24 +314,17 @@ export const HomeProvider = ({ children, sessionLoaded = false }) => {
         mmClientVars.isMirableEmailTransEnabled === true
       );
 
-      // Helper to insert menu URL at {0} placeholder
-      function insertMenuUrlAtPlaceholder(baseUrl, menuUrl) {
-        if (!baseUrl || !menuUrl) return baseUrl || menuUrl;
-        const urlWithQuery = menuUrl + (menuUrl.includes('?') ? '&' : '?');
-        if (baseUrl.includes('{0}')) {
-          return baseUrl.replace('{0}', urlWithQuery);
-        }
-        return baseUrl.replace(/\/$/, '') + '/' + menuUrl.replace(/^\//, '');
-      }
-
       // MM Integration iframe src (matching legacy ASP.NET)
       let mmIntegrationSrc = null;
-      if (showMMIntegration && mmClientVars.Token) {
+        if (showMMIntegration && mmClientVars.Token) {
         try {
           const mkmSite=apiData.MarketingManagerURL;
-          const marketingManagerSiteURL = await navigationService.getMarketingManagerSiteURL(mkmSite,mmClientVars);
+          // Construct URL exactly as server-side: frmMMIntegration.Src = string.Format(MarketingManagerSiteURL, "/AssignData.aspx?") + "&accesstoken=" + SessionManager.Token;
+          // Expected result: https://t1mrktapp.mirabeltechnologies.com/AssignData.aspx?ISMKM=1&FE=1&MKMFE=1&MKMUA=1&DPFE=0&DPUA=0&accesstoken=...
+          const marketingManagerSiteURL = await navigationService.getMarketingManagerSiteURL(mkmSite,mmClientVars,'/AssignData.aspx');
           if (marketingManagerSiteURL) {
-            mmIntegrationSrc = insertMenuUrlAtPlaceholder(marketingManagerSiteURL, '/AssignData.aspx?') + '&accesstoken=' + mmClientVars.Token;
+            mmIntegrationSrc = marketingManagerSiteURL + '&accesstoken=' + mmClientVars.Token;
+            console.log('🔗 MM Integration URL constructed:', mmIntegrationSrc);
           }
         } catch (error) {
           console.error('Error fetching MarketingManagerSiteURL:', error);
@@ -342,12 +335,15 @@ export const HomeProvider = ({ children, sessionLoaded = false }) => {
       let crmProspectingUrl = null;
       const showProspecting = isCRM && mmClientVars.IsUserHasDataPackAccess === true;
       
-      if (showProspecting) {
+        if (showProspecting) {
         try {
           const mkmsiteurl=apiData.MarketingManagerURL;
-          const marketingManagerSiteURL = await navigationService.getMarketingManagerSiteURL(mkmsiteurl,mmClientVars);
+          // Construct URL exactly as server-side: pnlProspecting.Loader.Url = string.Format(MarketingManagerSiteURL, "/midashboard.aspx?");
+          // Expected result: https://t1mrktapp.mirabeltechnologies.com/midashboard.aspx?ISMKM=1&FE=1&MKMFE=1&MKMUA=1&DPFE=0&DPUA=0
+          const marketingManagerSiteURL = await navigationService.getMarketingManagerSiteURL(mkmsiteurl,mmClientVars,'/midashboard.aspx');
           if (marketingManagerSiteURL) {
-            crmProspectingUrl = insertMenuUrlAtPlaceholder(marketingManagerSiteURL, '/midashboard.aspx?');
+            crmProspectingUrl = marketingManagerSiteURL;
+            console.log('🔗 CRM Prospecting URL constructed:', crmProspectingUrl);
           }
         } catch (error) {
           console.error('Error fetching MarketingManagerSiteURL for prospecting:', error);
@@ -405,7 +401,7 @@ export const HomeProvider = ({ children, sessionLoaded = false }) => {
       }
       
       const menus = await navigationService.fetchNavigationData(userId, navBarType);
-      
+      console.log('🔗 Navigation menus:', menus);
       // Ensure we always set some menu data, even if empty
       setNavigationMenus(menus || []);
     } catch (error) {
@@ -445,17 +441,7 @@ export const HomeProvider = ({ children, sessionLoaded = false }) => {
           const isCompleteUrl = dashboard.URL.startsWith('http://') || dashboard.URL.startsWith('https://');
           const baseUrl = isCompleteUrl ? '' : mkmDomain;
           const updatedUrl = `${baseUrl}${dashboard.URL}&accesstoken=${accessToken}`;
-          
-          // Debug logging for MKM URL processing
-          console.log('🔄 HomeContext: MKM URL processing debug:', {
-            dashboardName: dashboard.DashBoardName,
-            originalUrl: dashboard.URL,
-            isCompleteUrl,
-            mkmDomain,
-            baseUrl,
-            updatedUrl
-          });
-          
+      
           return {
             ...dashboard,
             URL: updatedUrl
@@ -746,8 +732,16 @@ export const HomeProvider = ({ children, sessionLoaded = false }) => {
       
       // Load tabs from localStorage after main data is loaded
       loadTabsFromStorage();
+      
+      // Initialize navigation service with React tab system
+      navigationService.initializeWithReactTabs(actions);
     };
     initializeApp();
+    
+    // Cleanup function
+    return () => {
+      navigationService.cleanup();
+    };
   }, [sessionLoaded]);
 
   // Save tabs to localStorage when they change
@@ -886,6 +880,31 @@ export const HomeProvider = ({ children, sessionLoaded = false }) => {
     ]);
   };
 
+  // Get current tabs (for navigation service integration)
+  const getTabs = () => {
+    return state.tabs;
+  };
+
+  // Refresh specific tab (for navigation service integration)
+  const refreshTab = (tabId) => {
+    const tab = state.tabs.find(t => t.id === tabId);
+    if (tab) {
+      const updatedTab = {
+        ...tab,
+        key: Date.now() // Force reload by changing key
+      };
+      dispatch({ type: ACTIONS.UPDATE_TAB, payload: updatedTab });
+    }
+  };
+
+  // Close active tab (for navigation service integration)
+  const closeActiveTab = () => {
+    const activeTab = state.tabs.find(tab => tab.id === state.activeTabId);
+    if (activeTab && activeTab.closable !== false) {
+      actions.removeTab(state.activeTabId);
+    }
+  };
+
   const actions = useMemo(() => ({
     addTab,
     removeTab,
@@ -914,7 +933,10 @@ export const HomeProvider = ({ children, sessionLoaded = false }) => {
     setupDashboard,
     showDashboard,
     toggleMKMWebsiteMenu,
-    createAllPortals
+    createAllPortals,
+    getTabs,
+    refreshTab,
+    closeActiveTab
   }), [
     addTab,
     removeTab,
@@ -943,7 +965,10 @@ export const HomeProvider = ({ children, sessionLoaded = false }) => {
     setupDashboard,
     showDashboard,
     toggleMKMWebsiteMenu,
-    createAllPortals
+    createAllPortals,
+    getTabs,
+    refreshTab,
+    closeActiveTab
   ]);
 
   const value = {
