@@ -29,9 +29,9 @@ export const navigationService = {
     try {
       // Get EmailSenderType, IsRepNotificationsEnabled, IsMirabelEmailTransSendEnabled from sitewide defaults
       const response = await axiosService.post(ADMIN_API.SITEWIDE_SETTINGS_GET_COLUMNNAMES, "EmailSenderType,IsRepNotificationsEnabled,IsMirabelEmailTransSendEnabled");
-      if (response?.content?.JSONContent) {
+      if (response?.JSONContent) {
         // Parse the JSONContent string to get the actual data
-        const sitewideDefaults = JSON.parse(response.content.JSONContent);
+        const sitewideDefaults = JSON.parse(response.JSONContent);
         
         const isRepNotificationEnabled = sitewideDefaults.IsRepNotificationsEnabled === true || sitewideDefaults.IsRepNotificationsEnabled === 'True';
         const isMirabelEmailTransEnabled = sitewideDefaults.IsMirabelEmailTransSendEnabled === true || sitewideDefaults.IsMirabelEmailTransSendEnabled === 'True';
@@ -112,22 +112,13 @@ export const navigationService = {
    */
   initializeSessionData: async () => {
     try {
-      const sessionVars = navigationService.getSessionDetails();
-      
-      // Check if new keys exist, if not fetch them
-      if (sessionVars && 
-          sessionVars.isMirabelEmailServiceEnabled === undefined && 
-          sessionVars.isRepNotificationEnabled === undefined && 
-          sessionVars.isMirabelEmailTransEnabled === undefined &&
-          sessionVars.isCallDispositionEnabled === undefined) {
-        
+     
         // Fetch email service settings
         await navigationService.verifyIsMirabelEmailServiceEnabled();
         
         // Fetch call disposition settings
         await navigationService.verifyIsCallDispositionEnabled();
         
-      }
     } catch (error) {
       console.error('❌ Error initializing session data:', error);
     }
