@@ -144,17 +144,9 @@ export const navigationService = {
       const isSiteMKMEnabled = sessionVars.IsSiteMKMEnabled === true || sessionVars.IsSiteMKMEnabled === 'True';
       const isUserHasMKMAccess = sessionVars.IsUserHasMKMAccess === true || sessionVars.IsUserHasMKMAccess === 'True';
       const isSiteDataPackEnabled = sessionVars.IsSiteDataPackEnabled === true || sessionVars.IsSiteDataPackEnabled === 'True';
-      const isUserHasDataPackAccess = sessionVars.IsUserHasDataPackAccess === true || sessionVars.IsUserHasDataPackAccess === 'True';
-      
-      // Construct URL exactly as backend does - matches string.Format(MarketingManagerSiteURL, URL + (URL.Contains("?") ? "&" : "?"))
-      // Base URL should be like: https://t1mrktapp.mirabeltechnologies.com/
-      // URL should be like: midashboard.aspx
-      // Final result: https://t1mrktapp.mirabeltechnologies.com/midashboard.aspx?ISMKM=1&FE=1&MKMFE=1&MKMUA=1&DPFE=0&DPUA=0
-      
+      const isUserHasDataPackAccess = sessionVars.IsUserHasDataPackAccess === true || sessionVars.IsUserHasDataPackAccess === 'True';      
       const urlWithQuery = url + (url.includes("?") ? "&" : "?");
       const mkmURL = `${mkmSiteURL}${urlWithQuery}ISMKM=1&FE=${isSiteMKMEnabled ? "1" : "0"}&MKMFE=${isSiteMKMEnabled ? "1" : "0"}&MKMUA=${isUserHasMKMAccess ? "1" : "0"}&DPFE=${isSiteDataPackEnabled ? "1" : "0"}&DPUA=${isUserHasDataPackAccess ? "1" : "0"}`;
-
-      console.log('🔗 MarketingManagerSiteURL constructed:', mkmURL);
       return mkmURL;
     } catch (error) {
       console.error('❌ Error getting MarketingManagerSiteURL:', error);
@@ -173,16 +165,8 @@ export const navigationService = {
     try {
       const isMirabelEmailServiceEnabled = sessionVars.IsMirabelEmailServiceEnabled === true || sessionVars.IsMirabelEmailServiceEnabled === 'True';
       const isUserHasMKMAccess = sessionVars.IsUserHasMKMAccess === true || sessionVars.IsUserHasMKMAccess === 'True';
-      
-      // Construct URL exactly as backend does - matches string.Format(EmailServiceSiteURL, URL + (URL.Contains("?") ? "&" : "?"))
-      // Base URL should be like: https://t1emailservice.magazinemanager.com/
-      // URL should be like: templates
-      // Final result: https://t1emailservice.magazinemanager.com/templates?ISMKM=1&ISMES=1&FE=1&ESFE=1&MKMUA=1
-      
       const urlWithQuery = url + (url.includes("?") ? "&" : "?");
       const mesSiteURL = `${emailServiceSiteURL}${urlWithQuery}ISMKM=1&ISMES=1&FE=${isMirabelEmailServiceEnabled ? "1" : "0"}&ESFE=${isMirabelEmailServiceEnabled ? "1" : "0"}&MKMUA=${isUserHasMKMAccess ? "1" : "0"}`;
-      
-      console.log('🔗 EmailServiceSiteURL constructed:', mesSiteURL);
       return mesSiteURL;
     } catch (error) {
       console.error('❌ Error getting EmailServiceSiteURL:', error);
@@ -306,36 +290,16 @@ export const navigationService = {
           let url = replaceSessionVarsInUrl(menu.URL);
           
           // Special URL handling for MKM/MES - matches backend exactly
-          // Convert URLSource to uppercase as server-side does: menuNavBar.URLSource = menuNavBar.URLSource.ToStr().ToUpper();
           const urlSource = (menu.URLSource || '').toString().toUpperCase();
-          
           if (urlSource === CLIENT_TYPE.MKM || urlSource === "MKM-DATA") {
-            /*
-             * Show the Lock Icon for MKM links if MKM is NOT Enabled for the SITE OR User has NO MKM Access
-             * if DataPack is NOT Enabled for the SITE OR User has NO DataPack Access
-             */
-            if ((urlSource === CLIENT_TYPE.MKM && (!sessionVars.IsSiteMKMEnabled || !sessionVars.IsUserHasMKMAccess)) ||
-                (urlSource === "MKM-DATA" && (!sessionVars.IsSiteDataPackEnabled || !sessionVars.IsUserHasDataPackAccess))) {
-              // Lock icon is already handled in getMenuLockStatus
-            }
             // URL construction matches server-side: URL = string.Format(MarketingManagerSiteURL, URL + (URL.Contains("?") ? "&" : "?"));
             const marketingManagerSiteURL = await navigationService.getMarketingManagerSiteURL(apiData.MarketingManagerURL, sessionVars, menu.URL);
             url = marketingManagerSiteURL;
           } else if (urlSource === "MES") {
-            //Show the Lock Icon for MES links if MES is NOT Enabled OR logged in user has NO access to MKM
-            if ((sessionVars.IsMirabelEmailServiceEnabled === false || sessionVars.IsRepNotificationEnabled) || !sessionVars.IsUserHasMKMAccess) {
-              if (!(sessionVars.IsRepNotificationEnabled && (menu.Caption === "Email Builder" || menu.Caption === "Workflows"))) {
-                // Lock icon is already handled in getMenuLockStatus
-              }
-            }
             // URL construction matches server-side: URL = string.Format(EmailServiceSiteURL, URL + (URL.Contains("?") ? "&" : "?"));
             const emailServiceSiteURL = await navigationService.getEmailServiceSiteURL(apiData.EmailServiceSiteURL, sessionVars, menu.URL);
             url = emailServiceSiteURL;
-          } else if (url && url.includes("{{MM_") && url.includes("}}")) {
-            //if the URL contains a session variable to replace
-            // This is already handled in replaceSessionVarsInUrl function
-          }
-          
+          }           
           // Tooltip
           const toolTip = menu.ToolTip || '';
           // Special click handling
