@@ -70,6 +70,9 @@ export const openPageInNextTab = (url, pageTitle, isQueryStrValEncoded, addTabAf
       closable: true
     };
     
+    // Note: Don't set window.name here - the iframe will get its window.name
+    // from the 'name' attribute when it's created in TabContent or IframeContainer
+    
     // Add the tab using the home context actions
     window.homeActions.addTab(tabData);
     
@@ -105,6 +108,7 @@ export const initializePageNavigation = (homeActions) => {
     window.top.openPageInNextTab = openPageInNextTab;
     window.top.isWindowTopAccessible = isWindowTopAccessible;
     window.top.renameTab = renameTab;
+    window.top.getCurrentWindowName = getCurrentWindowName;
     
     console.log('Page navigation helpers exposed on window.top');
   } else {
@@ -337,6 +341,14 @@ export const isWindowTopAccessible = () => {
 };
 
 /**
+ * Gets the current window's name (works correctly in iframe context)
+ * @returns {string} The window name (should match the tab ID for iframes)
+ */
+export const getCurrentWindowName = () => {
+  return window.name || '';
+};
+
+/**
  * Safely gets window.top if accessible
  * @returns {Window|null} window.top if accessible, null otherwise
  */
@@ -365,6 +377,7 @@ export const cleanupPageNavigation = () => {
     delete window.top.openPageInNextTab;
     delete window.top.isWindowTopAccessible;
     delete window.top.renameTab;
+    delete window.top.getCurrentWindowName;
   }
   
   delete window.homeActions;

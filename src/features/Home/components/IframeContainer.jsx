@@ -9,6 +9,7 @@ import { getTopPath } from '@/utils/commonHelpers';
  * @param {Object} props - Component props
  * @param {string} props.url - The relative URL to load (from API response)
  * @param {string} props.title - Title for the iframe content
+ * @param {string} props.name - Name for the iframe window (sets window.name in iframe)
  * @param {string} props.className - Additional CSS classes
  * @param {Object} props.style - Inline styles
  * @returns {React.ReactElement} IframeContainer component
@@ -16,6 +17,7 @@ import { getTopPath } from '@/utils/commonHelpers';
 const IframeContainer = memo(({ 
   url, 
   title = 'Content', 
+  name = '',
   className = '', 
   style = {},
   onLoad,
@@ -121,6 +123,7 @@ const IframeContainer = memo(({
       {/* Iframe */}
       <iframe
         key={refreshKey}
+        name={name}
         src={fullUrl}
         title={title}
         className="w-full h-full border-0"
