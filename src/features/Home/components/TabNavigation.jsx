@@ -274,7 +274,11 @@ const TabNavigation = memo(() => {
               onClick={() => handleTabClick(tab.id)}
               style={{ fontSize: '13px' }}
             >
-              <span className="text-xs font-medium truncate max-w-32 flex items-center" style={{ fontSize: '13px', marginRight: '2px' }}>
+              <span 
+                className="text-xs font-medium truncate max-w-32 flex items-center" 
+                style={{ fontSize: '13px', marginRight: '2px' }}
+                title={tab.title}
+              >
                 {tab.title}
               </span>
             </div>
@@ -324,7 +328,11 @@ const TabNavigation = memo(() => {
                             onClick={() => handleTabClick(tab.id)}
                             style={{ fontSize: '13px' }}
                           >
-                            <span className="text-xs font-medium truncate flex items-center" style={{ fontSize: isSmallScreen ? '11px' : '12px', marginRight: '2px' }}>
+                            <span 
+                              className="text-xs font-medium truncate flex items-center" 
+                              style={{ fontSize: isSmallScreen ? '11px' : '12px', marginRight: '2px' }}
+                              title={tab.title}
+                            >
                               {tab.title}
                             </span>
                           </div>
@@ -371,7 +379,7 @@ const TabNavigation = memo(() => {
                   >
                     <div className="flex items-center">
                       <span className="mr-2">{tab.icon}</span>
-                      <span className="truncate">{tab.title}</span>
+                      <span className="truncate" title={tab.title}>{tab.title}</span>
                     </div>
                     {tab.closable !== false && (
                       <button
