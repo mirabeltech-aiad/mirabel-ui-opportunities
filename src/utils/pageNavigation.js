@@ -46,7 +46,15 @@ export const openPageInNextTab = (url, pageTitle, isQueryStrValEncoded, addTabAf
     console.warn('openPageInNextTab: No URL provided');
     return null;
   }
+  const time = new Date();
+  const index = "_" + time.getYear() + time.getMonth() + time.getDay() + time.getHours() + time.getMinutes() + time.getSeconds() + "";
   
+  // Get page title from MMClientMessage if empty
+  if (pageTitle == '' || pageTitle == undefined) {
+    const messageWindow =  window.top ;
+    const magazineManagerText = (messageWindow.MMClientMessage && messageWindow.MMClientMessage.MagazineManager);
+    pageTitle = magazineManagerText + " " + index;
+  }
   // Get the tab system actions from the global context
   if (window.homeActions && window.homeActions.addTab) {
     const tabData = {
