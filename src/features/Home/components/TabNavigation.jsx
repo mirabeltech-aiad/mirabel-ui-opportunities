@@ -211,32 +211,31 @@ const TabNavigation = memo(() => {
             style={{ fontFamily: 'inherit', fontSize: '13px', fontWeight: 500, lineHeight: '1.5', border: 'none', boxShadow: activeTabId === fixedTabs[0].id ? '0 2px 8px rgba(0,0,0,0.04)' : 'none', marginRight: '1px', height: '24px', minHeight: '24px', paddingTop: '0', paddingBottom: '0' }}
           >
             <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <div
-                  className={`px-2 py-1 rounded font-medium text-xs transition flex items-center h-8 min-h-0 cursor-pointer ${
-                    activeTabId === 'dashboard' ? 'bg-blue-100 text-blue-900 font-bold shadow-sm' : 'bg-transparent text-gray-700 hover:bg-gray-100'
-                  }`}
-                  style={{ fontFamily: 'inherit', fontSize: '13px', fontWeight: 500, lineHeight: '1.5', minWidth: 120, border: 'none', boxShadow: activeTabId === 'dashboard' ? '0 2px 8px rgba(0,0,0,0.04)' : 'none', height: '24px', minHeight: '24px', paddingTop: '0', paddingBottom: '0' }}
-                >
-                  <span
-                    className="flex-1"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleTabClick('dashboard');
-                    }}
-                  >
-                    {selectedDashboard ? selectedDashboard.DashBoardName : 'Sales Dashboard'}
-                  </span>
-                  <button
-                    className="ml-2 p-0 hover:bg-gray-200 rounded transition-colors"
-                    style={{ background: 'none', border: 'none' }}
-                    onClick={(e) => e.stopPropagation()}
-                  >
-                    <ChevronDown className="h-4 w-4" />
-                  </button>
-                </div>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="start" side="bottom" className="w-56 mt-1 bg-white border border-gray-100 p-0 text-gray-800 font-medium">
+              <div
+                className={`px-2 py-1 rounded font-medium text-xs transition flex items-center h-8 min-h-0 ${
+                  activeTabId === 'dashboard' ? 'bg-blue-100 text-blue-900 font-bold shadow-sm' : 'bg-transparent text-gray-700 hover:bg-gray-100'
+                }`}
+                style={{ fontFamily: 'inherit', fontSize: '13px', fontWeight: 500, lineHeight: '1.5', minWidth: 120, border: 'none', boxShadow: activeTabId === 'dashboard' ? '0 2px 8px rgba(0,0,0,0.04)' : 'none', height: '24px', minHeight: '24px', paddingTop: '0', paddingBottom: '0' }}
+              >
+                                 <span
+                   className="flex-1 cursor-pointer"
+                   onClick={() => handleTabClick('dashboard')}
+                   title={selectedDashboard ? selectedDashboard.DashBoardName : 'Sales Dashboard'}
+                 >
+                   {selectedDashboard ? selectedDashboard.DashBoardName : 'Sales Dashboard'}
+                 </span>
+                                 <div className="relative flex items-center">
+                   <DropdownMenuTrigger asChild>
+                     <button
+                       className="ml-2 p-0 hover:bg-gray-200 rounded transition-colors flex items-center justify-center"
+                       style={{ background: 'none', border: 'none', height: '16px', width: '16px' }}
+                     >
+                       <ChevronDown className="h-3 w-3" />
+                     </button>
+                   </DropdownMenuTrigger>
+                 </div>
+              </div>
+              <DropdownMenuContent align="end" side="bottom" className="w-56 mt-1 bg-white border border-gray-100 p-0 text-gray-800 font-medium">
                 {dashboardsLoading ? (
                   <DropdownMenuItem disabled>Loading...</DropdownMenuItem>
                 ) : (
