@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
+import { createPortal } from 'react-dom';
 import { Search } from 'lucide-react';
 import { customerSearchService } from '@/services/customerSearchService';
 import { useHome } from '../contexts/HomeContext';
@@ -14,6 +15,7 @@ const CustomerSearch = () => {
   const [searchFlag, setSearchFlag] = useState('');
   const inputRef = useRef(null);
   const dropdownRef = useRef(null);
+  const [dropdownPosition, setDropdownPosition] = useState({ top: 0, left: 0, width: 0 });
 
   const { actions, tabs } = useHome();
   const { toast } = useToast();
@@ -49,6 +51,9 @@ const CustomerSearch = () => {
         setSearchResults(results);
         setShowDropdown(results.length > 0);
         setSelectedIndex(-1);
+        if (results.length > 0) {
+          calculateDropdownPosition();
+        }
       } catch (error) {
         console.error('CustomerSearch: Search failed:', error);
         setSearchResults([]);
@@ -158,8 +163,45 @@ const CustomerSearch = () => {
     // Show dropdown if we have results and query is long enough
     if (searchQuery.trim().length >= 3 && searchResults.length > 0) {
       setShowDropdown(true);
+      calculateDropdownPosition();
     }
   };
+
+  // Calculate dropdown position for portal
+  const calculateDropdownPosition = () => {
+    if (inputRef.current) {
+      const rect = inputRef.current.getBoundingClientRect();
+      setDropdownPosition({
+        top: rect.bottom + window.scrollY + 4,
+        left: rect.left + window.scrollX,
+        width: rect.width
+      });
+    }
+  };
+
+  // Update dropdown position when results change
+  useEffect(() => {
+    if (showDropdown) {
+      calculateDropdownPosition();
+    }
+  }, [showDropdown, searchResults]);
+
+  // Handle window resize to recalculate dropdown position
+  useEffect(() => {
+    const handleResize = () => {
+      if (showDropdown) {
+        calculateDropdownPosition();
+      }
+    };
+
+    window.addEventListener('resize', handleResize);
+    window.addEventListener('scroll', handleResize);
+    
+    return () => {
+      window.removeEventListener('resize', handleResize);
+      window.removeEventListener('scroll', handleResize);
+    };
+  }, [showDropdown]);
 
   // Handle blur (hide dropdown after delay)
   const handleBlur = () => {
@@ -273,17 +315,16 @@ const CustomerSearch = () => {
       </div>
 
       {/* Dropdown Results */}
-      {showDropdown && (
+      {showDropdown && createPortal(
         <div
           ref={dropdownRef}
-          className="absolute top-full left-0 right-0 mt-1 bg-white border border-gray-300 rounded-md shadow-lg z-[9999] max-h-60 overflow-y-auto"
+          className="fixed bg-white border border-gray-300 rounded-md shadow-lg z-[99999] max-h-60 overflow-y-auto"
           style={{ 
-            zIndex: 9999,
-            position: 'absolute',
-            top: '100%',
-            left: 0,
-            right: 0,
-            marginTop: '4px',
+            zIndex: 99999,
+            position: 'fixed',
+            top: dropdownPosition.top,
+            left: dropdownPosition.left,
+            width: dropdownPosition.width,
             backgroundColor: 'white',
             border: '1px solid #d1d5db',
             borderRadius: '6px',
@@ -335,7 +376,8 @@ const CustomerSearch = () => {
               No results found for "{searchQuery}"
             </div>
           )}
-        </div>
+        </div>,
+        document.body
       )}
     </div>
   );
