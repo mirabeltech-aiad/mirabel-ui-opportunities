@@ -59,6 +59,7 @@ const TabContent = () => {
             contentMap[tab.id] = (
               <iframe
                 src={tab.url}
+                name={tab.id}
                 className="w-full h-full border-0 min-w-0"
                 title={tab.title}
                 data-tab-id={tab.id}
