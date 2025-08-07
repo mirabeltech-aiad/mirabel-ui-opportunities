@@ -777,7 +777,6 @@ export const HomeProvider = ({ children, sessionLoaded = false }) => {
 
 
   const removeTab = (tabId) => {
-    const tab = state.tabs.find(t => t.id === tabId);
     dispatch({ type: ACTIONS.REMOVE_TAB, payload: tabId });
   };
 
@@ -901,7 +900,9 @@ export const HomeProvider = ({ children, sessionLoaded = false }) => {
   const closeActiveTab = () => {
     const activeTab = state.tabs.find(tab => tab.id === state.activeTabId);
     if (activeTab && activeTab.closable !== false) {
-      actions.removeTab(state.activeTabId);
+      removeTab(state.activeTabId);
+    } else {
+      console.warn('closeActiveTab: Active tab is not closable or no active tab found');
     }
   };
 
