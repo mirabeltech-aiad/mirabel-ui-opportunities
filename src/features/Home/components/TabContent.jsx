@@ -1,4 +1,4 @@
-import React, { Suspense, lazy, useMemo, useEffect } from 'react';
+import React, { Suspense, lazy, useMemo, useEffect, useState } from 'react';
 import { useHome } from '../contexts/HomeContext';
 import Dashboard from './Dashboard';
 import NewTab from './NewTab';
@@ -12,6 +12,25 @@ const Settings = lazy(() => import('./Settings'));
 const TabContent = () => {
   const { tabs, activeTabId } = useHome();
   const activeTab = tabs.find(tab => tab.id === activeTabId);
+  
+  // State to track iframe reload triggers for specific tabs
+  const [iframeReloadKeys, setIframeReloadKeys] = useState({});
+
+  // Function to reload a specific iframe
+  const reloadIframe = (tabId) => {
+    setIframeReloadKeys(prev => ({
+      ...prev,
+      [tabId]: Date.now() // Use timestamp as unique key to force reload
+    }));
+  };
+
+  // Expose reload function globally so TabNavigation can call it
+  useEffect(() => {
+    window.reloadTabIframe = reloadIframe;
+    return () => {
+      delete window.reloadTabIframe;
+    };
+  }, []);
 
   // Debug logging to track tab switches
   useEffect(() => {
@@ -55,6 +74,10 @@ const TabContent = () => {
         default:
           if (tab.type === 'iframe' && tab.url) {
             console.log('🔄 TabContent: Creating iframe for tab:', tab.id, 'URL:', tab.url);
+            
+            // Generate unique key for iframe - include reload key if present
+            const iframeKey = iframeReloadKeys[tab.id] ? `${tab.id}-${iframeReloadKeys[tab.id]}` : tab.id;
+            
             contentMap[tab.id] = (
               <iframe
                 src={tab.url}
@@ -62,7 +85,7 @@ const TabContent = () => {
                 className="w-full h-full border-0 min-w-0"
                 title={tab.title}
                 data-tab-id={tab.id}
-                key={tab.id} // Use tab.id as key to preserve iframe state
+                key={iframeKey} // Use dynamic key to force reload when needed
                 style={{ maxWidth: '100vw', overflow: 'hidden' }}
               />
             );
@@ -84,7 +107,7 @@ const TabContent = () => {
     
     console.log('🔄 TabContent: Finished rebuilding tab contents');
     return contentMap;
-  }, [tabs]);
+  }, [tabs, iframeReloadKeys]);
 
   // Log when using cached content
   useEffect(() => {

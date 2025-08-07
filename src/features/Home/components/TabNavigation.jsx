@@ -111,6 +111,12 @@ const TabNavigation = memo(() => {
   };
 
   const handleTabClick = (tabId) => {
+    // Check if this is the Inbox tab and trigger reload
+    if (tabId === 'inbox' && window.reloadTabIframe) {
+ 
+      window.reloadTabIframe(tabId);
+    }
+    
     actions.setActiveTab(tabId);
   };
 
