@@ -2,6 +2,7 @@ import React, { useEffect, useState, useRef, memo } from 'react';
 import { useHome } from '../contexts/HomeContext';
 import { initializePageNavigation, cleanupPageNavigation } from '@/utils/pageNavigation';
 import { dashboardService } from '../services/dashboardService';
+import navigationService from '../services/navigationService';
 import Navbar from './Navbar';
 import TabContent from './TabContent';
 import DashboardTab from './DashboardTab';
@@ -102,6 +103,17 @@ const TabNavigation = memo(() => {
     // Check if this is the Inbox tab and trigger reload of both iframes
     if (tabId === 'inbox' && window.reloadInboxIframes) {
       window.reloadInboxIframes();
+    }
+    
+    // Handle lazy loading for search tab
+    if (tabId === 'search') {
+      const searchTab = tabs.find(tab => tab.id === 'search');
+      if (searchTab && !searchTab.url) {
+        // Lazy load the search tab URL
+        const searchUrl = '/ui/Search';
+        const fullUrl = navigationService.getFullUrl(searchUrl);
+        actions.updateTab('search', { url: fullUrl });
+      }
     }
     
     actions.setActiveTab(tabId);

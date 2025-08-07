@@ -673,6 +673,7 @@ const Navbar = () => {
                   <CustomerSearch />
                 </div>
               )}
+              
               {/* Help Icon */}
               <Button
                 variant="ghost"
