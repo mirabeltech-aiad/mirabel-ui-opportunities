@@ -212,6 +212,7 @@ const Navbar = () => {
   const [canScrollLeft, setCanScrollLeft] = useState(false);
   const [canScrollRight, setCanScrollRight] = useState(false);
   const menuContainerRef = useRef(null);
+  const closeTimeoutRef = useRef(null);
 
   // Fallback user info if AuthContext user is null
   const [fallbackUser, setFallbackUser] = useState(null);
@@ -501,18 +502,33 @@ const Navbar = () => {
 
   // Handle menu open/close with hover functionality
   const handleMenuOpenChange = (menuId, isOpen) => {
+    // Clear any existing timeout
+    if (closeTimeoutRef.current) {
+      clearTimeout(closeTimeoutRef.current);
+      closeTimeoutRef.current = null;
+    }
+    
     if (isOpen) {
       // Enable hover functionality when any menu is opened
       setHoverEnabled(true);
       setOpenMenuId(menuId);
     } else {
-      setOpenMenuId(null);
+      // Add a small delay before closing to prevent flickering
+      closeTimeoutRef.current = setTimeout(() => {
+        setOpenMenuId(null);
+      }, 100);
     }
   };
 
   // Handle menu hover with conditional logic
   const handleMenuHover = (menuId) => {
-    if (hoverEnabled) {
+    // Clear any existing timeout
+    if (closeTimeoutRef.current) {
+      clearTimeout(closeTimeoutRef.current);
+      closeTimeoutRef.current = null;
+    }
+    
+    if (hoverEnabled && openMenuId !== menuId) {
       setOpenMenuId(menuId);
     }
   };
@@ -520,12 +536,25 @@ const Navbar = () => {
   // Handle menu leave
   const handleMenuLeave = () => {
     if (hoverEnabled) {
-      setOpenMenuId(null);
+      // Clear any existing timeout
+      if (closeTimeoutRef.current) {
+        clearTimeout(closeTimeoutRef.current);
+      }
+      // Add a small delay to prevent immediate closing
+      closeTimeoutRef.current = setTimeout(() => {
+        setOpenMenuId(null);
+      }, 150);
     }
   };
 
   // Handle menu content hover to keep menu open
   const handleMenuContentHover = (menuId) => {
+    // Clear any existing timeout
+    if (closeTimeoutRef.current) {
+      clearTimeout(closeTimeoutRef.current);
+      closeTimeoutRef.current = null;
+    }
+    
     if (hoverEnabled) {
       setOpenMenuId(menuId);
     }
@@ -534,7 +563,14 @@ const Navbar = () => {
   // Handle menu content leave
   const handleMenuContentLeave = () => {
     if (hoverEnabled) {
-      setOpenMenuId(null);
+      // Clear any existing timeout
+      if (closeTimeoutRef.current) {
+        clearTimeout(closeTimeoutRef.current);
+      }
+      // Add a small delay to prevent immediate closing
+      closeTimeoutRef.current = setTimeout(() => {
+        setOpenMenuId(null);
+      }, 150);
     }
   };
 
