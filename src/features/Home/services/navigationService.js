@@ -679,7 +679,7 @@ export const navigationService = {
         title: caption || 'New Tab',
         url: url,
         type: 'iframe',
-        icon: '🌐',
+        icon: '',
         closable: true
       };
       
