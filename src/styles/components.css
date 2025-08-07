@@ -10,5 +10,22 @@
     .form-label {
       @apply block mb-1 text-sm font-medium text-gray-700;
     }
+    
+    /* Menu icon styles - matches server-side ExtJS styling */
+    .mainMenuIcon {
+      @apply inline-block align-middle;
+    }
+    
+    .lockIcon {
+      @apply text-yellow-500 text-sm;
+    }
+    
+    .newFeatureIcon {
+      @apply text-green-500 text-xs;
+    }
+    
+    .betaFeatureIcon {
+      @apply text-blue-500 text-xs;
+    }
   }
   

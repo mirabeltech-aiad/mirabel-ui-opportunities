@@ -1,8 +1,8 @@
 import React, { useEffect, useState, useRef, memo } from 'react';
-import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import { useHome } from '../contexts/HomeContext';
 import { initializePageNavigation, cleanupPageNavigation } from '@/utils/pageNavigation';
 import { dashboardService } from '../services/dashboardService';
+import navigationService from '../services/navigationService';
 import Navbar from './Navbar';
 import TabContent from './TabContent';
 import DashboardTab from './DashboardTab';
@@ -97,23 +97,23 @@ const TabNavigation = memo(() => {
   const visibleDraggableTabs = draggableTabs.slice(0, maxVisibleDraggableTabs);
   const overflowDraggableTabs = draggableTabs.slice(maxVisibleDraggableTabs);
 
-  const handleDragEnd = (result) => {
-    if (!result.destination) return;
 
-    // Only reorder draggable tabs
-    const items = Array.from(draggableTabs);
-    const [reorderedItem] = items.splice(result.source.index, 1);
-    items.splice(result.destination.index, 0, reorderedItem);
-
-    // Merge fixed and reordered draggable tabs
-    const newTabs = [...tabs.slice(0, fixedTabsCount), ...items];
-    actions.reorderTabs(newTabs);
-  };
 
   const handleTabClick = (tabId) => {
     // Check if this is the Inbox tab and trigger reload of both iframes
     if (tabId === 'inbox' && window.reloadInboxIframes) {
       window.reloadInboxIframes();
+    }
+    
+    // Handle lazy loading for search tab
+    if (tabId === 'search') {
+      const searchTab = tabs.find(tab => tab.id === 'search');
+      if (searchTab && !searchTab.url) {
+        // Lazy load the search tab URL
+        const searchUrl = '/ui/Search';
+        const fullUrl = navigationService.getFullUrl(searchUrl);
+        actions.updateTab('search', { url: fullUrl });
+      }
     }
     
     actions.setActiveTab(tabId);
@@ -130,7 +130,7 @@ const TabNavigation = memo(() => {
       title: 'New Tab',
       component: 'NewTab',
       type: 'component',
-      icon: '📄',
+      icon: '',
       closable: true
     });
   };
@@ -238,6 +238,7 @@ const TabNavigation = memo(() => {
                    className="flex-1 cursor-pointer"
                    onClick={() => handleTabClick('dashboard')}
                    title={selectedDashboard ? selectedDashboard.DashBoardName : 'Sales Dashboard'}
+                   style={{ cursor: 'pointer' }}
                  >
                    {selectedDashboard ? selectedDashboard.DashBoardName : 'Sales Dashboard'}
                  </span>
@@ -245,9 +246,9 @@ const TabNavigation = memo(() => {
                    <DropdownMenuTrigger asChild>
                      <button
                        className="ml-2 p-0 hover:bg-gray-200 rounded transition-colors flex items-center justify-center"
-                       style={{ background: 'none', border: 'none', height: '16px', width: '16px' }}
+                       style={{ background: 'none', border: 'none', height: '16px', width: '16px', outline: 'none' }}
                      >
-                       <ChevronDown className="h-3 w-3" />
+                       <ChevronDown className="h-3 w-3 text-gray-600" />
                      </button>
                    </DropdownMenuTrigger>
                  </div>
@@ -289,14 +290,14 @@ const TabNavigation = memo(() => {
             <div
               className="flex items-center px-1 py-0 cursor-pointer flex-1 h-8 min-h-0"
               onClick={() => handleTabClick(tab.id)}
-              style={{ fontSize: '13px' }}
+              style={{ fontSize: '13px', cursor: 'pointer' }}
             >
               <span 
                 className="text-xs font-medium truncate max-w-32 flex items-center" 
                 style={{ fontSize: '13px', marginRight: '2px' }}
                 title={tab.title}
               >
-                {tab.title}
+                {tab.title.length > 8 ? `${tab.title.substring(0, 8)}...` : tab.title}
               </span>
             </div>
             {/* Close button (not draggable, but should not appear for fixed tabs) */}
@@ -314,65 +315,47 @@ const TabNavigation = memo(() => {
           </div>
         ))}
 
-        {/* Draggable tabs container with proper overflow handling */}
+        {/* Static tabs container with proper overflow handling */}
         <div className="flex items-center flex-1 min-w-0 overflow-hidden">
-          <DragDropContext onDragEnd={handleDragEnd}>
-            <Droppable droppableId="tabs" direction="horizontal">
-              {(provided) => (
+          <div className="flex items-center space-x-0.5 min-w-0 overflow-hidden" style={{ gap: '0px' }}>
+            {visibleDraggableTabs.map((tab, index) => (
+              <div
+                key={tab.id}
+                onContextMenu={(e) => handleContextMenu(e, tab.id)}
+                className={`flex items-center rounded transition-all duration-100 h-8 min-h-0 px-1 text-xs flex-shrink-0 ${
+                  activeTabId === tab.id
+                    ? 'bg-blue-100 text-blue-900 font-bold shadow-sm'
+                    : 'bg-transparent hover:bg-gray-100 text-gray-700'
+                }`}
+                style={{ fontFamily: 'inherit', fontSize: '13px', fontWeight: 500, lineHeight: '1.5', border: 'none', boxShadow: activeTabId === tab.id ? '0 2px 8px rgba(0,0,0,0.04)' : 'none', marginRight: '0px', height: '24px', minHeight: '24px', paddingTop: '0', paddingBottom: '0', width: isSmallScreen ? '100px' : '120px', minWidth: isSmallScreen ? '100px' : '120px', maxWidth: isSmallScreen ? '100px' : '120px' }}
+              >
                 <div
-                  ref={provided.innerRef}
-                  {...provided.droppableProps}
-                  className="flex items-center space-x-0.5 min-w-0 overflow-hidden"
-                  style={{ gap: '0px' }}
+                  className="flex items-center px-1 py-0 cursor-pointer flex-1 h-8 min-h-0 min-w-0"
+                  onClick={() => handleTabClick(tab.id)}
+                  style={{ fontSize: '13px', cursor: 'pointer' }}
                 >
-                  {visibleDraggableTabs.map((tab, index) => (
-                    <Draggable key={tab.id} draggableId={tab.id} index={index}>
-                      {(provided, snapshot) => (
-                        <div
-                          ref={provided.innerRef}
-                          {...provided.draggableProps}
-                          onContextMenu={(e) => handleContextMenu(e, tab.id)}
-                          className={`flex items-center rounded transition-all duration-100 h-8 min-h-0 px-1 text-xs flex-shrink-0 ${
-                            activeTabId === tab.id
-                              ? 'bg-blue-100 text-blue-900 font-bold shadow-sm'
-                              : 'bg-transparent hover:bg-gray-100 text-gray-700'
-                          }${snapshot.isDragging ? ' opacity-90 shadow-lg' : ''}`}
-                          style={{ fontFamily: 'inherit', fontSize: '13px', fontWeight: 500, lineHeight: '1.5', border: 'none', boxShadow: activeTabId === tab.id ? '0 2px 8px rgba(0,0,0,0.04)' : 'none', marginRight: '0px', height: '24px', minHeight: '24px', paddingTop: '0', paddingBottom: '0', maxWidth: isSmallScreen ? '100px' : '120px', minWidth: isSmallScreen ? '60px' : '80px' }}
-                        >
-                          <div
-                            {...provided.dragHandleProps}
-                            className="flex items-center px-1 py-0 cursor-pointer flex-1 h-8 min-h-0 min-w-0"
-                            onClick={() => handleTabClick(tab.id)}
-                            style={{ fontSize: '13px' }}
-                          >
-                            <span 
-                              className="text-xs font-medium truncate flex items-center" 
-                              style={{ fontSize: isSmallScreen ? '11px' : '12px', marginRight: '2px' }}
-                              title={tab.title}
-                            >
-                              {tab.title}
-                            </span>
-                          </div>
-                          {tab.closable !== false && (
-                            <button
-                              onClick={(e) => handleTabClose(e, tab.id)}
-                              className="mr-1 p-0 rounded hover:bg-gray-200 transition-colors flex-shrink-0 h-5 w-5 min-h-0 flex items-center justify-center"
-                              title="Close tab"
-                              type="button"
-                              style={{ marginLeft: '-4px' }}
-                            >
-                              <X className="h-3 w-3" />
-                            </button>
-                          )}
-                        </div>
-                      )}
-                    </Draggable>
-                  ))}
-                  {provided.placeholder}
+                  <span 
+                    className="text-xs font-medium truncate flex items-center" 
+                    style={{ fontSize: isSmallScreen ? '11px' : '12px', marginRight: '2px' }}
+                    title={tab.title}
+                  >
+                    {tab.title.length > 8 ? `${tab.title.substring(0, 8)}...` : tab.title}
+                  </span>
                 </div>
-              )}
-            </Droppable>
-          </DragDropContext>
+                {tab.closable !== false && (
+                  <button
+                    onClick={(e) => handleTabClose(e, tab.id)}
+                    className="mr-1 p-0 rounded hover:bg-gray-200 transition-colors flex-shrink-0 h-5 w-5 min-h-0 flex items-center justify-center"
+                    title="Close tab"
+                    type="button"
+                    style={{ marginLeft: '-4px' }}
+                  >
+                    <X className="h-3 w-3" />
+                  </button>
+                )}
+              </div>
+            ))}
+          </div>
         </div>
 
         {/* Overflow Menu */}
@@ -395,12 +378,11 @@ const TabNavigation = memo(() => {
                      className="flex items-center justify-between w-full px-3 py-2 text-sm"
                    >
                      <div className="flex items-center min-w-0 flex-1">
-                       <span className="mr-2 flex-shrink-0">{tab.icon}</span>
                        <span 
                          className="truncate text-left" 
                          title={tab.title}
                          style={{ 
-                           maxWidth: 'calc(100% - 60px)', // Account for icon and close button width
+                           maxWidth: 'calc(100% - 40px)', // Account for close button width only
                            overflow: 'hidden',
                            textOverflow: 'ellipsis',
                            whiteSpace: 'nowrap'
