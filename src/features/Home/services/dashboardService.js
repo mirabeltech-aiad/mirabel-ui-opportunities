@@ -43,12 +43,21 @@ export const dashboardService = {
 
   /**
    * Save active dashboard to API
-   * @param {string} endpoint - API endpoint for saving active dashboard
+   * @param {number} dashboardID - The dashboard ID 
+   * @param {string} refID - The dashboard reference ID (optional)
    * @returns {Promise} API response
    */
-  saveActiveDashboard: async (endpoint) => {
+  saveActiveDashboard: async (dashboardID, refID = null) => {
     try {
+      // Construct the endpoint: /services/User/Dashboards/Active/{dashboardID}/{refID?}
+      let endpoint = `/services/${DASHBOARD_API.SAVE_ACTIVE_DASHBOARD}${dashboardID}`;
+      if (refID) {
+        endpoint += `/${refID}`;
+      }
+      
+      console.log('Saving active dashboard:', { dashboardID, refID, endpoint });
       const response = await axiosService.post(endpoint);
+      console.log('Dashboard save response:', response);
       return response;
     } catch (error) {
       console.error('Error saving active dashboard:', error);

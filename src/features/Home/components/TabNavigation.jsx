@@ -2,6 +2,7 @@ import React, { useEffect, useState, useRef, memo } from 'react';
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import { useHome } from '../contexts/HomeContext';
 import { initializePageNavigation, cleanupPageNavigation } from '@/utils/pageNavigation';
+import { dashboardService } from '../services/dashboardService';
 import Navbar from './Navbar';
 import TabContent from './TabContent';
 import DashboardTab from './DashboardTab';
@@ -170,13 +171,24 @@ const TabNavigation = memo(() => {
 
   const handleDashboardSelect = async (dashboard) => {
     if (!dashboard) return;
-    let url = dashboard.URL;
-    if (url && url.toUpperCase().includes('ISMKM=1')) {
-      const token = getSessionValue('Token');
-      url += (url.includes('?') ? '&' : '?') + 'accesstoken=' + token;
+    
+    try {
+      // Save the active dashboard to backend first
+      await dashboardService.saveActiveDashboard(dashboard.ID, dashboard.RefID); 
+
+    } catch (error) {
+      console.error('Failed to save active dashboard:', error);
     }
-    actions.setSelectedDashboard({ ...dashboard, URL: url });
-    actions.setActiveTab('dashboard');
+          // Update URL with token if needed
+          let url = dashboard.URL;
+          if (url && url.toUpperCase().includes('ISMKM=1')) {
+            const token = getSessionValue('Token');
+            url += (url.includes('?') ? '&' : '?') + 'accesstoken=' + token;
+          }
+          
+          // Update local state after successful API call
+          actions.setSelectedDashboard({ ...dashboard, URL: url });
+          actions.setActiveTab('dashboard');
   };
 
   return (
