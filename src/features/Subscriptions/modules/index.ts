@@ -22,7 +22,7 @@ export const registerCoreModules = () => {
     name: 'Circulation Dashboard',
     description: 'Comprehensive circulation analytics and metrics tracking',
     version: '1.0.0',
-    route: '/circulation',
+    route: '/subscriptions/circulation',
     icon: 'BarChart3',
     category: 'analytics',
     permissions: ['circulation:read']
@@ -34,7 +34,7 @@ export const registerCoreModules = () => {
     name: 'Analytics Dashboard',
     description: 'Advanced analytics and data visualization',
     version: '1.0.0',
-    route: '/analytics',
+    route: '/subscriptions/analytics',
     icon: 'TrendingUp',
     category: 'analytics',
     permissions: ['analytics:read']
@@ -46,7 +46,7 @@ export const registerCoreModules = () => {
     name: 'Advanced Search',
     description: 'Advanced search and filtering capabilities',
     version: '1.0.0',
-    route: '/subscriptions/advanced-search',
+    route: '/subscriptions/analytics',
     icon: 'Search',
     category: 'management',
     permissions: ['search:read']
@@ -58,7 +58,7 @@ export const registerCoreModules = () => {
     name: 'Administration',
     description: 'System administration and management',
     version: '1.0.0',
-    route: '/admin',
+    route: '/subscriptions/admin',
     icon: 'Settings',
     category: 'admin',
     permissions: ['admin:read']

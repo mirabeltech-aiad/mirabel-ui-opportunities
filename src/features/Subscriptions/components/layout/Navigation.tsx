@@ -11,8 +11,6 @@ import {
   CommandGroup,
   CommandItem,
 } from '@/components/ui/command';
-import { Switch } from '@/components/ui/switch';
-import { useEditMode } from '../../contexts/EditModeContext';
 
 interface NavigationProps {
   activeTab: string;
@@ -21,7 +19,6 @@ interface NavigationProps {
 
 const Navigation: React.FC<NavigationProps> = ({ activeTab, onTabChange }) => {
   const [open, setOpen] = useState(false);
-  const { isEditMode, toggleEditMode } = useEditMode();
   const navigate = useNavigate();
   
   useEffect(() => {
@@ -37,11 +34,11 @@ const Navigation: React.FC<NavigationProps> = ({ activeTab, onTabChange }) => {
   }, []);
 
   const rightNavItems = [
-    { id: 'circulation', label: 'Circulation Dashboard', path: '/circulation' },
-    { id: 'analytics', label: 'Subscriber Dashboard', path: '/analytics' },
-    { id: 'reports', label: 'Reports', path: '/reports' },
-    { id: 'admin', label: 'Admin', path: '/admin' },
-    { id: 'settings', label: 'Settings', path: '/settings' }
+    { id: 'circulation', label: 'Circulation Dashboard', path: '/subscriptions/circulation' },
+    { id: 'analytics', label: 'Subscriber Dashboard', path: '/subscriptions/analytics' },
+    { id: 'reports', label: 'Reports', path: '/subscriptions/reports' },
+    { id: 'admin', label: 'Admin', path: '/subscriptions/admin' },
+    { id: 'settings', label: 'Settings', path: '/subscriptions/settings' }
   ];
 
   const allNavItems = [...rightNavItems];
@@ -72,7 +69,7 @@ const Navigation: React.FC<NavigationProps> = ({ activeTab, onTabChange }) => {
         <div className="flex items-center space-x-4">
           <nav className="hidden lg:flex items-center space-x-1">
             <button 
-              onClick={() => handleNavigation('circulation')}
+              onClick={() => handleNavigation('/subscriptions/circulation')}
               className={`text-white font-medium transition-colors px-3 py-1 rounded text-sm ${
                 activeTab === 'circulation'
                   ? 'bg-white/20 text-white'
