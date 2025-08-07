@@ -24,7 +24,6 @@ const TabContent = () => {
     const contentMap = {};
     
     tabs.forEach(tab => {
-      console.log('🔄 TabContent: Creating content for tab:', tab.id, 'type:', tab.type, 'component:', tab.component);
       switch (tab.component) {
         case 'Dashboard':
           contentMap[tab.id] = <Dashboard />;
