@@ -414,25 +414,18 @@ const Navbar = () => {
         setTimeout(() => {
           actions.setNavigationLoading(false);
         }, 1000);
-        toast({
-          title: "Dashboard refreshed",
-          description: "Dashboard data has been refreshed.",
-        });
-      } else if (activeTab.type === 'iframe') {
-        // Refresh iframe content by tab ID
-        const success = refreshIframeByTabId(activeTab.id);
-        if (success) {
-          toast({
-            title: "Page refreshed",
-            description: "The current page has been refreshed.",
-          });
+      } else if (activeTab.id === 'inbox') {
+        // Refresh inbox by calling the global reload function
+        if (window.reloadInboxIframes) {
+          window.reloadInboxIframes();
         } else {
-          toast({
-            title: "Refresh failed",
-            description: "Unable to refresh the current page.",
-            variant: "destructive",
-          });
+          // Fallback: use the refreshTab function to force a component reload
+          actions.refreshTab(activeTab.id);
         }
+      }
+      } else {
+        // Generic refresh for other component tabs
+        actions.refreshTab(activeTab.id);
       }
     }
   };
