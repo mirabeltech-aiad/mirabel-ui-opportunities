@@ -51,9 +51,8 @@ const initialState = {
     {
       id: 'inbox',
       title: 'Inbox',
-      component: 'Inbox',
-      type: 'iframe',
-      url: (typeof window !== 'undefined' ?getTopPath() : '') + '/intranet/Members/Home/InboxNotifications.aspx',
+      component: 'InboxPage',
+      type: 'component',
       closable: false,
       icon: ''
     },

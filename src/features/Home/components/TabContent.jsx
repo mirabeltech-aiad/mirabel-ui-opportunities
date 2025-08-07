@@ -2,6 +2,7 @@ import React, { Suspense, lazy, useMemo, useEffect, useState } from 'react';
 import { useHome } from '../contexts/HomeContext';
 import Dashboard from './Dashboard';
 import NewTab from './NewTab';
+import InboxPage from './InboxPage';
 import { withBaseUrl } from '@/lib/utils';
 
 // Lazy load components for better performance
@@ -68,6 +69,13 @@ const TabContent = () => {
           contentMap[tab.id] = (
             <Suspense fallback={<div className="flex items-center justify-center h-full"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div></div>}>
               <Settings />
+            </Suspense>
+          );
+          break;
+        case 'InboxPage':
+          contentMap[tab.id] = (
+            <Suspense fallback={<div className="flex items-center justify-center h-full"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div></div>}>
+              <InboxPage />
             </Suspense>
           );
           break;
