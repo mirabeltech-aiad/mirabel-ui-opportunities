@@ -580,8 +580,8 @@ const Navbar = () => {
                       <button
                         className={`flex-shrink-0 px-2 py-1 rounded-md font-medium text-sm transition flex items-center h-8 min-h-0 whitespace-nowrap ${
                           openMenuId === menu.id
-                            ? 'bg-blue-200 text-blue-900 shadow font-semibold' // Professional highlight for active
-                            : 'text-white hover:bg-ocean-700 hover:text-black focus:bg-ocean-800'
+                            ? 'bg-blue-200 text-blue-900 shadow font-semibold' // Consistent active tab styling
+                            : 'text-white hover:bg-ocean-700 hover:text-white focus:bg-ocean-800 focus:text-white'
                         }`}
                         style={{ fontSize: '13px' }}
                         onMouseEnter={() => handleMenuHover(menu.id)}
