@@ -74,7 +74,7 @@ export const openPageInNextTab = (url, pageTitle, isQueryStrValEncoded, addTabAf
     // from the 'name' attribute when it's created in TabContent or IframeContainer
     
     // Add the tab using the home context actions
-    window.homeActions.addTab(tabData);
+    window.homeActions.addTab(tabData); 
     
     console.log('openPageInNextTab: Added tab successfully:', tabData);
     
@@ -109,6 +109,7 @@ export const initializePageNavigation = (homeActions) => {
     window.top.isWindowTopAccessible = isWindowTopAccessible;
     window.top.renameTab = renameTab;
     window.top.getCurrentWindowName = getCurrentWindowName;
+    window.top.closeTab = closeTab;
     
     console.log('Page navigation helpers exposed on window.top');
   } else {
@@ -280,16 +281,20 @@ async function handlePasteClicked(evt) {
 }
 
 /**
- * Close the active tab
+ * Closes the currently active tab (replaces old ExtJS App.tabpnlMain.remove logic)
+ * This function is exposed on window.top for use by iframe content
  */
-function closeTab() {
+export const closeTab = () => {
+  console.log('closeTab called - removing active tab');
+  
   if (window.homeActions && window.homeActions.closeActiveTab) {
+    // Use React tab system to close active tab
     window.homeActions.closeActiveTab();
-  } else if (window.App && window.App.tabpnlMain) {
-    var activeIndex = window.App.tabpnlMain.items.indexOf(window.App.tabpnlMain.getActiveTab());
-    window.App.tabpnlMain.remove(activeIndex);
+    console.log('closeTab: Active tab closed successfully');
+  } else {
+    console.warn('closeTab: Home actions not available or closeActiveTab method missing');
   }
-}
+};
 
 /**
  * Open a page from MKM (Mirabel Knowledge Management)
@@ -378,6 +383,7 @@ export const cleanupPageNavigation = () => {
     delete window.top.isWindowTopAccessible;
     delete window.top.renameTab;
     delete window.top.getCurrentWindowName;
+    delete window.top.closeTab;
   }
   
   delete window.homeActions;

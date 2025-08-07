@@ -91,7 +91,7 @@ export const NAVIGATION_API = {
 // Dashboard APIs
 export const DASHBOARD_API = {
   USER_DASHBOARDS: '/services/User/Dashboards/false',
-  SAVE_ACTIVE_DASHBOARD: '/services/User/Dashboard/SaveActiveDashboard/'
+  SAVE_ACTIVE_DASHBOARD: '/services/User/Dashboards/Active/'
 };
 
 // Portal/Widget APIs
