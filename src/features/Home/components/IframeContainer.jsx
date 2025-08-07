@@ -106,7 +106,7 @@ const IframeContainer = memo(({
       )}
 
       {/* Control bar */}
-      {!loading && !error && (
+      {/* {!loading && !error && (
         <div className="absolute top-2 right-2 z-20 flex gap-1">
           <Button
             onClick={handleRefresh}
@@ -118,7 +118,7 @@ const IframeContainer = memo(({
             <RefreshCw className="h-4 w-4" />
           </Button>
         </div>
-      )}
+      )} */}
 
       {/* Iframe */}
       <iframe
