@@ -75,14 +75,15 @@ const TabNavigation = memo(() => {
   // // Initialize page navigation helpers when component mounts
   useEffect(() => {
     console.log('Initializing page navigation helpers in TabNavigation');
-    initializePageNavigation(actions);
+    // Pass both actions and state with activeTabId
+    initializePageNavigation(actions, { activeTabId, tabs });
 
     // Cleanup function
     return () => {
       console.log('Cleaning up page navigation helpers in TabNavigation');
       cleanupPageNavigation();
     };
-  }, []); // Remove actions dependency to prevent unnecessary re-initialization
+  }, [actions, activeTabId, tabs]); // Add dependencies to update when state changes
 
   // Split tabs into fixed and draggable
   // First three tabs: dropdown (dashboard), Inbox, Search are fixed
