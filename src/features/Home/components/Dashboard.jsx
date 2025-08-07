@@ -24,6 +24,7 @@ const Dashboard = () => {
         <IframeContainer 
           url={selectedDashboard.URL}
           title={selectedDashboard.DashBoardName}
+          name={`${selectedDashboard.ID}`} 
           className="h-full"
           key={selectedDashboard.ID} // Use dashboard ID as key to preserve state
         />

@@ -157,6 +157,9 @@ const Navbar = () => {
   const [openMenuId, setOpenMenuId] = useState(null);
   const [expandedMenus, setExpandedMenus] = React.useState({});
   
+  // Add state to track if hover functionality should be enabled
+  const [hoverEnabled, setHoverEnabled] = useState(false);
+  
   // Scroll state for navigation menus
   const [canScrollLeft, setCanScrollLeft] = useState(false);
   const [canScrollRight, setCanScrollRight] = useState(false);
@@ -448,6 +451,46 @@ const Navbar = () => {
     setExpandedMenus((prev) => ({ ...prev, [menuId]: false }));
   };
 
+  // Handle menu open/close with hover functionality
+  const handleMenuOpenChange = (menuId, isOpen) => {
+    if (isOpen) {
+      // Enable hover functionality when any menu is opened
+      setHoverEnabled(true);
+      setOpenMenuId(menuId);
+    } else {
+      setOpenMenuId(null);
+    }
+  };
+
+  // Handle menu hover with conditional logic
+  const handleMenuHover = (menuId) => {
+    if (hoverEnabled) {
+      setOpenMenuId(menuId);
+    }
+  };
+
+  // Handle menu leave
+  const handleMenuLeave = () => {
+    if (hoverEnabled) {
+      setOpenMenuId(null);
+    }
+  };
+
+  // Handle menu content hover to keep menu open
+  const handleMenuContentHover = (menuId) => {
+    if (hoverEnabled) {
+      setOpenMenuId(menuId);
+    }
+  };
+
+  // Handle menu content leave
+  const handleMenuContentLeave = () => {
+    if (hoverEnabled) {
+      setOpenMenuId(null);
+    }
+  };
+
+
   // Check if menus can scroll
   const checkScrollState = () => {
     if (menuContainerRef.current) {
@@ -532,7 +575,7 @@ const Navbar = () => {
                     }}
                   >
                     {navigationMenus.map((menu) => (
-                  <DropdownMenu key={menu.id} open={openMenuId === menu.id} onOpenChange={(open) => setOpenMenuId(open ? menu.id : null)}>
+                  <DropdownMenu key={menu.id} open={openMenuId === menu.id} onOpenChange={(open) => handleMenuOpenChange(menu.id, open)}>
                     <DropdownMenuTrigger asChild>
                       <button
                         className={`flex-shrink-0 px-2 py-1 rounded-md font-medium text-sm transition flex items-center h-8 min-h-0 whitespace-nowrap ${
@@ -541,7 +584,8 @@ const Navbar = () => {
                             : 'text-white hover:bg-ocean-700 hover:text-black focus:bg-ocean-800'
                         }`}
                         style={{ fontSize: '13px' }}
-                        onMouseEnter={() => setOpenMenuId(menu.id)}
+                        onMouseEnter={() => handleMenuHover(menu.id)}
+                        onMouseLeave={handleMenuLeave}
                       >
                         <span className="truncate">{menu.title}</span>
                       </button>
@@ -550,8 +594,8 @@ const Navbar = () => {
                       align="start" 
                       className="w-auto min-w-56 max-w-xl mt-2 bg-white border border-gray-100 p-0 text-gray-800 font-medium" 
                       style={{ fontFamily: 'inherit', fontSize: '13px', lineHeight: '1.5' }}
-                      onMouseEnter={() => setOpenMenuId(menu.id)}
-                      onMouseLeave={() => setOpenMenuId(null)}
+                      onMouseEnter={() => handleMenuHover(menu.id)}
+                      onMouseLeave={handleMenuLeave}
                     >
                       {menu.url && (
                         <DropdownMenuItem onClick={() => openTabByUrl(menu.title, menu.url, menu)} className="rounded-none font-medium px-4 py-2 hover:bg-[#e6f0fa] focus:bg-[#e6f0fa] hover:text-ocean-900 focus:text-ocean-900 cursor-pointer text-gray-800 transition-colors duration-150 flex items-center gap-2 whitespace-nowrap" style={{ fontFamily: 'inherit', fontSize: '13px', fontWeight: 500, lineHeight: '1.5' }}>
