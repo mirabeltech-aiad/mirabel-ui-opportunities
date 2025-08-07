@@ -1,36 +1,26 @@
 {
-  "compilerOptions": {
-    "target": "ES2020",
-    "useDefineForClassFields": true,
-    "lib": ["ES2020", "DOM", "DOM.Iterable"],
-    "module": "ESNext",
-    "skipLibCheck": true,
-
-    /* Bundler mode */
-    "moduleResolution": "bundler",
-    "allowImportingTsExtensions": true,
-    "resolveJsonModule": true,
-    "isolatedModules": true,
-    "noEmit": true,
-    "jsx": "react-jsx",
-
-    /* Linting */
-    "strict": true,
-    "noUnusedLocals": true,
-    "noUnusedParameters": true,
-    "noFallthroughCasesInSwitch": true,
-
-    /* Path mapping */
-    "baseUrl": ".",
-    "paths": {
-      "@/*": ["src/*"],
-      "@OpportunityUtils/*": ["src/features/Opportunity/utils/*"],
-      "@OpportunityConstants/*": ["src/features/Opportunity/constants/*"],
-      "@OpportunityContexts/*": ["src/features/Opportunity/contexts/*"],
-      "@OpportunityComponents/*": ["src/features/Opportunity/components/*"],
-      "@OpportunityServices/*": ["src/features/Opportunity/services/*"],
-      "@OpportunityData/*": ["src/features/Opportunity/data/*"]
-    }
-  },
-  "include": ["src", "vite.config.ts", "vite.aliases.ts", "postcss.config.ts"]
-}
+    "compilerOptions": {
+      "target": "ES6",
+      "module": "ESNext",
+      "lib": ["DOM", "DOM.Iterable", "ESNext"],
+      "allowJs": true,                  // ✅ allows JS files
+      "checkJs": false,                 // set true if you want to type-check JS files
+      "jsx": "react-jsx",               // or "react" for older versions
+      "moduleResolution": "node",
+      "esModuleInterop": true,
+      "allowSyntheticDefaultImports": true,
+      "resolveJsonModule": true,
+      "isolatedModules": true,
+      "noEmit": true,                   // avoids emitting .js files
+      "forceConsistentCasingInFileNames": true,
+      "strict": true,                   // strict type checking
+      "skipLibCheck": true,              // faster builds by skipping lib checks
+      "baseUrl": ".",
+      "paths": {
+        "@/*": ["src/*"]
+      }
+    },
+    "include": ["src"],
+    "exclude": ["node_modules", "dist"]
+  }
+  
