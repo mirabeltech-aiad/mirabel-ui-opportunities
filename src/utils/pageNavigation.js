@@ -4,8 +4,6 @@
  * to open pages either in new browser tabs or in the Shell app's tab system
  */
 
-import { isWindowTopAccessible } from './windowHelpers';
-import { apiCall } from '@/services/httpClient';
 
 /**
  * Opens a page in a new browser tab
@@ -49,15 +47,31 @@ export const openPageInNextTab = (url, pageTitle, isQueryStrValEncoded, addTabAf
     return null;
   }
   
+  // Generate unique tab ID using timestamp
+  const time = new Date();
+  const index = "_" + time.getYear() + time.getMonth() + time.getDay() + time.getHours() + time.getMinutes() + time.getSeconds() + "";
+  const id = "Tab" + index;
+  
+  // Get page title from MMClientMessage if empty
+  if (pageTitle == '' || pageTitle == undefined) {
+    const messageWindow =  window.top ;
+    const magazineManagerText = (messageWindow.MMClientMessage && messageWindow.MMClientMessage.MagazineManager);
+    pageTitle = magazineManagerText + " " + index;
+  }
+  
   // Get the tab system actions from the global context
   if (window.homeActions && window.homeActions.addTab) {
     const tabData = {
-      title: pageTitle || 'New Tab',
+      id: id,
+      title: pageTitle,
       url: url,
       type: 'iframe',
       icon: '🌐',
       closable: true
     };
+    
+    // Note: Don't set window.name here - the iframe will get its window.name
+    // from the 'name' attribute when it's created in TabContent or IframeContainer
     
     // Add the tab using the home context actions
     window.homeActions.addTab(tabData);
@@ -93,6 +107,8 @@ export const initializePageNavigation = (homeActions) => {
     window.top.openPage = openPage;
     window.top.openPageInNextTab = openPageInNextTab;
     window.top.isWindowTopAccessible = isWindowTopAccessible;
+    window.top.renameTab = renameTab;
+    window.top.getCurrentWindowName = getCurrentWindowName;
     
     console.log('Page navigation helpers exposed on window.top');
   } else {
@@ -101,19 +117,86 @@ export const initializePageNavigation = (homeActions) => {
 
   // Load the localizer script
   loadLocalizerScript();
+  
+  // Initialize message event listeners for iframe communication
+  initializeMessageListeners();
 };
 
+/**
+ * Renames a tab by updating its title
+ * @param {string} newName - The new name/title for the tab
+ * @param {string} tabId - The ID of the tab to rename (optional, uses active tab if not provided)
+ */
+export const renameTab = (newName, tabId) => {
+  console.log('renameTab called with:', { newName, tabId });
+  
+
+  
+  // Get the tab system actions from the global context
+  if (window.homeActions && window.homeActions.updateTab) {
+    // If tabId is provided, update that specific tab
+    if (tabId) {
+      const success = window.homeActions.updateTab(tabId, { title: newName });
+      if (success) {
+        console.log('renameTab: Tab renamed successfully:', { tabId, newName });
+        return true;
+      } else {
+        console.warn('renameTab: Failed to find tab with ID:', tabId);
+        return false;
+      }
+    } else {
+      // If no tabId provided, update the active tab
+      if (window.homeActions.updateActiveTab) {
+        const success = window.homeActions.updateActiveTab({ title: newName });
+        if (success) {
+          console.log('renameTab: Active tab renamed successfully:', newName);
+          return true;
+        } else {
+          console.warn('renameTab: Failed to rename active tab');
+          return false;
+        }
+      } else {
+        console.warn('renameTab: updateActiveTab action not available');
+        return false;
+      }
+    }
+  } else {
+    console.error('renameTab: Home actions not available or updateTab method missing');
+    return false;
+  }
+};
+
+/**
+ * Loads the localizer script with the correct domain path
+ */
 const loadLocalizerScript = async () => {
   try {
+    // Get ContentVersion from MMClientVars in localStorage
+    let version = '638896304468465380'; // fallback version
+    try {
+      const mmClientVars = JSON.parse(localStorage.getItem('MMClientVars') || '{}');
+      if (mmClientVars.ContentVersion) {
+        version = mmClientVars.ContentVersion;
+      }
+    } catch (error) {
+      console.warn('Failed to get ContentVersion from MMClientVars, using fallback:', error);
+    }
+    
+    console.log("📦 Loading localizer script with Content Version:", version);
 
-      const version = response;
-      console.log("📦 Content Version:", version);
-
-      const script = document.createElement("script");
-      script.src = `/intranet/localizer.js.axd?v='1.0.0'`;
-      script.async = true;
-
-      document.head.appendChild(script);
+    const script = document.createElement("script");
+    
+    // Get the complete domain and remove everything after /app
+    const currentUrl = window.location.href;
+    const appIndex = currentUrl.indexOf('/app');
+    // Remove '/app' from the URL if present, to get the base domain path
+    const baseUrl = appIndex !== -1 ? currentUrl.substring(0, appIndex) : window.location.origin;
+    script.src = `${baseUrl}/intranet/localizer.js.axd?v=${version}`;
+    script.async = true;
+    console.log('script', script);
+    
+    document.head.appendChild(script);
+    console.log("✅ Localizer script loaded successfully");
 
   } catch (err) {
     console.error("❌ Failed to load localizer script:", err);
@@ -121,17 +204,182 @@ const loadLocalizerScript = async () => {
 };
 
 /**
+ * Initialize message event listeners for iframe communication
+ */
+export const initializeMessageListeners = () => {
+  console.log('Initializing message event listeners');
+  
+  if (window.addEventListener) {
+    window.addEventListener("message", displayMessage, false);
+  } else {
+    window.attachEvent("onmessage", displayMessage);
+  }
+};
+
+/**
+ * Display and handle messages from iframes
+ * @param {MessageEvent} evt - The message event
+ */
+function displayMessage(evt) {
+  const validOrigins = ["localhost", ".magazinemanager.", ".mirabelsmarketingmanager.", ".newspapermanager.", ".mirabeltechnologies.", ".chargebrite."];
+
+  if (validOrigins.some(origin => evt.origin.includes(origin))) {
+    const eventData = evt.data;
+    if (eventData === "pasteClicked") {
+      handlePasteClicked(evt);
+    } else if (eventData && eventData.Source && eventData.Source.toUpperCase() == "AD") {
+      //If the request from Analytics Dashboard, refresh Home Dashboard list
+      if (window.App && window.App.direct && window.App.direct.SetupDashboard) {
+        window.App.direct.SetupDashboard(eventData.Source.toUpperCase(), eventData.isReload);
+      }
+    } else if (eventData === "closeActTab") {
+      //Close active tab
+      closeTab();
+    } else if (eventData && JSON.stringify(eventData).indexOf("MKM_Page_Reload") > -1) {
+      //send passed data to MKM website pages
+      document.querySelectorAll("iframe").forEach(function (el) {
+        if (el.src.toLocaleLowerCase().indexOf('ismkm=1') > -1) {
+          el.contentWindow.postMessage(eventData, "*")
+        }
+      });
+    } else {
+      openAPageFromMKM(eventData);
+    }
+  } else {
+    return false;
+  }
+}
+
+/**
+ * Handle paste clicked event from iframes
+ * @param {MessageEvent} evt - The message event
+ */
+async function handlePasteClicked(evt) {
+  try {
+    const clipBoardAccess = await navigator.permissions.query({
+      name: "clipboard-read"
+    });
+
+    if (clipBoardAccess.state == "prompt" || clipBoardAccess.state == "granted") {
+      const clipBoardData = await navigator.clipboard.readText();
+      const updatedClipBoardAccess = await navigator.permissions.query({ name: "clipboard-read" });
+      if (updatedClipBoardAccess.state == "granted") {
+        const sendDataToPasteSection = {
+          source: "pasteClicked",
+          clipBoardData
+        };
+        evt.source.postMessage(sendDataToPasteSection, "*");
+      }
+    } else {
+      throw new Error("Clipboard permissions denied");
+    }
+  } catch (error) {
+    // Handle the error gracefully, e.g., display a notification or log the error.
+    showMsg('Denying the "Copy Clipboard" permission will prevent copying a section from one landing page and pasting it into other landing pages.');
+  }
+}
+
+/**
+ * Close the active tab
+ */
+function closeTab() {
+  if (window.homeActions && window.homeActions.closeActiveTab) {
+    window.homeActions.closeActiveTab();
+  } else if (window.App && window.App.tabpnlMain) {
+    var activeIndex = window.App.tabpnlMain.items.indexOf(window.App.tabpnlMain.getActiveTab());
+    window.App.tabpnlMain.remove(activeIndex);
+  }
+}
+
+/**
+ * Open a page from MKM (Mirabel Knowledge Management)
+ * @param {Object} recvData - The received data containing page information
+ */
+function openAPageFromMKM(recvData) {
+  if (!isNullOrEmpty(recvData) && !isNullOrEmpty(recvData.pgUrl)) {
+    if (!(recvData.hasOwnProperty('isMM') || recvData.hasOwnProperty('isMKM'))) {
+      const pageTitle = isNullOrEmpty(recvData.pgTitle) ? "Contact Details" : recvData.pgTitle;
+      
+      // Use the existing openPageInNextTab function
+      openPageInNextTab(recvData.pgUrl, pageTitle, false, true);
+    }
+  }
+}
+
+/**
+ * Utility function to check if a value is null or empty
+ * @param {*} value - The value to check
+ * @returns {boolean} - True if null or empty, false otherwise
+ */
+function isNullOrEmpty(value) {
+  return value === null || value === undefined || value === '';
+}
+
+/**
+ * Show a message to the user (placeholder for now)
+ * @param {string} message - The message to display
+ */
+function showMsg(message) {
+  console.warn('Message:', message);
+  // TODO: Implement proper message display mechanism
+  // This could be integrated with a toast notification system or modal
+}
+
+export const isWindowTopAccessible = () => {
+  try {
+    // Try to access window.top and a property on it
+    if (window.top && window.top !== window) {
+      // Try to access a property to test if it's really accessible
+      window.top.location.href;
+      return true;
+    }
+    return false;
+  } catch (error) {
+    // If we get a security error, window.top is not accessible
+    return false;
+  }
+};
+
+/**
+ * Gets the current window's name (works correctly in iframe context)
+ * @returns {string} The window name (should match the tab ID for iframes)
+ */
+export const getCurrentWindowName = () => {
+  return window.name || '';
+};
+
+/**
+ * Safely gets window.top if accessible
+ * @returns {Window|null} window.top if accessible, null otherwise
+ */
+export const getTopWindow = () => {
+  if (isWindowTopAccessible()) {
+    return window.top;
+  }
+  return null;
+}; 
+/**
  * Cleans up the page navigation helpers
  * This should be called when the Shell app unmounts
  */
 export const cleanupPageNavigation = () => {
   console.log('Cleaning up page navigation helpers');
   
+  // Remove message event listeners
+  if (window.removeEventListener) {
+    window.removeEventListener("message", displayMessage, false);
+  } else {
+    window.detachEvent("onmessage", displayMessage);
+  }
+  
   if (window.top) {
     delete window.top.openPage;
     delete window.top.openPageInNextTab;
     delete window.top.isWindowTopAccessible;
+    delete window.top.renameTab;
+    delete window.top.getCurrentWindowName;
   }
   
   delete window.homeActions;
 }; 
+

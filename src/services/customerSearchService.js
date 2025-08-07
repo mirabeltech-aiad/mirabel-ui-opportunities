@@ -1,6 +1,6 @@
-import httpClient from './httpClient';
-import { getUserInfo } from '@/utils/sessionHelpers';
-import { API_CRM_CONTACTS_SEARCH_QUICK } from '@/config/apiUrls';
+import axiosService from './axiosService';
+import { getUserInfo } from '../utils/sessionHelpers';
+import { API_CRM_CONTACTS_SEARCH_QUICK } from '../utils/apiUrls';
 
 /**
  * Customer Search Service for quick customer lookup
@@ -35,25 +35,22 @@ export const customerSearchService = {
         UserID: userId
       };
 
-      const response = await httpClient.post(API_CRM_CONTACTS_SEARCH_QUICK, requestData);
+      const response = await axiosService.post(API_CRM_CONTACTS_SEARCH_QUICK, requestData);
       
-      // Handle different response formats (matching legacy behavior)
+      // Handle different response formats (simplified with automatic content extraction)
       let contacts = [];
-      if (response.content?.List) {
-        // New format: response.content.List
-        contacts = response.content.List;
-      } else if (response.data?.content?.List) {
-        // Alternative format: response.data.content.List
-        contacts = response.data.content.List;
-      } else if (response.data?.List) {
-        // Direct List format
-        contacts = response.data.List;
-      } else if (response.data?.d?.List) {
+      if (response?.List) {
+        // Direct List format (content automatically extracted by axiosService)
+        contacts = response.List;
+      } else if (response?.d?.List) {
         // Legacy format with 'd' wrapper
-        contacts = response.data.d.List;
-      } else if (Array.isArray(response.data)) {
-        // Direct array format
-        contacts = response.data;
+        contacts = response.d.List;
+      } else if (Array.isArray(response)) {
+        // Direct array format  
+        contacts = response;
+      } else {
+        // Fallback - empty array
+        contacts = [];
       }
       
       // Filter out inactive contacts (matching legacy behavior)
@@ -77,7 +74,7 @@ export const customerSearchService = {
         return [];
       }
 
-      const response = await httpClient.get(`/crm/contacts/search/byrep/${repId}`);
+      const response = await axiosService.get(`/crm/contacts/search/byrep/${repId}`);
       return response.data?.List || [];
     } catch (error) {
       console.error('Error searching customers by rep:', error);
@@ -96,7 +93,7 @@ export const customerSearchService = {
         throw new Error('Invalid customer ID');
       }
 
-      const response = await httpClient.get(`/crm/contacts/${customerId}`);
+      const response = await axiosService.get(`/crm/contacts/${customerId}`);
       return response.data;
     } catch (error) {
       console.error('Error getting customer by ID:', error);

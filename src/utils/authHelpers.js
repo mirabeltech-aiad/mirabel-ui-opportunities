@@ -1,136 +1,132 @@
-import CryptoJS from "crypto-js";
+import { getSessionValue } from './sessionHelpers';
 import { isDevelopmentMode } from './developmentHelper';
+import CryptoJS from 'crypto-js';
+// Auth error constants
+export const AUTH_ERRORS = {
+  INVALID_SESSION: 'Invalid session',
+  TOKEN_EXPIRED: 'Token expired',
+  UNAUTHORIZED: 'Unauthorized access',
+  LOGIN_REQUIRED: 'Login required'
+};
 
+// Encryption/decryption key for auth operations
 export const authEncryptDecryptKey = "20SA16ED";
 export const crmEncryptDecryptKey = "$%x@#~$a";
-export const enkey = "C6mL09K3Y";
 
-export const getBasePath = () => {
-    return '/ui60/';
+
+/**
+ * Get the main login URL with return URL parameter
+ * @param {string} returnUrl - URL to redirect to after login
+ * @returns {string} Complete login URL
+ */
+export const getMainLoginUrl = (returnUrl = window.location.href) => {
+  const baseUrl = window.location.origin;
+  const encodedReturnUrl = encodeURIComponent(returnUrl);
+  return `${baseUrl}/login.aspx?ReturnUrl=${encodedReturnUrl}`;
 };
 
-export const encryptByDES = (message, key) => {
-    try {
-        let keyHex = CryptoJS.enc.Utf8.parse(key);
-        let ivHex = CryptoJS.enc.Utf8.parse(key);
-        keyHex = CryptoJS.SHA1(keyHex);
-        ivHex = CryptoJS.SHA1(ivHex);
-        // CryptoJS use CBC as the default mode, and Pkcs7 as the default padding scheme
-        var encrypted = CryptoJS.DES.encrypt(message, keyHex, {
-            mode: CryptoJS.mode.CBC,
-            iv: ivHex,
-            padding: CryptoJS.pad.Pkcs7,
-        });
-        return encrypted.toString();
-    } catch {
-        return "";
-    }
+/**
+ * Simple encryption function for auth data
+ * @param {string} text - Text to encrypt
+ * @returns {string} Encrypted text
+ */
+export const encrypt = (text) => {
+  if (!text) return '';
+  
+  try {
+    // Simple base64 encoding with key (not secure, just for obfuscation)
+    const combined = authEncryptDecryptKey + text;
+    return btoa(combined);
+  } catch (error) {
+    console.error('Encryption error:', error);
+    return text;
+  }
 };
 
-export const encrypt = (message, key) => {
-    try {
-        let keyHex = CryptoJS.enc.Utf8.parse(key);
-        let ivHex = CryptoJS.enc.Utf8.parse(key);
-        keyHex = CryptoJS.SHA1(keyHex);
-        ivHex = CryptoJS.SHA1(ivHex);
-        var encrypted = CryptoJS.DES.encrypt(message, keyHex, {
-            mode: CryptoJS.mode.CBC,
-            iv: ivHex,
-            padding: CryptoJS.pad.Pkcs7,
-        });
-        return encrypted.toString();
-    } catch {
-        return "";
-    }
-};
-
+/**
+ * Simple decryption function for auth data
+ * @param {string} message - Text to decrypt
+ * @param {string} key - Decryption key
+ * @returns {string} Decrypted text
+ */
 export const decrypt = (message, key) => {
-    try {
-        let keyHex = CryptoJS.enc.Utf8.parse(key);
-        let ivHex = CryptoJS.enc.Utf8.parse(key);
-        keyHex = CryptoJS.SHA1(keyHex);
-        ivHex = CryptoJS.SHA1(ivHex);
-        var decrypted = CryptoJS.DES.decrypt(message, keyHex, {
-            mode: CryptoJS.mode.CBC,
-            iv: ivHex,
-            padding: CryptoJS.pad.Pkcs7,
-        });
-        return decrypted.toString(CryptoJS.enc.Utf8);
-    } catch {
-        return "";
-    }
-};
-
-export const isTokenValid = (token) => {
-    if (!token) return false;
-
-    try {
-        // Basic JWT token validation
-        const tokenParts = token.split('.');
-        if (tokenParts.length !== 3) {
-            // If not JWT format, check if it's a simple token (non-empty string)
-            return token.length > 0;
-        }
-
-        const payload = JSON.parse(atob(tokenParts[1]));
-        const currentTime = Math.floor(Date.now() / 1000);
-
-        // Check if token is expired
-        if (payload.exp && payload.exp < currentTime) {
-            return false;
-        }
-
-        return true;
-    } catch (error) {
-        // If JWT parsing fails, treat as simple token
-        return token && token.length > 0;
-    }
-};
-
-
-export const AUTH_ERRORS = {
-    TOKEN_EXPIRED: "Authentication token expired. Please login again.",
-    INVALID_TOKEN: "Invalid authentication token.",
-    REFRESH_FAILED: "Failed to refresh authentication token.",
-    NETWORK_ERROR: "Network error during authentication."
-};
-
-// Security utilities
-export const sanitizeInput = (input) => {
-    if (typeof input !== 'string') return input;
-    return input.replace(/[<>&"']/g, (char) => {
-        const entityMap = {
-            '<': '&lt;',
-            '>': '&gt;',
-            '&': '&amp;',
-            '"': '&quot;',
-            "'": '&#39;'
-        };
-        return entityMap[char];
+  try {
+    let keyHex = CryptoJS.enc.Utf8.parse(key);
+    let ivHex = CryptoJS.enc.Utf8.parse(key);
+    keyHex = CryptoJS.SHA1(keyHex);
+    ivHex = CryptoJS.SHA1(ivHex);
+    var decrypted = CryptoJS.DES.decrypt(message, keyHex, {
+      mode: CryptoJS.mode.CBC,
+      iv: ivHex,
+      padding: CryptoJS.pad.Pkcs7,
     });
+    return decrypted.toString(CryptoJS.enc.Utf8);
+  } catch {
+    return "";
+  }
 };
-
-// Modified getMainLoginUrl to handle development mode
-export const getMainLoginUrl = (returnUrl) => {
-    if (isDevelopmentMode()) {
-        return returnUrl;
-    }
-
-    // Use the current domain from environment or fallback to current origin
-    const mmDomain = import.meta.env.REACT_APP_API_BASE_URL || window.location.origin;
-    const encodedReturnUrl = encodeURIComponent(returnUrl);
-    // Match legacy ASP.NET path: /intranet/Members/Home/Login.aspx
-    return `${mmDomain}/intranet/Members/Home/Login.aspx?ReturnUrl=${encodedReturnUrl}`;
-};
-
-// Logout utility that redirects to legacy logout URL
-export const logout = () => {
+/**
+ * Logout function - clears session and redirects
+ * @param {string} returnUrl - Optional return URL after logout
+ */
+export const logout = (returnUrl = null) => {
+  try {
+    // Clear all session data
+    localStorage.removeItem('MMClientVars');
+    localStorage.removeItem('authToken');
+    localStorage.removeItem('refreshToken');
+    localStorage.removeItem('userInfo');
+    
+    // Clear session storage
+    sessionStorage.clear();
+    
     // In development mode, just reload
     if (isDevelopmentMode()) {
-        window.location.reload();
-        return;
+      console.log('🔧 Auth: Development mode - reloading instead of redirect');
+      window.location.reload();
+      return;
     }
+    
+    // Redirect to logout page in production
+    const logoutUrl = returnUrl 
+      ? `/intranet/Members/Home/Logout.aspx?ReturnUrl=${encodeURIComponent(returnUrl)}`
+      : '/intranet/Members/Home/Logout.aspx';
+    
+    console.log('🔄 Auth: Redirecting to logout:', logoutUrl);
+    window.location.href = logoutUrl;
+  } catch (error) {
+    console.error('Logout error:', error);
+    // Fallback to hard refresh
+    window.location.reload();
+  }
+};
 
-    // Redirect to legacy logout URL which handles all cleanup
-    window.location.href = '/intranet/Members/Home/Logout.aspx';
-};                                                                                                                                                                                                                             
+/**
+ * Check if user is authenticated
+ * @returns {boolean} True if user is authenticated
+ */
+export const isAuthenticated = () => {
+  try {
+    const sessionData = getSessionValue('SessionID');
+    const userEmail = getSessionValue('Email');
+    
+    return !!(sessionData && userEmail);
+  } catch (error) {
+    console.error('Auth check error:', error);
+    return false;
+  }
+};
+
+/**
+ * Get current user's authentication status
+ * @returns {object} Auth status object
+ */
+export const getAuthStatus = () => {
+  return {
+    isAuthenticated: isAuthenticated(),
+    sessionId: getSessionValue('SessionID'),
+    userId: getSessionValue('UserID'),
+    email: getSessionValue('Email'),
+    fullName: getSessionValue('FullName')
+  };
+};

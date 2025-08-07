@@ -4,17 +4,12 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "env-cmd -f env-dev vite",
+    "dev": "vite",
     "dev:plain": "vite",
     "build": "vite build",
     "lint": "eslint .",
-    "preview": "vite preview",
-    "dev:dev": "env-cmd -f env-dev vite",
-    "dev:stage": "env-cmd -f env-stage vite",
-    "dev:prod": "env-cmd -f env-prod vite",
-    "build:dev": "env-cmd -f env-dev vite build",
-    "build:stage": "env-cmd -f env-stage vite build",
-    "build:prod": "env-cmd -f env-prod vite build"
+    "preview": "vite preview"
+ 
   },
   "dependencies": {
     "@dnd-kit/core": "^6.3.1",

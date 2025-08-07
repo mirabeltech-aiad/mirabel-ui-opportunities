@@ -5,23 +5,11 @@ import { ErrorBoundary } from "react-error-boundary";
 import ErrorFallback from "./components/shared/ErrorBoundary";
 import { GlobalProvider } from "./store/GlobalContext";
 import { AuthProvider } from "./contexts/AuthContext";
-import { SearchProvider } from "./features/Opportunity/contexts/SearchContext";
-import { EditModeProvider } from "./features/Opportunity/contexts/EditModeContext";
-import { Toaster } from "./components/ui/sonner";
 import { TooltipProvider } from "./components/ui/tooltip";
+import { Toaster } from "./components/ui/sonner";
 import AppRoutes from "./routers/routes.jsx";
-import {
-  getSessionValue,
-  checkAuthenticationStatus,
-  performLoginRedirect,
-} from "./utils/sessionHelpers";
-import {
-  isDevelopmentMode,
-  initializeDevelopmentEnvironment,
-  createHelperIframe,
-  devURL,
-  isWindowTopAccessible,
-} from "./utils/developmentHelper";
+import { isDevelopmentMode, initializeDevelopmentEnvironment } from "./utils/developmentHelper";
+import { getTopPath } from "./utils/commonHelpers";
 
 const queryClient = new QueryClient();
 
@@ -43,102 +31,53 @@ const LoadingSpinner = () => (
 
 function App() {
   const [isLoaded, setIsLoaded] = useState(false);
-
   useLayoutEffect(() => {
-    // Authentication check (matches mirabel.mm.ui pattern exactly)
-    const isAuthCallback = window.location.pathname.startsWith(
-      "/ui60/auth/callback"
-    );
-    const isBlankPage = window.location.pathname === "/ui60/blank";
+    const initializeApp = async () => {
+      // Initialize environment first (sets up localStorage in dev mode)
+      if (isDevelopmentMode()) {
+        initializeDevelopmentEnvironment();
+      }
 
-    // Load Message Localizer - similar to mirabel.mm.ui pattern
-    const loadMessageLocalizerWrapper = (urlPrefix = "") => {
-      // Re-use the Client Message from Home Page when available
-      if (
-        !isWindowTopAccessible() ||
-        !Object.prototype.hasOwnProperty.call(window.top, "MMClientMessage")
-      ) {
-        const script = document.createElement("script");
-        const contentVersion = getSessionValue("ContentVersion") || "1.0.0";
-        script.src = `${urlPrefix}/intranet/localizer.js.axd?v=${contentVersion}`;
-        script.addEventListener("load", () => {
-          setIsLoaded(true);
-        });
-        script.addEventListener("error", () => {
-          setIsLoaded(true); // Continue even if localizer fails
-        });
-        document.querySelector("body").appendChild(script);
-      } else {
-        setIsLoaded(true);
+      // In production, monitor for session data and redirect if needed
+      if (!isDevelopmentMode()) {
+        const checkSessionAndRedirect = () => {
+          const mmClientVars = localStorage && localStorage.getItem("MMClientVars");
+          if (!mmClientVars) {
+            console.log('⏳ No session data found, checking again in 5 seconds...');
+            // Give more time for the API call to complete
+            setTimeout(() => {
+              const retryMMClientVars = localStorage && localStorage.getItem("MMClientVars");
+              if (!retryMMClientVars) {
+                console.log('❌ No session data after 5 seconds, redirecting to login');
+                window.location.href = `${getTopPath()}/intranet/home/login.aspx`;
+              }
+            }, 5000);
+          } else {
+            console.log('✅ Session data found');
+          }
+        };
+
+        // Start monitoring after a short delay to let Home component load
+        setTimeout(checkSessionAndRedirect, 1000);
       }
     };
 
-    const isNotBlankPage = window.location.pathname !== "/ui60/blank";
-
-    if (isDevelopmentMode()) {
-      // Initialize development environment FIRST
-      initializeDevelopmentEnvironment();
-
-      // Create helper iframe for API communication
-      const cleanupIframe = createHelperIframe();
-
-      // Load message localizer with development URL
-      if (isNotBlankPage) {
-        loadMessageLocalizerWrapper(devURL);
-      } else {
-        setIsLoaded(true);
-      }
-
-      // Cleanup function
-      return () => {
-        if (cleanupIframe) {
-          cleanupIframe();
-        }
-      };
-    } else {
-      // Production mode - check authentication and redirect if needed
-      const handleProductionMode = async () => {
-        if (!isAuthCallback && !isBlankPage) {
-          const authStatus = await checkAuthenticationStatus();
-          if (authStatus.shouldRedirect) {
-            performLoginRedirect();
-            return;
-          }
-        }
-
-        // Production mode - load from current domain
-        if (isNotBlankPage) {
-          const currentDomain =
-            import.meta.env.REACT_APP_API_BASE_URL || window.location.origin;
-          loadMessageLocalizerWrapper(currentDomain);
-        } else {
-          setIsLoaded(true);
-        }
-      };
-
-      handleProductionMode();
-    }
+    initializeApp();
   }, []);
 
   return (
     <ErrorBoundary
       FallbackComponent={ErrorFallback}
-      onReset={() => {
-        window.location.reload();
-      }}
+      onReset={() => window.location.reload()}
     >
       <QueryClientProvider client={queryClient}>
         <GlobalProvider>
           <AuthProvider>
             <TooltipProvider>
-              <BrowserRouter basename="/ui60">
-                <SearchProvider>
-                  <EditModeProvider>
-                    <div className="min-h-screen bg-background font-sans antialiased">
-                      {isLoaded ? <AppRoutes /> : <LoadingSpinner />}
-                    </div>
-                  </EditModeProvider>
-                </SearchProvider>
+              <BrowserRouter basename="/app">
+                <div className="min-h-screen bg-background font-sans antialiased">
+                  <AppRoutes />
+                </div>
               </BrowserRouter>
             </TooltipProvider>
           </AuthProvider>

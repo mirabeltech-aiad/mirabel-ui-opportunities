@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { toast } from "@/features/Opportunity/hooks/use-toast";
+import { toast } from "@/components/ui/use-toast";
 
 const ColorCustomizer = () => {
   const [colors, setColors] = useState({

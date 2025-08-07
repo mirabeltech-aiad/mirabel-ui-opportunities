@@ -1,7 +1,19 @@
 // Development helper utilities - matches mirabel.mm.ui pattern
 
-// Development URL based on environment files (env-dev, env-stage, env-prod)
-export const devURL = import.meta.env.REACT_APP_API_BASE_URL || 'https://mirabeldev.magazinemanager.com';
+// Development API Configuration - Core credentials for API calls
+export const devApiConfig = {
+    "baseUrl":  "https://smoke-feature13.magazinemanager.com",
+    "domain": "smoke-feature13",
+    "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJMb2dnZWRJblVzZXJJRCI6IjEiLCJMb2dnZWRJblNpdGVDbGllbnRJRCI6IjEwMDA3IiwiTG9nZ2VkSW5TaXRlQ3VsdHVyZVVJIjoiZW4tVVMiLCJEYXRlVGltZSI6IjgvNS8yMDI1IDI6MDU6NTkgUE0iLCJMb2dnZWRJblNpdGVDdXJyZW5jeVN5bWJvbCI6IiIsIkxvZ2dlZEluU2l0ZURhdGVGb3JtYXQiOiIiLCJEb21haW4iOiJzbW9rZS1mZWF0dXJlMTMiLCJMb2dnZWRJblNpdGVUaW1lQWRkIjpbIjAiLCIwIl0sIlNvdXJjZSI6IlRNTSIsIkVtYWlsIjoic2FAbWFnYXppbmVtYW5hZ2VyLmNvbSIsIklzQVBJVXNlciI6IkZhbHNlIiwibmJmIjoxNzU0NDAyNzU5LCJleHAiOjE3NTc0MDI3NTksImlhdCI6MTc1NDQwMjc1OSwiaXNzIjoiTWFnYXppbmVNYW5hZ2VyIiwiYXVkIjoiKiJ9.DJSwWDAjL7992_nAvHP5ipB_WoTIfaPB-g2NRS0OJ8E"
+};
+// export const devApiConfig = {
+//     "baseUrl":  "http://localhost",
+//     "domain": "localhost",
+//     "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJMb2dnZWRJblVzZXJJRCI6IjEiLCJMb2dnZWRJblNpdGVDbGllbnRJRCI6Ijk5MjAiLCJMb2dnZWRJblNpdGVDdWx0dXJlVUkiOiJlbi11cyIsIkRhdGVUaW1lIjoiMzEtMDctMjAyNSAxMTo0OTowNSIsIkxvZ2dlZEluU2l0ZUN1cnJlbmN5U3ltYm9sIjoiIiwiTG9nZ2VkSW5TaXRlRGF0ZUZvcm1hdCI6IiIsIkRvbWFpbiI6ImxvY2FsaG9zdCIsIkxvZ2dlZEluU2l0ZVRpbWVBZGQiOlsiMCIsIjAiXSwiU291cmNlIjoiVE1NIiwiRW1haWwiOiJzYUBtYWdhemluZW1hbmFnZXIuY29tIiwiSXNBUElVc2VyIjoiRmFsc2UiLCJuYmYiOjE3NTM5NjI1NDUsImV4cCI6MTc1Njk2MjU0NSwiaWF0IjoxNzUzOTYyNTQ1LCJpc3MiOiJNYWdhemluZU1hbmFnZXIiLCJhdWQiOiIqIn0.oYMUH3ttGycmsJxUPZkc57kx-DEKbxuaZl4C_ipTPV8"
+// };
+
+// Development URL (legacy compatibility)
+export const devURL = devApiConfig.Host;
 
 // Promise management for iframe communication
 export const promises = {};
@@ -10,57 +22,61 @@ export const promises = {};
 export const getValue = () => {
     return Math.random().toString(36).substr(2, 9) + Date.now().toString(36);
 };
-
-// Environment-aware session values for development
-const getEnvironmentInfo = () => {
-    const apiBaseUrl = import.meta.env.REACT_APP_API_BASE_URL || 'https://mirabeldev.magazinemanager.com';
-    const urlObj = new URL(apiBaseUrl);
-    const hostname = urlObj.hostname;
-    const subdomain = hostname.split('.')[0];
-
-    return {
-        apiBaseUrl,
-        hostname,
-        subdomain,
-        environment: import.meta.env.REACT_APP_ENVIRONMENT || 'development'
-    };
+// Development session values - references devApiConfig
+export const sessionValues = {
+  // Core API credentials - referenced from devApiConfig
+  "UserID": 1,
+  "Email": "sa@magazinemanager.com",
+  "Token": devApiConfig.token,
+  "Domain": devApiConfig.domain,
+  "Host": devApiConfig.baseUrl,
+  
+  // Authentication & Session
+  "AccessTokenTimeOut": "2025-09-04T01:47:49.87",
+  "IsAuthenticated": false,
+  "ChangePassword": false,
+  
+  // Client & Company Information
+  "ClientID": 9920,
+  "CompanyName": "Mirabel Development | Test site",
+  "CultureUI": "en-us",
+  "SiteType": "",
+  "TimeAdd": 0,
+  
+  // Package & Product Configuration
+  "PackageTypeID": 3,
+  "ProductType": "10182",
+  "PASubProductTypeId": 0,
+  "PASubProductTypeName": "",
+  "BSASubProductTypeId": 21,
+  "BSASubProductTypeName": "Broadstreet",
+  
+  // Feature Flags & Permissions
+  "IsMKMEnabled": true,
+  "IsUserHasMKMAccess": true,
+  "IsSiteDataPackEnabled": false,
+  "IsUserHasDataPackAccess": false,
+  "IsMirabelEmailServiceEnabled": false,
+  "IsRepNotificationEnabled": false,
+  "CanSendCRMEmail": true,
+  
+  // User Profile Information
+  "UserName": "sa@magazinemanager.com",
+  "EmployeeID": 1,
+  "FirstName": "System",
+  "LastName": "Administrator",
+  "FullName": "System Administrator",
+  "DisplayName": "System Administrator",
+  "IsAdmin": true,
+  "IsSA": true,
+  "UserNameID": 1,
+  "SalesRepName": "System Administrator",
+  "DepartmentID": "1",
+  
+  // Content & Version
+  "ContentVersion": null
 };
 
-// Hardcoded session values for development - now environment-aware
-export const sessionValues = (() => {
-    const envInfo = getEnvironmentInfo();
-
-    return {
-        "UserID": 23,
-        "Email": "techsupport@magazinemanager.com",
-        "IsAdmin": false,
-        "IsAuthenticated": true, // Critical for authentication check
-        "Token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJMb2dnZWRJblVzZXJJRCI6IjEiLCJMb2dnZWRJblNpdGVDbGllbnRJRCI6IjEwMDA3IiwiTG9nZ2VkSW5TaXRlQ3VsdHVyZVVJIjoiZW4tVVMiLCJEYXRlVGltZSI6IjcvMzAvMjAyNSAxMjo1MjozOSBQTSIsIkxvZ2dlZEluU2l0ZUN1cnJlbmN5U3ltYm9sIjoiIiwiTG9nZ2VkSW5TaXRlRGF0ZUZvcm1hdCI6IiIsIkRvbWFpbiI6InNtb2tlLWZlYXR1cmUxMyIsIkxvZ2dlZEluU2l0ZVRpbWVBZGQiOlsiMCIsIjAiXSwiU291cmNlIjoiVE1NIiwiRW1haWwiOiJzYUBtYWdhemluZW1hbmFnZXIuY29tIiwiSXNBUElVc2VyIjoiRmFsc2UiLCJuYmYiOjE3NTM4Nzk5NTksImV4cCI6MTc1Njg3OTk1OSwiaWF0IjoxNzUzODc5OTU5LCJpc3MiOiJNYWdhemluZU1hbmFnZXIiLCJhdWQiOiIqIn0.GMBn3Yj3wUbqltrbzO1vizzYb9c54G3_Ey9bm8Z0j3A",
-        "IsSA": "false",
-        "UserName": "Support Tech",
-        "DisplayName": "Support,Tech",
-        "UserNameID": "tsupport",
-        "ClientID": "5",
-        "Host": import.meta.env.REACT_APP_API_BASE_URL || envInfo.apiBaseUrl, // Use env var if available
-        "Domain": envInfo.subdomain, // Now environment-aware
-        "ContentVersion": "5.22.3",
-        "AccessTokenTimeOut": "7/1/2032 4:54:03 PM",
-        "IsMKMEnabled": "True",
-        "CompanyName": `Mirabel Technologies, Inc. (${envInfo.environment.toUpperCase()})`, // Show environment
-        "ProductType": "10178",
-        "TimeAdd": "0",
-        "PageList": "Invoices,Dashboards",
-        "HelpSite": "https://help.mirabeltechnologies.com",
-        "FullName": `Tech Support (${envInfo.environment})`, // Show environment
-        "DepartmentID": "2",
-        "PASubProductTypeId": "0",
-        "PASubProductTypeName": "",
-        "BSASubProductTypeId": "0",
-        "BSASubProductTypeName": "",
-        "CustomerPortalUrl": "http://portal.mirabeltechnologies.de",
-        "CanSendCRMEmail": "true"
-    };
-})();
 
 // Message handler for iframe communication
 export const handleMessage = (event) => {
@@ -95,32 +111,13 @@ export const handleMessage = (event) => {
     }
 };
 
-// Check if we're in development mode - STRICT CHECK for security
+// Check if we're in development mode - Vite specific
 export const isDevelopmentMode = () => {
-    // STRICT checks - must be explicitly development AND localhost
-    const isLocalhost = window.location.hostname === 'localhost' ||
-        window.location.hostname === '127.0.0.1' ||
-        window.location.hostname.startsWith('192.168.') ||
-        window.location.hostname.endsWith('.local');
-
-    const isExplicitDev = import.meta.env.REACT_APP_ENVIRONMENT === 'development';
-    const isNodeDev = import.meta.env.NODE_ENV === 'development';
-
-    // MUST be localhost AND have development indicators
-    // When in doubt, treat as production for security
-    const isDev = isLocalhost && (isExplicitDev || isNodeDev);
-
-    // // Debug logging
-    // console.log('🔍 Environment Check (STRICT):', {
-    //     'NODE_ENV': import.meta.env.NODE_ENV,
-    //     'REACT_APP_ENVIRONMENT': import.meta.env.REACT_APP_ENVIRONMENT,
-    //     'hostname': window.location.hostname,
-    //     'isLocalhost': isLocalhost,
-    //     'isExplicitDev': isExplicitDev,
-    //     'isNodeDev': isNodeDev,
-    //     'isDevelopmentMode': isDev,
-    //     'treatAsProduction': !isDev
-    // });
+    // Vite provides import.meta.env.DEV for development detection
+    const isViteDev = import.meta.env.DEV;
+    const isDevMode = import.meta.env.MODE === 'development';
+    // For Vite: Use DEV flag or development mode
+    const isDev = (isViteDev || isDevMode);
 
     return isDev || true;
 };
@@ -128,245 +125,12 @@ export const isDevelopmentMode = () => {
 // Initialize development environment
 export const initializeDevelopmentEnvironment = () => {
     if (isDevelopmentMode()) {
-        console.log(`🚧 Development Mode: ${getEnvironmentInfo().environment.toUpperCase()}`);
-        console.log(`🌐 API Base URL: ${getEnvironmentInfo().apiBaseUrl}`);
-
-        // Log initial session status
-        logSessionStatus();
-
-        // Set hardcoded session values if needed
-        const existingSession = localStorage.getItem("MMClientVars");
-        let shouldSetSession = false;
-
-        if (!existingSession) {
-            shouldSetSession = true;
-            console.log('ℹ️  Development Helper: No existing session found');
-        } else {
-            try {
-                const parsed = JSON.parse(existingSession);
-                const existingToken = parsed.Token;
-
-                const isValidToken = existingToken &&
-                    existingToken.length > 20 &&
-                    existingToken.includes('.') &&
-                    !existingToken.includes('dev_token') &&
-                    !existingToken.includes('placeholder');
-
-                if (!isValidToken) {
-                    shouldSetSession = true;
-                    console.log('⚠️  Development Helper: Existing token is invalid/placeholder, replacing...');
-                    console.log('🔑 Invalid Token:', existingToken);
-                } else {
-                    console.log('ℹ️  Development Helper: Using existing valid session');
-                    console.log('🔑 Existing Token Available:', !!existingToken);
-                }
-            } catch (e) {
-                shouldSetSession = true;
-                console.error('❌ Error parsing existing session, resetting:', e);
-            }
-        }
-
-        if (shouldSetSession) {
-            // Force initialize session immediately
-            localStorage.setItem("MMClientVars", JSON.stringify(sessionValues));
-            sessionStorage.setItem("ClientID", sessionValues.ClientID);
-            console.log('✅ Force initialized session with development values');
-        }
-
-        // Always ensure IsAuthenticated is true for development
-        const currentSession = JSON.parse(localStorage.getItem("MMClientVars") || "{}");
-        if (!currentSession.IsAuthenticated || !currentSession.Email) {
-            // Merge with sessionValues to ensure all required fields are present
-            const updatedSession = { ...sessionValues, ...currentSession };
-            updatedSession.IsAuthenticated = true;
-            localStorage.setItem("MMClientVars", JSON.stringify(updatedSession));
-            console.log('✅ Updated session for development with all required fields');
-        }
-
-        // Initialize sessionStorage for cross-tab validation
-        if (currentSession.ClientID && !sessionStorage.getItem("ClientID")) {
-            sessionStorage.setItem("ClientID", currentSession.ClientID);
-            console.log('✅ Set ClientID in sessionStorage for cross-tab validation');
-        }
-
-        // Make development utilities available globally
-        if (typeof window !== 'undefined') {
-            window.devHelper = {
-                checkSession: logSessionStatus,
-                initSession: forceInitializeSession,
-                clearSession: clearSessionData,
-                reload: () => window.location.reload(),
-                switchEnv: switchDevelopmentEnvironment
-            };
-            
-            // Add session debug function to global scope
-            window.debugSession = async () => {
-                const { debugSession } = await import('./sessionHelpers');
-                return debugSession();
-            };
-            
-            // Add direct localStorage access
-            window.getSession = () => {
-                const mmClientVars = localStorage.getItem("MMClientVars");
-                if (mmClientVars) {
-                    try {
-                        return JSON.parse(mmClientVars);
-                    } catch (error) {
-                        console.error('Error parsing session:', error);
-                        return null;
-                    }
-                }
-                return null;
-            };
-            
-            // Add session setter
-            window.setSession = (sessionData) => {
-                localStorage.setItem("MMClientVars", JSON.stringify(sessionData));
-                console.log('✅ Session set:', sessionData);
-            };
-            
-            console.log('🔧 Global debug functions available:');
-            console.log('  - window.debugSession() - Full session debug');
-            console.log('  - window.getSession() - Get raw session data');
-            console.log('  - window.setSession(data) - Set session data');
-            console.log('  - window.devHelper - Development utilities');
-            
-            console.log('🛠️ Development utilities available in console:');
-            console.log('- devHelper.checkSession() - Check current session');
-            console.log('- devHelper.initSession() - Force initialize session');
-            console.log('- devHelper.clearSession() - Clear session data');
-            console.log('- devHelper.reload() - Reload page');
-            console.log('- devHelper.switchEnv(envName) - Switch environment');
-        }
+        // Set session data in localStorage
+        localStorage.setItem("MMClientVars", JSON.stringify(sessionValues));
+        sessionStorage.setItem("ClientID", sessionValues.ClientID);
+        
+        console.log('✅ Development session initialized');
     }
 };
 
-// Enhanced session status logging
-export const logSessionStatus = () => {
-    if (!isDevelopmentMode()) return null;
-
-    console.log('🔍 Session Status:');
-    console.log('- Environment:', import.meta.env.NODE_ENV);
-    console.log('- Location:', window.location.hostname);
-    console.log('- isDevelopment:', isDevelopmentMode());
-    console.log('- localStorage MMClientVars:', localStorage.getItem("MMClientVars"));
-    console.log('- sessionStorage ClientID:', sessionStorage.getItem("ClientID"));
-
-    // Get session values directly from localStorage to avoid dependency issues
-    const sessionData = JSON.parse(localStorage.getItem("MMClientVars") || "{}");
-    console.log('- Email:', sessionData.Email || 'Not found');
-    console.log('- UserID:', sessionData.UserID || 'Not found');
-    console.log('- Token:', sessionData.Token ? `${sessionData.Token.substring(0, 20)}...` : 'Not found');
-
-    return {
-        hasMMClientVars: !!localStorage.getItem("MMClientVars"),
-        hasClientID: !!sessionStorage.getItem("ClientID"),
-        hasEmail: !!sessionData.Email,
-        hasUserID: !!sessionData.UserID,
-        hasToken: !!sessionData.Token
-    };
-};
-
-// Force initialize development session
-export const forceInitializeSession = () => {
-    if (!isDevelopmentMode()) return;
-
-    console.log('🔧 Force initializing development session...');
-    localStorage.setItem("MMClientVars", JSON.stringify(sessionValues));
-    sessionStorage.setItem("ClientID", sessionValues.ClientID);
-    console.log('✅ Session initialized with development values');
-    return logSessionStatus();
-};
-
-// Clear all session data
-export const clearSessionData = () => {
-    if (!isDevelopmentMode()) return;
-
-    console.log('🧹 Clearing all session data...');
-    localStorage.removeItem("MMClientVars");
-    localStorage.removeItem("TokenData");
-    sessionStorage.clear();
-    console.log('✅ Session cleared');
-    return logSessionStatus();
-};
-
-// Create helper iframe for API communication
-export const createHelperIframe = () => {
-    if (isDevelopmentMode()) {
-        const body = document.querySelector("body");
-        const iframe = document.createElement("iframe");
-
-        iframe.src = `${devURL}/intranet/Mirabel.MM.Web/Members/Home/ReactLocalHelper.aspx`;
-        iframe.style.display = "none";
-        iframe.id = "mmdeviframe";
-        iframe.onload = () => {
-            console.log('🔗 Development Helper: Helper iframe loaded');
-        };
-
-        body.appendChild(iframe);
-
-        // Add message listener
-        window.addEventListener("message", handleMessage);
-
-        return () => {
-            if (body.contains(iframe)) {
-                body.removeChild(iframe);
-            }
-            window.removeEventListener("message", handleMessage);
-        };
-    }
-    return null;
-};
-
-// Utility to check if window.top is accessible
-export const isWindowTopAccessible = () => {
-    try {
-        return window.top && window.top.location && window.top.location.hostname;
-    } catch {
-        return false;
-    }
-};
-
-// Load message localizer
-export const loadMessageLocalizer = (callback, urlPrefix = "") => {
-    // Re-use the Client Message from Home Page when available
-    if (!isWindowTopAccessible() || !Object.prototype.hasOwnProperty.call(window.top, "MMClientMessage")) {
-        const script = document.createElement("script");
-        const sessionValue = JSON.parse(localStorage.getItem("MMClientVars") || "{}");
-        const contentVersion = sessionValue.ContentVersion || "1.0.0";
-
-        script.src = `${urlPrefix}/intranet/localizer.js.axd?v=${contentVersion}`;
-        script.addEventListener("load", () => {
-            callback && callback();
-        });
-        script.addEventListener("error", () => {
-            callback && callback(); // Continue even if localizer fails
-        });
-
-        document.querySelector("body").appendChild(script);
-    } else {
-        callback && callback();
-    }
-};
-
-// Development environment switcher
-export const switchDevelopmentEnvironment = (envName) => {
-    if (isDevelopmentMode()) {
-        localStorage.removeItem("MMClientVars");
-        localStorage.setItem("MM_ENVIRONMENT", envName);
-        window.location.reload();
-    }
-};
-
-// Log development information
-export const logDevelopmentInfo = () => {
-    if (isDevelopmentMode()) {
-        const envInfo = getEnvironmentInfo();
-        console.log('🚧 Development Environment Information:');
-        console.log('- Environment:', envInfo.environment.toUpperCase());
-        console.log('- API Base URL:', envInfo.apiBaseUrl);
-        console.log('- Domain:', envInfo.hostname);
-        console.log('- Subdomain:', envInfo.subdomain);
-        console.log('- Session Values:', JSON.parse(localStorage.getItem("MMClientVars") || "{}"));
-    }
-}; 
+ 
