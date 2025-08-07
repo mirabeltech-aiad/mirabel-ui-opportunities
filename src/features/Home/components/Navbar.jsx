@@ -403,17 +403,21 @@ const Navbar = () => {
   };
 
   // Refresh current tab
-  const handleRefresh = () => {
+  const handleRefresh = async () => {
     const activeTab = tabs.find(tab => tab.id === activeTabId);
     
     if (activeTab) {
       if (activeTab.id === 'dashboard') {
-        // Refresh dashboard by reloading navigation and dashboards
+        // Refresh dashboard by reloading dashboard data and menu items only
         actions.setNavigationLoading(true);
-        // Trigger a reload of the dashboard data
-        setTimeout(() => {
+        // Trigger a refresh of dashboard data and menu items
+        try {
+          await actions.setupDashboard('', true); // Pass isReload=true to refresh dashboard data
+        } catch (error) {
+          console.error('Failed to refresh dashboard:', error);
+        } finally {
           actions.setNavigationLoading(false);
-        }, 1000);
+        }
       } else if (activeTab.id === 'inbox') {
         // Refresh inbox by calling the global reload function
         if (window.reloadInboxIframes) {
