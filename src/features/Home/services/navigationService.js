@@ -19,20 +19,32 @@ export const navigationService = {
    */
    _apiDataCache: null,
 
+  /**
+   * Cache for sitewide settings to prevent duplicate API calls
+   */
+   _sitewideSettingsCache: null,
+
 
 
   /**
-   * Verify if Mirabel Email Service is enabled - matches backend VerifyIsMirabelEmailServiceEnabled exactly
-   * @returns {Promise<Object>} Object with isMirabelEmailServiceEnabled, isRepNotificationEnabled, isMirabelEmailTransEnabled
+   * Verify sitewide settings in a single API call - combines email service and call disposition settings
+   * @returns {Promise<Object>} Object with all sitewide settings
    */
-  verifyIsMirabelEmailServiceEnabled: async () => {
+  verifySitewideSettings: async () => {
     try {
-      // Get EmailSenderType, IsRepNotificationsEnabled, IsMirabelEmailTransSendEnabled from sitewide defaults
-      const response = await axiosService.post(ADMIN_API.SITEWIDE_SETTINGS_GET_COLUMNNAMES, "EmailSenderType,IsRepNotificationsEnabled,IsMirabelEmailTransSendEnabled");
+      // Return cached data if available to prevent duplicate API calls
+      if (navigationService._sitewideSettingsCache) {
+        return navigationService._sitewideSettingsCache;
+      }
+
+      // Get all required settings in a single API call
+      const response = await axiosService.post(ADMIN_API.SITEWIDE_SETTINGS_GET_COLUMNNAMES, "EmailSenderType,IsRepNotificationsEnabled,IsMirabelEmailTransSendEnabled,IsCallDispositionEnabled");
+      
       if (response?.JSONContent) {
         // Parse the JSONContent string to get the actual data
         const sitewideDefaults = JSON.parse(response.JSONContent);
         
+        // Email service settings
         const isRepNotificationEnabled = sitewideDefaults.IsRepNotificationsEnabled === true || sitewideDefaults.IsRepNotificationsEnabled === 'True';
         const isMirabelEmailTransEnabled = sitewideDefaults.IsMirabelEmailTransSendEnabled === true || sitewideDefaults.IsMirabelEmailTransSendEnabled === 'True';
         
@@ -50,34 +62,67 @@ export const navigationService = {
         // Determine if Mirabel Email Service is enabled - matches backend logic exactly
         const isMirabelEmailServiceEnabled = emailSender === EMAIL_SENDER.MIRABEL_EMAIL || isRepNotificationEnabled;
         
+        // Call disposition settings
+        const isCallDispositionEnabled = sitewideDefaults.IsCallDispositionEnabled === true || sitewideDefaults.IsCallDispositionEnabled === 'True';
+        
         const result = {
           isMirabelEmailServiceEnabled,
           isRepNotificationEnabled,
-          isMirabelEmailTransEnabled
+          isMirabelEmailTransEnabled,
+          isCallDispositionEnabled
         };
         
-        // Update localStorage MMClientVars with the new values
+        // Update localStorage MMClientVars with all the new values in a single call
         navigationService.updateSessionData({
           isMirabelEmailServiceEnabled: isMirabelEmailServiceEnabled,
           isRepNotificationEnabled: isRepNotificationEnabled,
-          isMirabelEmailTransEnabled: isMirabelEmailTransEnabled
+          isMirabelEmailTransEnabled: isMirabelEmailTransEnabled,
+          isCallDispositionEnabled: isCallDispositionEnabled
         });
+        
+        // Cache the result to prevent duplicate API calls
+        navigationService._sitewideSettingsCache = result;
         
         return result;
       } else {
-        return {
+        const defaultResult = {
           isMirabelEmailServiceEnabled: false,
           isRepNotificationEnabled: false,
-          isMirabelEmailTransEnabled: false
+          isMirabelEmailTransEnabled: false,
+          isCallDispositionEnabled: false
         };
+        
+        // Cache the default result as well
+        navigationService._sitewideSettingsCache = defaultResult;
+        
+        return defaultResult;
       }
     } catch (error) {
-      return {
+      const errorResult = {
         isMirabelEmailServiceEnabled: false,
         isRepNotificationEnabled: false,
-        isMirabelEmailTransEnabled: false
+        isMirabelEmailTransEnabled: false,
+        isCallDispositionEnabled: false
       };
+      
+      // Cache the error result as well
+      navigationService._sitewideSettingsCache = errorResult;
+      
+      return errorResult;
     }
+  },
+
+  /**
+   * Verify if Mirabel Email Service is enabled - matches backend VerifyIsMirabelEmailServiceEnabled exactly
+   * @returns {Promise<Object>} Object with isMirabelEmailServiceEnabled, isRepNotificationEnabled, isMirabelEmailTransEnabled
+   */
+  verifyIsMirabelEmailServiceEnabled: async () => {
+    const settings = await navigationService.verifySitewideSettings();
+    return {
+      isMirabelEmailServiceEnabled: settings.isMirabelEmailServiceEnabled,
+      isRepNotificationEnabled: settings.isRepNotificationEnabled,
+      isMirabelEmailTransEnabled: settings.isMirabelEmailTransEnabled
+    };
   },
 
   /**
@@ -85,25 +130,8 @@ export const navigationService = {
    * @returns {Promise<boolean>} Whether call disposition is enabled
    */
   verifyIsCallDispositionEnabled: async () => {
-    try {
-      // Get IsCallDispositionEnabled from sitewide defaults
-      const response = await axiosService.post(ADMIN_API.SITEWIDE_SETTINGS_GET_COLUMNNAMES, "IsCallDispositionEnabled");
-      if (response?.content?.JSONContent) {
-        const sitewideDefaults = JSON.parse(response.content.JSONContent);
-        const isCallDispositionEnabled = sitewideDefaults.IsCallDispositionEnabled === true || sitewideDefaults.IsCallDispositionEnabled === 'True';
-        
-        // Update localStorage MMClientVars with the new value
-        navigationService.updateSessionData({
-          isCallDispositionEnabled: isCallDispositionEnabled
-        });
-        
-        return isCallDispositionEnabled;
-      } else {
-        return false;
-      }
-    } catch (error) {
-      return false;
-    }
+    const settings = await navigationService.verifySitewideSettings();
+    return settings.isCallDispositionEnabled;
   },
 
   /**
@@ -112,13 +140,8 @@ export const navigationService = {
    */
   initializeSessionData: async () => {
     try {
-     
-        // Fetch email service settings
-        await navigationService.verifyIsMirabelEmailServiceEnabled();
-        
-        // Fetch call disposition settings
-        await navigationService.verifyIsCallDispositionEnabled();
-        
+      // Fetch all sitewide settings in a single API call
+      await navigationService.verifySitewideSettings();
     } catch (error) {
       console.error('❌ Error initializing session data:', error);
     }
@@ -722,10 +745,23 @@ export const navigationService = {
   },
 
   /**
+   * Clear sitewide settings cache
+   * This can be called to force a refresh of sitewide settings
+   */
+  clearSitewideSettingsCache: () => {
+    navigationService._sitewideSettingsCache = null;
+    console.log('✅ Sitewide settings cache cleared');
+  },
+
+  /**
    * Cleanup navigation service
    * This should be called when the Home component unmounts
    */
   cleanup: () => {
+    // Clear caches
+    navigationService._apiDataCache = null;
+    navigationService._sitewideSettingsCache = null;
+    
     // Remove global references
     delete window.homeActions;
     delete window.menuItemClick;
