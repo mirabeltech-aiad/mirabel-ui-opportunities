@@ -131,7 +131,7 @@ const TabNavigation = memo(() => {
       title: 'New Tab',
       component: 'NewTab',
       type: 'component',
-      icon: '📄',
+      icon: '',
       closable: true
     });
   };
@@ -246,9 +246,9 @@ const TabNavigation = memo(() => {
                    <DropdownMenuTrigger asChild>
                      <button
                        className="ml-2 p-0 hover:bg-gray-200 rounded transition-colors flex items-center justify-center"
-                       style={{ background: 'none', border: 'none', height: '16px', width: '16px' }}
+                       style={{ background: 'none', border: 'none', height: '16px', width: '16px', outline: 'none' }}
                      >
-                       <ChevronDown className="h-3 w-3" />
+                       <ChevronDown className="h-3 w-3 text-gray-600" />
                      </button>
                    </DropdownMenuTrigger>
                  </div>
