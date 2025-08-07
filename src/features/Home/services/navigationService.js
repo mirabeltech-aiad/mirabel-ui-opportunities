@@ -24,6 +24,16 @@ export const navigationService = {
    */
    _sitewideSettingsCache: null,
 
+  /**
+   * Promise cache for API data to prevent race conditions
+   */
+   _apiDataPromiseCache: null,
+
+  /**
+   * Promise cache for sitewide settings to prevent race conditions
+   */
+   _sitewideSettingsPromiseCache: null,
+
 
 
   /**
@@ -37,78 +47,85 @@ export const navigationService = {
         return navigationService._sitewideSettingsCache;
       }
 
-      // Get all required settings in a single API call
-      const response = await axiosService.post(ADMIN_API.SITEWIDE_SETTINGS_GET_COLUMNNAMES, "EmailSenderType,IsRepNotificationsEnabled,IsMirabelEmailTransSendEnabled,IsCallDispositionEnabled");
-      
-      if (response?.JSONContent) {
-        // Parse the JSONContent string to get the actual data
-        const sitewideDefaults = JSON.parse(response.JSONContent);
-        
-        // Email service settings
-        const isRepNotificationEnabled = sitewideDefaults.IsRepNotificationsEnabled === true || sitewideDefaults.IsRepNotificationsEnabled === 'True';
-        const isMirabelEmailTransEnabled = sitewideDefaults.IsMirabelEmailTransSendEnabled === true || sitewideDefaults.IsMirabelEmailTransSendEnabled === 'True';
-        
-        // EmailSenderType logic - matches backend EmailSenderType function exactly
-        const emailSenderType = parseInt(sitewideDefaults.EmailSenderType) || 0;
-        const isMKM = true; // We're in MKM context
-        
-        let emailSender;
-        if (isMKM) {
-          emailSender = emailSenderType === EMAIL_SENDER.MAILCHIMP_PLUS_MKM ? EMAIL_SENDER.MIRABEL_EMAIL : emailSenderType;
-        } else {
-          emailSender = emailSenderType === EMAIL_SENDER.MAILCHIMP_PLUS_MKM ? EMAIL_SENDER.MAILCHIMP : emailSenderType;
-        }
-        
-        // Determine if Mirabel Email Service is enabled - matches backend logic exactly
-        const isMirabelEmailServiceEnabled = emailSender === EMAIL_SENDER.MIRABEL_EMAIL || isRepNotificationEnabled;
-        
-        // Call disposition settings
-        const isCallDispositionEnabled = sitewideDefaults.IsCallDispositionEnabled === true || sitewideDefaults.IsCallDispositionEnabled === 'True';
-        
-        const result = {
-          isMirabelEmailServiceEnabled,
-          isRepNotificationEnabled,
-          isMirabelEmailTransEnabled,
-          isCallDispositionEnabled
-        };
-        
-        // Update localStorage MMClientVars with all the new values in a single call
-        navigationService.updateSessionData({
-          isMirabelEmailServiceEnabled: isMirabelEmailServiceEnabled,
-          isRepNotificationEnabled: isRepNotificationEnabled,
-          isMirabelEmailTransEnabled: isMirabelEmailTransEnabled,
-          isCallDispositionEnabled: isCallDispositionEnabled
-        });
-        
-        // Cache the result to prevent duplicate API calls
-        navigationService._sitewideSettingsCache = result;
-        
-        return result;
-      } else {
-        const defaultResult = {
-          isMirabelEmailServiceEnabled: false,
-          isRepNotificationEnabled: false,
-          isMirabelEmailTransEnabled: false,
-          isCallDispositionEnabled: false
-        };
-        
-        // Cache the default result as well
-        navigationService._sitewideSettingsCache = defaultResult;
-        
-        return defaultResult;
+      // Return existing promise if API call is already in progress
+      if (navigationService._sitewideSettingsPromiseCache) {
+        return navigationService._sitewideSettingsPromiseCache;
       }
+
+      // Create new promise for API call
+      navigationService._sitewideSettingsPromiseCache = (async () => {
+        try {
+          // Get all required settings in a single API call
+          const response = await axiosService.post(ADMIN_API.SITEWIDE_SETTINGS_GET_COLUMNNAMES, "EmailSenderType,IsRepNotificationsEnabled,IsMirabelEmailTransSendEnabled,IsCallDispositionEnabled");
+          
+          if (response?.JSONContent) {
+            // Parse the JSONContent string to get the actual data
+            const sitewideDefaults = JSON.parse(response.JSONContent);
+            
+            // Email service settings
+            const isRepNotificationEnabled = sitewideDefaults.IsRepNotificationsEnabled === true || sitewideDefaults.IsRepNotificationsEnabled === 'True';
+            const isMirabelEmailTransEnabled = sitewideDefaults.IsMirabelEmailTransSendEnabled === true || sitewideDefaults.IsMirabelEmailTransSendEnabled === 'True';
+            
+            // EmailSenderType logic - matches backend EmailSenderType function exactly
+            const emailSenderType = parseInt(sitewideDefaults.EmailSenderType) || 0;
+            const isMKM = true; // We're in MKM context
+            
+            let emailSender;
+            if (isMKM) {
+              emailSender = emailSenderType === EMAIL_SENDER.MAILCHIMP_PLUS_MKM ? EMAIL_SENDER.MIRABEL_EMAIL : emailSenderType;
+            } else {
+              emailSender = emailSenderType === EMAIL_SENDER.MAILCHIMP_PLUS_MKM ? EMAIL_SENDER.MAILCHIMP : emailSenderType;
+            }
+            
+            // Determine if Mirabel Email Service is enabled - matches backend logic exactly
+            const isMirabelEmailServiceEnabled = emailSender === EMAIL_SENDER.MIRABEL_EMAIL || isRepNotificationEnabled;
+            
+            // Call disposition settings
+            const isCallDispositionEnabled = sitewideDefaults.IsCallDispositionEnabled === true || sitewideDefaults.IsCallDispositionEnabled === 'True';
+            
+            const result = {
+              isMirabelEmailServiceEnabled,
+              isRepNotificationEnabled,
+              isMirabelEmailTransEnabled,
+              isCallDispositionEnabled
+            };
+            
+            // Update localStorage MMClientVars with all the new values in a single call
+            navigationService.updateSessionData({
+              isMirabelEmailServiceEnabled: isMirabelEmailServiceEnabled,
+              isRepNotificationEnabled: isRepNotificationEnabled,
+              isMirabelEmailTransEnabled: isMirabelEmailTransEnabled,
+              isCallDispositionEnabled: isCallDispositionEnabled
+            });
+            
+            // Cache the result to prevent duplicate API calls
+            navigationService._sitewideSettingsCache = result;
+            
+            return result;
+          } else {
+            const defaultResult = {
+              isMirabelEmailServiceEnabled: false,
+              isRepNotificationEnabled: false,
+              isMirabelEmailTransEnabled: false,
+              isCallDispositionEnabled: false
+            };
+            
+            // Cache the default result as well
+            navigationService._sitewideSettingsCache = defaultResult;
+            
+            return defaultResult;
+          }
+        } finally {
+          // Clear the promise cache after completion (success or error)
+          navigationService._sitewideSettingsPromiseCache = null;
+        }
+      })();
+
+      return navigationService._sitewideSettingsPromiseCache;
     } catch (error) {
-      const errorResult = {
-        isMirabelEmailServiceEnabled: false,
-        isRepNotificationEnabled: false,
-        isMirabelEmailTransEnabled: false,
-        isCallDispositionEnabled: false
-      };
-      
-      // Cache the error result as well
-      navigationService._sitewideSettingsCache = errorResult;
-      
-      return errorResult;
+      // Clear promise cache on error
+      navigationService._sitewideSettingsPromiseCache = null;
+      throw error;
     }
   },
 
@@ -157,27 +174,45 @@ export const navigationService = {
       if (navigationService._apiDataCache) {
         return navigationService._apiDataCache;
       }
-      const response = await axiosService.get(NAVIGATION_API.ENCRYPTION_KEY);  
-      if (response?.Data) {       
-        // Decrypt the response data
-        const decryptedData = decrypt(response?.Data, authEncryptDecryptKey);    
-        if (decryptedData && decryptedData.trim() !== '') {
-          try {
-            const data = JSON.parse(decryptedData);
-            // Cache the data
-            navigationService._apiDataCache = data;
-            
-            return data;
-          } catch (parseError) {
-            throw new Error('Failed to parse decrypted data as JSON');
-          }
-        } else {
-          throw new Error('Decryption failed - returned empty data');
-        }
-      } else {
-        throw new Error('Invalid API response structure - missing content.Data');
+
+      // Return existing promise if API call is already in progress
+      if (navigationService._apiDataPromiseCache) {
+        return navigationService._apiDataPromiseCache;
       }
+
+      // Create new promise for API call
+      navigationService._apiDataPromiseCache = (async () => {
+        try {
+          const response = await axiosService.get(NAVIGATION_API.ENCRYPTION_KEY);  
+          if (response?.Data) {       
+            // Decrypt the response data
+            const decryptedData = decrypt(response?.Data, authEncryptDecryptKey);    
+            if (decryptedData && decryptedData.trim() !== '') {
+              try {
+                const data = JSON.parse(decryptedData);
+                // Cache the data
+                navigationService._apiDataCache = data;
+                
+                return data;
+              } catch (parseError) {
+                throw new Error('Failed to parse decrypted data as JSON');
+              }
+            } else {
+              throw new Error('Decryption failed - returned empty data');
+            }
+          } else {
+            throw new Error('Invalid API response structure - missing content.Data');
+          }
+        } finally {
+          // Clear the promise cache after completion (success or error)
+          navigationService._apiDataPromiseCache = null;
+        }
+      })();
+
+      return navigationService._apiDataPromiseCache;
     } catch (error) {
+      // Clear promise cache on error
+      navigationService._apiDataPromiseCache = null;
       throw error;
     }
   },
@@ -750,7 +785,18 @@ export const navigationService = {
    */
   clearSitewideSettingsCache: () => {
     navigationService._sitewideSettingsCache = null;
+    navigationService._sitewideSettingsPromiseCache = null;
     console.log('✅ Sitewide settings cache cleared');
+  },
+
+  /**
+   * Clear API data cache
+   * This can be called to force a refresh of API data
+   */
+  clearApiDataCache: () => {
+    navigationService._apiDataCache = null;
+    navigationService._apiDataPromiseCache = null;
+    console.log('✅ API data cache cleared');
   },
 
   /**
@@ -758,9 +804,11 @@ export const navigationService = {
    * This should be called when the Home component unmounts
    */
   cleanup: () => {
-    // Clear caches
+    // Clear all caches
     navigationService._apiDataCache = null;
+    navigationService._apiDataPromiseCache = null;
     navigationService._sitewideSettingsCache = null;
+    navigationService._sitewideSettingsPromiseCache = null;
     
     // Remove global references
     delete window.homeActions;
