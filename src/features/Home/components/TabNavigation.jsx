@@ -95,8 +95,19 @@ const TabNavigation = memo(() => {
   const isSmallScreen = window.innerWidth < 768;
   const estimatedTabWidth = isSmallScreen ? 100 : 120; // Smaller tabs on small screens
   const maxVisibleDraggableTabs = Math.floor(availableWidth / estimatedTabWidth);
-  const visibleDraggableTabs = draggableTabs.slice(0, maxVisibleDraggableTabs);
-  const overflowDraggableTabs = draggableTabs.slice(maxVisibleDraggableTabs);
+  
+  // Ensure the active tab is always visible
+  let visibleDraggableTabs = draggableTabs.slice(0, maxVisibleDraggableTabs);
+  let overflowDraggableTabs = draggableTabs.slice(maxVisibleDraggableTabs);
+  
+  // If the active tab is in overflow, move it to visible area
+  const activeTabIndex = draggableTabs.findIndex(tab => tab.id === activeTabId);
+  if (activeTabIndex >= maxVisibleDraggableTabs && activeTabIndex !== -1) {
+    // Remove the active tab from overflow and add it to visible
+    const activeTab = draggableTabs[activeTabIndex];
+    overflowDraggableTabs = overflowDraggableTabs.filter(tab => tab.id !== activeTabId);
+    visibleDraggableTabs = [...visibleDraggableTabs.slice(0, maxVisibleDraggableTabs - 1), activeTab];
+  }
 
 
 
@@ -364,7 +375,11 @@ const TabNavigation = memo(() => {
           <div className="flex-shrink-0">
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <button className="flex items-center px-2 py-1 rounded hover:bg-gray-100 transition-colors text-gray-600 bg-transparent" style={{ fontFamily: 'inherit', fontSize: '13px', fontWeight: 500, lineHeight: '1.5', height: '24px', minHeight: '24px', paddingTop: '0', paddingBottom: '0' }}>
+                <button className={`flex items-center px-2 py-1 rounded transition-colors ${
+                  overflowDraggableTabs.some(tab => tab.id === activeTabId)
+                    ? 'bg-blue-100 text-blue-900 font-semibold'
+                    : 'hover:bg-gray-100 text-gray-600 bg-transparent'
+                }`} style={{ fontFamily: 'inherit', fontSize: '13px', fontWeight: 500, lineHeight: '1.5', height: '24px', minHeight: '24px', paddingTop: '0', paddingBottom: '0' }}>
                   <ChevronDown className="h-4 w-4" />
                   <span className="ml-1 text-xs" style={{ fontSize: '13px' }}>
                     +{overflowDraggableTabs.length}
@@ -376,7 +391,11 @@ const TabNavigation = memo(() => {
                    <DropdownMenuItem
                      key={tab.id}
                      onClick={() => handleTabClick(tab.id)}
-                     className="flex items-center justify-between w-full px-3 py-2 text-sm"
+                     className={`flex items-center justify-between w-full px-3 py-2 text-sm ${
+                       activeTabId === tab.id
+                         ? 'bg-blue-100 text-blue-900 font-semibold'
+                         : 'hover:bg-gray-100'
+                     }`}
                    >
                      <div className="flex items-center min-w-0 flex-1">
                        <span 
