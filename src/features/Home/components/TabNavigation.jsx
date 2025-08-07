@@ -370,33 +370,45 @@ const TabNavigation = memo(() => {
                   </span>
                 </button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-48">
-                {overflowDraggableTabs.map((tab) => (
-                  <DropdownMenuItem
-                    key={tab.id}
-                    onClick={() => handleTabClick(tab.id)}
-                    className="flex items-center justify-between"
-                  >
-                    <div className="flex items-center">
-                      <span className="mr-2">{tab.icon}</span>
-                      <span className="truncate" title={tab.title}>{tab.title}</span>
-                    </div>
-                    {tab.closable !== false && (
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          e.preventDefault();
-                          handleTabClose(e, tab.id);
-                        }}
-                        className="ml-2 p-1 rounded hover:bg-gray-200"
-                        type="button"
-                      >
-                        <X className="h-3 w-3" />
-                      </button>
-                    )}
-                  </DropdownMenuItem>
-                ))}
-              </DropdownMenuContent>
+                             <DropdownMenuContent align="end" className="w-64 max-w-xs">
+                 {overflowDraggableTabs.map((tab) => (
+                   <DropdownMenuItem
+                     key={tab.id}
+                     onClick={() => handleTabClick(tab.id)}
+                     className="flex items-center justify-between w-full px-3 py-2 text-sm"
+                   >
+                     <div className="flex items-center min-w-0 flex-1">
+                       <span className="mr-2 flex-shrink-0">{tab.icon}</span>
+                       <span 
+                         className="truncate text-left" 
+                         title={tab.title}
+                         style={{ 
+                           maxWidth: 'calc(100% - 60px)', // Account for icon and close button width
+                           overflow: 'hidden',
+                           textOverflow: 'ellipsis',
+                           whiteSpace: 'nowrap'
+                         }}
+                       >
+                         {tab.title}
+                       </span>
+                     </div>
+                     {tab.closable !== false && (
+                       <button
+                         onClick={(e) => {
+                           e.stopPropagation();
+                           e.preventDefault();
+                           handleTabClose(e, tab.id);
+                         }}
+                         className="ml-2 p-1 rounded hover:bg-gray-200 transition-colors flex-shrink-0"
+                         type="button"
+                         title="Close tab"
+                       >
+                         <X className="h-3 w-3" />
+                       </button>
+                     )}
+                   </DropdownMenuItem>
+                 ))}
+               </DropdownMenuContent>
             </DropdownMenu>
           </div>
         )}
