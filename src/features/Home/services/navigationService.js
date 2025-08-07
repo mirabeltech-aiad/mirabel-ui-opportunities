@@ -373,7 +373,8 @@ export const navigationService = {
         const isMirabelEmailServiceEnabled = sessionVars.isMirabelEmailServiceEnabled === true || sessionVars.isMirabelEmailServiceEnabled === 'True';
         const isRepNotificationEnabled = sessionVars.isRepNotificationEnabled === true || sessionVars.isRepNotificationEnabled === 'True';
         
-        if ((isMirabelEmailServiceEnabled === false || isRepNotificationEnabled) || !sessionVars.IsUserHasMKMAccess) {
+        // Matches server-side logic exactly: (IsMirabelEmailServiceEnabled == false || (isRepNotificationEnabled)) || SessionManager.IsUserHasMKMAccess == false
+        if ((isMirabelEmailServiceEnabled === false || (isRepNotificationEnabled)) || !sessionVars.IsUserHasMKMAccess) {
           if (!(isRepNotificationEnabled && (menu.Caption === 'Email Builder' || menu.Caption === 'Workflows'))) {
             isLocked = true;
             lockReason = 'MES';
@@ -411,16 +412,6 @@ export const navigationService = {
             const marketingManagerSiteURL = await navigationService.getMarketingManagerSiteURL(apiData.MarketingManagerURL, sessionVars, menu.URL);
             url = marketingManagerSiteURL;
           } else if (urlSource === "MES") {
-            //Show the Lock Icon for MES links if MES is NOT Enabled OR logged in user has NO access to MKM
-            // Get email service settings from localStorage - matches backend IsMirabelEmailServiceEnabled property
-            const isMirabelEmailServiceEnabled = sessionVars.isMirabelEmailServiceEnabled === true || sessionVars.isMirabelEmailServiceEnabled === 'True';
-            const isRepNotificationEnabled = sessionVars.isRepNotificationEnabled === true || sessionVars.isRepNotificationEnabled === 'True';
-            
-            if ((isMirabelEmailServiceEnabled === false || isRepNotificationEnabled) || !sessionVars.IsUserHasMKMAccess) {
-              if (!(isRepNotificationEnabled && (menu.Caption === 'Email Builder' || menu.Caption === 'Workflows'))) {
-                // Lock icon is already handled in getMenuLockStatus
-              }
-            }
             // URL construction matches server-side: URL = string.Format(EmailServiceSiteURL, URL + (URL.Contains("?") ? "&" : "?"));
             const emailServiceSiteURL = await navigationService.getEmailServiceSiteURL(apiData.EmailServiceSiteURL, sessionVars, menu.URL);
             url = emailServiceSiteURL;

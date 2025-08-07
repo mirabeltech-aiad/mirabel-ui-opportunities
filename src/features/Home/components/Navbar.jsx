@@ -44,6 +44,19 @@ import { useToast } from '@/components/ui/use-toast';
 // Recursive menu renderer
 const renderMenuItems = (items, openTabByUrl) => {
   return items.map((item) => {
+    // Check if menu item is locked
+    const isLocked = item.isLocked === true;
+    
+    // Debug logging for locked items
+    if (isLocked) {
+      console.log('🔒 Found locked menu item:', {
+        title: item.title,
+        url: item.url,
+        urlSource: item.urlSource,
+        iconCls: item.iconCls
+      });
+    }
+    
     if (item.children && item.children.length > 0) {
       return (
         <DropdownMenuSub key={item.id}>
@@ -61,10 +74,15 @@ const renderMenuItems = (items, openTabByUrl) => {
         </DropdownMenuSub>
       );
     } else {
+      // Handle click for locked items - show message instead of opening tab
+      const handleClick = () => {
+        openTabByUrl(item.title, item.url, item);
+      };
+      
       return (
         <DropdownMenuItem
           key={item.id}
-          onClick={() => openTabByUrl(item.title, item.url, item)}
+          onClick={handleClick}
           className="rounded-none font-medium px-4 py-2 hover:bg-[#e6f0fa] focus:bg-[#e6f0fa] hover:text-ocean-900 focus:text-ocean-900 cursor-pointer text-gray-800 transition-colors duration-150 flex items-center gap-2 whitespace-nowrap"
           style={{ fontFamily: 'inherit', fontSize: '13px', fontWeight: 500, lineHeight: '1.5' }}
         >
@@ -73,6 +91,12 @@ const renderMenuItems = (items, openTabByUrl) => {
             <Badge className="ml-2 text-xs align-middle" variant="secondary">
               {item.icon}
             </Badge>
+          )}
+          {/* Show lock icon if item is locked */}
+          {isLocked && (
+            <span className="ml-auto">
+              <i className="mainMenuIcon lockIcon">🔒</i>
+            </span>
           )}
         </DropdownMenuItem>
       );
@@ -101,6 +125,9 @@ const renderMenuItemsWithShowMore = (items, openTabByUrl, expanded, setExpanded)
 
 // Helper to render a single menu item or submenu
 const renderMenuItemOrSub = (item, openTabByUrl, expanded, setExpanded) => {
+  // Check if menu item is locked
+  const isLocked = item.isLocked === true;
+  
   if (item.children && item.children.length > 0) {
     return (
       <DropdownMenuSub key={item.id}>
@@ -118,10 +145,15 @@ const renderMenuItemOrSub = (item, openTabByUrl, expanded, setExpanded) => {
       </DropdownMenuSub>
     );
   } else {
+    // Handle click for locked items - show message instead of opening tab
+    const handleClick = () => {
+      openTabByUrl(item.title, item.url, item);
+    };
+    
     return (
       <DropdownMenuItem
         key={item.id}
-        onClick={() => openTabByUrl(item.title, item.url, item)}
+        onClick={handleClick}
         className="rounded-none font-medium px-4 py-2 hover:bg-[#e6f0fa] focus:bg-[#e6f0fa] hover:text-ocean-900 focus:text-ocean-900 cursor-pointer text-gray-800 transition-colors duration-150 flex items-center gap-2 whitespace-nowrap"
         style={{ fontFamily: 'inherit', fontSize: '13px', fontWeight: 500, lineHeight: '1.5' }}
       >
@@ -130,6 +162,12 @@ const renderMenuItemOrSub = (item, openTabByUrl, expanded, setExpanded) => {
           <Badge className="ml-2 text-xs align-middle" variant="secondary">
             {item.icon}
           </Badge>
+        )}
+        {/* Show lock icon if item is locked */}
+        {isLocked && (
+          <span className="ml-auto">
+            <i className="mainMenuIcon lockIcon">🔒</i>
+          </span>
         )}
       </DropdownMenuItem>
     );
