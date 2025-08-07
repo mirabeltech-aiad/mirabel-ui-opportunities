@@ -590,7 +590,7 @@ const Navbar = () => {
             {/* Top Menus with Scrolling */}
             <div className="flex items-center min-h-0 flex-1 min-w-0">
               {navigationMenus && Array.isArray(navigationMenus) && navigationMenus.length > 0 && (
-                <div className="flex items-center w-full min-w-0">
+                <div className="flex items-center w-full min-w-0 pl-5">
                   {/* Left Scroll Button */}
                   {canScrollLeft && (
                     <button
@@ -616,9 +616,9 @@ const Navbar = () => {
                   <DropdownMenu key={menu.id} open={openMenuId === menu.id} onOpenChange={(open) => handleMenuOpenChange(menu.id, open)}>
                     <DropdownMenuTrigger asChild>
                       <button
-                        className={`flex-shrink-0 px-2 py-1 rounded-md font-medium text-sm transition flex items-center h-8 min-h-0 whitespace-nowrap ${
+                        className={`flex-shrink-0 px-2 py-1 rounded-md font-medium text-sm transition flex items-center h-8 min-h-0 whitespace-nowrap focus:outline-none focus:ring-0 border-0 ${
                           openMenuId === menu.id
-                            ? 'bg-blue-200 text-blue-900 shadow font-semibold' // Consistent active tab styling
+                            ? 'bg-blue-200 text-blue-900 font-semibold' // Removed shadow (black border)
                             : 'text-white hover:bg-ocean-700 hover:text-white focus:bg-ocean-800 focus:text-white'
                         }`}
                         style={{ fontSize: '13px' }}
