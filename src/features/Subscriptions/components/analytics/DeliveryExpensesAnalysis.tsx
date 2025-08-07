@@ -10,7 +10,7 @@ import { useSorting } from '../../hooks/useSorting';
 import { getDataTypeFromColumn } from '../../utils/sortingUtils';
 import { useTableColumnManager } from '../../hooks/useTableColumnManager';
 
-import { PIE_CHART_COLORS } from '../../constants/chartColors';
+import { PIE_CHART_COLORS } from '../../helpers/chartColors';
 
 const DeliveryExpensesAnalysis = () => {
   const { data: deliveryData, isLoading } = useDeliveryExpenses();
