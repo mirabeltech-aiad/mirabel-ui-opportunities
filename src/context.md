@@ -1,17 +1,18 @@
 # Mirabel UI Project Documentation
 
-> **Important Note**: This project uses TypeScript exclusively for better type safety and developer experience. All code examples and implementations should be in TypeScript (.ts/.tsx files).
+> **Important Note**: This project uses JavaScript exclusively. Do not use TypeScript. All code examples and implementations should be in JavaScript (.js/.jsx files).
 
-### TypeScript-First Policy
-- All new code must be written in TypeScript (.ts/.tsx files)
-- Use proper TypeScript type annotations and interfaces
-- Leverage TypeScript's strict mode for maximum type safety
-- Use TypeScript configuration files (tsconfig.json)
-- Prefer TypeScript types over JSDoc comments
-- Use TypeScript for compile-time type checking and validation
-- Follow TypeScript best practices for type safety
-- Use ESLint with TypeScript rules for code quality
-- Gradually migrate existing JavaScript files to TypeScript
+### JavaScript-Only Policy
+- All new code must be written in JavaScript (.js/.jsx files)
+- No TypeScript (.ts/.tsx) files are allowed
+- No type annotations or TypeScript-specific syntax
+- No TypeScript configuration files (tsconfig.json)
+- No TypeScript dependencies in package.json
+- Use JSDoc comments for documentation instead of TypeScript types
+- Use PropTypes for runtime prop validation
+- Use JavaScript's built-in type checking and validation
+- Follow JavaScript best practices for type safety
+- Use ESLint for JavaScript linting and code quality
 
 ## Project Overview
 Mirabel UI is a modern React application built with Vite, utilizing React Query for data management, ShadCN UI components, and a robust theming system. The project follows a feature-based architecture with clear separation of concerns.
@@ -26,7 +27,7 @@ Mirabel UI is a modern React application built with Vite, utilizing React Query 
 ### Core Framework
 - **React 18**: Latest version with concurrent features and automatic batching
 - **Vite**: Fast development server and optimized production builds
-- **TypeScript**: Modern type-safe JavaScript with strict type checking
+- **JavaScript**: Modern ES6+ features
 
 ### State Management
 - **Context API**: Global state management for:

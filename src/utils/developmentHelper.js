@@ -119,7 +119,7 @@ export const isDevelopmentMode = () => {
     // For Vite: Use DEV flag or development mode
     const isDev = (isViteDev || isDevMode);
 
-    return isDev || true;
+    return isDev;
 };
 
 // Initialize development environment
