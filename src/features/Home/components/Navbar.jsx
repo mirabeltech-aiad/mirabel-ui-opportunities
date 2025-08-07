@@ -422,10 +422,25 @@ const Navbar = () => {
           // Fallback: use the refreshTab function to force a component reload
           actions.refreshTab(activeTab.id);
         }
-      }
+      } else if (activeTab.type === 'iframe') {
+        // Refresh iframe content by tab ID
+        const success = refreshIframeByTabId(activeTab.id);
+        if (success) {
+          // Success case - no toast needed as requested
+        } else {
+          toast({
+            title: "Refresh failed",
+            description: "Unable to refresh the current page.",
+            variant: "destructive",
+          });
+        }
       } else {
         // Generic refresh for other component tabs
         actions.refreshTab(activeTab.id);
+        toast({
+          title: "Page refreshed",
+          description: "The current page has been refreshed.",
+        });
       }
     }
   };
