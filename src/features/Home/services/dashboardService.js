@@ -50,7 +50,7 @@ export const dashboardService = {
   saveActiveDashboard: async (dashboardID, refID = null) => {
     try {
       // Construct the endpoint: /services/User/Dashboards/Active/{dashboardID}/{refID?}
-      let endpoint = `/services/${DASHBOARD_API.SAVE_ACTIVE_DASHBOARD}${dashboardID}`;
+      let endpoint = `${DASHBOARD_API.SAVE_ACTIVE_DASHBOARD}${dashboardID}`;
       if (refID) {
         endpoint += `/${refID}`;
       }
