@@ -285,7 +285,7 @@ const TabNavigation = memo(() => {
                 style={{ fontSize: '13px', marginRight: '2px' }}
                 title={tab.title}
               >
-                {tab.title}
+                {tab.title.length > 8 ? `${tab.title.substring(0, 8)}...` : tab.title}
               </span>
             </div>
             {/* Close button (not draggable, but should not appear for fixed tabs) */}
@@ -315,7 +315,7 @@ const TabNavigation = memo(() => {
                     ? 'bg-blue-100 text-blue-900 font-bold shadow-sm'
                     : 'bg-transparent hover:bg-gray-100 text-gray-700'
                 }`}
-                style={{ fontFamily: 'inherit', fontSize: '13px', fontWeight: 500, lineHeight: '1.5', border: 'none', boxShadow: activeTabId === tab.id ? '0 2px 8px rgba(0,0,0,0.04)' : 'none', marginRight: '0px', height: '24px', minHeight: '24px', paddingTop: '0', paddingBottom: '0', maxWidth: isSmallScreen ? '100px' : '120px', minWidth: isSmallScreen ? '60px' : '80px' }}
+                style={{ fontFamily: 'inherit', fontSize: '13px', fontWeight: 500, lineHeight: '1.5', border: 'none', boxShadow: activeTabId === tab.id ? '0 2px 8px rgba(0,0,0,0.04)' : 'none', marginRight: '0px', height: '24px', minHeight: '24px', paddingTop: '0', paddingBottom: '0', width: isSmallScreen ? '100px' : '120px', minWidth: isSmallScreen ? '100px' : '120px', maxWidth: isSmallScreen ? '100px' : '120px' }}
               >
                 <div
                   className="flex items-center px-1 py-0 cursor-pointer flex-1 h-8 min-h-0 min-w-0"
@@ -327,7 +327,7 @@ const TabNavigation = memo(() => {
                     style={{ fontSize: isSmallScreen ? '11px' : '12px', marginRight: '2px' }}
                     title={tab.title}
                   >
-                    {tab.title}
+                    {tab.title.length > 8 ? `${tab.title.substring(0, 8)}...` : tab.title}
                   </span>
                 </div>
                 {tab.closable !== false && (
@@ -366,12 +366,11 @@ const TabNavigation = memo(() => {
                      className="flex items-center justify-between w-full px-3 py-2 text-sm"
                    >
                      <div className="flex items-center min-w-0 flex-1">
-                       <span className="mr-2 flex-shrink-0">{tab.icon}</span>
                        <span 
                          className="truncate text-left" 
                          title={tab.title}
                          style={{ 
-                           maxWidth: 'calc(100% - 60px)', // Account for icon and close button width
+                           maxWidth: 'calc(100% - 40px)', // Account for close button width only
                            overflow: 'hidden',
                            textOverflow: 'ellipsis',
                            whiteSpace: 'nowrap'
