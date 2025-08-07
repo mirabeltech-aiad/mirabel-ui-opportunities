@@ -60,7 +60,7 @@ const renderMenuItems = (items, openTabByUrl) => {
     if (item.children && item.children.length > 0) {
       return (
         <DropdownMenuSub key={item.id}>
-          <DropdownMenuSubTrigger className="rounded-none text-gray-800 font-medium px-4 py-2 hover:bg-[#e6f0fa] focus:bg-[#e6f0fa] hover:text-ocean-900 focus:text-ocean-900 cursor-pointer flex items-center gap-2 transition-colors duration-150 whitespace-nowrap" style={{ fontFamily: 'inherit', fontSize: '13px', fontWeight: 500, lineHeight: '1.5' }}>
+              <DropdownMenuSubTrigger className="rounded-none text-gray-800 font-medium px-4 py-1.5 hover:bg-[#e6f0fa] focus:bg-[#e6f0fa] hover:text-ocean-900 focus:text-ocean-900 cursor-pointer flex items-center gap-2 transition-colors duration-150 whitespace-nowrap" style={{ fontFamily: 'inherit', fontSize: '13px', fontWeight: 500, lineHeight: '1' }}>
             <span>{item.title}</span>
             {item.icon && (
               <Badge className="ml-2 text-xs align-middle" variant="secondary">
@@ -68,7 +68,12 @@ const renderMenuItems = (items, openTabByUrl) => {
               </Badge>
             )}
           </DropdownMenuSubTrigger>
-          <DropdownMenuSubContent className="w-auto min-w-56 max-w-xl mt-2 bg-white border border-gray-100 p-0 text-gray-800 font-medium" style={{ fontFamily: 'inherit', fontSize: '13px', lineHeight: '1.5' }}>
+          <DropdownMenuSubContent className="w-auto min-w-56 max-w-xl bg-white border border-gray-100 p-0 text-gray-800 font-medium overflow-y-auto" style={{ 
+            fontFamily: 'inherit', 
+            fontSize: '13px', 
+            lineHeight: '1.2',
+            maxHeight: '70vh'
+          }}>
             {renderMenuItems(item.children, openTabByUrl)}
           </DropdownMenuSubContent>
         </DropdownMenuSub>
@@ -83,8 +88,8 @@ const renderMenuItems = (items, openTabByUrl) => {
         <DropdownMenuItem
           key={item.id}
           onClick={handleClick}
-          className="rounded-none font-medium px-4 py-2 hover:bg-[#e6f0fa] focus:bg-[#e6f0fa] hover:text-ocean-900 focus:text-ocean-900 cursor-pointer text-gray-800 transition-colors duration-150 flex items-center gap-2 whitespace-nowrap"
-          style={{ fontFamily: 'inherit', fontSize: '13px', fontWeight: 500, lineHeight: '1.5' }}
+          className="rounded-none font-medium px-4 py-1.5 hover:bg-[#e6f0fa] focus:bg-[#e6f0fa] hover:text-ocean-900 focus:text-ocean-900 cursor-pointer text-gray-800 transition-colors duration-150 flex items-center gap-2 whitespace-nowrap"
+          style={{ fontFamily: 'inherit', fontSize: '13px', fontWeight: 500, lineHeight: '1.2' }}
         >
           <span>{item.title}</span>
           {item.icon && (
@@ -109,7 +114,7 @@ const renderMenuItemsWithShowMore = (items, openTabByUrl, expanded, setExpanded)
   const VISIBLE_COUNT = 10;
   if (!items || items.length <= VISIBLE_COUNT || expanded) {
     return (
-      <div className={expanded ? 'overflow-y-auto max-h-[400px]' : ''}>
+      <div>
         {items.map((item) => renderMenuItemOrSub(item, openTabByUrl, expanded, setExpanded))}
       </div>
     );
@@ -131,7 +136,7 @@ const renderMenuItemOrSub = (item, openTabByUrl, expanded, setExpanded) => {
   if (item.children && item.children.length > 0) {
     return (
       <DropdownMenuSub key={item.id}>
-        <DropdownMenuSubTrigger className="rounded-none text-gray-800 font-medium px-4 py-2 hover:bg-[#e6f0fa] focus:bg-[#e6f0fa] hover:text-ocean-900 focus:text-ocean-900 cursor-pointer flex items-center gap-2 transition-colors duration-150 whitespace-nowrap" style={{ fontFamily: 'inherit', fontSize: '13px', fontWeight: 500, lineHeight: '1.5' }}>
+        <DropdownMenuSubTrigger className="rounded-none text-gray-800 font-medium px-4 py-1.5 hover:bg-[#e6f0fa] focus:bg-[#e6f0fa] hover:text-ocean-900 focus:text-ocean-900 cursor-pointer flex items-center gap-2 transition-colors duration-150 whitespace-nowrap" style={{ fontFamily: 'inherit', fontSize: '13px', fontWeight: 500, lineHeight: '1' }}>
           <span>{item.title}</span>
           {item.icon && (
             <Badge className="ml-2 text-xs align-middle" variant="secondary">
@@ -139,7 +144,12 @@ const renderMenuItemOrSub = (item, openTabByUrl, expanded, setExpanded) => {
             </Badge>
           )}
         </DropdownMenuSubTrigger>
-        <DropdownMenuSubContent className="w-auto min-w-56 max-w-xl mt-2 bg-white border border-gray-100 p-0 text-gray-800 font-medium" style={{ fontFamily: 'inherit', fontSize: '13px', lineHeight: '1.5' }}>
+        <DropdownMenuSubContent className="w-auto min-w-56 max-w-xl bg-white border border-gray-100 p-0 text-gray-800 font-medium overflow-y-auto" style={{ 
+          fontFamily: 'inherit', 
+          fontSize: '13px', 
+          lineHeight: '1.2',
+          maxHeight: '70vh'
+        }}>
           <SubMenuWithShowMore items={item.children} openTabByUrl={openTabByUrl} />
         </DropdownMenuSubContent>
       </DropdownMenuSub>
@@ -150,13 +160,13 @@ const renderMenuItemOrSub = (item, openTabByUrl, expanded, setExpanded) => {
       openTabByUrl(item.title, item.url, item);
     };
     
-    return (
-      <DropdownMenuItem
-        key={item.id}
-        onClick={handleClick}
-        className="rounded-none font-medium px-4 py-2 hover:bg-[#e6f0fa] focus:bg-[#e6f0fa] hover:text-ocean-900 focus:text-ocean-900 cursor-pointer text-gray-800 transition-colors duration-150 flex items-center gap-2 whitespace-nowrap"
-        style={{ fontFamily: 'inherit', fontSize: '13px', fontWeight: 500, lineHeight: '1.5' }}
-      >
+          return (
+        <DropdownMenuItem
+          key={item.id}
+          onClick={handleClick}
+          className="rounded-none font-medium px-4 py-1.5 hover:bg-[#e6f0fa] focus:bg-[#e6f0fa] hover:text-ocean-900 focus:text-ocean-900 cursor-pointer text-gray-800 transition-colors duration-150 flex items-center gap-2 whitespace-nowrap"
+          style={{ fontFamily: 'inherit', fontSize: '13px', fontWeight: 500, lineHeight: '1.2' }}
+        >
         <span>{item.title}</span>
         {item.icon && (
           <Badge className="ml-2 text-xs align-middle" variant="secondary">
@@ -630,13 +640,18 @@ const Navbar = () => {
                     </DropdownMenuTrigger>
                     <DropdownMenuContent 
                       align="start" 
-                      className="w-auto min-w-56 max-w-xl mt-2 bg-white border border-gray-100 p-0 text-gray-800 font-medium" 
-                      style={{ fontFamily: 'inherit', fontSize: '13px', lineHeight: '1.5' }}
+                      className="w-auto min-w-56 max-w-xl bg-white border border-gray-100 p-0 text-gray-800 font-medium overflow-y-auto" 
+                      style={{ 
+                        fontFamily: 'inherit', 
+                        fontSize: '13px', 
+                        lineHeight: '1.2',
+                        maxHeight: expandedMenus[menu.id] ? '90vh' : '70vh'
+                      }}
                       onMouseEnter={() => handleMenuHover(menu.id)}
                       onMouseLeave={handleMenuLeave}
                     >
                       {menu.url && (
-                        <DropdownMenuItem onClick={() => openTabByUrl(menu.title, menu.url, menu)} className="rounded-none font-medium px-4 py-2 hover:bg-[#e6f0fa] focus:bg-[#e6f0fa] hover:text-ocean-900 focus:text-ocean-900 cursor-pointer text-gray-800 transition-colors duration-150 flex items-center gap-2 whitespace-nowrap" style={{ fontFamily: 'inherit', fontSize: '13px', fontWeight: 500, lineHeight: '1.5' }}>
+                        <DropdownMenuItem onClick={() => openTabByUrl(menu.title, menu.url, menu)} className="rounded-none font-medium px-4 py-1.5 pt-3 hover:bg-[#e6f0fa] focus:bg-[#e6f0fa] hover:text-ocean-900 focus:text-ocean-900 cursor-pointer text-gray-800 transition-colors duration-150 flex items-center gap-2 whitespace-nowrap" style={{ fontFamily: 'inherit', fontSize: '13px', fontWeight: 500, lineHeight: '1' }}>
                           <span>{menu.title} Home</span>
                         </DropdownMenuItem>
                       )}
