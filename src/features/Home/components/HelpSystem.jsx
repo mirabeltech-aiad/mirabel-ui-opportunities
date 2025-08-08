@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useHome } from '../contexts/HomeContext';
 import { 
-  HelpCircle, 
+  HelpCircle,
   MessageCircle, 
   Phone, 
   Calendar, 
@@ -84,14 +84,20 @@ const DraggableHelpIcon = ({ position, onPositionChange, onClick, onHide }) => {
     >
       <Button
         size="lg"
-        className="bg-ocean-600 hover:bg-ocean-700 text-white border-2 border-white shadow-lg rounded-full w-14 h-14 p-0 transition-all duration-200"
+        className="relative bg-ocean-600 hover:bg-ocean-700 text-white shadow-lg rounded-2xl w-14 h-14 p-0 transition-all duration-200 overflow-hidden border border-white/20"
         style={{
           userSelect: 'none',
           touchAction: 'none',
           pointerEvents: isDragging ? 'none' : 'auto',
         }}
       >
-        <HelpCircle className="h-10 w-10" />
+        <span
+          className="absolute inset-0 pointer-events-none"
+          style={{
+            background: 'linear-gradient(135deg, rgba(0,0,0,0) 45%, rgba(0,0,0,0.18) 45%)'
+          }}
+        />
+        <span className="relative z-10 text-white text-2xl leading-none">?</span>
       </Button>
       
       {/* Tooltip */}
