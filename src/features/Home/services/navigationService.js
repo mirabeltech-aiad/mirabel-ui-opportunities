@@ -290,7 +290,7 @@ export const navigationService = {
       const response = await axiosService.get(`/services/User/Accounts/CheckCondition/${userId}/-1`);
       return !!(response?.Data || response?.content?.Data);
     } catch (error) {
-      console.log('Job function check failed:', error);
+  
       return false;
     }
   },
@@ -416,17 +416,18 @@ export const navigationService = {
         }
       }
       
-      // MKM and MKM-DATA logic
-      if (menu.URLSource === 'MKM' || menu.URLSource === 'MKM-DATA') {
-        if ((menu.URLSource === 'MKM' && (!sessionVars.IsSiteMKMEnabled || !sessionVars.IsUserHasMKMAccess)) ||
-            (menu.URLSource === 'MKM-DATA' && (!sessionVars.IsSiteDataPackEnabled || !sessionVars.IsUserHasDataPackAccess))) {
+      // MKM and MKM-DATA logic - matches server-side exactly
+      const urlSource = (menu.URLSource || '').toString().toUpperCase();
+      if (urlSource === CLIENT_TYPE.MKM || urlSource === "MKM-DATA") {
+        if ((urlSource === CLIENT_TYPE.MKM && (!sessionVars.IsSiteMKMEnabled || !sessionVars.IsUserHasMKMAccess)) ||
+            (urlSource === "MKM-DATA" && (!sessionVars.IsSiteDataPackEnabled || !sessionVars.IsUserHasDataPackAccess))) {
           isLocked = true;
           lockReason = 'MKM';
         }
       }
       
       // MES logic - matches backend exactly
-      if (menu.URLSource === 'MES') {
+      if (urlSource === "MES") {
         // Get email service settings from localStorage - matches backend IsMirabelEmailServiceEnabled property
         const isMirabelEmailServiceEnabled = sessionVars.isMirabelEmailServiceEnabled === true || sessionVars.isMirabelEmailServiceEnabled === 'True';
         const isRepNotificationEnabled = sessionVars.isRepNotificationEnabled === true || sessionVars.isRepNotificationEnabled === 'True';
@@ -451,15 +452,19 @@ export const navigationService = {
       return menu.IconCls || '';
     }
 
-   // Helper: recursively build children
+
+
+   // Helper: recursively build children - matches server-side CreateMenu function exactly
     async function buildMenuTree(parentId) {
       const menuPromises = menus
         .filter(menu => menu.ParentID === parentId)
         .map(async menu => {
-          // Lock/permission logic
+          // Lock/permission logic - matches server-side exactly
           const { isLocked } = await getMenuLockStatus(menu);
-          // Icon class
+          
+          // Icon class - matches server-side logic exactly
           const iconCls = getIconClass(menu, isLocked);
+          
           // URL replacement
           let url = replaceSessionVarsInUrl(menu.URL);
           
@@ -473,15 +478,17 @@ export const navigationService = {
             // URL construction matches server-side: URL = string.Format(EmailServiceSiteURL, URL + (URL.Contains("?") ? "&" : "?"));
             const emailServiceSiteURL = await navigationService.getEmailServiceSiteURL(apiData.EmailServiceSiteURL, sessionVars, menu.URL);
             url = emailServiceSiteURL;
-          }           
+          }               
           // Tooltip
           const toolTip = menu.ToolTip || '';
           // Special click handling
           const isNewWindow = !!menu.IsNewWindow;
           const isCalendar = url && url.toLowerCase().includes(STATIC_URLS.CALENDAR);
-          // Children
+          
+          // Children - recursively build submenus
           const children = await buildMenuTree(menu.ID);
-          // Compose menu item
+          
+          // Compose menu item - matches server-side CreateMenu function exactly
           return {
             id: menu.ID,
             title: menu.Caption,
@@ -613,7 +620,7 @@ export const navigationService = {
       
       try {
         localStorage.setItem('MMClientVars', JSON.stringify(updated));
-        console.log('✅ Session data updated successfully');
+       
         return updated;
       } catch (storageError) {
         console.error('❌ Error storing session data:', storageError);
@@ -733,7 +740,7 @@ export const navigationService = {
       };
       
       window.homeActions.addTab(tabData);
-      console.log('✅ Added tab to home panel:', tabData);
+     
     } else {
       // Fallback to opening in new window
       console.warn('⚠️ Home actions not available, opening in new window');
@@ -774,9 +781,8 @@ export const navigationService = {
     
     // Expose test function for URL construction verification
     window.testUrlConstruction = navigationService.testUrlConstruction;
-    
-    console.log('✅ Navigation service initialized with React tab system');
-    console.log('🧪 To test URL construction, run: testUrlConstruction()');
+      
+
   },
 
   /**
@@ -786,7 +792,7 @@ export const navigationService = {
   clearSitewideSettingsCache: () => {
     navigationService._sitewideSettingsCache = null;
     navigationService._sitewideSettingsPromiseCache = null;
-    console.log('✅ Sitewide settings cache cleared');
+  
   },
 
   /**
@@ -796,7 +802,7 @@ export const navigationService = {
   clearApiDataCache: () => {
     navigationService._apiDataCache = null;
     navigationService._apiDataPromiseCache = null;
-    console.log('✅ API data cache cleared');
+
   },
 
   /**
@@ -819,7 +825,7 @@ export const navigationService = {
     delete window.addNewTabToHomePanel;
     delete window.getDecodedURI;
     
-    console.log('✅ Navigation service cleaned up');
+   
   },
 
 getSessionValue: (key) => {

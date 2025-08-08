@@ -37,21 +37,21 @@ const IframeContainer = memo(({
 
 
   const handleIframeLoad = () => {
-    console.log('🔄 IframeContainer: Loaded', title);
+ 
     setLoading(false);
     setError(false);
     onLoad && onLoad();
   };
 
   const handleIframeError = () => {
-    console.log('🔄 IframeContainer: Error loading', title);
+ 
     setLoading(false);
     setError(true);
     onError && onError();
   };
 
   const handleRefresh = () => {
-    console.log('🔄 IframeContainer: Refreshing', title);
+  
     setLoading(true);
     setError(false);
     setRefreshKey(prev => prev + 1);

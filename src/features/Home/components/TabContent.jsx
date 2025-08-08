@@ -35,12 +35,12 @@ const TabContent = () => {
 
   // Debug logging to track tab switches
   useEffect(() => {
-    console.log('🔄 TabContent: Active tab changed to:', activeTabId);
+   
   }, [activeTabId]);
 
   // Memoize all tab content to prevent unnecessary re-renders
   const tabContents = useMemo(() => {
-    console.log('🔄 TabContent: Rebuilding tab contents for', tabs.length, 'tabs');
+    
     const contentMap = {};
     
     tabs.forEach(tab => {
@@ -81,7 +81,7 @@ const TabContent = () => {
           break;
         default:
           if (tab.type === 'iframe' && tab.url) {
-            console.log('🔄 TabContent: Creating iframe for tab:', tab.id, 'URL:', tab.url);
+          
             
             // Generate unique key for iframe - include reload key if present
             const iframeKey = iframeReloadKeys[tab.id] ? `${tab.id}-${iframeReloadKeys[tab.id]}` : tab.id;
@@ -113,14 +113,10 @@ const TabContent = () => {
       }
     });
     
-    console.log('🔄 TabContent: Finished rebuilding tab contents');
+   
     return contentMap;
   }, [tabs, iframeReloadKeys]);
 
-  // Log when using cached content
-  useEffect(() => {
-    console.log('🔄 TabContent: Using cached tab contents (no rebuild needed)');
-  }, [tabContents]);
 
   if (!activeTab) {
     return (

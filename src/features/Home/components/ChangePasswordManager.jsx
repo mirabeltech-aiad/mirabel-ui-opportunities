@@ -24,7 +24,7 @@ const ChangePasswordManager = () => {
       const changePasswordData = changePasswordService.getChangePasswordData();
       
       if (changePasswordData) {
-        console.log('Change password required:', changePasswordData);
+       
         
         // Generate the change password URL
         const url = changePasswordService.generateChangePasswordUrl(
