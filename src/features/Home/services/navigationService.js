@@ -290,7 +290,7 @@ export const navigationService = {
       const response = await axiosService.get(`/services/User/Accounts/CheckCondition/${userId}/-1`);
       return !!(response?.Data || response?.content?.Data);
     } catch (error) {
-      console.log('Job function check failed:', error);
+  
       return false;
     }
   },
@@ -620,7 +620,7 @@ export const navigationService = {
       
       try {
         localStorage.setItem('MMClientVars', JSON.stringify(updated));
-        console.log('✅ Session data updated successfully');
+       
         return updated;
       } catch (storageError) {
         console.error('❌ Error storing session data:', storageError);
@@ -740,7 +740,7 @@ export const navigationService = {
       };
       
       window.homeActions.addTab(tabData);
-      console.log('✅ Added tab to home panel:', tabData);
+     
     } else {
       // Fallback to opening in new window
       console.warn('⚠️ Home actions not available, opening in new window');
@@ -782,8 +782,7 @@ export const navigationService = {
     // Expose test function for URL construction verification
     window.testUrlConstruction = navigationService.testUrlConstruction;
       
-    console.log('✅ Navigation service initialized with React tab system');
-    console.log('🧪 To test URL construction, run: testUrlConstruction()');
+
   },
 
   /**
@@ -793,7 +792,7 @@ export const navigationService = {
   clearSitewideSettingsCache: () => {
     navigationService._sitewideSettingsCache = null;
     navigationService._sitewideSettingsPromiseCache = null;
-    console.log('✅ Sitewide settings cache cleared');
+  
   },
 
   /**
@@ -803,7 +802,7 @@ export const navigationService = {
   clearApiDataCache: () => {
     navigationService._apiDataCache = null;
     navigationService._apiDataPromiseCache = null;
-    console.log('✅ API data cache cleared');
+
   },
 
   /**
@@ -826,7 +825,7 @@ export const navigationService = {
     delete window.addNewTabToHomePanel;
     delete window.getDecodedURI;
     
-    console.log('✅ Navigation service cleaned up');
+   
   },
 
 getSessionValue: (key) => {

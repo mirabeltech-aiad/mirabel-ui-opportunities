@@ -14,10 +14,8 @@
  * @returns {Window} The new window object
  */
 export const openPage = (url, pageTitle, isQueryStrValEncoded, addTabAfterActiveTab) => {
-  console.log('openPage called with:', { url, pageTitle, isQueryStrValEncoded, addTabAfterActiveTab });
   
   if (!url) {
-    console.warn('openPage: No URL provided');
     return null;
   }
   
@@ -40,10 +38,8 @@ export const openPage = (url, pageTitle, isQueryStrValEncoded, addTabAfterActive
  * @returns {Object} Tab information
  */
 export const openPageInNextTab = (url, pageTitle, isQueryStrValEncoded, addTabAfterActiveTab) => {
-  console.log('openPageInNextTab called with:', { url, pageTitle, isQueryStrValEncoded, addTabAfterActiveTab });
   
   if (!url) {
-    console.warn('openPageInNextTab: No URL provided');
     return null;
   }
   
@@ -76,7 +72,6 @@ export const openPageInNextTab = (url, pageTitle, isQueryStrValEncoded, addTabAf
     // Add the tab using the home context actions
     window.homeActions.addTab(tabData); 
     
-    console.log('openPageInNextTab: Added tab successfully:', tabData);
     
     return {
       success: true,
@@ -98,7 +93,6 @@ export const openPageInNextTab = (url, pageTitle, isQueryStrValEncoded, addTabAf
  * @param {Object} homeState - The state object from HomeContext (optional, for accessing activeTabId)
  */
 export const initializePageNavigation = (homeActions, homeState = null) => {
-  console.log('Initializing page navigation helpers');
 
   // Store home actions and state globally for access by the helper functions
   window.homeActions = homeActions;
@@ -115,9 +109,8 @@ export const initializePageNavigation = (homeActions, homeState = null) => {
     window.top.getCurrentWindowName = getCurrentWindowName;
     window.top.closeTab = closeTab;
     
-    console.log('Page navigation helpers exposed on window.top');
+
   } else {
-    console.warn('window.top not available, cannot expose navigation helpers');
   }
 
   // Load the localizer script
@@ -133,20 +126,16 @@ export const initializePageNavigation = (homeActions, homeState = null) => {
  * @param {string} tabId - The ID of the tab to rename (optional, uses active tab if not provided)
  */
 export const renameTab = (newName, tabId) => {
-  console.log('renameTab called with:', { newName, tabId });
-  
 
-  
   // Get the tab system actions from the global context
   if (window.homeActions && window.homeActions.updateTab) {
     // If tabId is provided, update that specific tab
     if (tabId) {
       const success = window.homeActions.updateTab(tabId, { title: newName });
       if (success) {
-        console.log('renameTab: Tab renamed successfully:', { tabId, newName });
         return true;
       } else {
-        console.warn('renameTab: Failed to find tab with ID:', tabId);
+        
         return false;
       }
     } else {
@@ -154,19 +143,17 @@ export const renameTab = (newName, tabId) => {
       if (window.homeActions.updateActiveTab) {
         const success = window.homeActions.updateActiveTab({ title: newName });
         if (success) {
-          console.log('renameTab: Active tab renamed successfully:', newName);
+          
           return true;
         } else {
-          console.warn('renameTab: Failed to rename active tab');
+         
           return false;
         }
       } else {
-        console.warn('renameTab: updateActiveTab action not available');
         return false;
       }
     }
   } else {
-    console.error('renameTab: Home actions not available or updateTab method missing');
     return false;
   }
 };
@@ -184,10 +171,9 @@ const loadLocalizerScript = async () => {
         version = mmClientVars.ContentVersion;
       }
     } catch (error) {
-      console.warn('Failed to get ContentVersion from MMClientVars, using fallback:', error);
     }
     
-    console.log("📦 Loading localizer script with Content Version:", version);
+   
 
     const script = document.createElement("script");
     
@@ -198,10 +184,9 @@ const loadLocalizerScript = async () => {
     const baseUrl = appIndex !== -1 ? currentUrl.substring(0, appIndex) : window.location.origin;
     script.src = `${baseUrl}/intranet/localizer.js.axd?v=${version}`;
     script.async = true;
-    console.log('script', script);
-    
+   
     document.head.appendChild(script);
-    console.log("✅ Localizer script loaded successfully");
+    
 
   } catch (err) {
     console.error("❌ Failed to load localizer script:", err);
@@ -212,7 +197,7 @@ const loadLocalizerScript = async () => {
  * Initialize message event listeners for iframe communication
  */
 export const initializeMessageListeners = () => {
-  console.log('Initializing message event listeners');
+ 
   
   if (window.addEventListener) {
     window.addEventListener("message", displayMessage, false);
@@ -279,8 +264,6 @@ async function handlePasteClicked(evt) {
       throw new Error("Clipboard permissions denied");
     }
   } catch (error) {
-    // Handle the error gracefully, e.g., display a notification or log the error.
-    showMsg('Denying the "Copy Clipboard" permission will prevent copying a section from one landing page and pasting it into other landing pages.');
   }
 }
 
@@ -289,19 +272,17 @@ async function handlePasteClicked(evt) {
  * This function is exposed on window.top for use by iframe content
  */
 export const closeTab = () => {
-  console.log('closeTab called - removing active tab');
+ 
   
   if (window.homeActions && window.homeActions.removeTab && window.homeState) {
     const activeTabId = window.homeState.activeTabId;
     if (activeTabId) {
       // Use direct removeTab logic like the context menu close
       window.homeActions.removeTab(activeTabId);
-      console.log('closeTab: Active tab closed successfully:', activeTabId);
+     
     } else {
-      console.warn('closeTab: No active tab ID found');
     }
   } else {
-    console.warn('closeTab: Home actions/state not available or removeTab method missing');
   }
 };
 
@@ -333,11 +314,7 @@ function isNullOrEmpty(value) {
  * Show a message to the user (placeholder for now)
  * @param {string} message - The message to display
  */
-function showMsg(message) {
-  console.warn('Message:', message);
-  // TODO: Implement proper message display mechanism
-  // This could be integrated with a toast notification system or modal
-}
+
 
 export const isWindowTopAccessible = () => {
   try {
@@ -377,7 +354,6 @@ export const getTopWindow = () => {
  * This should be called when the Shell app unmounts
  */
 export const cleanupPageNavigation = () => {
-  console.log('Cleaning up page navigation helpers');
   
   // Remove message event listeners
   if (window.removeEventListener) {
