@@ -55,9 +55,9 @@ export const dashboardService = {
         endpoint += `/${refID}`;
       }
       
-      console.log('Saving active dashboard:', { dashboardID, refID, endpoint });
+      
       const response = await axiosService.post(endpoint);
-      console.log('Dashboard save response:', response);
+  
       return response;
     } catch (error) {
       console.error('Error saving active dashboard:', error);

@@ -19,12 +19,7 @@ const TabNavigation = memo(() => {
   const { tabs, activeTabId, actions, dashboards, selectedDashboard, dashboardsLoading } = useHome();
 
   // Debug logging to track component lifecycle
-  useEffect(() => {
-    console.log('🔄 TabNavigation: Component mounted');
-    return () => {
-      console.log('🔄 TabNavigation: Component unmounted');
-    };
-  }, []);
+
 
   // Context menu state
   const [contextMenu, setContextMenu] = useState({ visible: false, x: 0, y: 0, tabId: null });
@@ -74,13 +69,13 @@ const TabNavigation = memo(() => {
 
   // // Initialize page navigation helpers when component mounts
   useEffect(() => {
-    console.log('Initializing page navigation helpers in TabNavigation');
+  
     // Pass both actions and state with activeTabId
     initializePageNavigation(actions, { activeTabId, tabs });
 
     // Cleanup function
     return () => {
-      console.log('Cleaning up page navigation helpers in TabNavigation');
+  
       cleanupPageNavigation();
     };
   }, [actions, activeTabId, tabs]); // Add dependencies to update when state changes
