@@ -190,21 +190,23 @@ const ContactSalesRepForm = ({ isOpen, onClose }) => {
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
       <Card className="w-full max-w-4xl max-h-[90vh] overflow-y-auto">
-        <CardHeader className="bg-ocean-gradient text-white">
-          <div className="flex items-center justify-between">
-            <CardTitle className="text-xl font-semibold">
-              Contact your Sales Rep
-            </CardTitle>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={onClose}
-              className="text-white hover:bg-white/20"
-            >
-              <LucideX className="h-5 w-5" />
-            </Button>
-          </div>
-        </CardHeader>
+                 <CardHeader className="bg-ocean-gradient text-white py-3">
+           <div className="flex items-center justify-between">
+             <CardTitle className="flex items-center text-lg">
+               <Mail className="h-4 w-4 mr-2" />
+               Contact your Sales Rep
+             </CardTitle>
+             <Button
+               variant="ghost"
+               size="sm"
+               onClick={onClose}
+               className="text-white hover:bg-white/20 h-8 w-8 p-0"
+               aria-label="Close Contact Sales Rep"
+             >
+               <LucideX className="h-4 w-4" />
+             </Button>
+           </div>
+         </CardHeader>
         <CardContent className="p-4">
           <form onSubmit={handleSubmit} className="space-y-3">
             {/* From/To Information */}

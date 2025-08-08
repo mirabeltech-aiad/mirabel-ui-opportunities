@@ -61,7 +61,7 @@ const initialState = {
       title: 'Search',
       component: 'Search',
       type: 'iframe',
-      url:  (typeof window !== 'undefined' ? getTopPath() : '') + '/ui/Search',
+      url: null, // Lazy-loaded - will be set when tab is clicked
       closable: false,
       icon: ''
     }

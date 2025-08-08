@@ -44,10 +44,23 @@ import { useToast } from '@/components/ui/use-toast';
 // Recursive menu renderer
 const renderMenuItems = (items, openTabByUrl) => {
   return items.map((item) => {
+    // Check if menu item is locked
+    const isLocked = item.isLocked === true;
+    
+    // Debug logging for locked items
+    if (isLocked) {
+      console.log('🔒 Found locked menu item:', {
+        title: item.title,
+        url: item.url,
+        urlSource: item.urlSource,
+        iconCls: item.iconCls
+      });
+    }
+    
     if (item.children && item.children.length > 0) {
       return (
         <DropdownMenuSub key={item.id}>
-          <DropdownMenuSubTrigger className="rounded-none text-gray-800 font-medium px-4 py-2 hover:bg-[#e6f0fa] focus:bg-[#e6f0fa] hover:text-ocean-900 focus:text-ocean-900 cursor-pointer flex items-center gap-2 transition-colors duration-150 whitespace-nowrap" style={{ fontFamily: 'inherit', fontSize: '13px', fontWeight: 500, lineHeight: '1.5' }}>
+              <DropdownMenuSubTrigger className="rounded-none text-gray-800 font-medium px-4 py-1.5 hover:bg-[#e6f0fa] focus:bg-[#e6f0fa] hover:text-ocean-900 focus:text-ocean-900 cursor-pointer flex items-center gap-2 transition-colors duration-150 whitespace-nowrap" style={{ fontFamily: 'inherit', fontSize: '13px', fontWeight: 500, lineHeight: '1' }}>
             <span>{item.title}</span>
             {item.icon && (
               <Badge className="ml-2 text-xs align-middle" variant="secondary">
@@ -55,24 +68,40 @@ const renderMenuItems = (items, openTabByUrl) => {
               </Badge>
             )}
           </DropdownMenuSubTrigger>
-          <DropdownMenuSubContent className="w-auto min-w-56 max-w-xl mt-2 bg-white border border-gray-100 p-0 text-gray-800 font-medium" style={{ fontFamily: 'inherit', fontSize: '13px', lineHeight: '1.5' }}>
+          <DropdownMenuSubContent className="w-auto min-w-56 max-w-xl bg-white border border-gray-100 p-0 text-gray-800 font-medium overflow-y-auto" style={{ 
+            fontFamily: 'inherit', 
+            fontSize: '13px', 
+            lineHeight: '1.2',
+            maxHeight: '70vh'
+          }}>
             {renderMenuItems(item.children, openTabByUrl)}
           </DropdownMenuSubContent>
         </DropdownMenuSub>
       );
     } else {
+      // Handle click for locked items - show message instead of opening tab
+      const handleClick = () => {
+        openTabByUrl(item.title, item.url, item);
+      };
+      
       return (
         <DropdownMenuItem
           key={item.id}
-          onClick={() => openTabByUrl(item.title, item.url, item)}
-          className="rounded-none font-medium px-4 py-2 hover:bg-[#e6f0fa] focus:bg-[#e6f0fa] hover:text-ocean-900 focus:text-ocean-900 cursor-pointer text-gray-800 transition-colors duration-150 flex items-center gap-2 whitespace-nowrap"
-          style={{ fontFamily: 'inherit', fontSize: '13px', fontWeight: 500, lineHeight: '1.5' }}
+          onClick={handleClick}
+          className="rounded-none font-medium px-4 py-1.5 hover:bg-[#e6f0fa] focus:bg-[#e6f0fa] hover:text-ocean-900 focus:text-ocean-900 cursor-pointer text-gray-800 transition-colors duration-150 flex items-center gap-2 whitespace-nowrap"
+          style={{ fontFamily: 'inherit', fontSize: '13px', fontWeight: 500, lineHeight: '1.2' }}
         >
           <span>{item.title}</span>
           {item.icon && (
             <Badge className="ml-2 text-xs align-middle" variant="secondary">
               {item.icon}
             </Badge>
+          )}
+          {/* Show lock icon if item is locked */}
+          {isLocked && (
+            <span className="ml-auto">
+              <i className="mainMenuIcon lockIcon">🔒</i>
+            </span>
           )}
         </DropdownMenuItem>
       );
@@ -85,7 +114,7 @@ const renderMenuItemsWithShowMore = (items, openTabByUrl, expanded, setExpanded)
   const VISIBLE_COUNT = 10;
   if (!items || items.length <= VISIBLE_COUNT || expanded) {
     return (
-      <div className={expanded ? 'overflow-y-auto max-h-[400px]' : ''}>
+      <div>
         {items.map((item) => renderMenuItemOrSub(item, openTabByUrl, expanded, setExpanded))}
       </div>
     );
@@ -101,10 +130,13 @@ const renderMenuItemsWithShowMore = (items, openTabByUrl, expanded, setExpanded)
 
 // Helper to render a single menu item or submenu
 const renderMenuItemOrSub = (item, openTabByUrl, expanded, setExpanded) => {
+  // Check if menu item is locked
+  const isLocked = item.isLocked === true;
+  
   if (item.children && item.children.length > 0) {
     return (
       <DropdownMenuSub key={item.id}>
-        <DropdownMenuSubTrigger className="rounded-none text-gray-800 font-medium px-4 py-2 hover:bg-[#e6f0fa] focus:bg-[#e6f0fa] hover:text-ocean-900 focus:text-ocean-900 cursor-pointer flex items-center gap-2 transition-colors duration-150 whitespace-nowrap" style={{ fontFamily: 'inherit', fontSize: '13px', fontWeight: 500, lineHeight: '1.5' }}>
+        <DropdownMenuSubTrigger className="rounded-none text-gray-800 font-medium px-4 py-1.5 hover:bg-[#e6f0fa] focus:bg-[#e6f0fa] hover:text-ocean-900 focus:text-ocean-900 cursor-pointer flex items-center gap-2 transition-colors duration-150 whitespace-nowrap" style={{ fontFamily: 'inherit', fontSize: '13px', fontWeight: 500, lineHeight: '1' }}>
           <span>{item.title}</span>
           {item.icon && (
             <Badge className="ml-2 text-xs align-middle" variant="secondary">
@@ -112,24 +144,40 @@ const renderMenuItemOrSub = (item, openTabByUrl, expanded, setExpanded) => {
             </Badge>
           )}
         </DropdownMenuSubTrigger>
-        <DropdownMenuSubContent className="w-auto min-w-56 max-w-xl mt-2 bg-white border border-gray-100 p-0 text-gray-800 font-medium" style={{ fontFamily: 'inherit', fontSize: '13px', lineHeight: '1.5' }}>
+        <DropdownMenuSubContent className="w-auto min-w-56 max-w-xl bg-white border border-gray-100 p-0 text-gray-800 font-medium overflow-y-auto" style={{ 
+          fontFamily: 'inherit', 
+          fontSize: '13px', 
+          lineHeight: '1.2',
+          maxHeight: '70vh'
+        }}>
           <SubMenuWithShowMore items={item.children} openTabByUrl={openTabByUrl} />
         </DropdownMenuSubContent>
       </DropdownMenuSub>
     );
   } else {
-    return (
-      <DropdownMenuItem
-        key={item.id}
-        onClick={() => openTabByUrl(item.title, item.url, item)}
-        className="rounded-none font-medium px-4 py-2 hover:bg-[#e6f0fa] focus:bg-[#e6f0fa] hover:text-ocean-900 focus:text-ocean-900 cursor-pointer text-gray-800 transition-colors duration-150 flex items-center gap-2 whitespace-nowrap"
-        style={{ fontFamily: 'inherit', fontSize: '13px', fontWeight: 500, lineHeight: '1.5' }}
-      >
+    // Handle click for locked items - show message instead of opening tab
+    const handleClick = () => {
+      openTabByUrl(item.title, item.url, item);
+    };
+    
+          return (
+        <DropdownMenuItem
+          key={item.id}
+          onClick={handleClick}
+          className="rounded-none font-medium px-4 py-1.5 hover:bg-[#e6f0fa] focus:bg-[#e6f0fa] hover:text-ocean-900 focus:text-ocean-900 cursor-pointer text-gray-800 transition-colors duration-150 flex items-center gap-2 whitespace-nowrap"
+          style={{ fontFamily: 'inherit', fontSize: '13px', fontWeight: 500, lineHeight: '1.2' }}
+        >
         <span>{item.title}</span>
         {item.icon && (
           <Badge className="ml-2 text-xs align-middle" variant="secondary">
             {item.icon}
           </Badge>
+        )}
+        {/* Show lock icon if item is locked */}
+        {isLocked && (
+          <span className="ml-auto">
+            <i className="mainMenuIcon lockIcon">🔒</i>
+          </span>
         )}
       </DropdownMenuItem>
     );
@@ -164,6 +212,7 @@ const Navbar = () => {
   const [canScrollLeft, setCanScrollLeft] = useState(false);
   const [canScrollRight, setCanScrollRight] = useState(false);
   const menuContainerRef = useRef(null);
+  const closeTimeoutRef = useRef(null);
 
   // Fallback user info if AuthContext user is null
   const [fallbackUser, setFallbackUser] = useState(null);
@@ -354,29 +403,34 @@ const Navbar = () => {
   };
 
   // Refresh current tab
-  const handleRefresh = () => {
+  const handleRefresh = async () => {
     const activeTab = tabs.find(tab => tab.id === activeTabId);
     
     if (activeTab) {
       if (activeTab.id === 'dashboard') {
-        // Refresh dashboard by reloading navigation and dashboards
+        // Refresh dashboard by reloading dashboard data and menu items only
         actions.setNavigationLoading(true);
-        // Trigger a reload of the dashboard data
-        setTimeout(() => {
+        // Trigger a refresh of dashboard data and menu items
+        try {
+          await actions.setupDashboard('', true); // Pass isReload=true to refresh dashboard data
+        } catch (error) {
+          console.error('Failed to refresh dashboard:', error);
+        } finally {
           actions.setNavigationLoading(false);
-        }, 1000);
-        toast({
-          title: "Dashboard refreshed",
-          description: "Dashboard data has been refreshed.",
-        });
+        }
+      } else if (activeTab.id === 'inbox') {
+        // Refresh inbox by calling the global reload function
+        if (window.reloadInboxIframes) {
+          window.reloadInboxIframes();
+        } else {
+          // Fallback: use the refreshTab function to force a component reload
+          actions.refreshTab(activeTab.id);
+        }
       } else if (activeTab.type === 'iframe') {
         // Refresh iframe content by tab ID
         const success = refreshIframeByTabId(activeTab.id);
         if (success) {
-          toast({
-            title: "Page refreshed",
-            description: "The current page has been refreshed.",
-          });
+          // Success case - no toast needed as requested
         } else {
           toast({
             title: "Refresh failed",
@@ -384,6 +438,13 @@ const Navbar = () => {
             variant: "destructive",
           });
         }
+      } else {
+        // Generic refresh for other component tabs
+        actions.refreshTab(activeTab.id);
+        toast({
+          title: "Page refreshed",
+          description: "The current page has been refreshed.",
+        });
       }
     }
   };
@@ -453,18 +514,33 @@ const Navbar = () => {
 
   // Handle menu open/close with hover functionality
   const handleMenuOpenChange = (menuId, isOpen) => {
+    // Clear any existing timeout
+    if (closeTimeoutRef.current) {
+      clearTimeout(closeTimeoutRef.current);
+      closeTimeoutRef.current = null;
+    }
+    
     if (isOpen) {
       // Enable hover functionality when any menu is opened
       setHoverEnabled(true);
       setOpenMenuId(menuId);
     } else {
-      setOpenMenuId(null);
+      // Add a small delay before closing to prevent flickering
+      closeTimeoutRef.current = setTimeout(() => {
+        setOpenMenuId(null);
+      }, 100);
     }
   };
 
   // Handle menu hover with conditional logic
   const handleMenuHover = (menuId) => {
-    if (hoverEnabled) {
+    // Clear any existing timeout
+    if (closeTimeoutRef.current) {
+      clearTimeout(closeTimeoutRef.current);
+      closeTimeoutRef.current = null;
+    }
+    
+    if (hoverEnabled && openMenuId !== menuId) {
       setOpenMenuId(menuId);
     }
   };
@@ -472,12 +548,25 @@ const Navbar = () => {
   // Handle menu leave
   const handleMenuLeave = () => {
     if (hoverEnabled) {
-      setOpenMenuId(null);
+      // Clear any existing timeout
+      if (closeTimeoutRef.current) {
+        clearTimeout(closeTimeoutRef.current);
+      }
+      // Add a small delay to prevent immediate closing
+      closeTimeoutRef.current = setTimeout(() => {
+        setOpenMenuId(null);
+      }, 150);
     }
   };
 
   // Handle menu content hover to keep menu open
   const handleMenuContentHover = (menuId) => {
+    // Clear any existing timeout
+    if (closeTimeoutRef.current) {
+      clearTimeout(closeTimeoutRef.current);
+      closeTimeoutRef.current = null;
+    }
+    
     if (hoverEnabled) {
       setOpenMenuId(menuId);
     }
@@ -486,7 +575,14 @@ const Navbar = () => {
   // Handle menu content leave
   const handleMenuContentLeave = () => {
     if (hoverEnabled) {
-      setOpenMenuId(null);
+      // Clear any existing timeout
+      if (closeTimeoutRef.current) {
+        clearTimeout(closeTimeoutRef.current);
+      }
+      // Add a small delay to prevent immediate closing
+      closeTimeoutRef.current = setTimeout(() => {
+        setOpenMenuId(null);
+      }, 150);
     }
   };
 
@@ -552,7 +648,7 @@ const Navbar = () => {
             {/* Top Menus with Scrolling */}
             <div className="flex items-center min-h-0 flex-1 min-w-0">
               {navigationMenus && Array.isArray(navigationMenus) && navigationMenus.length > 0 && (
-                <div className="flex items-center w-full min-w-0">
+                <div className="flex items-center w-full min-w-0 pl-5">
                   {/* Left Scroll Button */}
                   {canScrollLeft && (
                     <button
@@ -578,9 +674,9 @@ const Navbar = () => {
                   <DropdownMenu key={menu.id} open={openMenuId === menu.id} onOpenChange={(open) => handleMenuOpenChange(menu.id, open)}>
                     <DropdownMenuTrigger asChild>
                       <button
-                        className={`flex-shrink-0 px-2 py-1 rounded-md font-medium text-sm transition flex items-center h-8 min-h-0 whitespace-nowrap ${
+                        className={`flex-shrink-0 px-2 py-1 rounded-md font-medium text-sm transition flex items-center h-8 min-h-0 whitespace-nowrap focus:outline-none focus:ring-0 border-0 ${
                           openMenuId === menu.id
-                            ? 'bg-blue-200 text-blue-900 shadow font-semibold' // Consistent active tab styling
+                            ? 'bg-blue-200 text-blue-900 font-semibold' // Removed shadow (black border)
                             : 'text-white hover:bg-ocean-700 hover:text-white focus:bg-ocean-800 focus:text-white'
                         }`}
                         style={{ fontSize: '13px' }}
@@ -592,13 +688,18 @@ const Navbar = () => {
                     </DropdownMenuTrigger>
                     <DropdownMenuContent 
                       align="start" 
-                      className="w-auto min-w-56 max-w-xl mt-2 bg-white border border-gray-100 p-0 text-gray-800 font-medium" 
-                      style={{ fontFamily: 'inherit', fontSize: '13px', lineHeight: '1.5' }}
+                      className="w-auto min-w-56 max-w-xl bg-white border border-gray-100 p-0 text-gray-800 font-medium overflow-y-auto" 
+                      style={{ 
+                        fontFamily: 'inherit', 
+                        fontSize: '13px', 
+                        lineHeight: '1.2',
+                        maxHeight: expandedMenus[menu.id] ? '90vh' : '70vh'
+                      }}
                       onMouseEnter={() => handleMenuHover(menu.id)}
                       onMouseLeave={handleMenuLeave}
                     >
                       {menu.url && (
-                        <DropdownMenuItem onClick={() => openTabByUrl(menu.title, menu.url, menu)} className="rounded-none font-medium px-4 py-2 hover:bg-[#e6f0fa] focus:bg-[#e6f0fa] hover:text-ocean-900 focus:text-ocean-900 cursor-pointer text-gray-800 transition-colors duration-150 flex items-center gap-2 whitespace-nowrap" style={{ fontFamily: 'inherit', fontSize: '13px', fontWeight: 500, lineHeight: '1.5' }}>
+                        <DropdownMenuItem onClick={() => openTabByUrl(menu.title, menu.url, menu)} className="rounded-none font-medium px-4 py-1.5 pt-3 hover:bg-[#e6f0fa] focus:bg-[#e6f0fa] hover:text-ocean-900 focus:text-ocean-900 cursor-pointer text-gray-800 transition-colors duration-150 flex items-center gap-2 whitespace-nowrap" style={{ fontFamily: 'inherit', fontSize: '13px', fontWeight: 500, lineHeight: '1' }}>
                           <span>{menu.title} Home</span>
                         </DropdownMenuItem>
                       )}
@@ -635,6 +736,7 @@ const Navbar = () => {
                   <CustomerSearch />
                 </div>
               )}
+              
               {/* Help Icon */}
               <Button
                 variant="ghost"

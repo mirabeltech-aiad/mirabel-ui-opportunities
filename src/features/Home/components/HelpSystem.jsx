@@ -1,7 +1,7 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useHome } from '../contexts/HomeContext';
 import { 
-  HelpCircle, 
+  HelpCircle,
   MessageCircle, 
   Phone, 
   Calendar, 
@@ -25,20 +25,108 @@ import { chatService } from '../services/chatService';
 import { consultantService } from '../services/consultantService';
 import { getUserInfo } from '@/utils/sessionHelpers';
 import { useToast } from '@/components/ui/use-toast';
+import {
+  DndContext,
+  useDraggable,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+} from '@dnd-kit/core';
+import {
+  sortableKeyboardCoordinates,
+} from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
+
+// Custom draggable help icon component using dnd-kit
+const DraggableHelpIcon = ({ position, onPositionChange, onClick, onHide }) => {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    isDragging,
+  } = useDraggable({
+    id: 'help-icon',
+    data: {
+      type: 'help-icon',
+      position,
+    },
+  });
+
+  const style = {
+    position: 'fixed',
+    left: position.x,
+    top: position.y,
+    zIndex: 1000,
+    cursor: isDragging ? 'grabbing' : 'grab',
+    userSelect: 'none',
+    touchAction: 'none',
+    willChange: isDragging ? 'transform' : 'auto',
+    transform: CSS.Translate.toString(transform),
+  };
+
+  const handleClick = (e) => {
+    if (!isDragging) {
+      onClick(e);
+    }
+  };
+
+  return (
+    <div
+      ref={setNodeRef}
+      style={style}
+      {...attributes}
+      {...listeners}
+      className="group"
+      onClick={handleClick}
+    >
+      <Button
+        size="lg"
+        className="relative bg-ocean-600 hover:bg-ocean-700 text-white shadow-lg rounded-2xl w-14 h-14 p-0 transition-all duration-200 overflow-hidden border border-white/20"
+        style={{
+          userSelect: 'none',
+          touchAction: 'none',
+          pointerEvents: isDragging ? 'none' : 'auto',
+        }}
+      >
+        <span
+          className="absolute inset-0 pointer-events-none"
+          style={{
+            background: 'linear-gradient(135deg, rgba(0,0,0,0) 45%, rgba(0,0,0,0.18) 45%)'
+          }}
+        />
+        <span className="relative z-10 text-white text-2xl leading-none">?</span>
+      </Button>
+      
+      {/* Tooltip */}
+      <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-2 py-1 bg-gray-900 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap">
+        Help
+      </div>
+      
+      {/* Hide Help Icon Button */}
+      <Button
+        size="sm"
+        variant="ghost"
+        onClick={onHide}
+        className="absolute -top-2 -right-2 bg-red-500 hover:bg-red-600 text-white rounded-full w-6 h-6 p-0 opacity-0 group-hover:opacity-100 transition-opacity duration-200"
+        title="Hide Help Icon"
+      >
+        <X className="h-3 w-3" />
+      </Button>
+    </div>
+  );
+};
 
 const HelpSystem = () => {
   const { helpVisible, helpPosition, actions } = useHome();
   
-
-  const [isDragging, setIsDragging] = useState(false);
-  const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
-  const [dragStartPosition, setDragStartPosition] = useState({ x: 0, y: 0 });
   const [helpIconVisible, setHelpIconVisible] = useState(true);
   const [showTicketForm, setShowTicketForm] = useState(false);
   const [showContactForm, setShowContactForm] = useState(false);
   const [showTrainingForm, setShowTrainingForm] = useState(false);
   const [isContactConsultantOpen, setIsContactConsultantOpen] = useState(false);
-  const buttonRef = useRef(null);
   const [showLivePhoneModal, setShowLivePhoneModal] = useState(false);
   const [showSalesRepForm, setShowSalesRepForm] = useState(false);
   const userInfo = getUserInfo();
@@ -55,6 +143,48 @@ const HelpSystem = () => {
   }, [consultantInfo]);
 
   const defaultHelpPosition = { x: typeof window !== 'undefined' ? window.innerWidth - 76 : 1320, y: typeof window !== 'undefined' ? window.innerHeight - 76 : 620 };
+
+  // DnD Kit sensors
+  const sensors = useSensors(
+    useSensor(PointerSensor, {
+      activationConstraint: {
+        distance: 3, // Reduced activation distance for more responsive dragging
+      },
+    }),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    })
+  );
+
+  // DnD Kit event handlers
+  const handleDragStart = (event) => {
+    // Optional: Add any logic needed when drag starts
+  };
+
+
+
+  const handleDragEnd = (event) => {
+    const { active, delta } = event;
+    
+    if (active.id === 'help-icon') {
+      // Calculate new position based on the delta
+      const newX = helpPosition.x + delta.x;
+      const newY = helpPosition.y + delta.y;
+      
+      // Constrain to viewport (button is 56px x 56px)
+      const maxX = window.innerWidth - 56;
+      const maxY = window.innerHeight - 56;
+      
+      const constrainedX = Math.max(0, Math.min(newX, maxX));
+      const constrainedY = Math.max(0, Math.min(newY, maxY));
+      
+      // Update the position in the context
+      actions.setHelpPosition({
+        x: constrainedX,
+        y: constrainedY
+      });
+    }
+  };
 
   const helpOptions = [
     {
@@ -148,32 +278,7 @@ const HelpSystem = () => {
     }
   ];
 
-  const handleMouseDown = (e) => {
-    if (e.button !== 0) return; // Only left click
-    
-    setIsDragging(true);
-    setDragStartPosition({ x: e.clientX, y: e.clientY });
-    const rect = buttonRef.current.getBoundingClientRect();
-    setDragOffset({
-      x: e.clientX - rect.left,
-      y: e.clientY - rect.top
-    });
-  };
-
   const handleClick = (e) => {
-    // Calculate distance moved
-    const distance = Math.sqrt(
-      Math.pow(e.clientX - dragStartPosition.x, 2) + 
-      Math.pow(e.clientY - dragStartPosition.y, 2)
-    );
-    
-    // Prevent click if user was dragging (moved more than 5px)
-    if (distance > 5) {
-      e.preventDefault();
-      e.stopPropagation();
-      return;
-    }
-    
     actions.toggleHelp();
   };
 
@@ -184,8 +289,6 @@ const HelpSystem = () => {
   const handleHideHelpIcon = () => {
     setHelpIconVisible(false);
   };
-
-
 
   const handleOverlayClick = (e) => {
     // Close help panel when clicking on the overlay
@@ -200,38 +303,6 @@ const HelpSystem = () => {
       handleCloseHelp();
     }
   };
-
-  const handleMouseMove = (e) => {
-    if (!isDragging) return;
-
-    const newX = e.clientX - dragOffset.x;
-    const newY = e.clientY - dragOffset.y;
-
-    // Constrain to viewport (button is 56px x 56px)
-    const maxX = window.innerWidth - 56;
-    const maxY = window.innerHeight - 56;
-    
-    actions.setHelpPosition({
-      x: Math.max(0, Math.min(newX, maxX)),
-      y: Math.max(0, Math.min(newY, maxY))
-    });
-  };
-
-  const handleMouseUp = (e) => {
-    // Reset dragging state immediately
-    setIsDragging(false);
-  };
-
-  useEffect(() => {
-    if (isDragging) {
-      document.addEventListener('mousemove', handleMouseMove);
-      document.addEventListener('mouseup', handleMouseUp);
-      return () => {
-        document.removeEventListener('mousemove', handleMouseMove);
-        document.removeEventListener('mouseup', handleMouseUp);
-      };
-    }
-  }, [isDragging, dragOffset]);
 
   // Initialize Front Chat when component mounts
   useEffect(() => {
@@ -258,45 +329,21 @@ const HelpSystem = () => {
 
   return (
     <>
-      {/* Draggable Help Button */}
-      {helpIconVisible && (
-        <div
-          ref={buttonRef}
-          style={{
-            position: 'fixed',
-            left: helpPosition.x,
-            top: helpPosition.y,
-            zIndex: 1000,
-            cursor: isDragging ? 'grabbing' : 'grab',
-          }}
-          onMouseDown={handleMouseDown}
-          className="group"
-        >
-        <Button
-          size="lg"
-          className="bg-ocean-600 hover:bg-ocean-700 text-white border-2 border-white shadow-lg rounded-full w-14 h-14 p-0 transition-all duration-200"
-          onClick={handleClick}
-        >
-          <HelpCircle className="h-10 w-10" />
-        </Button>
-        
-        {/* Tooltip */}
-        <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-2 py-1 bg-gray-900 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap">
-          Help
-        </div>
-        
-        {/* Hide Help Icon Button */}
-        <Button
-          size="sm"
-          variant="ghost"
-          onClick={handleHideHelpIcon}
-          className="absolute -top-2 -right-2 bg-red-500 hover:bg-red-600 text-white rounded-full w-6 h-6 p-0 opacity-0 group-hover:opacity-100 transition-opacity duration-200"
-          title="Hide Help Icon"
-        >
-          <X className="h-3 w-3" />
-        </Button>
-      </div>
-      )}
+      {/* DnD Context for Draggable Help Button */}
+      <DndContext
+        sensors={sensors}
+        collisionDetection={closestCenter}
+        onDragStart={handleDragStart}
+        onDragEnd={handleDragEnd}
+      >
+        {helpIconVisible && (
+          <DraggableHelpIcon
+            position={helpPosition}
+            onClick={handleClick}
+            onHide={handleHideHelpIcon}
+          />
+        )}
+      </DndContext>
 
 
 
@@ -309,24 +356,24 @@ const HelpSystem = () => {
           tabIndex={0}
         >
           <div className="relative w-full max-w-5xl bg-white rounded-xl shadow-2xl overflow-hidden">
-            {/* Professional Header */}
-            <CardHeader className="bg-ocean-gradient text-white">
+            {/* Compact Header */}
+            <div className="bg-ocean-gradient text-white px-4 py-3">
               <div className="flex items-center justify-between">
-                <CardTitle className="flex items-center">
-                  <HelpCircle className="h-5 w-5 mr-2" />
-                  Support Center
-                </CardTitle>
+                <div className="flex items-center">
+                  <HelpCircle className="h-4 w-4 mr-2" />
+                  <span className="text-lg font-semibold">Support Center</span>
+                </div>
                 <Button
                   variant="ghost"
                   size="sm"
                   onClick={handleCloseHelp}
-                  className="text-white hover:bg-white/20"
+                  className="text-white hover:bg-white/20 h-8 w-8 p-0"
                   aria-label="Close Support Center"
                 >
                   <LucideX className="h-4 w-4" />
                 </Button>
               </div>
-            </CardHeader>
+            </div>
             
             <CardContent className="p-6">
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -388,21 +435,28 @@ const HelpSystem = () => {
         />
       )}
 
-      {/* Live Phone Support Modal */}
-      {showLivePhoneModal && (
-        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-          <Card className="w-full max-w-lg max-h-[90vh] overflow-hidden">
-            <CardHeader className="bg-ocean-gradient text-white">
-              <div className="flex items-center justify-between">
-                <CardTitle className="flex items-center">
-                  <Phone className="h-5 w-5 mr-2" />
-                  Live Phone Support
-                </CardTitle>
-                <Button variant="ghost" size="sm" onClick={() => setShowLivePhoneModal(false)} className="text-white hover:bg-white/20">
-                  <X className="h-4 w-4" />
-                </Button>
-              </div>
-            </CardHeader>
+             {/* Live Phone Support Modal */}
+       {showLivePhoneModal && (
+         <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+           <Card className="w-full max-w-lg max-h-[90vh] overflow-hidden">
+             {/* Compact Header */}
+             <div className="bg-ocean-gradient text-white px-4 py-3">
+               <div className="flex items-center justify-between">
+                 <div className="flex items-center">
+                   <Phone className="h-4 w-4 mr-2" />
+                   <span className="text-lg font-semibold">Live Phone Support</span>
+                 </div>
+                 <Button
+                   variant="ghost"
+                   size="sm"
+                   onClick={() => setShowLivePhoneModal(false)}
+                   className="text-white hover:bg-white/20 h-8 w-8 p-0"
+                   aria-label="Close Live Phone Support"
+                 >
+                   <X className="h-4 w-4" />
+                 </Button>
+               </div>
+             </div>
             <CardContent className="p-6 overflow-y-auto max-h-[calc(90vh-80px)]">
               {isAdmin ? (
                 <div className="space-y-4">

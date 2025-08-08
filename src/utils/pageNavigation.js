@@ -95,12 +95,16 @@ export const openPageInNextTab = (url, pageTitle, isQueryStrValEncoded, addTabAf
  * Initializes the page navigation helpers by exposing them on window.top
  * This should be called when the Shell app loads
  * @param {Object} homeActions - The actions object from HomeContext
+ * @param {Object} homeState - The state object from HomeContext (optional, for accessing activeTabId)
  */
-export const initializePageNavigation = (homeActions) => {
+export const initializePageNavigation = (homeActions, homeState = null) => {
   console.log('Initializing page navigation helpers');
 
-  // Store home actions globally for access by the helper functions
+  // Store home actions and state globally for access by the helper functions
   window.homeActions = homeActions;
+  if (homeState) {
+    window.homeState = homeState;
+  }
   
   // Expose functions on window.top for Feature apps to use
   if (window.top) {
@@ -287,12 +291,17 @@ async function handlePasteClicked(evt) {
 export const closeTab = () => {
   console.log('closeTab called - removing active tab');
   
-  if (window.homeActions && window.homeActions.closeActiveTab) {
-    // Use React tab system to close active tab
-    window.homeActions.closeActiveTab();
-    console.log('closeTab: Active tab closed successfully');
+  if (window.homeActions && window.homeActions.removeTab && window.homeState) {
+    const activeTabId = window.homeState.activeTabId;
+    if (activeTabId) {
+      // Use direct removeTab logic like the context menu close
+      window.homeActions.removeTab(activeTabId);
+      console.log('closeTab: Active tab closed successfully:', activeTabId);
+    } else {
+      console.warn('closeTab: No active tab ID found');
+    }
   } else {
-    console.warn('closeTab: Home actions not available or closeActiveTab method missing');
+    console.warn('closeTab: Home actions/state not available or removeTab method missing');
   }
 };
 
@@ -387,5 +396,6 @@ export const cleanupPageNavigation = () => {
   }
   
   delete window.homeActions;
+  delete window.homeState;
 }; 
 

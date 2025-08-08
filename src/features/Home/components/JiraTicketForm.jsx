@@ -261,17 +261,23 @@ const JiraTicketForm = ({ onClose }) => {
   return (
     <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
       <Card className="w-full max-w-2xl max-h-[95vh] overflow-hidden">
-        <CardHeader className="bg-ocean-gradient text-white">
-          <div className="flex items-center justify-between">
-            <CardTitle className="flex items-center">
-              <Send className="h-5 w-5 mr-2" />
-              Submit Tech Support Ticket
-            </CardTitle>
-            <Button variant="ghost" size="sm" onClick={onClose} className="text-white hover:bg-white/20">
-              <X className="h-4 w-4" />
-            </Button>
-          </div>
-        </CardHeader>
+                 <CardHeader className="bg-ocean-gradient text-white py-3">
+           <div className="flex items-center justify-between">
+             <CardTitle className="flex items-center text-lg">
+               <Send className="h-4 w-4 mr-2" />
+               Submit Tech Support Ticket
+             </CardTitle>
+             <Button
+               variant="ghost"
+               size="sm"
+               onClick={onClose}
+               className="text-white hover:bg-white/20 h-8 w-8 p-0"
+               aria-label="Close Submit Ticket"
+             >
+               <X className="h-4 w-4" />
+             </Button>
+           </div>
+         </CardHeader>
         <CardContent className="p-4 overflow-y-auto max-h-[calc(95vh-120px)]">
           <form onSubmit={handleSubmit} className="space-y-3">
             {/* Support Category */}
