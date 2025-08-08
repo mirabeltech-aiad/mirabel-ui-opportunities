@@ -356,24 +356,24 @@ const HelpSystem = () => {
           tabIndex={0}
         >
           <div className="relative w-full max-w-5xl bg-white rounded-xl shadow-2xl overflow-hidden">
-            {/* Professional Header */}
-            <CardHeader className="bg-ocean-gradient text-white">
+            {/* Compact Header */}
+            <div className="bg-ocean-gradient text-white px-4 py-3">
               <div className="flex items-center justify-between">
-                <CardTitle className="flex items-center">
-                  <HelpCircle className="h-5 w-5 mr-2" />
-                  Support Center
-                </CardTitle>
+                <div className="flex items-center">
+                  <HelpCircle className="h-4 w-4 mr-2" />
+                  <span className="text-lg font-semibold">Support Center</span>
+                </div>
                 <Button
                   variant="ghost"
                   size="sm"
                   onClick={handleCloseHelp}
-                  className="text-white hover:bg-white/20"
+                  className="text-white hover:bg-white/20 h-8 w-8 p-0"
                   aria-label="Close Support Center"
                 >
                   <LucideX className="h-4 w-4" />
                 </Button>
               </div>
-            </CardHeader>
+            </div>
             
             <CardContent className="p-6">
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -435,21 +435,28 @@ const HelpSystem = () => {
         />
       )}
 
-      {/* Live Phone Support Modal */}
-      {showLivePhoneModal && (
-        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-          <Card className="w-full max-w-lg max-h-[90vh] overflow-hidden">
-            <CardHeader className="bg-ocean-gradient text-white">
-              <div className="flex items-center justify-between">
-                <CardTitle className="flex items-center">
-                  <Phone className="h-5 w-5 mr-2" />
-                  Live Phone Support
-                </CardTitle>
-                <Button variant="ghost" size="sm" onClick={() => setShowLivePhoneModal(false)} className="text-white hover:bg-white/20">
-                  <X className="h-4 w-4" />
-                </Button>
-              </div>
-            </CardHeader>
+             {/* Live Phone Support Modal */}
+       {showLivePhoneModal && (
+         <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+           <Card className="w-full max-w-lg max-h-[90vh] overflow-hidden">
+             {/* Compact Header */}
+             <div className="bg-ocean-gradient text-white px-4 py-3">
+               <div className="flex items-center justify-between">
+                 <div className="flex items-center">
+                   <Phone className="h-4 w-4 mr-2" />
+                   <span className="text-lg font-semibold">Live Phone Support</span>
+                 </div>
+                 <Button
+                   variant="ghost"
+                   size="sm"
+                   onClick={() => setShowLivePhoneModal(false)}
+                   className="text-white hover:bg-white/20 h-8 w-8 p-0"
+                   aria-label="Close Live Phone Support"
+                 >
+                   <X className="h-4 w-4" />
+                 </Button>
+               </div>
+             </div>
             <CardContent className="p-6 overflow-y-auto max-h-[calc(90vh-80px)]">
               {isAdmin ? (
                 <div className="space-y-4">

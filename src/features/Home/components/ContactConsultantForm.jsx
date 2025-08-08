@@ -175,21 +175,23 @@ const ContactConsultantForm = ({ isOpen, onClose, consultantInfo }) => {
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
       <Card className="w-full max-w-4xl max-h-[95vh] overflow-hidden">
-        <CardHeader className="bg-ocean-gradient text-white">
-          <div className="flex items-center justify-between">
-            <CardTitle className="text-xl font-semibold">
-              Contact your Software Consultant
-            </CardTitle>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={onClose}
-              className="text-white hover:bg-white/20"
-            >
-              <X className="h-5 w-5" />
-            </Button>
-          </div>
-        </CardHeader>
+                 <CardHeader className="bg-ocean-gradient text-white py-3">
+           <div className="flex items-center justify-between">
+             <CardTitle className="flex items-center text-lg">
+               <MessageSquare className="h-4 w-4 mr-2" />
+               Contact your Software Consultant
+             </CardTitle>
+             <Button
+               variant="ghost"
+               size="sm"
+               onClick={onClose}
+               className="text-white hover:bg-white/20 h-8 w-8 p-0"
+               aria-label="Close Contact Consultant"
+             >
+               <X className="h-4 w-4" />
+             </Button>
+           </div>
+         </CardHeader>
         
         <CardContent className="p-4 overflow-y-auto max-h-[calc(95vh-120px)]">
           <form onSubmit={handleSubmit} className="space-y-3">

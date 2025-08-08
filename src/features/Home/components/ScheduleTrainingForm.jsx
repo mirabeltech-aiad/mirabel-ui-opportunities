@@ -98,35 +98,23 @@ const ScheduleTrainingForm = ({ isOpen, onClose }) => {
   return (
     <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-1 sm:p-4">
       <Card className="w-full max-w-4xl max-h-[95vh] sm:max-h-[85vh] overflow-hidden flex flex-col">
-        <CardHeader className="text-white" style={{ background: 'linear-gradient(135deg, #0c4a6e 0%, #38bdf8 100%)' }}>
-          <div className="flex items-center justify-between gap-2">
-            <CardTitle className="flex items-center flex-1">
-              <Calendar className="h-5 w-5 mr-2 flex-shrink-0" />
-              <span>Schedule Training</span>
-            </CardTitle>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={onClose}
-              className="text-white hover:bg-white/20 flex-shrink-0 rounded-full w-8 h-8 p-0 border border-white/20 hover:border-white/40"
-              aria-label="Close Schedule Training"
-            >
-              <X className="h-4 w-4" />
-            </Button>
-          </div>
-          
-          {/* Additional close button for very small screens */}
-          <div className="flex justify-center mt-2 sm:hidden">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={onClose}
-              className="text-white border-white/30 hover:bg-white/10 text-xs"
-            >
-              Close
-            </Button>
-          </div>
-        </CardHeader>
+                 <CardHeader className="bg-ocean-gradient text-white py-3">
+           <div className="flex items-center justify-between">
+             <CardTitle className="flex items-center text-lg">
+               <Calendar className="h-4 w-4 mr-2" />
+               Schedule Training
+             </CardTitle>
+             <Button
+               variant="ghost"
+               size="sm"
+               onClick={onClose}
+               className="text-white hover:bg-white/20 h-8 w-8 p-0"
+               aria-label="Close Schedule Training"
+             >
+               <X className="h-4 w-4" />
+             </Button>
+           </div>
+         </CardHeader>
         
         <CardContent 
           ref={contentRef}
