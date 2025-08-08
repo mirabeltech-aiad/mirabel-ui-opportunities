@@ -56,7 +56,7 @@ const renderMenuItems = (items, openTabByUrl) => {
         iconCls: item.iconCls
       });
     }
-    
+       
     if (item.children && item.children.length > 0) {
       return (
         <DropdownMenuSub key={item.id}>
@@ -66,6 +66,12 @@ const renderMenuItems = (items, openTabByUrl) => {
               <Badge className="ml-2 text-xs align-middle" variant="secondary">
                 {item.icon}
               </Badge>
+            )}
+            {/* Show lock icon if item is locked */}
+            {isLocked && (
+              <span className="ml-auto">
+                <i className="mainMenuIcon lockIcon">🔒</i>
+              </span>
             )}
           </DropdownMenuSubTrigger>
           <DropdownMenuSubContent className="w-auto min-w-56 max-w-xl bg-white border border-gray-100 p-0 text-gray-800 font-medium" style={{ 
@@ -146,6 +152,12 @@ const renderMenuItemOrSub = (item, openTabByUrl, expanded, setExpanded) => {
             <Badge className="ml-2 text-xs align-middle" variant="secondary">
               {item.icon}
             </Badge>
+          )}
+          {/* Show lock icon if item is locked */}
+          {isLocked && (
+            <span className="ml-auto">
+              <i className="mainMenuIcon lockIcon">🔒</i>
+            </span>
           )}
         </DropdownMenuSubTrigger>
         <DropdownMenuSubContent className="w-auto min-w-56 max-w-xl bg-white border border-gray-100 p-0 text-gray-800 font-medium" style={{ 
