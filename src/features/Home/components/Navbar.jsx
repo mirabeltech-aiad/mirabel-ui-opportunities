@@ -115,7 +115,7 @@ const renderMenuItems = (items, openTabByUrl) => {
 
 // Helper to render menu items with 'Show more' if needed
 const renderMenuItemsWithShowMore = (items, openTabByUrl, expanded, setExpanded) => {
-  const VISIBLE_COUNT = 10;
+  const VISIBLE_COUNT = 12;
   if (!items || items.length <= VISIBLE_COUNT || expanded) {
     return (
       <div>
@@ -740,7 +740,7 @@ const Navbar = () => {
                         </DropdownMenuItem>
                       )}
                       {renderMenuItemsWithShowMore(menu.children, openTabByUrl, expandedMenus[menu.id], () => handleExpandMenu(menu.id))}
-                      {menu.children && menu.children.length > 10 && expandedMenus[menu.id] && (
+                      {menu.children && menu.children.length > 12 && expandedMenus[menu.id] && (
                         <div className="flex justify-center items-center cursor-pointer py-2 hover:bg-[#e6f0fa]" onClick={() => handleCollapseMenu(menu.id)}>
                           <ChevronUp className="h-4 w-4 mr-1" />
                           <span className="text-xs font-medium text-ocean-900">Show less</span>
