@@ -50,8 +50,11 @@ export const changePasswordService = {
    * @returns {boolean} Whether change password is required
    */
   isChangePasswordRequired: (sessionData) => {
-    return sessionData && sessionData.ChangePassword !== null && sessionData.ChangePassword !== undefined && sessionData.ChangePassword !== false && sessionData.ExternalAuth &&  sessionData.ExternalAuth !== null &&   sessionData.ExternalAuth !== '';
-  },
+    return (
+      sessionData?.ChangePassword != null &&
+      (sessionData.ExternalAuth === null || sessionData.ExternalAuth === '')
+    );
+  },  
 
   /**
    * Get change password data from session
