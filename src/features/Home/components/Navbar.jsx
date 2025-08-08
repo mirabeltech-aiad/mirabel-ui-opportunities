@@ -373,6 +373,10 @@ const Navbar = () => {
   const openTabByUrl = (title, url, menuItem = null) => {
     if (!url) return;
     
+    // Close the dropdown menu after selection
+    setOpenMenuId(null);
+    setHoverEnabled(false);
+    
     // Use the same logic as server-side menuItemClick function
     const fullUrl = navigationService.getFullUrl(url);
     
