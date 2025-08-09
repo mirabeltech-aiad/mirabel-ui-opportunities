@@ -56,25 +56,35 @@ const renderMenuItems = (items, openTabByUrl) => {
         iconCls: item.iconCls
       });
     }
-    
+       
     if (item.children && item.children.length > 0) {
       return (
         <DropdownMenuSub key={item.id}>
-              <DropdownMenuSubTrigger className="rounded-none text-gray-800 font-medium px-4 py-1.5 hover:bg-[#e6f0fa] focus:bg-[#e6f0fa] hover:text-ocean-900 focus:text-ocean-900 cursor-pointer flex items-center gap-2 transition-colors duration-150 whitespace-nowrap" style={{ fontFamily: 'inherit', fontSize: '13px', fontWeight: 500, lineHeight: '1' }}>
+              <DropdownMenuSubTrigger className="rounded-none text-gray-800 font-medium px-4 py-2 hover:bg-[#e6f0fa] focus:bg-[#e6f0fa] hover:text-ocean-900 focus:text-ocean-900 cursor-pointer flex items-center gap-2 transition-colors duration-150 whitespace-nowrap" style={{ fontFamily: 'inherit', fontSize: '13px', fontWeight: 500, lineHeight: '1.5' }}>
             <span>{item.title}</span>
             {item.icon && (
               <Badge className="ml-2 text-xs align-middle" variant="secondary">
                 {item.icon}
               </Badge>
             )}
+            {/* Show lock icon if item is locked */}
+            {isLocked && (
+              <span className="ml-auto">
+                <i className="mainMenuIcon lockIcon">🔒</i>
+              </span>
+            )}
           </DropdownMenuSubTrigger>
-          <DropdownMenuSubContent className="w-auto min-w-56 max-w-xl bg-white border border-gray-100 p-0 text-gray-800 font-medium overflow-y-auto" style={{ 
+          <DropdownMenuSubContent className="w-auto min-w-56 max-w-xl bg-white border border-gray-100 p-0 text-gray-800 font-medium" style={{ 
             fontFamily: 'inherit', 
             fontSize: '13px', 
-            lineHeight: '1.2',
-            maxHeight: '70vh'
+            lineHeight: '1.5'
           }}>
-            {renderMenuItems(item.children, openTabByUrl)}
+            <div style={{ 
+              maxHeight: `${calculateMenuHeight(false)}px`,
+              overflowY: 'auto'
+            }}>
+              {renderMenuItems(item.children, openTabByUrl)}
+            </div>
           </DropdownMenuSubContent>
         </DropdownMenuSub>
       );
@@ -88,8 +98,8 @@ const renderMenuItems = (items, openTabByUrl) => {
         <DropdownMenuItem
           key={item.id}
           onClick={handleClick}
-          className="rounded-none font-medium px-4 py-1.5 hover:bg-[#e6f0fa] focus:bg-[#e6f0fa] hover:text-ocean-900 focus:text-ocean-900 cursor-pointer text-gray-800 transition-colors duration-150 flex items-center gap-2 whitespace-nowrap"
-          style={{ fontFamily: 'inherit', fontSize: '13px', fontWeight: 500, lineHeight: '1.2' }}
+          className="rounded-none font-medium px-4 py-2 hover:bg-[#e6f0fa] focus:bg-[#e6f0fa] hover:text-ocean-900 focus:text-ocean-900 cursor-pointer text-gray-800 transition-colors duration-150 flex items-center gap-2 whitespace-nowrap"
+          style={{ fontFamily: 'inherit', fontSize: '13px', fontWeight: 500, lineHeight: '1.5' }}
         >
           <span>{item.title}</span>
           {item.icon && (
@@ -136,19 +146,24 @@ const renderMenuItemOrSub = (item, openTabByUrl, expanded, setExpanded) => {
   if (item.children && item.children.length > 0) {
     return (
       <DropdownMenuSub key={item.id}>
-        <DropdownMenuSubTrigger className="rounded-none text-gray-800 font-medium px-4 py-1.5 hover:bg-[#e6f0fa] focus:bg-[#e6f0fa] hover:text-ocean-900 focus:text-ocean-900 cursor-pointer flex items-center gap-2 transition-colors duration-150 whitespace-nowrap" style={{ fontFamily: 'inherit', fontSize: '13px', fontWeight: 500, lineHeight: '1' }}>
+        <DropdownMenuSubTrigger className="rounded-none text-gray-800 font-medium px-4 py-2 hover:bg-[#e6f0fa] focus:bg-[#e6f0fa] hover:text-ocean-900 focus:text-ocean-900 cursor-pointer flex items-center gap-2 transition-colors duration-150 whitespace-nowrap" style={{ fontFamily: 'inherit', fontSize: '13px', fontWeight: 500, lineHeight: '1.5' }}>
           <span>{item.title}</span>
           {item.icon && (
             <Badge className="ml-2 text-xs align-middle" variant="secondary">
               {item.icon}
             </Badge>
           )}
+          {/* Show lock icon if item is locked */}
+          {isLocked && (
+            <span className="ml-auto">
+              <i className="mainMenuIcon lockIcon">🔒</i>
+            </span>
+          )}
         </DropdownMenuSubTrigger>
-        <DropdownMenuSubContent className="w-auto min-w-56 max-w-xl bg-white border border-gray-100 p-0 text-gray-800 font-medium overflow-y-auto" style={{ 
+        <DropdownMenuSubContent className="w-auto min-w-56 max-w-xl bg-white border border-gray-100 p-0 text-gray-800 font-medium" style={{ 
           fontFamily: 'inherit', 
           fontSize: '13px', 
-          lineHeight: '1.2',
-          maxHeight: '70vh'
+          lineHeight: '1.5'
         }}>
           <SubMenuWithShowMore items={item.children} openTabByUrl={openTabByUrl} />
         </DropdownMenuSubContent>
@@ -164,8 +179,8 @@ const renderMenuItemOrSub = (item, openTabByUrl, expanded, setExpanded) => {
         <DropdownMenuItem
           key={item.id}
           onClick={handleClick}
-          className="rounded-none font-medium px-4 py-1.5 hover:bg-[#e6f0fa] focus:bg-[#e6f0fa] hover:text-ocean-900 focus:text-ocean-900 cursor-pointer text-gray-800 transition-colors duration-150 flex items-center gap-2 whitespace-nowrap"
-          style={{ fontFamily: 'inherit', fontSize: '13px', fontWeight: 500, lineHeight: '1.2' }}
+          className="rounded-none font-medium px-4 py-2 hover:bg-[#e6f0fa] focus:bg-[#e6f0fa] hover:text-ocean-900 focus:text-ocean-900 cursor-pointer text-gray-800 transition-colors duration-150 flex items-center gap-2 whitespace-nowrap"
+          style={{ fontFamily: 'inherit', fontSize: '13px', fontWeight: 500, lineHeight: '1.5' }}
         >
         <span>{item.title}</span>
         {item.icon && (
@@ -184,10 +199,34 @@ const renderMenuItemOrSub = (item, openTabByUrl, expanded, setExpanded) => {
   }
 };
 
+// Helper function to calculate dynamic menu height based on screen size
+const calculateMenuHeight = (isExpanded = false) => {
+  const screenHeight = window.innerHeight;
+  const percentage = isExpanded ? 90 : 80;
+  const maxHeight = (screenHeight * percentage) / 100;
+  
+  // Ensure minimum and maximum bounds
+  const minHeight = 300; // Minimum 300px
+  const maxHeightPx = Math.min(maxHeight, 800); // Maximum 800px
+  
+  return Math.max(minHeight, maxHeightPx);
+};
+
 // SubMenuWithShowMore component
 const SubMenuWithShowMore = ({ items, openTabByUrl }) => {
   const [expanded, setExpanded] = React.useState(false);
-  return <>{renderMenuItemsWithShowMore(items, openTabByUrl, expanded, setExpanded)}</>;
+  
+  // Calculate if scroll is needed based on content height
+  const shouldShowScroll = items && items.length > 8; // Show scroll if more than 8 items
+  
+  return (
+    <div style={{ 
+      maxHeight: `${calculateMenuHeight(expanded)}px`,
+      overflowY: shouldShowScroll ? 'auto' : 'visible'
+    }}>
+      {renderMenuItemsWithShowMore(items, openTabByUrl, expanded, setExpanded)}
+    </div>
+  );
 };
 
 const Navbar = () => {
@@ -345,6 +384,10 @@ const Navbar = () => {
 
   const openTabByUrl = (title, url, menuItem = null) => {
     if (!url) return;
+    
+    // Close the dropdown menu after selection
+    setOpenMenuId(null);
+    setHoverEnabled(false);
     
     // Use the same logic as server-side menuItemClick function
     const fullUrl = navigationService.getFullUrl(url);
@@ -616,7 +659,11 @@ const Navbar = () => {
   useEffect(() => {
     checkScrollState();
     
-    const handleResize = () => checkScrollState();
+    const handleResize = () => {
+      checkScrollState();
+      // Force re-render to recalculate menu heights
+      setExpandedMenus(prev => ({ ...prev }));
+    };
     window.addEventListener('resize', handleResize);
     
     return () => window.removeEventListener('resize', handleResize);
@@ -688,12 +735,13 @@ const Navbar = () => {
                     </DropdownMenuTrigger>
                     <DropdownMenuContent 
                       align="start" 
-                      className="w-auto min-w-56 max-w-xl bg-white border border-gray-100 p-0 text-gray-800 font-medium overflow-y-auto" 
+                      className="w-auto min-w-56 max-w-xl bg-white border border-gray-100 p-0 text-gray-800 font-medium" 
                       style={{ 
                         fontFamily: 'inherit', 
                         fontSize: '13px', 
-                        lineHeight: '1.2',
-                        maxHeight: expandedMenus[menu.id] ? '90vh' : '70vh'
+                        lineHeight: '1',
+                        maxHeight: `${calculateMenuHeight(expandedMenus[menu.id])}px`,
+                        overflowY: (menu.children && menu.children.length > 8) || expandedMenus[menu.id] ? 'auto' : 'visible'
                       }}
                       onMouseEnter={() => handleMenuHover(menu.id)}
                       onMouseLeave={handleMenuLeave}

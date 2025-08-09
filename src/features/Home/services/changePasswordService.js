@@ -36,13 +36,6 @@ export const changePasswordService = {
       // Build the URL with query parameters matching backend logic
       const url = `${STATIC_URLS.CHANGE_PASSWORD}?loginId=${encodeURIComponent(encryptedLoginId)}&enabled=true&rtype=${resetTypeValue}&CUI=${encodeURIComponent(cultureUI)}`;
       
-      console.log('Generated change password URL:', {
-        email,
-        changePasswordValue,
-        resetTypeValue,
-        cultureUI,
-        url
-      });
       
       return url;
     } catch (error) {
@@ -57,8 +50,11 @@ export const changePasswordService = {
    * @returns {boolean} Whether change password is required
    */
   isChangePasswordRequired: (sessionData) => {
-    return sessionData && sessionData.ChangePassword !== null && sessionData.ChangePassword !== undefined && sessionData.ChangePassword !== false && sessionData.ExternalAuth &&  sessionData.ExternalAuth !== null &&   sessionData.ExternalAuth !== '';
-  },
+    return (
+      sessionData?.ChangePassword != null &&
+      (sessionData.ExternalAuth === null || sessionData.ExternalAuth === '')
+    );
+  },  
 
   /**
    * Get change password data from session
@@ -66,7 +62,7 @@ export const changePasswordService = {
    */
   getChangePasswordData: () => {
     try {
-      const sessionData = localStorage.getItem('MMClientVars');
+      const sessionData = localStorage.getItem('MMClientVars'); 
       if (!sessionData) {
         return null;
       }

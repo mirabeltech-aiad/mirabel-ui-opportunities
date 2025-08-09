@@ -84,20 +84,14 @@ const DraggableHelpIcon = ({ position, onPositionChange, onClick, onHide }) => {
     >
       <Button
         size="lg"
-        className="relative bg-ocean-600 hover:bg-ocean-700 text-white shadow-lg rounded-2xl w-14 h-14 p-0 transition-all duration-200 overflow-hidden border border-white/20"
+        className="relative bg-ocean-600 hover:bg-ocean-700 text-white shadow-lg rounded-lg w-14 h-14 p-0 transition-all duration-200 hover:shadow-xl border border-white/20"
         style={{
           userSelect: 'none',
           touchAction: 'none',
           pointerEvents: isDragging ? 'none' : 'auto',
         }}
       >
-        <span
-          className="absolute inset-0 pointer-events-none"
-          style={{
-            background: 'linear-gradient(135deg, rgba(0,0,0,0) 45%, rgba(0,0,0,0.18) 45%)'
-          }}
-        />
-        <span className="relative z-10 text-white text-2xl leading-none">?</span>
+        <HelpCircle className="h-6 w-6 text-white" />
       </Button>
       
       {/* Tooltip */}
@@ -109,7 +103,10 @@ const DraggableHelpIcon = ({ position, onPositionChange, onClick, onHide }) => {
       <Button
         size="sm"
         variant="ghost"
-        onClick={onHide}
+        onClick={(e) => {
+          e.stopPropagation();
+          onHide();
+        }}
         className="absolute -top-2 -right-2 bg-red-500 hover:bg-red-600 text-white rounded-full w-6 h-6 p-0 opacity-0 group-hover:opacity-100 transition-opacity duration-200"
         title="Hide Help Icon"
       >
@@ -290,6 +287,13 @@ const HelpSystem = () => {
     setHelpIconVisible(false);
   };
 
+  // Show help icon when help panel is opened from navbar
+  useEffect(() => {
+    if (helpVisible && !helpIconVisible) {
+      setHelpIconVisible(true);
+    }
+  }, [helpVisible, helpIconVisible]);
+
   const handleOverlayClick = (e) => {
     // Close help panel when clicking on the overlay
     if (e.target === e.currentTarget) {
@@ -344,6 +348,8 @@ const HelpSystem = () => {
           />
         )}
       </DndContext>
+
+
 
 
 
@@ -412,20 +418,17 @@ const HelpSystem = () => {
         />
       )}
 
-      {/* Contact Consultant Form Modal */}
-      {isContactConsultantOpen && (
-        <>
-          {console.log('🔧 HelpSystem: Rendering ContactConsultantForm with consultantInfo:', consultantInfo)}
-          <ContactConsultantForm
-            isOpen={isContactConsultantOpen}
-            onClose={() => {
-              setIsContactConsultantOpen(false);
-              setConsultantInfo(null); // Reset consultant info when form is closed
-            }}
-            consultantInfo={consultantInfo}
-          />
-        </>
-      )}
+       {/* Contact Consultant Form Modal */}
+       {isContactConsultantOpen && (
+         <ContactConsultantForm
+           isOpen={isContactConsultantOpen}
+           onClose={() => {
+             setIsContactConsultantOpen(false);
+             setConsultantInfo(null); // Reset consultant info when form is closed
+           }}
+           consultantInfo={consultantInfo}
+         />
+       )}
 
       {/* Schedule Training Form Modal */}
       {showTrainingForm && (
