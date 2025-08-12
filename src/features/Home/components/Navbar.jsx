@@ -789,11 +789,12 @@ const Navbar = () => {
               <Button
                 variant="ghost"
                 size="sm"
-                className="h-9 w-9 rounded-full p-0 hover:bg-ocean-700 text-white flex-shrink-0"
+                className="h-7 px-3 rounded-full hover:bg-ocean-700 text-white flex-shrink-0 border border-white/20 min-w-[60px]"
                 onClick={actions.toggleHelp}
                 title="Help & Support"
               >
-                <HelpCircle className="h-5 w-5" />
+                <span className="text-xs font-medium">Help</span>
+                <span className="text-xs font-medium">?</span>
               </Button>
 
               {/* Bell Notification */}
