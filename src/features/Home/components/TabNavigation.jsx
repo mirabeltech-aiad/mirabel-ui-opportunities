@@ -16,7 +16,7 @@ import {
 import { getSessionValue } from '@/utils/sessionHelpers';
 
 const TabNavigation = memo(() => {
-  const { tabs, activeTabId, actions, dashboards, selectedDashboard, dashboardsLoading } = useHome();
+  const { tabs, activeTabId, actions, dashboards, selectedDashboard, dashboardsLoading, crmProspectingUrl, isCRMProspecting} = useHome();
 
   // Debug logging to track component lifecycle
 
@@ -80,11 +80,10 @@ const TabNavigation = memo(() => {
     };
   }, [actions, activeTabId, tabs]); // Add dependencies to update when state changes
 
-  // Split tabs into fixed and draggable
-  // First three tabs: dropdown (dashboard), Inbox, Search are fixed
-  const fixedTabsCount = 3; // Dropdown, Inbox, Search
-  const fixedTabs = tabs.slice(0, fixedTabsCount); // first three tabs are fixed
-  const draggableTabs = tabs.slice(fixedTabsCount); // tabs after the first three are draggable
+  // First four tabs: dropdown (dashboard), Inbox, Search, Prospecting are fixed
+  const fixedTabsCount = 4; // Dropdown, Inbox, Search, Prospecting
+  const fixedTabs = tabs.slice(0, fixedTabsCount); // first four tabs are fixed
+  const draggableTabs = tabs.slice(fixedTabsCount); // tabs after the first four are draggable
 
   // Calculate which draggable tabs should be visible based on available space
   const isSmallScreen = window.innerWidth < 768;
@@ -122,7 +121,16 @@ const TabNavigation = memo(() => {
         actions.updateTab('search', { url: fullUrl });
       }
     }
-    
+     // Handle lazy loading for prospecting tab
+     if (tabId === 'prospecting') {
+      const prospectingTab = tabs.find(tab => tab.id === 'prospecting');
+      if (prospectingTab && !prospectingTab.url) {
+        // Lazy load the prospecting tab URL from CRM prospecting URL
+        if (crmProspectingUrl) {
+          actions.updateTab('prospecting', { url: crmProspectingUrl });
+        }
+      }
+    }
     actions.setActiveTab(tabId);
   };
 
@@ -283,7 +291,12 @@ const TabNavigation = memo(() => {
           </div>
         )}
         {/* Render remaining fixed tabs (Inbox, Search) */}
-        {fixedTabs.slice(1).map((tab, index) => (
+        {fixedTabs.slice(1).map((tab, index) => {
+             // Skip prospecting tab if not visible
+             if (tab.id === 'prospecting' && !isCRMProspecting) {
+              return null;
+            }
+            return (
           <div
             key={tab.id}
             onContextMenu={(e) => handleContextMenu(e, tab.id)}
@@ -320,7 +333,8 @@ const TabNavigation = memo(() => {
               </button>
             )}
           </div>
-        ))}
+        );
+      })}
 
         {/* Static tabs container with proper overflow handling */}
         <div className="flex items-center flex-1 min-w-0 overflow-hidden">

@@ -860,13 +860,6 @@ const Navbar = () => {
           <iframe src={mmIntegrationSrc} title="MM Integration" style={{ width: 0, height: 0, border: 0, display: 'none' }} />
         </div>
       )}
-      
-      {/* CRM Prospecting Panel (matching legacy ASP.NET) */}
-      {isCRMProspecting && crmProspectingUrl && (
-        <div>
-          <iframe src={crmProspectingUrl} title="Prospecting Dashboard" style={{ width: '100%', height: 400, border: '1px solid #ccc' }} />
-        </div>
-      )}
     </>
   );
 };
