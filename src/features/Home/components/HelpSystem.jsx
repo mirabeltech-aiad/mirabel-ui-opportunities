@@ -84,20 +84,20 @@ const DraggableHelpIcon = ({ position, onPositionChange, onClick, onHide }) => {
     >
       <Button
         size="lg"
-        className="relative bg-ocean-600 hover:bg-ocean-700 text-white shadow-lg rounded-lg w-14 h-14 p-0 transition-all duration-200 hover:shadow-xl border border-white/20"
+        className="relative bg-ocean-600 hover:bg-ocean-700 text-white shadow-lg rounded-lg px-3 py-2 h-auto transition-all duration-200 hover:shadow-xl border border-white/20 flex items-center space-x-2"
         style={{
           userSelect: 'none',
           touchAction: 'none',
           pointerEvents: isDragging ? 'none' : 'auto',
         }}
       >
-        <HelpCircle className="h-6 w-6 text-white" />
+        {/* White circular icon with blue question mark */}
+        <div className="w-6 h-6 bg-white rounded-full flex items-center justify-center">
+          <span className="text-ocean-600 text-sm font-bold">?</span>
+        </div>
+        {/* Help text */}
+        <span className="text-sm font-medium">Help</span>
       </Button>
-      
-      {/* Tooltip */}
-      <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-2 py-1 bg-gray-900 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap">
-        Help
-      </div>
       
       {/* Hide Help Icon Button */}
       <Button
@@ -139,7 +139,36 @@ const HelpSystem = () => {
     }
   }, [consultantInfo]);
 
-  const defaultHelpPosition = { x: typeof window !== 'undefined' ? window.innerWidth - 76 : 1320, y: typeof window !== 'undefined' ? window.innerHeight - 76 : 620 };
+  // Ensure help icon is properly positioned when component mounts and on window resize
+  useEffect(() => {
+    const updateHelpPosition = () => {
+      const buttonWidth = 80;
+      const buttonHeight = 40;
+      const margin = 20;
+      const bottomMargin = 5; // Reduced bottom margin to eliminate gap and match legacy design
+      const maxX = window.innerWidth - buttonWidth - margin;
+      const maxY = window.innerHeight - buttonHeight - bottomMargin;
+      
+      // Check if current position is within bounds
+      if (helpPosition.x > maxX || helpPosition.y > maxY || helpPosition.x < margin || helpPosition.y < margin) {
+        const newX = Math.max(margin, Math.min(helpPosition.x, maxX));
+        const newY = Math.max(margin, Math.min(helpPosition.y, maxY));
+        actions.setHelpPosition({ x: newX, y: newY });
+      }
+    };
+
+    // Update position on mount
+    updateHelpPosition();
+
+    // Update position on window resize
+    window.addEventListener('resize', updateHelpPosition);
+    return () => window.removeEventListener('resize', updateHelpPosition);
+  }, [helpPosition, actions]);
+
+  const defaultHelpPosition = { 
+    x: typeof window !== 'undefined' ? window.innerWidth - 100 : 1320, 
+    y: typeof window !== 'undefined' ? window.innerHeight - 60 : 620 
+  };
 
   // DnD Kit sensors
   const sensors = useSensors(
@@ -168,12 +197,16 @@ const HelpSystem = () => {
       const newX = helpPosition.x + delta.x;
       const newY = helpPosition.y + delta.y;
       
-      // Constrain to viewport (button is 56px x 56px)
-      const maxX = window.innerWidth - 56;
-      const maxY = window.innerHeight - 56;
+      // Constrain to viewport with margin (button is approximately 80px wide and 40px tall)
+      const buttonWidth = 80;
+      const buttonHeight = 40;
+      const margin = 20; // Add margin to prevent edge cutting
+      const bottomMargin = 5; // Reduced bottom margin to eliminate gap and match legacy design
+      const maxX = window.innerWidth - buttonWidth - margin;
+      const maxY = window.innerHeight - buttonHeight - bottomMargin;
       
-      const constrainedX = Math.max(0, Math.min(newX, maxX));
-      const constrainedY = Math.max(0, Math.min(newY, maxY));
+      const constrainedX = Math.max(margin, Math.min(newX, maxX));
+      const constrainedY = Math.max(margin, Math.min(newY, maxY));
       
       // Update the position in the context
       actions.setHelpPosition({

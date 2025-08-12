@@ -77,7 +77,10 @@ const initialState = {
   ],
   activeTabId: 'dashboard', // Set default to 'dashboard' (not in tabs array)
   helpVisible: false,
-  helpPosition: { x: typeof window !== 'undefined' ? window.innerWidth - 76 : 1320, y: typeof window !== 'undefined' ? window.innerHeight - 76 : 620 },
+  helpPosition: { 
+    x: typeof window !== 'undefined' ? window.innerWidth - 117 : 1320, 
+    y: typeof window !== 'undefined' ? window.innerHeight - 35 : 620 
+  },
   sessionData: null,
   isAuthenticated: false,
   dashboards: [],
