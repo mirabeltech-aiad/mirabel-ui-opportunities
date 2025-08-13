@@ -369,11 +369,11 @@ const TabNavigation = memo(() => {
       {/* Tab Bar */}
       <div 
         ref={tabBarRef}
-        className="bg-white border-b border-gray-200 flex items-center px-1 sm:px-2 py-0 h-9 min-h-0 overflow-hidden w-full" 
+        className="bg-white border-b border-gray-200 flex items-center px-1 sm:px-2 py-0 h-11 min-h-0 overflow-hidden w-full" 
         style={{ 
           boxShadow: '0 1px 0 0 #e5e7eb', 
-          height: '28px', 
-          minHeight: '28px', 
+          height: '34px', 
+          minHeight: '34px', 
           fontFamily: 'inherit', 
           fontSize: '13px', 
           fontWeight: 500, 
