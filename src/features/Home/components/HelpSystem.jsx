@@ -82,6 +82,24 @@ const DraggableHelpIcon = ({ position, onPositionChange, onClick, onHide }) => {
       className="group"
       onClick={handleClick}
     >
+      {/* Drag Handle - Header-like area above the button */}
+      <div
+        className="absolute -top-6 left-0 right-0 h-6 bg-gray-200 hover:bg-gray-300 rounded-t-lg cursor-grab active:cursor-grabbing opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex items-center justify-center border-b border-gray-300 select-none"
+        title="Drag to move"
+        style={{ 
+          userSelect: 'none', 
+          WebkitUserSelect: 'none',
+          touchAction: 'none',
+        }}
+      >
+        {/* Drag indicator dots */}
+        <div className="flex space-x-1.5">
+          <div className="w-1.5 h-1.5 bg-gray-500 rounded-full"></div>
+          <div className="w-1.5 h-1.5 bg-gray-500 rounded-full"></div>
+          <div className="w-1.5 h-1.5 bg-gray-500 rounded-full"></div>
+        </div>
+      </div>
+
       <Button
         size="lg"
         className="relative bg-ocean-600 hover:bg-ocean-700 text-white shadow-lg rounded-lg px-3 py-2 h-auto transition-all duration-200 hover:shadow-xl border border-white/20 flex items-center space-x-2"
