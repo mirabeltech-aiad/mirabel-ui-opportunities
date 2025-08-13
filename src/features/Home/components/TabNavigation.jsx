@@ -254,6 +254,80 @@ const TabNavigation = memo(() => {
     visibleDraggableTabs = [...visibleDraggableTabs.slice(0, maxVisibleDraggableTabs - 1), activeTab];
   }
 
+  // Add keyboard navigation effect
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      // Only handle arrow keys when no input fields are focused
+      if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.tagName === 'SELECT') {
+        return;
+      }
+
+      // Handle left arrow key (previous tab)
+      if (e.key === 'ArrowLeft') {
+        e.preventDefault();
+        navigateToPreviousTab();
+      }
+      
+      // Handle right arrow key (next tab)
+      if (e.key === 'ArrowRight') {
+        e.preventDefault();
+        navigateToNextTab();
+      }
+    };
+
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, [tabs, activeTabId, actions]);
+
+  // Navigate to previous tab
+  const navigateToPreviousTab = () => {
+    if (tabs.length <= 1) return;
+    
+    const currentIndex = tabs.findIndex(tab => tab.id === activeTabId);
+    if (currentIndex === -1) return;
+    
+    let previousIndex = currentIndex - 1;
+    
+    // Wrap around to the last tab if we're at the first tab
+    if (previousIndex < 0) {
+      previousIndex = tabs.length - 1;
+    }
+    
+    // Skip fixed tabs when wrapping (optional - you can remove this if you want to include fixed tabs)
+    if (previousIndex < fixedTabsCount && currentIndex === 0) {
+      previousIndex = tabs.length - 1;
+    }
+    
+    const previousTab = tabs[previousIndex];
+    if (previousTab) {
+      handleTabClick(previousTab.id);
+    }
+  };
+
+  // Navigate to next tab
+  const navigateToNextTab = () => {
+    if (tabs.length <= 1) return;
+    
+    const currentIndex = tabs.findIndex(tab => tab.id === activeTabId);
+    if (currentIndex === -1) return;
+    
+    let nextIndex = currentIndex + 1;
+    
+    // Wrap around to the first tab if we're at the last tab
+    if (nextIndex >= tabs.length) {
+      nextIndex = 0;
+    }
+    
+    // Skip fixed tabs when wrapping (optional - you can remove this if you want to include fixed tabs)
+    if (nextIndex < fixedTabsCount && currentIndex === tabs.length - 1) {
+      nextIndex = fixedTabsCount;
+    }
+    
+    const nextTab = tabs[nextIndex];
+    if (nextTab) {
+      handleTabClick(nextTab.id);
+    }
+  };
 
 
   const handleTabClick = (tabId) => {
