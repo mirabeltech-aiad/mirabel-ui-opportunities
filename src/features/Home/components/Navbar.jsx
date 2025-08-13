@@ -26,6 +26,19 @@ import {
   ChevronUp,
   ChevronLeft,
   ChevronRight,
+  Sparkles,
+  Star,
+  StarIcon,
+  ArrowRight,
+  FileText,
+  Edit,
+  Plus,
+  CheckCircle,
+  AlertTriangle,
+  Trash2,
+  Zap,
+  Award,
+  Trophy,
 } from 'lucide-react';
 import {
   DropdownMenu,
@@ -63,8 +76,8 @@ const renderMenuItems = (items, openTabByUrl) => {
               <DropdownMenuSubTrigger className="rounded-none text-gray-800 font-medium px-4 py-2 hover:bg-[#e6f0fa] focus:bg-[#e6f0fa] hover:text-ocean-900 focus:text-ocean-900 cursor-pointer flex items-center gap-2 transition-colors duration-150 whitespace-nowrap" style={{ fontFamily: 'inherit', fontSize: '13px', fontWeight: 500, lineHeight: '1.5' }}>
             <span>{item.title}</span>
             {item.icon && (
-              <Badge className="ml-2 text-xs align-middle" variant="secondary">
-                {item.icon}
+              <Badge className="ml-auto text-xs flex items-center justify-center min-w-[20px] h-5 px-1.5" variant="secondary">
+                {getBadgeIcon(item.icon) ? React.createElement(getBadgeIcon(item.icon), { className: "h-3 w-3" }) : item.icon}
               </Badge>
             )}
             {/* Show lock icon if item is locked */}
@@ -103,8 +116,8 @@ const renderMenuItems = (items, openTabByUrl) => {
         >
           <span>{item.title}</span>
           {item.icon && (
-            <Badge className="ml-2 text-xs align-middle" variant="secondary">
-              {item.icon}
+            <Badge className="ml-2 text-xs align-middle flex items-center justify-center min-w-[20px] h-5 px-1.5" variant="secondary">
+              {getBadgeIcon(item.icon) ? React.createElement(getBadgeIcon(item.icon), { className: "h-3 w-3" }) : item.icon}
             </Badge>
           )}
           {/* Show lock icon if item is locked */}
@@ -149,8 +162,8 @@ const renderMenuItemOrSub = (item, openTabByUrl, expanded, setExpanded) => {
         <DropdownMenuSubTrigger className="rounded-none text-gray-800 font-medium px-4 py-2 hover:bg-[#e6f0fa] focus:bg-[#e6f0fa] hover:text-ocean-900 focus:text-ocean-900 cursor-pointer flex items-center gap-2 transition-colors duration-150 whitespace-nowrap" style={{ fontFamily: 'inherit', fontSize: '13px', fontWeight: 500, lineHeight: '1.5' }}>
           <span>{item.title}</span>
           {item.icon && (
-            <Badge className="ml-2 text-xs align-middle" variant="secondary">
-              {item.icon}
+            <Badge className="ml-auto text-xs flex items-center justify-center min-w-[20px] h-5 px-1.5" variant="secondary">
+              {getBadgeIcon(item.icon) ? React.createElement(getBadgeIcon(item.icon), { className: "h-3 w-3" }) : item.icon}
             </Badge>
           )}
           {/* Show lock icon if item is locked */}
@@ -183,11 +196,11 @@ const renderMenuItemOrSub = (item, openTabByUrl, expanded, setExpanded) => {
           style={{ fontFamily: 'inherit', fontSize: '13px', fontWeight: 500, lineHeight: '1.5' }}
         >
         <span>{item.title}</span>
-        {item.icon && (
-          <Badge className="ml-2 text-xs align-middle" variant="secondary">
-            {item.icon}
-          </Badge>
-        )}
+                  {item.icon && (
+            <Badge className="ml-auto text-xs flex items-center justify-center min-w-[20px] h-5 px-1.5" variant="secondary">
+              {getBadgeIcon(item.icon) ? React.createElement(getBadgeIcon(item.icon), { className: "h-3 w-3" }) : item.icon}
+            </Badge>
+          )}
         {/* Show lock icon if item is locked */}
         {isLocked && (
           <span className="ml-auto">
@@ -197,6 +210,90 @@ const renderMenuItemOrSub = (item, openTabByUrl, expanded, setExpanded) => {
       </DropdownMenuItem>
     );
   }
+};
+
+// Helper function to get icon for badge text
+const getBadgeIcon = (iconText) => {
+  if (!iconText) return null;
+  
+  const iconMap = {
+    // New/Recent items
+    'New': Sparkles,
+    'new': Sparkles,
+    
+    // Star ratings and highlights - Different types of stars
+    'Star': Star,
+    'star': Star,
+    'StarGold': Award,        // Gold star - using Award icon
+    'Gold Star': Award,       // Gold star - using Award icon
+    'GoldStar': Award,        // Gold star - using Award icon
+    'StarSilver': Trophy,     // Silver star - using Trophy icon
+    'Silver Star': Trophy,    // Silver star - using Trophy icon
+    'StarBronze': StarIcon,   // Bronze star - using StarIcon variant
+    
+    // Navigation and actions
+    'Arrow': ArrowRight,
+    'PlayBlue': ArrowRight,
+    'arrow': ArrowRight,
+    
+    // Status indicators
+    'Beta': Zap,
+    'beta': Zap,
+    'Warning': AlertTriangle,
+    'warning': AlertTriangle,
+    'Yellow Asterisk': AlertTriangle,
+    'Orange Asterisk': AlertTriangle,
+    'AsteriskYellow': AlertTriangle,
+    'AsteriskOrange': AlertTriangle,
+    
+    // Actions
+    'Report': FileText,
+    'Edit': Edit,
+    'Add': Plus,
+    'Check': CheckCircle,
+    'Delete': Trash2,
+    'Table': FileText,
+    'PageWhiteEdit': Edit,
+    
+    // Plus/Check indicators
+    '+': Plus,
+    '✓': CheckCircle,
+    'check': CheckCircle,
+    
+    // Cross/Close indicators
+    'X': Trash2,
+    'x': Trash2,
+    'cross': Trash2,
+    
+    // Additional common badge types
+    'Decline': Trash2,
+    'Accept': CheckCircle,
+    'Error': AlertTriangle,
+    'Success': CheckCircle,
+    'Info': HelpCircle,
+    'Note': FileText,
+    'Important': AlertTriangle,
+    'Critical': AlertTriangle,
+    'High': AlertTriangle,
+    'Medium': AlertTriangle,
+    'Low': AlertTriangle,
+    'Pending': Loader2,
+    'Processing': Loader2,
+    'Complete': CheckCircle,
+    'Incomplete': AlertTriangle,
+    'Active': CheckCircle,
+    'Inactive': AlertTriangle,
+    'Enabled': CheckCircle,
+    'Disabled': AlertTriangle,
+    'On': CheckCircle,
+    'Off': AlertTriangle,
+    'Yes': CheckCircle,
+    'No': AlertTriangle,
+    'True': CheckCircle,
+    'False': AlertTriangle,
+  };
+  
+  return iconMap[iconText] || null;
 };
 
 // Helper function to calculate dynamic menu height based on screen size
@@ -789,11 +886,12 @@ const Navbar = () => {
               <Button
                 variant="ghost"
                 size="sm"
-                className="h-9 w-9 rounded-full p-0 hover:bg-ocean-700 text-white flex-shrink-0"
+                className="h-7 px-3 rounded-full hover:bg-ocean-700 text-white flex-shrink-0 border border-white/20 min-w-[60px]"
                 onClick={actions.toggleHelp}
                 title="Help & Support"
               >
-                <HelpCircle className="h-5 w-5" />
+                <span className="text-xs font-medium">Help</span>
+                <span className="text-xs font-medium">?</span>
               </Button>
 
               {/* Bell Notification */}
@@ -835,7 +933,7 @@ const Navbar = () => {
                           className="rounded-none font-medium cursor-pointer flex items-center text-gray-800 hover:bg-ocean-50 hover:text-ocean-700 px-4 py-2 mx-0"
                           style={{ fontSize: '13px' }}
                         >
-                          {item.icon && <item.icon className="h-4 w-4 mr-3 text-gray-600" />}
+                          {item.icon && React.createElement(item.icon, { className: "h-4 w-4 mr-3 text-gray-600" })}
                           <span>{item.title}</span>
                         </DropdownMenuItem>
                       );
@@ -858,13 +956,6 @@ const Navbar = () => {
       {isMMIntegration && mmIntegrationSrc && (
         <div>
           <iframe src={mmIntegrationSrc} title="MM Integration" style={{ width: 0, height: 0, border: 0, display: 'none' }} />
-        </div>
-      )}
-      
-      {/* CRM Prospecting Panel (matching legacy ASP.NET) */}
-      {isCRMProspecting && crmProspectingUrl && (
-        <div>
-          <iframe src={crmProspectingUrl} title="Prospecting Dashboard" style={{ width: '100%', height: 400, border: '1px solid #ccc' }} />
         </div>
       )}
     </>

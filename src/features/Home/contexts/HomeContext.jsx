@@ -64,11 +64,23 @@ const initialState = {
       url: null, // Lazy-loaded - will be set when tab is clicked
       closable: false,
       icon: ''
+    },
+    {
+      id: 'prospecting',
+      title: 'Prospecting',
+      component: 'Prospecting',
+      type: 'iframe',
+      url: null, // Will be set when CRM prospecting is enabled
+      closable: false,
+      icon: ''
     }
   ],
   activeTabId: 'dashboard', // Set default to 'dashboard' (not in tabs array)
   helpVisible: false,
-  helpPosition: { x: typeof window !== 'undefined' ? window.innerWidth - 76 : 1320, y: typeof window !== 'undefined' ? window.innerHeight - 76 : 620 },
+  helpPosition: { 
+    x: typeof window !== 'undefined' ? window.innerWidth - 117 : 1320, 
+    y: typeof window !== 'undefined' ? window.innerHeight - 35 : 620 
+  },
   sessionData: null,
   isAuthenticated: false,
   dashboards: [],

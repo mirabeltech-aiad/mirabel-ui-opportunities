@@ -26,17 +26,8 @@ import { consultantService } from '../services/consultantService';
 import { getUserInfo } from '@/utils/sessionHelpers';
 import { useToast } from '@/components/ui/use-toast';
 import {
-  DndContext,
   useDraggable,
-  closestCenter,
-  KeyboardSensor,
-  PointerSensor,
-  useSensor,
-  useSensors,
 } from '@dnd-kit/core';
-import {
-  sortableKeyboardCoordinates,
-} from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 
 // Custom draggable help icon component using dnd-kit
@@ -82,22 +73,40 @@ const DraggableHelpIcon = ({ position, onPositionChange, onClick, onHide }) => {
       className="group"
       onClick={handleClick}
     >
+      {/* Drag Handle - Header-like area above the button */}
+      <div
+        className="absolute -top-6 left-0 right-0 h-6 bg-gray-200 hover:bg-gray-300 rounded-t-lg cursor-grab active:cursor-grabbing opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex items-center justify-center border-b border-gray-300 select-none"
+        title="Drag to move"
+        style={{ 
+          userSelect: 'none', 
+          WebkitUserSelect: 'none',
+          touchAction: 'none',
+        }}
+      >
+        {/* Drag indicator dots */}
+        <div className="flex space-x-1.5">
+          <div className="w-1.5 h-1.5 bg-gray-500 rounded-full"></div>
+          <div className="w-1.5 h-1.5 bg-gray-500 rounded-full"></div>
+          <div className="w-1.5 h-1.5 bg-gray-500 rounded-full"></div>
+        </div>
+      </div>
+
       <Button
         size="lg"
-        className="relative bg-ocean-600 hover:bg-ocean-700 text-white shadow-lg rounded-lg w-14 h-14 p-0 transition-all duration-200 hover:shadow-xl border border-white/20"
+        className="relative bg-ocean-600 hover:bg-ocean-700 text-white shadow-lg rounded-lg px-3 py-2 h-auto transition-all duration-200 hover:shadow-xl border border-white/20 flex items-center space-x-2"
         style={{
           userSelect: 'none',
           touchAction: 'none',
           pointerEvents: isDragging ? 'none' : 'auto',
         }}
       >
-        <HelpCircle className="h-6 w-6 text-white" />
+        {/* White circular icon with blue question mark */}
+        <div className="w-6 h-6 bg-white rounded-full flex items-center justify-center">
+          <span className="text-ocean-600 text-sm font-bold">?</span>
+        </div>
+        {/* Help text */}
+        <span className="text-sm font-medium">Help</span>
       </Button>
-      
-      {/* Tooltip */}
-      <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-2 py-1 bg-gray-900 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap">
-        Help
-      </div>
       
       {/* Hide Help Icon Button */}
       <Button
@@ -116,7 +125,7 @@ const DraggableHelpIcon = ({ position, onPositionChange, onClick, onHide }) => {
   );
 };
 
-const HelpSystem = () => {
+const HelpSystem = ({ onDragHandler }) => {
   const { helpVisible, helpPosition, actions } = useHome();
   
   const [helpIconVisible, setHelpIconVisible] = useState(true);
@@ -139,49 +148,77 @@ const HelpSystem = () => {
     }
   }, [consultantInfo]);
 
-  const defaultHelpPosition = { x: typeof window !== 'undefined' ? window.innerWidth - 76 : 1320, y: typeof window !== 'undefined' ? window.innerHeight - 76 : 620 };
+  // Ensure help icon is properly positioned when component mounts and on window resize
+  useEffect(() => {
+    const updateHelpPosition = () => {
+      const buttonWidth = 80;
+      const buttonHeight = 40;
+      const margin = 20;
+      const bottomMargin = 5; // Reduced bottom margin to eliminate gap and match legacy design
+      const maxX = window.innerWidth - buttonWidth - margin;
+      const maxY = window.innerHeight - buttonHeight - bottomMargin;
+      
+      // Check if current position is within bounds
+      if (helpPosition.x > maxX || helpPosition.y > maxY || helpPosition.x < margin || helpPosition.y < margin) {
+        const newX = Math.max(margin, Math.min(helpPosition.x, maxX));
+        const newY = Math.max(margin, Math.min(helpPosition.y, maxY));
+        actions.setHelpPosition({ x: newX, y: newY });
+      }
+    };
 
-  // DnD Kit sensors
-  const sensors = useSensors(
-    useSensor(PointerSensor, {
-      activationConstraint: {
-        distance: 3, // Reduced activation distance for more responsive dragging
-      },
-    }),
-    useSensor(KeyboardSensor, {
-      coordinateGetter: sortableKeyboardCoordinates,
-    })
-  );
+    // Update position on mount
+    updateHelpPosition();
 
-  // DnD Kit event handlers
-  const handleDragStart = (event) => {
-    // Optional: Add any logic needed when drag starts
+    // Update position on window resize
+    window.addEventListener('resize', updateHelpPosition);
+    return () => window.removeEventListener('resize', updateHelpPosition);
+  }, [helpPosition, actions]);
+
+  const defaultHelpPosition = { 
+    x: typeof window !== 'undefined' ? window.innerWidth - 100 : 1320, 
+    y: typeof window !== 'undefined' ? window.innerHeight - 60 : 620 
   };
 
+  // Register drag handler with parent
+  useEffect(() => {
+    const handleDragEnd = (event) => {
+      const { active, delta } = event;
+      
+      if (active.id === 'help-icon') {
+        // Calculate new position based on the delta
+        const newX = helpPosition.x + delta.x;
+        const newY = helpPosition.y + delta.y;
+        
+        // Constrain to viewport with margin (button is approximately 80px wide and 40px tall)
+        const buttonWidth = 80;
+        const buttonHeight = 40;
+        const margin = 20; // Add margin to prevent edge cutting
+        const bottomMargin = 5; // Reduced bottom margin to eliminate gap and match legacy design
+        const maxX = window.innerWidth - buttonWidth - margin;
+        const maxY = window.innerHeight - buttonHeight - bottomMargin;
+        
+        const constrainedX = Math.max(margin, Math.min(newX, maxX));
+        const constrainedY = Math.max(margin, Math.min(newY, maxY));
+        
+        // Update the position in the context
+        actions.setHelpPosition({
+          x: constrainedX,
+          y: constrainedY
+        });
+      }
+    };
 
-
-  const handleDragEnd = (event) => {
-    const { active, delta } = event;
-    
-    if (active.id === 'help-icon') {
-      // Calculate new position based on the delta
-      const newX = helpPosition.x + delta.x;
-      const newY = helpPosition.y + delta.y;
-      
-      // Constrain to viewport (button is 56px x 56px)
-      const maxX = window.innerWidth - 56;
-      const maxY = window.innerHeight - 56;
-      
-      const constrainedX = Math.max(0, Math.min(newX, maxX));
-      const constrainedY = Math.max(0, Math.min(newY, maxY));
-      
-      // Update the position in the context
-      actions.setHelpPosition({
-        x: constrainedX,
-        y: constrainedY
-      });
+    if (onDragHandler) {
+      onDragHandler(handleDragEnd);
     }
-  };
+
+    // Cleanup
+    return () => {
+      if (onDragHandler) {
+        onDragHandler(null);
+      }
+    };
+  }, [helpPosition, actions, onDragHandler]);
 
   const helpOptions = [
     {
@@ -333,21 +370,14 @@ const HelpSystem = () => {
 
   return (
     <>
-      {/* DnD Context for Draggable Help Button */}
-      <DndContext
-        sensors={sensors}
-        collisionDetection={closestCenter}
-        onDragStart={handleDragStart}
-        onDragEnd={handleDragEnd}
-      >
-        {helpIconVisible && (
-          <DraggableHelpIcon
-            position={helpPosition}
-            onClick={handleClick}
-            onHide={handleHideHelpIcon}
-          />
-        )}
-      </DndContext>
+      {/* Draggable Help Button */}
+      {helpIconVisible && (
+        <DraggableHelpIcon
+          position={helpPosition}
+          onClick={handleClick}
+          onHide={handleHideHelpIcon}
+        />
+      )}
 
 
 
