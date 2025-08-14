@@ -667,7 +667,7 @@ const TabNavigation = memo(() => {
         )}
 
         {/* Globe Button with Dropdown - positioned next to overflow menu */}
-        {isWebsiteButtonVisible && (
+        {(isWebsiteButtonVisible || (selectedDashboard && selectedDashboard.URL && selectedDashboard.URL.toLowerCase().includes('ismkm=1'))) && (
           <div className="flex-shrink-0 ml-1">
             <DropdownMenu open={isFloatingDropdownOpen} onOpenChange={setIsFloatingDropdownOpen}>
               <DropdownMenuTrigger asChild>
