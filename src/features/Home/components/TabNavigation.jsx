@@ -87,7 +87,7 @@ const TabNavigation = memo(() => {
         // Use mirabeldev-qa as fallback for localhost
         const siteName = domain === 'localhost' ? 'mirabeldev-qa' : subdomain;
         
-        const response = await axios.get(`${baseUrl}GetClientWebSites/${siteName}`);
+        const response = await axios.get(`${baseUrl}${siteName}`);
         const data = response.data;
         
         // Transform the API data to match our component structure
