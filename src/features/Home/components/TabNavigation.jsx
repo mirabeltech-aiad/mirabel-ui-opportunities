@@ -429,6 +429,8 @@ const TabNavigation = memo(() => {
         actions.removeTab(tab.id);
       }
     });
+    // Set active tab back to dashboard after closing all tabs
+    actions.setActiveTab('dashboard');
     setContextMenu((prev) => ({ ...prev, visible: false }));
   };
 
