@@ -281,24 +281,33 @@ const TabNavigation = memo(() => {
 
   // Navigate to previous tab
   const navigateToPreviousTab = () => {
-    if (tabs.length <= 1) return;
+    // Create a list of navigable tabs (only visible and active tabs)
+    const navigableTabs = tabs.filter(tab => {
+      // Include dashboard, inbox, search (always available)
+      if (tab.id === 'dashboard' || tab.id === 'inbox' || tab.id === 'search') {
+        return true;
+      }
+      // Include prospecting only if it's actually available and has content
+      if (tab.id === 'prospecting') {
+        return tab.url && crmProspectingUrl;
+      }
+      // Include only tabs that are actually visible and have content
+      return tab.url || tab.component;
+    });
     
-    const currentIndex = tabs.findIndex(tab => tab.id === activeTabId);
+    if (navigableTabs.length <= 1) return;
+    
+    const currentIndex = navigableTabs.findIndex(tab => tab.id === activeTabId);
     if (currentIndex === -1) return;
     
     let previousIndex = currentIndex - 1;
     
     // Wrap around to the last tab if we're at the first tab
     if (previousIndex < 0) {
-      previousIndex = tabs.length - 1;
+      previousIndex = navigableTabs.length - 1;
     }
     
-    // Skip fixed tabs when wrapping (optional - you can remove this if you want to include fixed tabs)
-    if (previousIndex < fixedTabsCount && currentIndex === 0) {
-      previousIndex = tabs.length - 1;
-    }
-    
-    const previousTab = tabs[previousIndex];
+    const previousTab = navigableTabs[previousIndex];
     if (previousTab) {
       handleTabClick(previousTab.id);
     }
@@ -306,24 +315,33 @@ const TabNavigation = memo(() => {
 
   // Navigate to next tab
   const navigateToNextTab = () => {
-    if (tabs.length <= 1) return;
+    // Create a list of navigable tabs (only visible and active tabs)
+    const navigableTabs = tabs.filter(tab => {
+      // Include dashboard, inbox, search (always available)
+      if (tab.id === 'dashboard' || tab.id === 'inbox' || tab.id === 'search') {
+        return true;
+      }
+      // Include prospecting only if it's actually available and has content
+      if (tab.id === 'prospecting') {
+        return tab.url && crmProspectingUrl;
+      }
+      // Include only tabs that are actually visible and have content
+      return tab.url || tab.component;
+    });
     
-    const currentIndex = tabs.findIndex(tab => tab.id === activeTabId);
+    if (navigableTabs.length <= 1) return;
+    
+    const currentIndex = navigableTabs.findIndex(tab => tab.id === activeTabId);
     if (currentIndex === -1) return;
     
     let nextIndex = currentIndex + 1;
     
     // Wrap around to the first tab if we're at the last tab
-    if (nextIndex >= tabs.length) {
+    if (nextIndex >= navigableTabs.length) {
       nextIndex = 0;
     }
     
-    // Skip fixed tabs when wrapping (optional - you can remove this if you want to include fixed tabs)
-    if (nextIndex < fixedTabsCount && currentIndex === tabs.length - 1) {
-      nextIndex = fixedTabsCount;
-    }
-    
-    const nextTab = tabs[nextIndex];
+    const nextTab = navigableTabs[nextIndex];
     if (nextTab) {
       handleTabClick(nextTab.id);
     }
@@ -411,6 +429,8 @@ const TabNavigation = memo(() => {
         actions.removeTab(tab.id);
       }
     });
+    // Set active tab back to dashboard after closing all tabs
+    actions.setActiveTab('dashboard');
     setContextMenu((prev) => ({ ...prev, visible: false }));
   };
 
