@@ -952,12 +952,7 @@ const Navbar = () => {
         onClose={() => setIsAnnouncementsPanelOpen(false)} 
       />
       
-      {/* MM Integration Iframe (matching legacy ASP.NET) */}
-      {isMMIntegration && mmIntegrationSrc && (
-        <div>
-          <iframe src={mmIntegrationSrc} title="MM Integration" style={{ width: 0, height: 0, border: 0, display: 'none' }} />
-        </div>
-      )}
+      
     </>
   );
 };
