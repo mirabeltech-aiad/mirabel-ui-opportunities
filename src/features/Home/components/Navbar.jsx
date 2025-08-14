@@ -665,23 +665,22 @@ const Navbar = () => {
       setHoverEnabled(true);
       setOpenMenuId(menuId);
     } else {
-      // Add a small delay to prevent immediate closing when clicking the same button
+      // Add a small delay before closing to prevent flickering
       closeTimeoutRef.current = setTimeout(() => {
         setOpenMenuId(null);
-        setHoverEnabled(false);
-      }, 50);
+      }, 100);
     }
   };
 
   // Handle menu hover with conditional logic
   const handleMenuHover = (menuId) => {
-    // Only handle hover if hover is enabled and we're not already on this menu
+    // Clear any existing timeout
+    if (closeTimeoutRef.current) {
+      clearTimeout(closeTimeoutRef.current);
+      closeTimeoutRef.current = null;
+    }
+    
     if (hoverEnabled && openMenuId !== menuId) {
-      // Clear any existing timeout
-      if (closeTimeoutRef.current) {
-        clearTimeout(closeTimeoutRef.current);
-        closeTimeoutRef.current = null;
-      }
       setOpenMenuId(menuId);
     }
   };
@@ -696,8 +695,6 @@ const Navbar = () => {
       // Add a small delay to prevent immediate closing
       closeTimeoutRef.current = setTimeout(() => {
         setOpenMenuId(null);
-        // Disable hover mode when menu closes due to mouse leave
-        setHoverEnabled(false);
       }, 150);
     }
   };
@@ -725,8 +722,6 @@ const Navbar = () => {
       // Add a small delay to prevent immediate closing
       closeTimeoutRef.current = setTimeout(() => {
         setOpenMenuId(null);
-        // Disable hover mode when menu content closes due to mouse leave
-        setHoverEnabled(false);
       }, 150);
     }
   };
@@ -829,6 +824,8 @@ const Navbar = () => {
                             : 'text-white hover:bg-ocean-700 hover:text-white focus:bg-ocean-800 focus:text-white'
                         }`}
                         style={{ fontSize: '13px' }}
+                        onMouseEnter={() => handleMenuHover(menu.id)}
+                        onMouseLeave={handleMenuLeave}
                       >
                         <span className="truncate">{menu.title}</span>
                       </button>
