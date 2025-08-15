@@ -185,9 +185,9 @@ const TabNavigation = memo(() => {
       if (tabBarRef.current) {
         const tabBarWidth = tabBarRef.current.offsetWidth;
         // Reserve space for fixed tabs, overflow menu, and padding
-        // Responsive reserved space based on screen size
+        // Responsive reserved space based on screen size - reduced to fit more tabs
         const isSmallScreen = window.innerWidth < 768;
-        const reservedSpace = isSmallScreen ? 200 : 300; // Less space reserved on small screens
+        const reservedSpace = isSmallScreen ? 180 : 270; // Reduced reserved space to fit one more tab
         setAvailableWidth(Math.max(0, tabBarWidth - reservedSpace));
       }
     };
@@ -239,7 +239,7 @@ const TabNavigation = memo(() => {
 
   // Calculate which draggable tabs should be visible based on available space
   const isSmallScreen = window.innerWidth < 768;
-  const estimatedTabWidth = isSmallScreen ? 100 : 120; // Smaller tabs on small screens
+  const estimatedTabWidth = isSmallScreen ? 85 : 105; // Further reduced tab width to ensure close button visibility
   const maxVisibleDraggableTabs = Math.floor(availableWidth / estimatedTabWidth);
   
   // Ensure the active tab is always visible
@@ -558,13 +558,13 @@ const TabNavigation = memo(() => {
               onClick={() => handleTabClick(tab.id)}
               style={{ fontSize: '13px', cursor: 'pointer' }}
             >
-              <span 
-                className="text-xs font-medium truncate max-w-32 flex items-center" 
-                style={{ fontSize: '13px', marginRight: '2px' }}
-                title={tab.title}
-              >
-                {tab.title.length > 8 ? `${tab.title.substring(0, 8)}...` : tab.title}
-              </span>
+                              <span 
+                  className="text-xs font-medium truncate max-w-32 flex items-center" 
+                  style={{ fontSize: '13px', marginRight: '2px' }}
+                  title={tab.title}
+                >
+                  {tab.title.length > 10 ? `${tab.title.substring(0, 10)}...` : tab.title}
+                </span>
             </div>
             {/* Close button (not draggable, but should not appear for fixed tabs) */}
             {tab.closable !== false && (
@@ -594,7 +594,7 @@ const TabNavigation = memo(() => {
                     ? 'bg-blue-100 text-blue-900 font-bold shadow-sm'
                     : 'bg-transparent hover:bg-gray-100 text-gray-700'
                 }`}
-                style={{ fontFamily: 'inherit', fontSize: '13px', fontWeight: 500, lineHeight: '1.5', border: 'none', boxShadow: activeTabId === tab.id ? '0 2px 8px rgba(0,0,0,0.04)' : 'none', marginRight: '0px', height: '24px', minHeight: '24px', paddingTop: '0', paddingBottom: '0', width: isSmallScreen ? '100px' : '120px', minWidth: isSmallScreen ? '100px' : '120px', maxWidth: isSmallScreen ? '100px' : '120px' }}
+                style={{ fontFamily: 'inherit', fontSize: '13px', fontWeight: 500, lineHeight: '1.5', border: 'none', boxShadow: activeTabId === tab.id ? '0 2px 8px rgba(0,0,0,0.04)' : 'none', marginRight: '0px', height: '24px', minHeight: '24px', paddingTop: '0', paddingBottom: '0', width: isSmallScreen ? '85px' : '105px', minWidth: isSmallScreen ? '85px' : '105px', maxWidth: isSmallScreen ? '85px' : '105px' }}
               >
                 <div
                   className="flex items-center px-1 py-0 cursor-pointer flex-1 h-8 min-h-0 min-w-0"
@@ -606,7 +606,7 @@ const TabNavigation = memo(() => {
                     style={{ fontSize: isSmallScreen ? '11px' : '12px', marginRight: '2px' }}
                     title={tab.title}
                   >
-                    {tab.title.length > 8 ? `${tab.title.substring(0, 8)}...` : tab.title}
+                    {tab.title.length > 10 ? `${tab.title.substring(0, 10)}...` : tab.title}
                   </span>
                 </div>
                 {tab.closable !== false && (
