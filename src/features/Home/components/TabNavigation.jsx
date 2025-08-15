@@ -40,36 +40,37 @@ const TabNavigation = memo(() => {
       // Get the current active tab
       const activeTab = tabs.find(tab => tab.id === activeTabId);
       
-      if (activeTab && activeTab.url) {
-        const currentURL = activeTab.url.toLowerCase();
-        // Show button only if current tab contains "ismkm=1" in URL
-        const shouldShow = currentURL.indexOf('ismkm=1') > -1;
-        setIsWebsiteButtonVisible(shouldShow);
-        
-        if (shouldShow) {
-          console.log('Website button visible - MKM tab detected:', currentURL);
+      let shouldShow = false;
+      
+      if (activeTab) {
+        // If it's the dashboard tab, check the selected dashboard URL
+        if (activeTab.id === 'dashboard' && selectedDashboard && selectedDashboard.URL) {
+          const dashboardURL = selectedDashboard.URL.toLowerCase();
+          shouldShow = dashboardURL.indexOf('ismkm=1') > -1;
+        }
+        // For other tabs, check the tab's URL
+        else if (activeTab.url) {
+          const currentURL = activeTab.url.toLowerCase();
+          shouldShow = currentURL.indexOf('ismkm=1') > -1;
         } else {
-          console.log('Website button hidden - regular MM tab:', currentURL);
+          // Hide button if no URL
+          shouldShow = false;
         }
       } else {
-        // Hide button if no active tab or no URL
-        setIsWebsiteButtonVisible(false);
+        // Hide button if no active tab
+        shouldShow = false;
       }
+      
+      setIsWebsiteButtonVisible(shouldShow);
     } catch (error) {
-      console.error('Error checking website button visibility:', error);
       setIsWebsiteButtonVisible(false);
     }
   };
 
-  // Check visibility when active tab changes
+  // Check visibility when active tab, tabs, or selected dashboard changes
   useEffect(() => {
     checkWebsiteButtonVisibility();
-  }, [activeTabId, tabs]);
-
-  // Check visibility when tabs array changes
-  useEffect(() => {
-    checkWebsiteButtonVisibility();
-  }, [tabs]);
+  }, [activeTabId, tabs, selectedDashboard]);
 
   // Fetch websites from API
   useEffect(() => {
@@ -687,7 +688,7 @@ const TabNavigation = memo(() => {
         )}
 
         {/* Globe Button with Dropdown - positioned next to overflow menu */}
-        {(isWebsiteButtonVisible || (selectedDashboard && selectedDashboard.URL && selectedDashboard.URL.toLowerCase().includes('ismkm=1'))) && (
+        {isWebsiteButtonVisible && (
           <div className="flex-shrink-0 ml-1">
             <DropdownMenu open={isFloatingDropdownOpen} onOpenChange={setIsFloatingDropdownOpen}>
               <DropdownMenuTrigger asChild>
