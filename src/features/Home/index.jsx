@@ -19,6 +19,7 @@ import {
   sortableKeyboardCoordinates,
 } from '@dnd-kit/sortable';
 import useHelpDragHandler from './hooks/useHelpDragHandler';
+import IframeContainer from './components/IframeContainer';
 
 const Home = () => {
   const [showJobFunction, setShowJobFunction] = useState(false);
@@ -61,6 +62,27 @@ const Home = () => {
 
   return isSessionLoaded ? (
     <HomeProvider sessionLoaded={true}>
+      <HomeContent 
+        sensors={sensors}
+        handleDragEnd={handleDragEnd}
+        setHelpDragHandler={setHelpDragHandler}
+        showJobFunction={showJobFunction}
+        setShowJobFunction={setShowJobFunction}
+      />
+    </HomeProvider>
+  ) : null;
+};
+
+const HomeContent = ({ sensors, handleDragEnd, setHelpDragHandler, showJobFunction, setShowJobFunction }) => {
+  const { mmIntegrationSrc } = useHome();
+  
+  return (
+    <>
+      <IframeContainer
+        url={mmIntegrationSrc}
+        title="MM Integration"
+        style={{ display: 'none' }}
+      />
       <DndContext
         sensors={sensors}
         collisionDetection={closestCenter}
@@ -69,19 +91,19 @@ const Home = () => {
         }}
         onDragEnd={handleDragEnd}
       >
-        {isSessionLoaded && ( <div className="min-h-screen bg-gray-50 w-full overflow-x-hidden">
+        <div className="min-h-screen bg-gray-50 w-full overflow-x-hidden">
           <TabNavigation />
           <HelpSystem onDragHandler={setHelpDragHandler} />
-         <TermsAndConditionsModalWrapper />
+          <TermsAndConditionsModalWrapper />
           <ChangePasswordManager />
           <JobFunctionNotification
             isOpen={showJobFunction}
             onClose={() => setShowJobFunction(false)}
           />
-        </div>)}
+        </div>
       </DndContext>
-    </HomeProvider>
-  ) : null;
+    </>
+  );
 };
 
 const TermsAndConditionsModalWrapper = () => {
