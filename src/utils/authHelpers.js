@@ -43,6 +43,7 @@ export const encrypt = (text) => {
   }
 };
 
+
 /**
  * Simple decryption function for auth data
  * @param {string} message - Text to decrypt
@@ -65,6 +66,28 @@ export const decrypt = (message, key) => {
     return "";
   }
 };
+
+
+function sendLogoutInfoToMKM() {
+  // Notify all MKM integration iframes about logout
+  const logoutMessage = {
+    Action: "Logout",
+    Data: {}
+  };
+  document.querySelectorAll("iframe").forEach((iframe) => {
+    try {
+      if (
+        typeof iframe.src === "string" &&
+        iframe.src.toLowerCase().includes("ismkm=1")
+      ) {
+        iframe.contentWindow.postMessage(logoutMessage, "*");
+      }
+    } catch (err) {
+      // Ignore cross-origin or inaccessible iframe errors
+      // Optionally log: console.warn('Could not post logout to iframe:', err);
+    }
+  });
+}
 /**
  * Logout function - clears session and redirects
  * @param {string} returnUrl - Optional return URL after logout
@@ -76,6 +99,14 @@ export const logout = (returnUrl = null) => {
     localStorage.removeItem('authToken');
     localStorage.removeItem('refreshToken');
     localStorage.removeItem('userInfo');
+
+     // Remove legacy ASP.NET session cookie if present (for cross-app logout)
+     try {
+      document.cookie = "ASP.NET_SessionId=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/";
+    } catch (e) {
+      // Ignore cookie errors
+    }
+    sendLogoutInfoToMKM();
     
     // Clear session storage
     sessionStorage.clear();

@@ -3,6 +3,7 @@ import { useHome } from '../contexts/HomeContext';
 import Dashboard from './Dashboard';
 import NewTab from './NewTab';
 import InboxPage from './InboxPage';
+import Prospecting from './Prospecting';
 import { withBaseUrl } from '@/lib/utils';
 
 // Lazy load components for better performance
@@ -79,6 +80,13 @@ const TabContent = () => {
             </Suspense>
           );
           break;
+          case 'Prospecting':
+            contentMap[tab.id] = (
+              <Suspense fallback={<div className="flex items-center justify-center h-full"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div></div>}>
+                <Prospecting />
+              </Suspense>
+            );
+            break;
         default:
           if (tab.type === 'iframe' && tab.url) {
           

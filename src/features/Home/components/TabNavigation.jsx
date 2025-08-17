@@ -6,7 +6,7 @@ import navigationService from '../services/navigationService';
 import Navbar from './Navbar';
 import TabContent from './TabContent';
 import DashboardTab from './DashboardTab';
-import { Plus, X, ChevronDown } from 'lucide-react';
+import { Plus, X, ChevronDown, Monitor } from 'lucide-react';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -14,12 +14,19 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { getSessionValue } from '@/utils/sessionHelpers';
+import axios from 'axios';
 
 const TabNavigation = memo(() => {
-  const { tabs, activeTabId, actions, dashboards, selectedDashboard, dashboardsLoading } = useHome();
+  const { tabs, activeTabId, actions, dashboards, selectedDashboard, dashboardsLoading, crmProspectingUrl, isCRMProspecting} = useHome();
 
   // Debug logging to track component lifecycle
 
+  // Floating button dropdown state
+  const [isFloatingDropdownOpen, setIsFloatingDropdownOpen] = useState(false);
+  const [websites, setWebsites] = useState([]);
+  const [websitesLoading, setWebsitesLoading] = useState(false);
+  const [selectedWebsiteId, setSelectedWebsiteId] = useState(null);
+  const [isWebsiteButtonVisible, setIsWebsiteButtonVisible] = useState(false);
 
   // Context menu state
   const [contextMenu, setContextMenu] = useState({ visible: false, x: 0, y: 0, tabId: null });
@@ -27,15 +34,160 @@ const TabNavigation = memo(() => {
   const tabBarRef = useRef(null);
   const [availableWidth, setAvailableWidth] = useState(0);
 
+  // Function to check if current tab should show website button
+  const checkWebsiteButtonVisibility = () => {
+    try {
+      // Get the current active tab
+      const activeTab = tabs.find(tab => tab.id === activeTabId);
+      
+      let shouldShow = false;
+      
+      if (activeTab) {
+        // If it's the dashboard tab, check the selected dashboard URL
+        if (activeTab.id === 'dashboard' && selectedDashboard && selectedDashboard.URL) {
+          const dashboardURL = selectedDashboard.URL.toLowerCase();
+          shouldShow = dashboardURL.indexOf('ismkm=1') > -1;
+        }
+        // For other tabs, check the tab's URL
+        else if (activeTab.url) {
+          const currentURL = activeTab.url.toLowerCase();
+          shouldShow = currentURL.indexOf('ismkm=1') > -1;
+        } else {
+          // Hide button if no URL
+          shouldShow = false;
+        }
+      } else {
+        // Hide button if no active tab
+        shouldShow = false;
+      }
+      
+      setIsWebsiteButtonVisible(shouldShow);
+    } catch (error) {
+      setIsWebsiteButtonVisible(false);
+    }
+  };
+
+  // Check visibility when active tab, tabs, or selected dashboard changes
+  useEffect(() => {
+    checkWebsiteButtonVisibility();
+  }, [activeTabId, tabs, selectedDashboard]);
+
+  // Fetch websites from API
+  useEffect(() => {
+    const fetchWebsites = async () => {
+      setWebsitesLoading(true);
+      try {
+        // Get API URLs from configuration
+        const apiData = await navigationService.fetchApiData();
+        const baseUrl = apiData.MKMBlastServiceRestURL;
+        
+        // Get domain from current URL and extract subdomain
+        const domain = window.location.hostname;
+        const subdomain = domain.split('.')[0];
+        
+        // Use mirabeldev-qa as fallback for localhost
+        const siteName = domain === 'localhost' ? 'mirabeldev-qa' : subdomain;
+        
+        const response = await axios.get(`${baseUrl}${siteName}`);
+        const data = response.data;
+        
+        // Transform the API data to match our component structure
+        const transformedWebsites = data.map(site => ({
+          id: site.WebsiteID,
+          url: site.WebsiteUrl,
+          name: site.WebsiteName,
+          selected: false, // Default to false, will be set based on selectedWebsiteId
+          isVerified: site.IsVerified,
+          currency: site.Currency,
+          timeZone: site.TimeZone,
+          isWebMasterAccess: site.IsWebMasterAccess,
+          trackEU: site.TrackEU,
+          visitsCount: site.VisitsCount,
+          webmasterSiteURL: site.WebmasterSiteURL,
+          websiteCrawlsStatus: site.WebsiteCrawlsStatus,
+          letterCategoryID: site.LetterCategoryID,
+          createdBy: site.CreatedBy,
+          urlIsValid: site.UrlIsvalid,
+          faviconUrl: site.FaviconUrl,
+          description: site.Description,
+          category: site.Category
+        }));
+        
+        setWebsites(transformedWebsites);
+        
+        // Set the first website as selected by default
+        if (transformedWebsites.length > 0) {
+          setSelectedWebsiteId(transformedWebsites[0].id);
+          // Update the selected state for the first website
+          setWebsites(prev => prev.map(site => ({
+            ...site,
+            selected: site.id === transformedWebsites[0].id
+          })));
+        }
+      } catch (error) {
+        console.error('Failed to fetch websites:', error);
+        // Fallback to empty array if API fails
+        setWebsites([]);
+      } finally {
+        setWebsitesLoading(false);
+      }
+    };
+
+    fetchWebsites();
+  }, []);
+
+  // Handle website selection
+  const handleWebsiteSelect = (websiteId) => {
+    try {
+      // Find the selected website data
+      const selectedWebsite = websites.find(site => site.id === websiteId);
+      
+      if (selectedWebsite) {
+        // Prepare the message object like in the original implementation
+        const jsonObj = {
+          Action: "WebsiteChange",
+          Data: {
+            WebsiteID: selectedWebsite.id,
+            WebsiteName: selectedWebsite.name,
+            WebsiteUrl: selectedWebsite.url
+          }
+        };
+        
+        console.log('Sending message to iframes:', jsonObj);
+        
+        // Send message to all iframes with 'ismkm=1' in their src (like original implementation)
+        document.querySelectorAll("iframe").forEach(function (el) {
+          if (el.src.toLowerCase().indexOf('ismkm=1') > -1) {
+            el.contentWindow.postMessage(jsonObj, "*");
+          }
+        });
+        
+        // Update local state
+        setSelectedWebsiteId(websiteId);
+        setWebsites(prev => prev.map(site => ({
+          ...site,
+          selected: site.id === websiteId
+        })));
+        
+        // Close the dropdown
+        setIsFloatingDropdownOpen(false);
+        
+        console.log(`Website ID ${websiteId} selected and message sent to iframes`);
+      }
+    } catch (error) {
+      console.error('Failed to send message to iframes:', error);
+    }
+  };
+
   // Calculate available width for tabs
   useEffect(() => {
     const updateAvailableWidth = () => {
       if (tabBarRef.current) {
         const tabBarWidth = tabBarRef.current.offsetWidth;
         // Reserve space for fixed tabs, overflow menu, and padding
-        // Responsive reserved space based on screen size
+        // Responsive reserved space based on screen size - reduced to fit more tabs
         const isSmallScreen = window.innerWidth < 768;
-        const reservedSpace = isSmallScreen ? 200 : 300; // Less space reserved on small screens
+        const reservedSpace = isSmallScreen ? 180 : 270; // Reduced reserved space to fit one more tab
         setAvailableWidth(Math.max(0, tabBarWidth - reservedSpace));
       }
     };
@@ -80,15 +232,14 @@ const TabNavigation = memo(() => {
     };
   }, [actions, activeTabId, tabs]); // Add dependencies to update when state changes
 
-  // Split tabs into fixed and draggable
-  // First three tabs: dropdown (dashboard), Inbox, Search are fixed
-  const fixedTabsCount = 3; // Dropdown, Inbox, Search
-  const fixedTabs = tabs.slice(0, fixedTabsCount); // first three tabs are fixed
-  const draggableTabs = tabs.slice(fixedTabsCount); // tabs after the first three are draggable
+  // First four tabs: dropdown (dashboard), Inbox, Search, Prospecting are fixed
+  const fixedTabsCount = 4; // Dropdown, Inbox, Search, Prospecting
+  const fixedTabs = tabs.slice(0, fixedTabsCount); // first four tabs are fixed
+  const draggableTabs = tabs.slice(fixedTabsCount); // tabs after the first four are draggable
 
   // Calculate which draggable tabs should be visible based on available space
   const isSmallScreen = window.innerWidth < 768;
-  const estimatedTabWidth = isSmallScreen ? 100 : 120; // Smaller tabs on small screens
+  const estimatedTabWidth = isSmallScreen ? 85 : 105; // Further reduced tab width to ensure close button visibility
   const maxVisibleDraggableTabs = Math.floor(availableWidth / estimatedTabWidth);
   
   // Ensure the active tab is always visible
@@ -104,6 +255,98 @@ const TabNavigation = memo(() => {
     visibleDraggableTabs = [...visibleDraggableTabs.slice(0, maxVisibleDraggableTabs - 1), activeTab];
   }
 
+  // Add keyboard navigation effect
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      // Only handle arrow keys when no input fields are focused
+      if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.tagName === 'SELECT') {
+        return;
+      }
+
+      // Handle left arrow key (previous tab)
+      if (e.key === 'ArrowLeft') {
+        e.preventDefault();
+        navigateToPreviousTab();
+      }
+      
+      // Handle right arrow key (next tab)
+      if (e.key === 'ArrowRight') {
+        e.preventDefault();
+        navigateToNextTab();
+      }
+    };
+
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, [tabs, activeTabId, actions]);
+
+  // Navigate to previous tab
+  const navigateToPreviousTab = () => {
+    // Create a list of navigable tabs (only visible and active tabs)
+    const navigableTabs = tabs.filter(tab => {
+      // Include dashboard, inbox, search (always available)
+      if (tab.id === 'dashboard' || tab.id === 'inbox' || tab.id === 'search') {
+        return true;
+      }
+      // Include prospecting only if it's actually available and has content
+      if (tab.id === 'prospecting') {
+        return tab.url && crmProspectingUrl;
+      }
+      // Include only tabs that are actually visible and have content
+      return tab.url || tab.component;
+    });
+    
+    if (navigableTabs.length <= 1) return;
+    
+    const currentIndex = navigableTabs.findIndex(tab => tab.id === activeTabId);
+    if (currentIndex === -1) return;
+    
+    let previousIndex = currentIndex - 1;
+    
+    // Wrap around to the last tab if we're at the first tab
+    if (previousIndex < 0) {
+      previousIndex = navigableTabs.length - 1;
+    }
+    
+    const previousTab = navigableTabs[previousIndex];
+    if (previousTab) {
+      handleTabClick(previousTab.id);
+    }
+  };
+
+  // Navigate to next tab
+  const navigateToNextTab = () => {
+    // Create a list of navigable tabs (only visible and active tabs)
+    const navigableTabs = tabs.filter(tab => {
+      // Include dashboard, inbox, search (always available)
+      if (tab.id === 'dashboard' || tab.id === 'inbox' || tab.id === 'search') {
+        return true;
+      }
+      // Include prospecting only if it's actually available and has content
+      if (tab.id === 'prospecting') {
+        return tab.url && crmProspectingUrl;
+      }
+      // Include only tabs that are actually visible and have content
+      return tab.url || tab.component;
+    });
+    
+    if (navigableTabs.length <= 1) return;
+    
+    const currentIndex = navigableTabs.findIndex(tab => tab.id === activeTabId);
+    if (currentIndex === -1) return;
+    
+    let nextIndex = currentIndex + 1;
+    
+    // Wrap around to the first tab if we're at the last tab
+    if (nextIndex >= navigableTabs.length) {
+      nextIndex = 0;
+    }
+    
+    const nextTab = navigableTabs[nextIndex];
+    if (nextTab) {
+      handleTabClick(nextTab.id);
+    }
+  };
 
 
   const handleTabClick = (tabId) => {
@@ -122,7 +365,16 @@ const TabNavigation = memo(() => {
         actions.updateTab('search', { url: fullUrl });
       }
     }
-    
+     // Handle lazy loading for prospecting tab
+     if (tabId === 'prospecting') {
+      const prospectingTab = tabs.find(tab => tab.id === 'prospecting');
+      if (prospectingTab && !prospectingTab.url) {
+        // Lazy load the prospecting tab URL from CRM prospecting URL
+        if (crmProspectingUrl) {
+          actions.updateTab('prospecting', { url: crmProspectingUrl });
+        }
+      }
+    }
     actions.setActiveTab(tabId);
   };
 
@@ -178,6 +430,8 @@ const TabNavigation = memo(() => {
         actions.removeTab(tab.id);
       }
     });
+    // Set active tab back to dashboard after closing all tabs
+    actions.setActiveTab('dashboard');
     setContextMenu((prev) => ({ ...prev, visible: false }));
   };
 
@@ -210,11 +464,11 @@ const TabNavigation = memo(() => {
       {/* Tab Bar */}
       <div 
         ref={tabBarRef}
-        className="bg-white border-b border-gray-200 flex items-center px-1 sm:px-2 py-0 h-9 min-h-0 overflow-hidden w-full" 
+        className="bg-white border-b border-gray-200 flex items-center px-1 sm:px-2 py-0 h-11 min-h-0 overflow-hidden w-full" 
         style={{ 
           boxShadow: '0 1px 0 0 #e5e7eb', 
-          height: '28px', 
-          minHeight: '28px', 
+          height: '34px', 
+          minHeight: '34px', 
           fontFamily: 'inherit', 
           fontSize: '13px', 
           fontWeight: 500, 
@@ -283,7 +537,12 @@ const TabNavigation = memo(() => {
           </div>
         )}
         {/* Render remaining fixed tabs (Inbox, Search) */}
-        {fixedTabs.slice(1).map((tab, index) => (
+        {fixedTabs.slice(1).map((tab, index) => {
+             // Skip prospecting tab if not visible
+             if (tab.id === 'prospecting' && !isCRMProspecting) {
+              return null;
+            }
+            return (
           <div
             key={tab.id}
             onContextMenu={(e) => handleContextMenu(e, tab.id)}
@@ -299,13 +558,13 @@ const TabNavigation = memo(() => {
               onClick={() => handleTabClick(tab.id)}
               style={{ fontSize: '13px', cursor: 'pointer' }}
             >
-              <span 
-                className="text-xs font-medium truncate max-w-32 flex items-center" 
-                style={{ fontSize: '13px', marginRight: '2px' }}
-                title={tab.title}
-              >
-                {tab.title.length > 8 ? `${tab.title.substring(0, 8)}...` : tab.title}
-              </span>
+                              <span 
+                  className="text-xs font-medium truncate max-w-32 flex items-center" 
+                  style={{ fontSize: '13px', marginRight: '2px' }}
+                  title={tab.title}
+                >
+                  {tab.title.length > 10 ? `${tab.title.substring(0, 10)}...` : tab.title}
+                </span>
             </div>
             {/* Close button (not draggable, but should not appear for fixed tabs) */}
             {tab.closable !== false && (
@@ -320,7 +579,8 @@ const TabNavigation = memo(() => {
               </button>
             )}
           </div>
-        ))}
+        );
+      })}
 
         {/* Static tabs container with proper overflow handling */}
         <div className="flex items-center flex-1 min-w-0 overflow-hidden">
@@ -334,7 +594,7 @@ const TabNavigation = memo(() => {
                     ? 'bg-blue-100 text-blue-900 font-bold shadow-sm'
                     : 'bg-transparent hover:bg-gray-100 text-gray-700'
                 }`}
-                style={{ fontFamily: 'inherit', fontSize: '13px', fontWeight: 500, lineHeight: '1.5', border: 'none', boxShadow: activeTabId === tab.id ? '0 2px 8px rgba(0,0,0,0.04)' : 'none', marginRight: '0px', height: '24px', minHeight: '24px', paddingTop: '0', paddingBottom: '0', width: isSmallScreen ? '100px' : '120px', minWidth: isSmallScreen ? '100px' : '120px', maxWidth: isSmallScreen ? '100px' : '120px' }}
+                style={{ fontFamily: 'inherit', fontSize: '13px', fontWeight: 500, lineHeight: '1.5', border: 'none', boxShadow: activeTabId === tab.id ? '0 2px 8px rgba(0,0,0,0.04)' : 'none', marginRight: '0px', height: '24px', minHeight: '24px', paddingTop: '0', paddingBottom: '0', width: isSmallScreen ? '85px' : '105px', minWidth: isSmallScreen ? '85px' : '105px', maxWidth: isSmallScreen ? '85px' : '105px' }}
               >
                 <div
                   className="flex items-center px-1 py-0 cursor-pointer flex-1 h-8 min-h-0 min-w-0"
@@ -346,7 +606,7 @@ const TabNavigation = memo(() => {
                     style={{ fontSize: isSmallScreen ? '11px' : '12px', marginRight: '2px' }}
                     title={tab.title}
                   >
-                    {tab.title.length > 8 ? `${tab.title.substring(0, 8)}...` : tab.title}
+                    {tab.title.length > 10 ? `${tab.title.substring(0, 10)}...` : tab.title}
                   </span>
                 </div>
                 {tab.closable !== false && (
@@ -389,7 +649,7 @@ const TabNavigation = memo(() => {
                      className={`flex items-center justify-between w-full px-3 py-2 text-sm ${
                        activeTabId === tab.id
                          ? 'bg-blue-100 text-blue-900 font-semibold'
-                         : 'hover:bg-gray-100'
+                         : 'hover:bg-blue-100'
                      }`}
                    >
                      <div className="flex items-center min-w-0 flex-1">
@@ -423,6 +683,85 @@ const TabNavigation = memo(() => {
                    </DropdownMenuItem>
                  ))}
                </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
+        )}
+
+        {/* Globe Button with Dropdown - positioned next to overflow menu */}
+        {isWebsiteButtonVisible && (
+          <div className="flex-shrink-0 ml-1">
+            <DropdownMenu open={isFloatingDropdownOpen} onOpenChange={setIsFloatingDropdownOpen}>
+              <DropdownMenuTrigger asChild>
+                <button
+                  className="flex items-center px-2 py-1 rounded transition-colors hover:bg-gray-100 text-gray-600 bg-transparent"
+                  style={{ fontFamily: 'inherit', fontSize: '13px', fontWeight: 500, lineHeight: '1.5', height: '24px', minHeight: '24px', paddingTop: '0', paddingBottom: '0' }}
+                  onClick={() => setIsFloatingDropdownOpen(!isFloatingDropdownOpen)}
+                >
+                  <Monitor className="h-4 w-4" />
+                </button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent 
+                align="end" 
+                side="bottom" 
+                className="w-80 max-h-96 overflow-y-auto bg-white border border-gray-200 rounded-lg shadow-xl p-0"
+                style={{ marginTop: '4px' }}
+              >
+                {/* Header */}
+                <div className="bg-gray-50 px-4 py-3 border-b border-gray-200 rounded-t-lg">
+                  <h3 className="text-sm font-semibold text-gray-800 text-center">Select Website</h3>
+                </div>
+                
+                {/* Website List */}
+                <div className="py-2">
+                  {websitesLoading ? (
+                    <div className="px-4 py-3 text-center text-gray-500">
+                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600 mx-auto mb-2"></div>
+                      Loading websites...
+                    </div>
+                  ) : websites.length === 0 ? (
+                    <div className="px-4 py-3 text-center text-gray-500">
+                      No websites found.
+                    </div>
+                  ) : (
+                    websites.map((website) => (
+                      <DropdownMenuItem
+                        key={website.id}
+                        onClick={() => handleWebsiteSelect(website.id)}
+                        className={`px-4 py-3 hover:bg-blue-50 cursor-pointer transition-colors duration-150 ${
+                          selectedWebsiteId === website.id ? 'bg-blue-100' : ''
+                        }`}
+                      >
+                        <div className="flex items-center w-full">
+                          {/* Selection Indicator */}
+                          <div className={`w-4 h-4 rounded-full border-2 mr-3 flex items-center justify-center ${
+                            selectedWebsiteId === website.id 
+                              ? 'bg-green-500 border-green-500' 
+                              : 'border-gray-300'
+                          }`}>
+                            {selectedWebsiteId === website.id && (
+                              <div className="w-2 h-2 bg-white rounded-full"></div>
+                            )}
+                          </div>
+                          
+                          {/* Website Info */}
+                          <div className="flex-1 min-w-0">
+                            <div className={`text-sm font-medium truncate ${
+                              selectedWebsiteId === website.id ? 'text-blue-900' : 'text-gray-900'
+                            }`}>
+                              {website.url.startsWith('http') ? website.url : `https://${website.url}`}
+                            </div>
+                            <div className={`text-xs truncate ${
+                              selectedWebsiteId === website.id ? 'text-blue-700' : 'text-gray-500'
+                            }`}>
+                              {website.name}
+                            </div>
+                          </div>
+                        </div>
+                      </DropdownMenuItem>
+                    ))
+                  )}
+                </div>
+              </DropdownMenuContent>
             </DropdownMenu>
           </div>
         )}

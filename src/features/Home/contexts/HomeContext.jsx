@@ -64,11 +64,23 @@ const initialState = {
       url: null, // Lazy-loaded - will be set when tab is clicked
       closable: false,
       icon: ''
+    },
+    {
+      id: 'prospecting',
+      title: 'Prospecting',
+      component: 'Prospecting',
+      type: 'iframe',
+      url: null, // Will be set when CRM prospecting is enabled
+      closable: false,
+      icon: ''
     }
   ],
   activeTabId: 'dashboard', // Set default to 'dashboard' (not in tabs array)
   helpVisible: false,
-  helpPosition: { x: typeof window !== 'undefined' ? window.innerWidth - 76 : 1320, y: typeof window !== 'undefined' ? window.innerHeight - 76 : 620 },
+  helpPosition: { 
+    x: typeof window !== 'undefined' ? window.innerWidth - 100 : 1320, 
+    y: typeof window !== 'undefined' ? window.innerHeight - 35 : 620 
+  },
   sessionData: null,
   isAuthenticated: false,
   dashboards: [],
@@ -100,9 +112,73 @@ const homeReducer = (state, action) => {
     
     case ACTIONS.REMOVE_TAB:
       const filteredTabs = state.tabs.filter(tab => tab.id !== action.payload);
-      const newActiveTab = state.activeTabId === action.payload 
-        ? (filteredTabs[filteredTabs.length - 1]?.id || 'dashboard')
-        : state.activeTabId;
+      let newActiveTab = state.activeTabId;
+      
+      // If we're removing the currently active tab, find the next best tab
+      if (state.activeTabId === action.payload) {
+        // Count active dynamic tabs BEFORE removal (excluding fixed tabs and inactive prospecting)
+        const currentActiveDynamicTabs = state.tabs.filter(tab => {
+          // Exclude fixed tabs
+          if (tab.id === 'dashboard' || tab.id === 'inbox' || tab.id === 'search') {
+            return false;
+          }
+          // Exclude inactive prospecting tab
+          if (tab.id === 'prospecting' && !tab.url) {
+            return false;
+          }
+          // Include only tabs with content
+          return tab.url || tab.component;
+        });
+        
+        // If only 1 dynamic tab remains BEFORE removal, go to Search tab
+        if (currentActiveDynamicTabs.length <= 1) {
+          if (filteredTabs.some(tab => tab.id === 'search')) {
+            newActiveTab = 'search';
+          } else if (filteredTabs.some(tab => tab.id === 'inbox')) {
+            newActiveTab = 'inbox';
+          } else if (filteredTabs.some(tab => tab.id === 'dashboard')) {
+            newActiveTab = 'dashboard';
+          }
+        } else {
+          // Find the index of the tab being removed
+          const removedTabIndex = state.tabs.findIndex(tab => tab.id === action.payload);
+          
+          // Try to go to the tab to the right first, then left
+          if (removedTabIndex < state.tabs.length - 1) {
+            // Try to go to the tab to the right
+            const rightTab = state.tabs[removedTabIndex + 1];
+            if (rightTab && filteredTabs.some(tab => tab.id === rightTab.id)) {
+              newActiveTab = rightTab.id;
+            } else if (removedTabIndex > 0) {
+              // Try to go to the tab to the left
+              const leftTab = state.tabs[removedTabIndex - 1];
+              if (leftTab && filteredTabs.some(tab => tab.id === leftTab.id)) {
+                newActiveTab = leftTab.id;
+              }
+            }
+          } else if (removedTabIndex > 0) {
+            // If it's the last tab, go to the left
+            const leftTab = state.tabs[removedTabIndex - 1];
+            if (leftTab && filteredTabs.some(tab => tab.id === leftTab.id)) {
+              newActiveTab = leftTab.id;
+            }
+          }
+          
+          // If we still don't have a valid tab, fallback to priority system
+          if (!filteredTabs.some(tab => tab.id === newActiveTab)) {
+            if (filteredTabs.some(tab => tab.id === 'search')) {
+              newActiveTab = 'search';
+            } else if (filteredTabs.some(tab => tab.id === 'inbox')) {
+              newActiveTab = 'inbox';
+            } else if (filteredTabs.some(tab => tab.id === 'dashboard')) {
+              newActiveTab = 'dashboard';
+            } else {
+              // Final fallback to last available tab
+              newActiveTab = filteredTabs[filteredTabs.length - 1]?.id || 'dashboard';
+            }
+          }
+        }
+      }
       
       return {
         ...state,
