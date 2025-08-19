@@ -951,7 +951,19 @@ const Navbar = () => {
         isOpen={isAnnouncementsPanelOpen} 
         onClose={() => setIsAnnouncementsPanelOpen(false)} 
       />
-      
+        {isMMIntegration && mmIntegrationSrc  && tabs.component === 'Dashboard' && (
+        <div>
+          {console.log(mmIntegrationSrc,'iframe mmIntegrationSrc navbar.jsx')}
+          <iframe 
+              src={mmIntegrationSrc} 
+              title="MM Integration" 
+              style={{display: 'none' }} 
+              name="mm-integration"
+              className="w-full h-full border-0 min-w-0"
+              data-tab-id="mm-integration"
+          />
+        </div>
+      )}
       
     </>
   );

@@ -5,7 +5,6 @@ import { dashboardService } from '../services/dashboardService';
 import navigationService from '../services/navigationService';
 import Navbar from './Navbar';
 import TabContent from './TabContent';
-import DashboardTab from './DashboardTab';
 import { Plus, X, ChevronDown, Monitor } from 'lucide-react';
 import {
   DropdownMenu,
