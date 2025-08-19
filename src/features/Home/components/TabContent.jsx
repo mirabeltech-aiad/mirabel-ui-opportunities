@@ -90,7 +90,7 @@ const TabContent = () => {
         default:
           if (tab.type === 'iframe' && tab.url) {
           
-            // const { mmIntegrationSrc } = useHome();
+          const { mmIntegrationSrc } = useHome();
             // Generate unique key for iframe - include reload key if present
             const iframeKey = iframeReloadKeys[tab.id] ? `${tab.id}-${iframeReloadKeys[tab.id]}` : tab.id;
             debugger;
