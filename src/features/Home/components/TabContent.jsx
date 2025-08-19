@@ -89,11 +89,8 @@ const TabContent = () => {
             break;
         default:
           if (tab.type === 'iframe' && tab.url) {
-          
-          const { mmIntegrationSrc } = useHome();
             // Generate unique key for iframe - include reload key if present
             const iframeKey = iframeReloadKeys[tab.id] ? `${tab.id}-${iframeReloadKeys[tab.id]}` : tab.id;
-            debugger;
             contentMap[tab.id] = (
               <iframe
                 src={tab.url}
@@ -105,20 +102,6 @@ const TabContent = () => {
                 style={{ maxWidth: '100vw', overflow: 'hidden' }}
               />
             );
-            console.log('TabContent.jsx')
-            console.log(tab,'tab')
-            console.log(mmIntegrationSrc,'mmIntegrationSrc');
-            
-            // {mmIntegrationSrc && tab.component === 'dashboard' && (
-            //   <iframe
-            //     src={mmIntegrationSrc}
-            //     name="mm-integration"
-            //     className="w-full h-full border-0 min-w-0"
-            //     title="MM Integration"
-            //     data-tab-id="mm-integration"
-            //     style={{ display: 'none' }}
-            //   />
-            // )}
           } else {
             contentMap[tab.id] = (
               <div className="flex items-center justify-center h-full">

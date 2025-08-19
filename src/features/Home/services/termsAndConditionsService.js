@@ -13,11 +13,12 @@ export const termsAndConditionsService = {
    */
   async getAgreementText() {
     try {
-      const clientId = getSessionData().ClientId;
-      const userId = getSessionData().UserId;
+      const sessionData = getSessionData();
+      const clientId = sessionData.ClientID;
+      const userId = sessionData.UserID;
       
       if (!clientId || !userId) {
-        throw new Error('Session data not available');
+         throw new Error('Session data not available');
       }
 
       const response = await axiosService.get(
@@ -43,7 +44,7 @@ export const termsAndConditionsService = {
       const userId = userInfo?.userId;
       
       if (!clientId || !userId) {
-        throw new Error('Session data not available');
+         throw new Error('Session data not available');
       }
 
       const response = await axiosService.post(

@@ -515,9 +515,7 @@ export const HomeProvider = ({ children, sessionLoaded = false }) => {
           // Check if URL is already a complete URL (starts with http:// or https://)
           const isCompleteUrl = dashboard.URL.startsWith('http://') || dashboard.URL.startsWith('https://');
           const baseUrl = isCompleteUrl ? '' : mkmDomain;
-          const hasAccessToken = dashboard.URL.toLowerCase().includes('accesstoken=');
-          const accessTokenParam = hasAccessToken ? '' : `&accesstoken=${accessToken}`;
-          const updatedUrl = `${baseUrl}${dashboard.URL}${accessTokenParam}`;
+          const updatedUrl = `${baseUrl}${dashboard.URL}&accesstoken=${accessToken}`;
       
           return {
             ...dashboard,
