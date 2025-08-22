@@ -89,11 +89,8 @@ const TabContent = () => {
             break;
         default:
           if (tab.type === 'iframe' && tab.url) {
-          
-            
             // Generate unique key for iframe - include reload key if present
             const iframeKey = iframeReloadKeys[tab.id] ? `${tab.id}-${iframeReloadKeys[tab.id]}` : tab.id;
-            
             contentMap[tab.id] = (
               <iframe
                 src={tab.url}

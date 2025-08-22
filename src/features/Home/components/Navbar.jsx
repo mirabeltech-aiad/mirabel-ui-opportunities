@@ -951,8 +951,6 @@ const Navbar = () => {
         isOpen={isAnnouncementsPanelOpen} 
         onClose={() => setIsAnnouncementsPanelOpen(false)} 
       />
-      
-      
     </>
   );
 };

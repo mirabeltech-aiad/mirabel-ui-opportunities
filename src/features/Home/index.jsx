@@ -81,7 +81,12 @@ const HomeContent = ({ sensors, handleDragEnd, setHelpDragHandler, showJobFuncti
       <IframeContainer
         url={mmIntegrationSrc}
         title="MM Integration"
-        style={{ display: 'none' }}
+        style={{ 
+          opacity: 0, 
+          position: 'absolute', 
+          pointerEvents: 'none',
+          zIndex: -1 
+        }}
       />
       <DndContext
         sensors={sensors}
