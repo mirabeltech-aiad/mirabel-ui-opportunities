@@ -58,9 +58,9 @@ export const navigationService = {
           // Get all required settings in a single API call
           const response = await axiosService.post(ADMIN_API.SITEWIDE_SETTINGS_GET_COLUMNNAMES, "EmailSenderType,IsRepNotificationsEnabled,IsMirabelEmailTransSendEnabled,IsCallDispositionEnabled");
           
-          if (response?.JSONContent) {
+          if (response?.content?.JSONContent) {
             // Parse the JSONContent string to get the actual data
-            const sitewideDefaults = JSON.parse(response.JSONContent);
+            const sitewideDefaults = JSON.parse(response.content.JSONContent);
             
             // Email service settings
             const isRepNotificationEnabled = sitewideDefaults.IsRepNotificationsEnabled === true || sitewideDefaults.IsRepNotificationsEnabled === 'True';
@@ -184,9 +184,9 @@ export const navigationService = {
       navigationService._apiDataPromiseCache = (async () => {
         try {
           const response = await axiosService.get(NAVIGATION_API.ENCRYPTION_KEY);  
-          if (response?.Data) {       
+          if (response?.content?.Data) {       
             // Decrypt the response data
-            const decryptedData = decrypt(response?.Data, authEncryptDecryptKey);    
+            const decryptedData = decrypt(response?.content?.Data, authEncryptDecryptKey);    
             if (decryptedData && decryptedData.trim() !== '') {
               try {
                 const data = JSON.parse(decryptedData);
@@ -230,8 +230,8 @@ export const navigationService = {
       const response = await axiosService.get(`${NAVIGATION_API.USER_MENUS}/${userId}/${siteId}`);        
     
       // Check if response has the expected structure
-      if (response?.List) {
-        const menus = response.List;
+      if (response?.content?.List) {
+        const menus = response.content.List;
         const processedMenus = await navigationService.processNavigationMenus(menus);      
         return processedMenus;
       } else {
@@ -249,8 +249,8 @@ export const navigationService = {
     loadSessionDetails: async () => {
         try {
             const response = await axiosService.get(NAVIGATION_API.SESSION_DETAILS, { withCredentials: true });          
-            if (response && response.SessionResponse) {
-                const sessionDataResponse = response.SessionResponse;
+            if (response && response.content?.SessionResponse) {
+                const sessionDataResponse = response.content.SessionResponse;
                 // Validate session data before storing
                 if (typeof sessionDataResponse === 'object' && sessionDataResponse !== null) {
                     try {
@@ -287,10 +287,13 @@ export const navigationService = {
    */
   checkJobFunctionCondition: async (userId) => {
     try {
+     
       const response = await axiosService.get(`/services/User/Accounts/CheckCondition/${userId}/-1`);
-      return !!(response?.Data || response?.content?.Data);
+      console.log('CheckJobFunctionCondition Response:'+response?.content.Data);
+      
+      return !!(response?.content.Data);
     } catch (error) {
-  
+      console.log('error CheckJobFunctionCondition Response:'+response?.content);
       return false;
     }
   },
@@ -316,6 +319,7 @@ export const navigationService = {
       return '';
     }
   },
+
 
   /**
    * Get EmailServiceSiteURL - matches backend logic exactly
@@ -577,7 +581,7 @@ export const navigationService = {
       const sessionData = localStorage.getItem('MMClientVars');
       
       if (!sessionData || sessionData === 'null' || sessionData === 'undefined') {
-        console.warn('⚠️ getSessionDetails: No valid session data found');
+      
         return null;
       }
       
@@ -586,7 +590,7 @@ export const navigationService = {
         
         // Ensure parsed data is a valid object
         if (typeof parsed !== 'object' || parsed === null || Array.isArray(parsed)) {
-          console.warn('⚠️ getSessionDetails: Session data is not a valid object');
+        
           return null;
         }
         

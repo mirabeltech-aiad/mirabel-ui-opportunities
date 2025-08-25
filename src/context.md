@@ -198,7 +198,7 @@ Each directory serves a specific purpose:
            try {
              setLoading(true);
              const response = await featureService.getData();
-             setData(response.data);
+             setData(response.);
            } catch (err) {
              setError(err);
            } finally {

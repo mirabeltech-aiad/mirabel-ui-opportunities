@@ -12,8 +12,8 @@ export const dashboardService = {
   getDashboards: async () => {
     try {
       const response = await axiosService.get(DASHBOARD_API.USER_DASHBOARDS);
-      if (response?.Status === 'Success' && response?.List) {
-        return response.List;
+      if (response?.content?.Status === 'Success' && response?.content?.List) {
+        return response.content.List;
       }else{
         return [];
       }      

@@ -2,7 +2,7 @@
  * Session Helper Functions
  * Manages user session data in localStorage
  */
-
+import { session } from './session';
 // Session storage key for MMClientVars (matching legacy ASP.NET pattern)
 const SESSION_STORAGE_KEY = 'MMClientVars';
 
@@ -162,25 +162,28 @@ export const resetSession = clearSession;
 
 /**
  * Get user information from session
- * @returns {object|null} User info object or null
+  * @returns {object|null} User info object or null
  */
 export const getUserInfo = () => {
   const sessionData = getSessionData();
   if (!sessionData) return null;
 
   return {
-    userId: sessionData.UserID || sessionData.userId,
-    userID: sessionData.UserID || sessionData.userId, // Support both formats
-    email: sessionData.Email || sessionData.email,
-    fullName: sessionData.FullName || sessionData.fullName,
-    userName: sessionData.UserName || sessionData.userName,
-    sessionId: sessionData.SessionID || sessionData.sessionId,
-    isAdmin: sessionData.IsAdmin || sessionData.isAdmin || false,
-    isSA: sessionData.IsSA || sessionData.isSA || false,
-    companyId: sessionData.CompanyID || sessionData.companyId,
-    repId: sessionData.RepID || sessionData.repId,
-    jobFunctionId: sessionData.JobFunctionID || sessionData.jobFunctionId,
-    permissions: sessionData.Permissions || sessionData.permissions || []
+    // Use the session object from src/utils/session.js for all values
+    
+
+    userId: session.UserID,
+    userID: session.UserID, // Support both formats
+    email: session.Email,
+    fullName: session.FullName,
+    userName: session.UserName,
+    sessionId: session.SessionID,
+    isAdmin: session.IsAdmin || false,
+    isSA: session.IsSA || false,
+    companyId: session.CompanyID,
+    repId: session.RepID,
+    jobFunctionId: session.JobFunctionID,
+    permissions: session.Permissions || []
   };
 };
 
@@ -203,9 +206,10 @@ export const setUserInfo = (userInfo) => {
   sessionData.RepID = userInfo.repId || userInfo.RepID;
   sessionData.JobFunctionID = userInfo.jobFunctionId || userInfo.JobFunctionID;
   sessionData.Permissions = userInfo.permissions || userInfo.Permissions || [];
-  
+    
   setSessionData(sessionData);
 };
+
 
 /**
  * Check if user session is valid
@@ -215,7 +219,6 @@ export const isSessionValid = () => {
   const sessionData = getSessionData();
   const sessionId = sessionData?.SessionID;
   const email = sessionData?.Email;
-  
   return !!(sessionId && email);
 };
 
@@ -224,8 +227,7 @@ export const isSessionValid = () => {
  * @returns {string|number|null} User ID or null if not found
  */
 export const getCurrentUserId = () => {
-  const userInfo = getUserInfo();
-  return userInfo?.userId || userInfo?.UserID || null;
+  return session.UserID;
 };
 
 /**
@@ -233,8 +235,7 @@ export const getCurrentUserId = () => {
  * @returns {string|null} User email or null if not found
  */
 export const getCurrentUserEmail = () => {
-  const userInfo = getUserInfo();
-  return userInfo?.email || userInfo?.Email || null;
+  return session.Email;
 };
 
 /**
@@ -242,8 +243,7 @@ export const getCurrentUserEmail = () => {
  * @returns {boolean} True if user is admin
  */
 export const isCurrentUserAdmin = () => {
-  const userInfo = getUserInfo();
-  return !!(userInfo?.isAdmin || userInfo?.IsAdmin || userInfo?.isSA || userInfo?.IsSA);
+  return session.IsAdmin || session.IsSA;
 };
 
 /**

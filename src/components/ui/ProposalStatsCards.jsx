@@ -51,43 +51,50 @@ const ProposalStatsCards = ({ stats }) => {
       </div>
       <div className="flex-1">
         <StatCard 
-          value={`$${stats.amount.toLocaleString()}`} 
+          value={`$${stats.amount}`} 
           label="Proposal Amount" 
           colorType="primary"
         />
       </div>
       <div className="flex-1">
         <StatCard 
-          value={stats.approved} 
-          label="Total Proposals Won" 
+          value={stats.activeProposals} 
+          label="Active Proposals" 
           colorType="success"
         />
       </div>
       <div className="flex-1">
         <StatCard 
-          value={stats.underReview} 
-          label="Total Proposals Open" 
+          value={`$${stats.activeProposalsAmount}`} 
+          label="Active Proposals Total" 
           colorType="secondary"
         />
       </div>
       <div className="flex-1">
         <StatCard 
-          value={stats.rejected} 
-          label="Total Proposals Lost" 
+          value={stats.sentProposals} 
+          label="Sent Proposals" 
           colorType="danger"
         />
       </div>
       <div className="flex-1">
         <StatCard 
-          value={`$${stats.winTotal.toLocaleString()}`} 
-          label="Proposals Win Total" 
+          value={`$${stats.sentProposalsAmount}`} 
+          label="Sent Proposals Total" 
           colorType="success"
         />
       </div>
       <div className="flex-1">
         <StatCard 
-          value={`${stats.winPercentage}%`} 
-          label="Proposals Win %" 
+          value={`${stats.approvedProposals}`} 
+          label="Approved Proposals" 
+          colorType="warning"
+        />
+      </div>
+      <div className="flex-1">
+        <StatCard 
+          value={`$${stats.approvedProposalsAmount}`} 
+          label="Approved Proposals Total" 
           colorType="warning"
         />
       </div>

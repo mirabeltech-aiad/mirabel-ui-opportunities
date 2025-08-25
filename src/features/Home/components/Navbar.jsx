@@ -902,6 +902,7 @@ const Navbar = () => {
                 />
               </div>
 
+
               {/* User Menu - Professional round profile icon */}
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>

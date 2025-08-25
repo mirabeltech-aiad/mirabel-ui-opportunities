@@ -20,6 +20,8 @@ import {
 } from '@dnd-kit/sortable';
 import useHelpDragHandler from './hooks/useHelpDragHandler';
 import IframeContainer from './components/IframeContainer';
+import SessionManager from './components/SessionManager';
+
 
 const Home = () => {
   const [showJobFunction, setShowJobFunction] = useState(false);
@@ -77,7 +79,8 @@ const HomeContent = ({ sensors, handleDragEnd, setHelpDragHandler, showJobFuncti
   const { mmIntegrationSrc } = useHome();
   
   return (
-    <>
+    <>  
+    <SessionManager />   
       <IframeContainer
         url={mmIntegrationSrc}
         title="MM Integration"

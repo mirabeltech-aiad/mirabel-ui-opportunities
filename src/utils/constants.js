@@ -12,6 +12,12 @@ export const APP_CONFIG = {
   SUPPORTED_FILE_TYPES: ['.pdf', '.doc', '.docx', '.xls', '.xlsx', '.jpg', '.jpeg', '.png', '.gif']
 };
 
+// Idle Detection Configuration
+export const IDLE_CONFIG = {
+  DEFAULT_TIMEOUT: 5 * 60 * 1000, // 1 minutes default
+  THREE_HOURS: 3 * 60 * 60 * 1000, // 3 hours
+};
+
 // Local Storage Keys
 export const STORAGE_KEYS = {
   MM_CLIENT_VARS: 'MMClientVars',

@@ -66,7 +66,7 @@ export const consultantService = {
         payload
       );
       
-      return response;
+      return response.content;
     } catch (error) {
       console.error('❌ ConsultantService: Error sending email:', error);
       throw error;

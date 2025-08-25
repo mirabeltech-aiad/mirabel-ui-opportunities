@@ -1,6 +1,10 @@
 // utils/session.js
 
-export const Session = {
+// The naming convention used here is PascalCase for the property names (e.g., UserID, Email, AccessTokenTimeOut, etc.)
+// PascalCase means each word starts with a capital letter, including the first word.
+// This is in contrast to camelCase, where the first word starts with a lowercase letter and subsequent words start with a capital letter (e.g., userId, email, accessTokenTimeOut).
+
+export const session = {
   _getVars() {
     try {
       const raw = localStorage.getItem("MMClientVars");
@@ -19,6 +23,7 @@ export const Session = {
     localStorage.removeItem("MMClientVars");
   },
 
+  // All property names below use PascalCase
   get UserID() {
     return this._getVars().UserID || null;
   },

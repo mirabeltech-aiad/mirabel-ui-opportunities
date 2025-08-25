@@ -68,7 +68,7 @@ axiosInstance.interceptors.request.use((config) => {
   // In development mode, adjust configuration for CORS
   if (isDevelopmentMode()) {
     config.metadata = { startTime: new Date() };
-    console.log(`🚀 API Request: ${config.method?.toUpperCase()} ${config.url}`);
+    //console.log(`🚀 API Request: ${config.method?.toUpperCase()} ${config.url}`);
     
     // Remove authorization header in development to avoid CORS preflight
     if (!envConfig.token) {
@@ -100,7 +100,7 @@ axiosInstance.interceptors.response.use(
   (response) => {
     if (isDevelopmentMode() && response.config.metadata) {
       const duration = new Date() - response.config.metadata.startTime;
-      console.log(`✅ API Response: ${response.status} ${response.config.url} (${duration}ms)`);
+     
     }
     return response;
   },
@@ -240,9 +240,9 @@ const handleError = (error) => {
  */
 const extractResponseContent = (responseData) => {
   // If the response has a content property, return it
-  if (responseData && typeof responseData === 'object' && responseData.content !== undefined) {
-    return responseData.content;
-  }
+  // if (responseData && typeof responseData === 'object' && responseData.content !== undefined) {
+  //   return responseData.content;
+  // }
   
   // Otherwise return the full response data
   return responseData;
@@ -256,6 +256,7 @@ const axiosService = {
   async get(url, config = {}) {
     try {
       const response = await axiosInstance.get(url, config);
+     
       return extractResponseContent(response.data);
     } catch (error) {
       throw handleError(error);

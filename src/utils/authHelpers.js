@@ -88,6 +88,8 @@ function sendLogoutInfoToMKM() {
     }
   });
 }
+
+
 /**
  * Logout function - clears session and redirects
  * @param {string} returnUrl - Optional return URL after logout
@@ -111,14 +113,9 @@ export const logout = (returnUrl = null) => {
     // Clear session storage
     sessionStorage.clear();
     
-    // In development mode, just reload
-    if (isDevelopmentMode()) {
-      console.log('🔧 Auth: Development mode - reloading instead of redirect');
-      window.location.reload();
-      return;
-    }
+    // Always redirect to logout page (same behavior for all environments)
     
-    // Redirect to logout page in production
+    
     const logoutUrl = returnUrl 
       ? `/intranet/Members/Home/Logout.aspx?ReturnUrl=${encodeURIComponent(returnUrl)}`
       : '/intranet/Members/Home/Logout.aspx';

@@ -78,7 +78,8 @@ export const AUTH_API = {
   LOGIN: '/services/auth/login',
   LOGOUT: '/services/auth/logout',
   REFRESH_TOKEN: '/intranet/Members/Home/Home.aspx/auth/refresh',
-  VALIDATE_SESSION: '/services/auth/validate'
+  CHECK_ANOTHER_SESSION: '/services/User/Logins/CheckSession',
+  UPDATE_LOGOUT_TIME: '/services/User/Logins/LogOut'
 };
 
 // Navigation APIs
@@ -116,7 +117,7 @@ export const CONSULTANT_API = {
 
 // Terms and Conditions APIs
 export const TERMS_API = {
-  AGREEMENTS_BY_USER: '/services/mm/agreements/byuser/',
+  AGREEMENTS_BY_USER: '/services/mm/agreements/',
   AGREEMENTS_ACCEPT: '/services/mm/agreements/accept/'
 };
 
@@ -125,7 +126,8 @@ export const STATIC_URLS = {
   CHANGE_PASSWORD: '/Intranet/Members/Account/ChangePassword.aspx',
   LOGOUT: '/intranet/home/logout.aspx',
   SESSION_OUT: '/sessionout',
-  CALENDAR: 'calendar.aspx'
+  CALENDAR: 'calendar.aspx',
+  LOGIN_ENDED: '/intranet/Members/User/UserLoginEnded.aspx'
 };
 
 // Legacy API constants for backward compatibility (used by userService.js)
@@ -165,3 +167,124 @@ export const API_ENDPOINTS = {
   ...TERMS_API,
   ...STATIC_URLS
 };
+
+export const API_URLS = {
+    // Activities
+    ACTIVITIES: '/services/Crm/Activities',
+  
+    // Admin
+    ADMIN: {
+      BUSINESS_UNITS: '/services/admin/BusinessUnits/ByCriteria/true/-1',
+      PRODUCTS_MASTER: '/services/Admin/Products/Master/-1/true/-1/1',
+      PRODUCTS_BY_CRITERIA: '/services/Admin/Products/ByCriteria/',
+      OPPORTUNITY_STAGES: '/services/Admin/Opportunities/Stage/',
+      OPPORTUNITY_TYPES: '/services/Admin/Opportunities/Type',
+      OPPORTUNITY_LOSS_REASONS: '/services/Admin/Opportunities/lossreason/',
+    },
+  
+    // Contacts & CRM
+    CONTACTS: {
+      EDIT_DETAILS: (contactId) => `/services/Crm/Contacts/EditDetails/${contactId}/1`,
+      CONTACT_DETAILS: (contactId) => `/services/Crm/Contacts/Contacts/${contactId}`,
+      DISTINCT_CUSTOMERS: '/services/crm/contacts/GetDistinctCustomers/1/false/false/false/false',
+      DISTINCT_CUSTOMER_EMAILS: '/services/crm/contacts/GetCustomerEmails',
+    },
+  
+    // Opportunities
+    OPPORTUNITIES: {
+      BASE: '/services/Opportunities',
+      DETAILS: (opportunityId) => `/services/Opportunities/${opportunityId}`,
+      HISTORY: (opportunityId) => `/services/Opportunities/History/${opportunityId}/10/1`,
+      UPDATE_STAGE: (opportunityId, userId) => `/Services/Opportunities/Field/PipelineStageID/${opportunityId}/0/${userId}/Insert`,
+      REPORT_ALL: '/services/opportunities/report/all/',
+    },
+  
+    // Proposals
+    PROPOSALS: {
+      BY_CRITERIA: '/services/production/proposals/bycriteria/ALL',
+    },
+  
+    // User Management
+    USER: {
+      ACCOUNTS_MASTER: (userId) => `/services/User/Accounts/Master/${userId}/false/true`,
+    },
+  
+    // Reports & Analytics
+    REPORTS: {
+      SETTINGS: (userId, viewId) => `Reports/Settings/${userId}/${viewId}`,
+      SETTINGS_UPDATE: 'Reports/Settings/',
+      EXECUTIVE_DASHBOARD: 'services/admin/common/production/executesp/',
+      STORED_PROCEDURE: 'services/admin/common/production/executesp/',
+      OPPORTUNITY_STATS: '/services/admin/common/production/executesp/',
+    },
+  
+    // Advanced Search
+    ADVANCED_SEARCH: {
+      RESULT_VIEW_COLUMN_OPPORTUNITIES: '/services/AdvSearches/ResultViewColumn/1/1/-1',
+      RESULT_VIEW_COLUMN_PROPOSALS: '/services/AdvSearches/ResultViewColumn/1/2/-1',
+    },
+  
+    // Views
+    VIEWS: {
+      SAVED_VIEWS: '/services/AdvSearches/Views//1/0/1',
+      PROPOSAL_VIEWS: '/services/AdvSearches/Views//1/0/2',
+      AVAILABLE_COLUMNS: '/services/AdvSearches/Views/Column/EMPTY/1',
+      PROPOSAL_AVAILABLE_COLUMNS: '/services/AdvSearches/Views/Column/Production/1',
+      VIEW_DETAILS: (viewId) => `/services/AdvSearches/Views/1/${viewId}`,
+      SAVE_CUSTOM_VIEW: '/services/AdvSearches/Views/',
+      UPDATE_VIEW: '/services/AdvSearches/Views/Update',
+      DELETE_PROPOSAL_VIEW: (viewId, userId) => `/services/crm/contacts/search/ListViewItem/${viewId}/${userId}/1`,
+    },
+  
+    // Masters & Dropdowns
+    MASTERS: {
+      LEAD_SOURCES: '/services/Admin/Masters/MasterData/LeadSources',
+      LEAD_TYPES: '/services/Admin/Masters/MasterData/LeadTypes',
+      LEAD_STATUS: '/services/Admin/Masters/MasterData/LeadStatus',
+      PROSPECTING_STAGES: '/services/Admin/Masters/MasterData/ProspectingStages',
+      OPPORTUNITY_LOSS_REASON: '/services/Masters/opportunitylossreason',
+      CONTACT_COUNTRIES: '/services/Admin/Masters/MasterData/ContactCountries',
+      CONTACT_STATES: '/services/Admin/Masters/MasterData/ContactStates',
+      CONTACT_CITIES: '/services/Admin/Masters/MasterData/ContactCities',
+      CONTACT_COUNTIES: '/services/Admin/Masters/MasterData/ContactCounties',
+      OPPORTUNITY_SOURCE: '/services/Admin/Opportunities/Opportunity/Source/',
+      OPPORTUNITY_STATUS: '/services/Admin/Opportunities/Status/',
+      OPPORTUNITY_PROBABILITY: '/services/Admin/Opportunities/Probability/',
+      PROPOSAL_STAGES: '/services/production/stages/proposal',
+      SAVED_SEARCHES: '/services/crm/contacts/search/SavedSearchesList/22/-1/1',
+    },
+  
+    // CRM & General
+    CRM: {
+      OPPORTUNITIES_BY_CRITERIA: '/services/CRM/Opportunities/ByCriteria/0/0/0/false/false/1/25',
+      ACTIVITIES_SAVE: '/services/crm/activities/save',
+      CONTACTS_UPDATE: '/services/Crm/Contacts/Update',
+    },
+
+    // Saved Searches
+    SAVED_SEARCH: {
+      BASE: '/services/SavedSearch/',
+      RECENT_OPPORTUNITIES: '/services/SavedSearch/RecentView/1/Recent Search/-1',
+      RECENT_PROPOSALS: '/services/SavedSearch/RecentView/1/Recent Search/2',
+    },
+
+    // Additional Masters & Admin
+    ADMIN_EXTENDED: {
+      TASK_LIST_PRIORITY: '/services/Admin/Masters/TaskListPriority',
+      ACTIVITY_TYPES: '/services/Admin/Masters/MasterData/ActivityTypes',
+      PROSPECTING_STAGES_COLORS: '/services/prospectingstages',
+    },
+
+    // User & Views
+    USER_EXTENDED: {
+      PAGE_VIEW_SAVE: '/bl/rep/saveUserPageView',
+    },
+  
+    // Import/Export
+    IMPORT_EXPORT: {
+      EXPORT_OPPORTUNITIES: '/services/ImportExport/Opportunities/export/',
+      IMPORT_OPPORTUNITIES: '/services/ImportExport/Opportunities/import/',
+    },
+  };
+  
+  export default API_URLS;

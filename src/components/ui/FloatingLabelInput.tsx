@@ -20,6 +20,8 @@ interface FloatingLabelInputProps {
   minHeight?: string;
   placeholder?: string;
   disabled?: boolean;
+  error?: string;
+  
 }
 
 /**
@@ -41,6 +43,7 @@ const FloatingLabelInput: React.FC<FloatingLabelInputProps> = ({
   minHeight = "80px",
   placeholder,
   disabled = false,
+  error=""
 }) => {
   const [isFocused, setIsFocused] = useState(false);
 
@@ -66,9 +69,12 @@ const FloatingLabelInput: React.FC<FloatingLabelInputProps> = ({
   const readOnlyClasses = readOnly ? "bg-gray-100 border-gray-300 text-gray-600" : "";
   const disabledClasses = disabled ? "cursor-not-allowed opacity-50" : "";
   
+  // Add error border and focus ring if error is present
+  const hasError = !!error && error.length > 0;
+  const errorInputClasses = hasError ? "border-red-500 focus-visible:ring-red-500" : "";
   const inputClasses = isTextarea 
-    ? cn(`min-h-[${minHeight}] rounded-md`, baseInputClasses, readOnlyClasses, disabledClasses, className)
-    : cn("h-12 rounded-md", baseInputClasses, readOnlyClasses, disabledClasses, className);
+    ? cn(`min-h-[${minHeight}] rounded-md`, baseInputClasses, readOnlyClasses, disabledClasses, className, errorInputClasses)
+    : cn("h-12 rounded-md", baseInputClasses, readOnlyClasses, disabledClasses, className, errorInputClasses);
 
   const labelClasses = cn(
     "absolute left-3 transition-all duration-200 pointer-events-none z-10 px-1",
@@ -137,6 +143,11 @@ const FloatingLabelInput: React.FC<FloatingLabelInputProps> = ({
       >
         {label}{required ? " *" : ""}
       </Label>
+      {hasError && (
+        <p id={`${id}-error`} className="mt-1 text-xs text-red-600">
+          {error}
+        </p>
+      )}
     </div>
   );
 };

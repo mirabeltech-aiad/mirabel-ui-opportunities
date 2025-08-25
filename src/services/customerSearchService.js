@@ -75,7 +75,7 @@ export const customerSearchService = {
       }
 
       const response = await axiosService.get(`/crm/contacts/search/byrep/${repId}`);
-      return response.data?.List || [];
+      return response.List || [];
     } catch (error) {
       console.error('Error searching customers by rep:', error);
       return [];
@@ -94,7 +94,7 @@ export const customerSearchService = {
       }
 
       const response = await axiosService.get(`/crm/contacts/${customerId}`);
-      return response.data;
+      return response;
     } catch (error) {
       console.error('Error getting customer by ID:', error);
       throw error;

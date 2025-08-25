@@ -171,19 +171,8 @@ const Settings = () => {
               <div className="flex items-center justify-between">
                 <div>
                   <Label htmlFor="sessionTimeout">Session Timeout</Label>
-                  <p className="text-sm text-gray-600">Automatically log out after inactivity</p>
+                  <p className="text-sm text-gray-600">Time before automatic logout</p>
                 </div>
-                <Select defaultValue="8">
-                  <SelectTrigger className="w-32">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="1">1 hour</SelectItem>
-                    <SelectItem value="4">4 hours</SelectItem>
-                    <SelectItem value="8">8 hours</SelectItem>
-                    <SelectItem value="24">24 hours</SelectItem>
-                  </SelectContent>
-                </Select>
               </div>
             </CardContent>
           </Card>

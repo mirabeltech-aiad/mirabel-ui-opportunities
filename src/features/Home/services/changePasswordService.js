@@ -34,7 +34,7 @@ export const changePasswordService = {
       const resetTypeValue = changePasswordValue === changePasswordService.CHANGEPASSWORD_PASSWORDWEAK ? "true" : "false";
       
       // Build the URL with query parameters matching backend logic
-      const url = `${STATIC_URLS.CHANGE_PASSWORD}?loginId=${encodeURIComponent(encryptedLoginId)}&enabled=true&rtype=${resetTypeValue}&CUI=${encodeURIComponent(cultureUI)}`;
+      const url = `${STATIC_URLS.CHANGE_PASSWORD}?loginId=${encryptedLoginId}&enabled=true&rtype=${resetTypeValue}&CUI=${cultureUI}`;
       
       
       return url;

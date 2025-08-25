@@ -35,7 +35,7 @@ const JobFunctionNotification = ({ isOpen, onClose }) => {
     setError(null);
     try {
       const res = await axiosService.get(JOB_FUNCTIONS_API);
-      const list = res?.Data?.JobFunction || [];
+      const list = res?.content?.Data?.JobFunction || [];
       setJobFunctions(list);
     } catch (e) {
       setError('Failed to load job functions.');

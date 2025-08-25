@@ -12,11 +12,11 @@ import {
   getUserInfo,
   resetSession,
   isSameSession,
-  setClientSession,
 } from "../utils/sessionHelpers";
 import { AUTH_ERRORS, getMainLoginUrl, logout } from "../utils/authHelpers";
-import { isDevelopmentMode, sessionValues } from '../utils/developmentHelper';
 import { AUTH_API } from "@/utils/apiUrls";
+import { useIdleDetectionWithWarning } from "@/features/Home/hooks/useIdleDetectionWithWarning";
+import { getIdleDetectionPreferences } from "@/features/Home/services/idleDetectionService";
 
 const AuthContext = createContext();
 
@@ -33,6 +33,23 @@ export const AuthProvider = ({ children }) => {
   const [isAuthenticating, setIsAuthenticating] = useState(false);
   const [authError, setAuthError] = useState(null);
   const [loading, setLoading] = useState(true);
+
+  // Get idle detection preferences
+  const preferences = getIdleDetectionPreferences();
+  
+  // Initialize global idle detection using existing logout function
+  const {
+    showWarning,
+    remainingTime,
+    extendSession,
+    closeWarning,
+    enabled,
+    timeout,
+    warningTime
+  } = useIdleDetectionWithWarning(
+    preferences.timeout,
+    preferences.enabled
+  );
 
   // Initialize authentication state
   useEffect(() => {
@@ -206,6 +223,16 @@ export const AuthProvider = ({ children }) => {
     hasPermission,
     updateUser,
     detectSession,
+    // Idle detection state
+    idleDetection: {
+      showWarning,
+      remainingTime,
+      extendSession,
+      closeWarning,
+      enabled,
+      timeout,
+      warningTime
+    }
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

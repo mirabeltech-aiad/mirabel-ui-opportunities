@@ -12,7 +12,7 @@ const Reports = lazy(() => import('./Reports'));
 const Settings = lazy(() => import('./Settings'));
 
 const TabContent = () => {
-  const { tabs, activeTabId } = useHome();
+  const { tabs, activeTabId,mmIntegrationSrc } = useHome();
   const activeTab = tabs.find(tab => tab.id === activeTabId);
   
   // State to track iframe reload triggers for specific tabs
@@ -100,8 +100,10 @@ const TabContent = () => {
                 data-tab-id={tab.id}
                 key={iframeKey} // Use dynamic key to force reload when needed
                 style={{ maxWidth: '100vw', overflow: 'hidden' }}
-              />
-            );
+              />)
+           
+        
+            
           } else {
             contentMap[tab.id] = (
               <div className="flex items-center justify-center h-full">

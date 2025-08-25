@@ -128,9 +128,8 @@ export const initializeDevelopmentEnvironment = () => {
         // Set session data in localStorage
         localStorage.setItem("MMClientVars", JSON.stringify(sessionValues));
         sessionStorage.setItem("ClientID", sessionValues.ClientID);
-        
+
         console.log('✅ Development session initialized');
     }
 };
 
- 

@@ -11,6 +11,7 @@ import {
 import { X } from "lucide-react";
 import { cn } from "@/lib/utils";
 
+type AnyOption = Record<string, unknown>;
 interface SelectOption {
   value: string;
   label: string;
@@ -21,12 +22,15 @@ interface FloatingLabelSelectProps {
   label: string;
   value: string;
   onChange: (value: string) => void;
-  options: string[] | SelectOption[];
+  options: Array<string | AnyOption>;
   placeholder?: string;
   required?: boolean;
   className?: string;
   disabled?: boolean;
   allowClear?: boolean;
+  optionValueKey?: string; // key to read the option's value (default: "value")
+  optionLabelKey?: string; // key to read the option's label/text (default: "label")
+  error?: string;
 }
 
 /**
@@ -44,8 +48,11 @@ const FloatingLabelSelect: React.FC<FloatingLabelSelectProps> = ({
   className = "",
   disabled = false,
   allowClear = true,
+  optionValueKey = "value",
+  optionLabelKey = "label",
+  error = "",
 }) => {
-  const isStringArray = (opts: string[] | SelectOption[]): opts is string[] => {
+  const isStringArray = (opts: Array<string | AnyOption>): opts is string[] => {
     // Add validation to handle undefined, null, or empty arrays
     if (!opts || !Array.isArray(opts) || opts.length === 0) {
       return false;
@@ -56,18 +63,30 @@ const FloatingLabelSelect: React.FC<FloatingLabelSelectProps> = ({
   // Safely handle value - convert to string and handle null/undefined
   const safeValue = value != null ? String(value) : '';
   const hasValue = safeValue && safeValue.trim() !== '';
+  const hasError = typeof error === 'string' && error.trim().length > 0;
+
+  // Utilities to extract value/label from an option object
+  const getObjValue = (obj: AnyOption): string => {
+    const v = (obj?.[optionValueKey] ?? obj?.value ?? obj?.Value ?? obj?.id ?? obj?.ID);
+    return v != null ? String(v) : '';
+  };
+  const getObjLabel = (obj: AnyOption): string => {
+    const v = (obj?.[optionLabelKey] ?? obj?.label ?? obj?.Label ?? obj?.Display ?? obj?.Source);
+    return v != null ? String(v) : '';
+  };
+
+  const getOptionValue = (opt: string | AnyOption): string =>
+    typeof opt === 'string' ? opt : getObjValue(opt);
+
+  const getOptionLabel = (opt: string | AnyOption): string =>
+    typeof opt === 'string' ? opt : getObjLabel(opt);
 
   // Check if the current value exists in the options
   const valueExistsInOptions = () => {
     if (!options || !Array.isArray(options) || options.length === 0) {
       return false;
     }
-    
-    if (isStringArray(options)) {
-      return options.includes(safeValue);
-    } else {
-      return options.some(option => option.value === safeValue);
-    }
+    return options.some((opt) => getOptionValue(opt) === safeValue);
   };
 
   const handleClear = (e: React.MouseEvent) => {
@@ -110,23 +129,17 @@ const FloatingLabelSelect: React.FC<FloatingLabelSelectProps> = ({
       );
     }
 
-    if (isStringArray(options)) {
-      optionElements.push(
-        ...options.map((option) => (
-          <SelectItem key={option} value={option}>
-            {option}
+    optionElements.push(
+      ...options.map((opt) => {
+        const v = getOptionValue(opt);
+        const l = getOptionLabel(opt);
+        return (
+          <SelectItem key={v} value={v}>
+            {l}
           </SelectItem>
-        ))
-      );
-    } else {
-      optionElements.push(
-        ...options.map((option) => (
-          <SelectItem key={option.value} value={option.value}>
-            {option.label}
-          </SelectItem>
-        ))
-      );
-    }
+        );
+      })
+    );
 
     return optionElements;
   };
@@ -134,7 +147,7 @@ const FloatingLabelSelect: React.FC<FloatingLabelSelectProps> = ({
   const labelClasses = cn(
     "absolute left-3 transition-all duration-200 pointer-events-none z-10 px-1",
     hasValue 
-      ? "top-1.5 text-xs text-primary bg-background" 
+      ? cn("top-1.5 text-xs bg-background", hasError ? "text-red-600" : "text-primary") 
       : "top-3.5 text-base text-muted-foreground bg-transparent"
   );
 
@@ -147,11 +160,21 @@ const FloatingLabelSelect: React.FC<FloatingLabelSelectProps> = ({
       >
         <SelectTrigger 
           id={id} 
-          className="h-12 pt-6 pb-2 px-3 w-full min-w-0 focus:ring-2 focus:ring-ocean-500 focus:ring-offset-2" 
+          className={cn(
+            "h-12 pt-6 pb-2 px-3 w-full min-w-0 border focus:ring-2 focus:ring-offset-2",
+            hasError ? "border-red-500 focus:ring-red-500" : "border-input focus:ring-ocean-500"
+          )}
           aria-required={required}
+          aria-invalid={hasError || undefined}
+          aria-describedby={hasError ? `${id}-error` : undefined}
+          title={hasError ? error : undefined}
         >
           <SelectValue placeholder="">
-            {hasValue ? safeValue : ""}
+            {hasValue
+              ? (options.find((opt) => getOptionValue(opt) === safeValue) 
+                  ? getOptionLabel(options.find((opt) => getOptionValue(opt) === safeValue) as string | AnyOption)
+                  : safeValue)
+              : ""}
           </SelectValue>
           {hasValue && allowClear && !disabled && (
             <button
@@ -174,8 +197,13 @@ const FloatingLabelSelect: React.FC<FloatingLabelSelectProps> = ({
       >
         {label}{required ? " *" : ""}
       </Label>
+      {hasError && (
+        <p id={`${id}-error`} className="mt-1 text-xs text-red-600">
+          {error}
+        </p>
+      )}
     </div>
   );
-};
+}
 
 export default FloatingLabelSelect;

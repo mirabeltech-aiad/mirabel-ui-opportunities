@@ -330,7 +330,7 @@ const homeReducer = (state, action) => {
         dashboardMenuItems: action.payload
       };
     
-       default:
+    default:
       return state;
   }
 };
@@ -399,8 +399,7 @@ export const HomeProvider = ({ children, sessionLoaded = false }) => {
           const marketingManagerSiteURL = await navigationService.getMarketingManagerSiteURL(mkmSite,mmClientVars,'/AssignData.aspx');
           if (marketingManagerSiteURL) {
             mmIntegrationSrc = marketingManagerSiteURL + '&accesstoken=' + mmClientVars.Token;
-            console.log('🔗 MM Integration URL constructed:', mmIntegrationSrc);
-          }
+           }
         } catch (error) {
           console.error('Error fetching MarketingManagerSiteURL:', error);
         }
@@ -883,7 +882,7 @@ export const HomeProvider = ({ children, sessionLoaded = false }) => {
     dispatch({ type: ACTIONS.CLEAR_SESSION });
   };
 
-  const setDashboards = (dashboards) => {
+   const setDashboards = (dashboards) => {
     dispatch({ type: ACTIONS.SET_DASHBOARDS, payload: dashboards });
   };
 
