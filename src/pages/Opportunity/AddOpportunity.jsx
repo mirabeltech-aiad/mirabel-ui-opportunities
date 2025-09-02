@@ -63,7 +63,8 @@ const AddOpportunity = () => {
         className: "border-green-200 bg-green-50 text-green-900 shadow-lg",
         duration: 4000,
       });
-      navigate(-1);
+      // Navigate to opportunities page instead of using browser back
+      navigate("/opportunities");
     }
   };
 
@@ -72,7 +73,8 @@ const AddOpportunity = () => {
   };
 
   const handleCancel = () => {
-    navigate(-1);
+    // Navigate to opportunities page instead of using browser back
+    navigate("/opportunities");
   };
 
   const handleLinkProposal = () => {

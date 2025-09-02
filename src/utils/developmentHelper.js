@@ -2,9 +2,9 @@
 
 // Development API Configuration - Core credentials for API calls
 export const devApiConfig = {
-    "baseUrl":  "https://smoke-feature21.magazinemanager.com",
-    "domain": "smoke-feature13",
-    "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJMb2dnZWRJblVzZXJJRCI6IjIzIiwiTG9nZ2VkSW5TaXRlQ2xpZW50SUQiOiIxMDAxNSIsIkxvZ2dlZEluU2l0ZUN1bHR1cmVVSSI6ImVuLVVTIiwiRGF0ZVRpbWUiOiI5LzIvMjAyNSAxMDowNDo1NCBBTSIsIkxvZ2dlZEluU2l0ZUN1cnJlbmN5U3ltYm9sIjoiIiwiTG9nZ2VkSW5TaXRlRGF0ZUZvcm1hdCI6IiIsIkRvbWFpbiI6InNtb2tlLWZlYXR1cmUyMSIsIkxvZ2dlZEluU2l0ZVRpbWVBZGQiOlsiMCIsIjAiXSwiU291cmNlIjoiVE1NIiwiRW1haWwiOiJzYUBtYWdhemluZW1hbmFnZXIuY29tIiwiSXNBUElVc2VyIjoiRmFsc2UiLCJFeHRlcm5hbEF1dGgiOiIiLCJuYmYiOjE3NTY4MDc0OTQsImV4cCI6MTc1OTgwNzQ5NCwiaWF0IjoxNzU2ODA3NDk0LCJpc3MiOiJNYWdhemluZU1hbmFnZXIiLCJhdWQiOiIqIn0.kjhDi-MfTvKUATb8IFwaLtkkk5_QVmX3eRcdP9Mm45s"
+    "baseUrl": "https://smoke-feature21.magazinemanager.com",
+    "domain": "smoke-feature21",
+    "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJMb2dnZWRJblVzZXJJRCI6IjIzIiwiTG9nZ2VkSW5TaXRlQ2xpZW50SUQiOiIxMDAxNSIsIkxvZ2dlZEluU2l0ZUN1bHR1cmVVSSI6ImVuLVVTIiwiRGF0ZVRpbWUiOiI5LzIvMjAyNSAxMTo1NTowMSBBTSIsIkxvZ2dlZEluU2l0ZUN1cnJlbmN5U3ltYm9sIjoiIiwiTG9nZ2VkSW5TaXRlRGF0ZUZvcm1hdCI6IiIsIkRvbWFpbiI6InNtb2tlLWZlYXR1cmUyMSIsIkxvZ2dlZEluU2l0ZVRpbWVBZGQiOlsiMCIsIjAiXSwiU291cmNlIjoiVE1NIiwiRW1haWwiOiJzYUBtYWdhemluZW1hbmFnZXIuY29tIiwiSXNBUElVc2VyIjoiRmFsc2UiLCJFeHRlcm5hbEF1dGgiOiIiLCJuYmYiOjE3NTY4MTQxMDEsImV4cCI6MTc1OTgxNDEwMSwiaWF0IjoxNzU2ODE0MTAxLCJpc3MiOiJNYWdhemluZU1hbmFnZXIiLCJhdWQiOiIqIn0.S2IHgttLL0BzPGD-MsexonQJLuJSuxGdJCdSOh7IPsg"
 };
 // export const devApiConfig = {
 //     "baseUrl":  "http://localhost",
@@ -24,57 +24,57 @@ export const getValue = () => {
 };
 // Development session values - references devApiConfig
 export const sessionValues = {
-  // Core API credentials - referenced from devApiConfig
-  "UserID": 1,
-  "Email": "sa@magazinemanager.com",
-  "Token": devApiConfig.token,
-  "Domain": devApiConfig.domain,
-  "Host": devApiConfig.baseUrl,
-  
-  // Authentication & Session
-  "AccessTokenTimeOut": "2025-09-04T01:47:49.87",
-  "IsAuthenticated": false,
-  "ChangePassword": false,
-  
-  // Client & Company Information
-  "ClientID": 9920,
-  "CompanyName": "Mirabel Development | Test site",
-  "CultureUI": "en-us",
-  "SiteType": "",
-  "TimeAdd": 0,
-  
-  // Package & Product Configuration
-  "PackageTypeID": 3,
-  "ProductType": "10182",
-  "PASubProductTypeId": 0,
-  "PASubProductTypeName": "",
-  "BSASubProductTypeId": 21,
-  "BSASubProductTypeName": "Broadstreet",
-  
-  // Feature Flags & Permissions
-  "IsMKMEnabled": true,
-  "IsUserHasMKMAccess": true,
-  "IsSiteDataPackEnabled": false,
-  "IsUserHasDataPackAccess": false,
-  "IsMirabelEmailServiceEnabled": false,
-  "IsRepNotificationEnabled": false,
-  "CanSendCRMEmail": true,
-  
-  // User Profile Information
-  "UserName": "sa@magazinemanager.com",
-  "EmployeeID": 1,
-  "FirstName": "System",
-  "LastName": "Administrator",
-  "FullName": "System Administrator",
-  "DisplayName": "System Administrator",
-  "IsAdmin": true,
-  "IsSA": true,
-  "UserNameID": 1,
-  "SalesRepName": "System Administrator",
-  "DepartmentID": "1",
-  
-  // Content & Version
-  "ContentVersion": null
+    // Core API credentials - referenced from devApiConfig
+    "UserID": 1,
+    "Email": "sa@magazinemanager.com",
+    "Token": devApiConfig.token,
+    "Domain": devApiConfig.domain,
+    "Host": devApiConfig.baseUrl,
+
+    // Authentication & Session
+    "AccessTokenTimeOut": "2025-09-04T01:47:49.87",
+    "IsAuthenticated": false,
+    "ChangePassword": false,
+
+    // Client & Company Information
+    "ClientID": 9920,
+    "CompanyName": "Mirabel Development | Test site",
+    "CultureUI": "en-us",
+    "SiteType": "",
+    "TimeAdd": 0,
+
+    // Package & Product Configuration
+    "PackageTypeID": 3,
+    "ProductType": "10182",
+    "PASubProductTypeId": 0,
+    "PASubProductTypeName": "",
+    "BSASubProductTypeId": 21,
+    "BSASubProductTypeName": "Broadstreet",
+
+    // Feature Flags & Permissions
+    "IsMKMEnabled": true,
+    "IsUserHasMKMAccess": true,
+    "IsSiteDataPackEnabled": false,
+    "IsUserHasDataPackAccess": false,
+    "IsMirabelEmailServiceEnabled": false,
+    "IsRepNotificationEnabled": false,
+    "CanSendCRMEmail": true,
+
+    // User Profile Information
+    "UserName": "sa@magazinemanager.com",
+    "EmployeeID": 1,
+    "FirstName": "System",
+    "LastName": "Administrator",
+    "FullName": "System Administrator",
+    "DisplayName": "System Administrator",
+    "IsAdmin": true,
+    "IsSA": true,
+    "UserNameID": 1,
+    "SalesRepName": "System Administrator",
+    "DepartmentID": "1",
+
+    // Content & Version
+    "ContentVersion": null
 };
 
 

@@ -42,7 +42,6 @@ const EditOpportunity = () => {
   }, []);
 
   const handleSave = async () => {
-    console.log("Save button clicked - calling saveOpportunity function");
     const success = await saveOpportunity();
     if (success) {
       toast({
@@ -66,12 +65,14 @@ const EditOpportunity = () => {
         className: "border-green-200 bg-green-50 text-green-900 shadow-lg",
         duration: 4000,
       });
-      navigate(-1);
+      // Navigate to opportunities page instead of using browser back
+      navigate("/opportunities");
     }
   };
 
   const handleCancel = () => {
-    navigate(-1);
+    // Navigate to opportunities page instead of using browser back
+    navigate("/opportunities");
   };
 
   const handleLinkProposal = () => {
