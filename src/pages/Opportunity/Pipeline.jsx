@@ -1388,7 +1388,7 @@ const Pipeline = () => {
 
   return (
     <div className="flex-1 flex flex-col bg-white w-full overflow-x-hidden">
-      <div className="w-full px-2 py-2 flex-1 overflow-auto mx-0">
+      <div className="w-full px-2 py-1 flex-1 overflow-auto mx-0">
         <div className="flex items-center justify-between mb-2">
           <h1 className="text-2xl font-bold text-[#1a4d80]"></h1>
         </div>

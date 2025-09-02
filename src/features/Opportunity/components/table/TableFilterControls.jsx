@@ -451,7 +451,7 @@ const TableFilterControls = ({
                 >
                   <button
                     type="button"
-                    className="flex items-center h-9 text-sm outline-none bg-white w-full justify-between px-3 hover:bg-gray-50 transition-colors min-w-[80px] max-w-[120px] focus:bg-blue-50"
+                    className="flex items-center h-9 text-sm outline-none bg-white w-full justify-between px-3 hover:bg-gray-50 transition-colors min-w-[80px] max-w-[180px] focus:bg-blue-50"
                     onClick={handleRepDropdownToggle}
                     aria-haspopup="listbox"
                     aria-expanded={repDropdownOpen}
@@ -663,7 +663,7 @@ const TableFilterControls = ({
                       className="gap-1 text-white h-8 px-2 bg-ocean-500 hover:bg-ocean-600 border-ocean-500 text-xs"
                     >
                       <Search className="h-3 w-3" />
-                      Search
+                      Filter
                     </Button>
                   </TooltipTrigger>
                   <TooltipContent side="bottom" sideOffset={5}>

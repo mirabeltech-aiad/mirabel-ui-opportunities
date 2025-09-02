@@ -654,7 +654,7 @@ const OpportunityTableRow = ({
       case "name":
       case "opportunityName":
         return (
-          <span className="font-medium text-blue-600 text-sm cursor-pointer hover:text-blue-700 transition-colors">
+          <span className="font-medium text-blue-600 text-sm cursor-pointer hover:text-blue-700 transition-colors underline">
             {value || "Untitled Opportunity"}
           </span>
         );
@@ -701,7 +701,11 @@ const OpportunityTableRow = ({
           </div>
         );
       case "assignedRep":
-        return <UserAvatar user={value || opportunity.assignedRep} />;
+        return (
+          <div className="flex justify-center">
+            <UserAvatar user={value || opportunity.assignedRep} />
+          </div>
+        );
       case "createdBy":
         return <UserAvatar user={value || opportunity.createdBy} />;
       case "salesPresenter":
@@ -983,7 +987,7 @@ const OpportunityTableRow = ({
         title="Click to select, double-click to edit"
       >
         {!isSplitScreenMode && (
-          <TableCell className="w-12 px-4 py-2.5">
+          <TableCell className="w-12 px-4 py-1.5">
             <Checkbox
               checked={isSelected}
               onCheckedChange={(checked) => onSelect(checked)}
@@ -992,7 +996,7 @@ const OpportunityTableRow = ({
             />
           </TableCell>
         )}
-        <TableCell className="w-12 px-2 py-2.5">
+        <TableCell className="w-12 px-2 py-1.5">
           <Button
             variant="ghost"
             size="sm"
@@ -1006,12 +1010,14 @@ const OpportunityTableRow = ({
         {columnOrder.map((column) => (
           <TableCell
             key={column.id}
-            className="px-4 py-2.5 text-sm border-r border-gray-50 last:border-r-0 overflow-hidden"
+            className={`px-4 py-1.5 text-sm border-r border-gray-50 last:border-r-0 overflow-hidden ${
+              column.id === 'AssignedTo' ? 'text-center' : ''
+            }`}
             style={{
               width: columnWidths[column.id]
                 ? `${columnWidths[column.id]}px`
                 : undefined,
-              minWidth: "150px",
+              minWidth: column.id === 'Status' ? "70px" : column.id === 'AssignedTo' ? "90px" : column.id === 'Probability' ? "90px" : column.id === 'Amount' ? "90px" : "150px",
               maxWidth: columnWidths[column.id]
                 ? `${columnWidths[column.id]}px`
                 : "250px",

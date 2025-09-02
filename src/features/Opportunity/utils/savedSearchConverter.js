@@ -51,6 +51,11 @@ export const convertApiPayloadToFormFields = (apiPayload) => {
         }
         return formattedValue.replace(/IN=|~/g, '');
       } else if (format === 'date') {
+        // Handle ISO date format (with T and Z)
+        if (formattedValue && formattedValue.includes('T')) {
+          const isoDate = new Date(formattedValue);
+          return isoDate.toISOString().split('T')[0];
+        }
         // Convert MM/DD/YYYY format to YYYY-MM-DD format for HTML5 date inputs
         if (formattedValue && formattedValue.match(/^\d{1,2}\/\d{1,2}\/\d{4}$/)) {
           const [month, day, year] = formattedValue.split('/');
@@ -116,10 +121,12 @@ export const convertApiPayloadToFormFields = (apiPayload) => {
     
     if (apiPayload.CreatedFrom) {
       formFields.createdDateFrom = extractValue(apiPayload.CreatedFrom, 'date');
+      formFields.createdFrom = extractValue(apiPayload.CreatedFrom, 'date');
     }
     
     if (apiPayload.CreatedTo) {
       formFields.createdDateTo = extractValue(apiPayload.CreatedTo, 'date');
+      formFields.createdTo = extractValue(apiPayload.CreatedTo, 'date');
     }
     
     if (apiPayload.CloseFrom) {
@@ -131,7 +138,9 @@ export const convertApiPayloadToFormFields = (apiPayload) => {
       formFields.projectedCloseDateTo = extractValue(apiPayload.CloseTo, 'date');
       formFields.closeDateTo = extractValue(apiPayload.CloseTo, 'date');
     }
-    
+
+
+
     if (apiPayload.ActualCloseFrom) {
       formFields.actualCloseDateFrom = extractValue(apiPayload.ActualCloseFrom, 'date');
       formFields.actualCloseFrom = extractValue(apiPayload.ActualCloseFrom, 'date');
@@ -236,24 +245,57 @@ export const convertApiPayloadToFormFields = (apiPayload) => {
     if (apiPayload.ProposalCreateDateRangeFrom) {
       // Handle ISO date format from API response
       const dateValue = apiPayload.ProposalCreateDateRangeFrom;
+      console.log('Processing ProposalCreateDateRangeFrom:', dateValue);
       if (dateValue && dateValue.includes('T')) {
         // Convert ISO date to YYYY-MM-DD format
         const isoDate = new Date(dateValue);
         formFields.proposalCreatedDateFrom = isoDate.toISOString().split('T')[0];
+        console.log('Converted ISO date to YYYY-MM-DD:', formFields.proposalCreatedDateFrom);
       } else {
         formFields.proposalCreatedDateFrom = extractValue(dateValue, 'date');
+        console.log('Extracted date value:', formFields.proposalCreatedDateFrom);
       }
     }
     
     if (apiPayload.ProposalCreateDateRangeTo) {
       // Handle ISO date format from API response
       const dateValue = apiPayload.ProposalCreateDateRangeTo;
+      console.log('Processing ProposalCreateDateRangeTo:', dateValue);
       if (dateValue && dateValue.includes('T')) {
         // Convert ISO date to YYYY-MM-DD format
         const isoDate = new Date(dateValue);
         formFields.proposalCreatedDateTo = isoDate.toISOString().split('T')[0];
+        console.log('Converted ISO date to YYYY-MM-DD:', formFields.proposalCreatedDateTo);
       } else {
         formFields.proposalCreatedDateTo = extractValue(dateValue, 'date');
+        console.log('Extracted date value:', formFields.proposalCreatedDateTo);
+      }
+    }
+    
+    // Also handle the direct field names if they exist
+    if (apiPayload.proposalCreatedDateFrom) {
+      const dateValue = apiPayload.proposalCreatedDateFrom;
+      console.log('Processing proposalCreatedDateFrom:', dateValue);
+      if (dateValue && dateValue.includes('T')) {
+        const isoDate = new Date(dateValue);
+        formFields.proposalCreatedDateFrom = isoDate.toISOString().split('T')[0];
+        console.log('Converted ISO date to YYYY-MM-DD:', formFields.proposalCreatedDateFrom);
+      } else {
+        formFields.proposalCreatedDateFrom = extractValue(dateValue, 'date');
+        console.log('Extracted date value:', formFields.proposalCreatedDateFrom);
+      }
+    }
+    
+    if (apiPayload.proposalCreatedDateTo) {
+      const dateValue = apiPayload.proposalCreatedDateTo;
+      console.log('Processing proposalCreatedDateTo:', dateValue);
+      if (dateValue && dateValue.includes('T')) {
+        const isoDate = new Date(dateValue);
+        formFields.proposalCreatedDateTo = isoDate.toISOString().split('T')[0];
+        console.log('Converted ISO date to YYYY-MM-DD:', formFields.proposalCreatedDateTo);
+      } else {
+        formFields.proposalCreatedDateTo = extractValue(dateValue, 'date');
+        console.log('Extracted date value:', formFields.proposalCreatedDateTo);
       }
     }
     

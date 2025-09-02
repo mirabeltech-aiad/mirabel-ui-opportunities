@@ -18,7 +18,8 @@ const AdvancedSearchTabs = ({
   useProposalSpecificComponent = false,
   isSearching = false,
   searchJSON = {},
-  isLoadingRecentSearch = false
+  isLoadingRecentSearch = false,
+  tabKey = 0 // Add tabKey prop to force re-render
 }) => {
   return (
     <Tabs value={activeTab} onValueChange={onTabChange} className="w-full">
@@ -41,6 +42,7 @@ const AdvancedSearchTabs = ({
       
       <TabsContent value="opportunities" className="mt-0">
         <OpportunitiesTabContent
+          key={`opportunities-content-${tabKey}`}
           searchParams={searchParams}
           handleInputChange={handleInputChange}
           handleSelectChange={handleSelectChange}
@@ -56,6 +58,7 @@ const AdvancedSearchTabs = ({
       <TabsContent value="proposals" className="mt-0">
         {useProposalSpecificComponent ? (
           <ProposalsAdvancedSearchTabContent
+            key={`proposals-advanced-content-${tabKey}`}
             searchParams={searchParams}
             handleInputChange={handleInputChange}
             handleSelectChange={handleSelectChange}
@@ -67,6 +70,7 @@ const AdvancedSearchTabs = ({
           />
         ) : (
           <ProposalsTabContent
+            key={`proposals-content-${tabKey}`}
             searchParams={searchParams}
             handleInputChange={handleInputChange}
             handleSelectChange={handleSelectChange}

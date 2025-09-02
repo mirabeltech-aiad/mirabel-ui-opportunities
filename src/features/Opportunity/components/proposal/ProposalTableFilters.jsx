@@ -109,7 +109,7 @@ const ProposalTableFilters = ({ filters, onFilterChange, view, onViewChange }) =
         
         <button className="search-button">
           <Search className="h-4 w-4" />
-          Search
+          Filter
         </button>
         
         <button className="views-button">

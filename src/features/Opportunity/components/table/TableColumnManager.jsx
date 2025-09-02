@@ -115,9 +115,9 @@ export const useTableColumns = (
       // Merge calculated and saved widths (saved widths take precedence)
       const finalWidths = mergeColumnWidths(calculatedWidths, savedWidths);
 
-      // Ensure minimum widths to prevent overlap
+      // Ensure minimum widths to prevent overlap (except for Status and Assigned Rep columns)
       Object.keys(finalWidths).forEach((columnId) => {
-        if (finalWidths[columnId] < 150) {
+        if (columnId !== 'Status' && columnId !== 'AssignedTo' && columnId !== 'Probability' && columnId !== 'Amount' && finalWidths[columnId] < 150) {
           finalWidths[columnId] = 150;
         }
       });

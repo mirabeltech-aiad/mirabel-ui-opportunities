@@ -41,7 +41,7 @@ const StatCard = ({ value, label, colorType = "primary", bgColorType = "white" }
 
 const ProposalStatsCards = ({ stats }) => {
   return (
-    <div className="flex flex-nowrap gap-4 mb-6 mt-4">
+    <div className="flex flex-nowrap gap-4 mb-4 mt-2">
       <div className="flex-1">
         <StatCard 
           value={stats.total} 

@@ -313,6 +313,14 @@ export const OPPORTUNITY_FORM_CONFIG = {
           componentType: "textbox",
           type: "date",
           gridCols: "col-span-12 sm:col-span-4"
+        },
+        {
+          fieldName: "type",
+          label: "Type",
+          componentType: "multiselect",
+          dataSource: "types",
+          placeholder: "Select type",
+          gridCols: "col-span-12 sm:col-span-4"
         }
       ]
     },

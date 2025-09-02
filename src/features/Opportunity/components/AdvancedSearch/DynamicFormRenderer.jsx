@@ -309,6 +309,19 @@ const DynamicFormRenderer = ({
 
     // Autocomplete field
     if (componentType === "autocomplete") {
+      // Determine type and placeholder based on field name
+      let autocompleteType = type || "company";
+      let autocompletePlaceholder = placeholder;
+      
+      // Check if field is email-related
+      if (fieldName.toLowerCase().includes("email") || fieldName.toLowerCase().includes("contactemail")) {
+        autocompleteType = "email";
+        autocompletePlaceholder = autocompletePlaceholder || "Type to search emails...";
+      } else if (fieldName.toLowerCase().includes("company") || fieldName.toLowerCase().includes("customername")) {
+        autocompleteType = "company";
+        autocompletePlaceholder = autocompletePlaceholder || "Type to search companies...";
+      }
+      
       return (
         <div
           key={fieldName}
@@ -320,9 +333,9 @@ const DynamicFormRenderer = ({
             onChange={(values) =>
               handleSelectFieldChange(fieldName)(values.join(","))
             }
-            placeholder={placeholder}
+            placeholder={autocompletePlaceholder}
             className="w-full"
-            type={type}
+            type={autocompleteType}
           />
         </div>
       );
@@ -480,8 +493,8 @@ const DynamicFormRenderer = ({
     }
 
     return (
-      <div className="pt-2">
-        <div className="space-y-3">
+      <div className="pt-1">
+        <div className="space-y-2">
           {rows.map((row, rowIndex) => (
             <div key={rowIndex} className="grid grid-cols-12 gap-3">
               {row.map(renderField)}
@@ -507,32 +520,37 @@ const DynamicFormRenderer = ({
         </div>
       )}
 
-      <form onSubmit={handleSearch} className="space-y-4">
+      <form onSubmit={handleSearch} className="space-y-2">
         <Accordion
           type="multiple"
           value={openAccordions}
           onValueChange={setOpenAccordions}
-          className="space-y-4"
+          className="space-y-2"
         >
-          {config.sections.map((section) => (
+          {config.sections.map((section, index) => (
             <AccordionItem
               key={section.id}
               value={section.id}
-              className="border border-gray-200 rounded-lg bg-white"
+              className="border-0 bg-transparent"
             >
-              <AccordionTrigger className="px-6 py-4 text-blue-800 hover:no-underline">
+              <AccordionTrigger className="px-0 py-3 text-blue-800 hover:no-underline hover:bg-gray-50 rounded-lg transition-colors">
                 <div className="flex items-center">
                   <div
                     className={`w-1 h-6 ${getSectionColorClass(
                       section.id
                     )} rounded-full mr-3`}
                   ></div>
-                  {section.title}
+                  <span className="text-lg font-semibold">{section.title}</span>
                 </div>
               </AccordionTrigger>
-              <AccordionContent className="px-6 pb-6">
+              <AccordionContent className="px-0 pb-3">
                 {renderSection(section)}
               </AccordionContent>
+              
+              {/* Horizontal Separator (except for last section) */}
+              {index < config.sections.length - 1 && (
+                <hr className="border-gray-200 my-3" />
+              )}
             </AccordionItem>
           ))}
         </Accordion>

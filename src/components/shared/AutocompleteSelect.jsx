@@ -74,7 +74,7 @@ const AutocompleteSelect = ({
   }, [open]);
 
   const fetchUrl = type === "email"
-    ? API_URLS.CONTACTS.DISTINCT_CUSTOMER_EMAILS
+    ? API_URLS.CONTACTS.DISTINCT_CUSTOMER_EMAILS(getCurrentUserId())
     : API_URLS.CONTACTS.DISTINCT_CUSTOMERS;
 
   // Handle input change with debouncing

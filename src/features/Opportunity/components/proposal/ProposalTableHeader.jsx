@@ -38,14 +38,14 @@ const ProposalTableHeader = ({
 
   return (
     <TableHeader className="sticky top-0 z-10">
-      <TableRow className="hover:bg-transparent border-b border-gray-200">
-        <TableHead className="w-12 px-4 py-2.5 bg-gray-50 text-muted-foreground h-11">
-          <Checkbox checked={selectAll} onCheckedChange={onSelectAll} />
-        </TableHead>
+      <TableRow className="hover:bg-transparent border-b-2 border-gray-300">
+                 <TableHead className="w-12 px-4 py-1.5 bg-gray-50 text-muted-foreground h-11 border-b-2 border-gray-300">
+           <Checkbox checked={selectAll} onCheckedChange={onSelectAll} />
+         </TableHead>
         {columnOrder.map((column) => (
           <TableHead
             key={column.id}
-            className="relative cursor-pointer text-sm font-medium text-muted-foreground bg-gray-50 px-4 py-2.5 text-left hover:bg-gray-100 transition-colors border-r border-gray-200 last:border-r-0 h-11"
+                         className="relative cursor-pointer text-sm font-medium text-muted-foreground bg-gray-50 px-4 py-1.5 text-left hover:bg-gray-100 transition-colors border-r border-gray-200 last:border-r-0 h-11 border-b-2 border-gray-300"
             draggable="true"
             onDragStart={(e) => handleDragStart(e, column.id)}
             onDragOver={(e) => handleDragOver(e, column.id)}

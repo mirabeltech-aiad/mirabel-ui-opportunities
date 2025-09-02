@@ -498,99 +498,103 @@ const LinkedProposalsSection = ({
           </div>
         </CardHeader>
         <CardContent>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead className="w-12">Select</TableHead>
-                <TableHead>Proposal Name</TableHead>
-                <TableHead>Products</TableHead>
-                <TableHead>Description</TableHead>
+          <div className="table-horizontal-scroll table-smooth-scroll">
+            <div className="table-content-wrapper">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead className="w-12">Select</TableHead>
+                    <TableHead>Proposal Name</TableHead>
+                    <TableHead>Products</TableHead>
+                    <TableHead>Description</TableHead>
 
-                <TableHead>Rep</TableHead>
-                <TableHead>Created Date</TableHead>
-                <TableHead>Amount</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {proposals.map((proposal) => {
-                const isChecked =
-                  selectedProposal?.toString() === proposal.ID.toString();
-                const isLinkedByParent =
-                  opportunityData.proposalId &&
-                  opportunityData.proposalId
-                    .toString()
-                    .split(",")
-                    .includes(proposal.ID.toString());
-                // Combined check retained for possible future use
-
-                return (
-                  <TableRow
-                    key={proposal.ID}
-                    className={cn(
-                      "hover:bg-gray-50 cursor-pointer",
-                      (isLinkedByParent || isChecked) &&
-                        "bg-green-50 border-green-200"
-                    )}
-                    onClick={() => handleSelectProposal(proposal.ID)}
-                  >
-                    <TableCell>
-                      <input
-                        type="radio"
-                        name="proposalSelection"
-                        checked={isChecked}
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleSelectProposal(proposal.ID);
-                        }}
-                        onChange={(e) => {
-                          e.stopPropagation();
-                          handleSelectProposal(proposal.ID);
-                        }}
-                        className="w-4 h-4 text-blue-600"
-                      />
-                      {/* Linked label removed per requirements */}
-                    </TableCell>
-                    <TableCell className="font-medium">
-                      {proposal.Name ||
-                        proposal.ProposalName ||
-                        "Unnamed Proposal"}
-                    </TableCell>
-                    <TableCell className="text-sm text-gray-600">
-                      {proposal.ProductNames || proposal.Products || "N/A"}
-                    </TableCell>
-                    <TableCell className="text-sm text-gray-600">
-                      {proposal.Description || "N/A"}
-                    </TableCell>
-                    <TableCell className="text-sm text-gray-600">
-                      {proposal.SalesRep?.Name || proposal.Rep || "N/A"}
-                    </TableCell>
-                    <TableCell>
-                      {proposal.CreatedDate || proposal.StartDate
-                        ? new Date(
-                            proposal.CreatedDate || proposal.StartDate
-                          ).toLocaleDateString()
-                        : "N/A"}
-                    </TableCell>
-                    <TableCell>
-                      {(() => {
-                        const val =
-                          proposal.Net ??
-                          proposal.Amount ??
-                          proposal.TotalAmount ??
-                          proposal.NetAmount ??
-                          proposal.TotalNet ??
-                          proposal.Total ??
-                          null;
-                        return val
-                          ? `$${parseFloat(val).toLocaleString()}`
-                          : "";
-                      })()}
-                    </TableCell>
+                    <TableHead>Rep</TableHead>
+                    <TableHead>Created Date</TableHead>
+                    <TableHead>Amount</TableHead>
                   </TableRow>
-                );
-              })}
-            </TableBody>
-          </Table>
+                </TableHeader>
+                <TableBody>
+                  {proposals.map((proposal) => {
+                    const isChecked =
+                      selectedProposal?.toString() === proposal.ID.toString();
+                    const isLinkedByParent =
+                      opportunityData.proposalId &&
+                      opportunityData.proposalId
+                        .toString()
+                        .split(",")
+                        .includes(proposal.ID.toString());
+                    // Combined check retained for possible future use
+
+                    return (
+                      <TableRow
+                        key={proposal.ID}
+                        className={cn(
+                          "hover:bg-gray-50 cursor-pointer",
+                          (isLinkedByParent || isChecked) &&
+                            "bg-green-50 border-green-200"
+                        )}
+                        onClick={() => handleSelectProposal(proposal.ID)}
+                      >
+                        <TableCell>
+                          <input
+                            type="radio"
+                            name="proposalSelection"
+                            checked={isChecked}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleSelectProposal(proposal.ID);
+                            }}
+                            onChange={(e) => {
+                              e.stopPropagation();
+                              handleSelectProposal(proposal.ID);
+                            }}
+                            className="w-4 h-4 text-blue-600"
+                          />
+                          {/* Linked label removed per requirements */}
+                        </TableCell>
+                        <TableCell className="font-medium">
+                          {proposal.Name ||
+                            proposal.ProposalName ||
+                            "Unnamed Proposal"}
+                        </TableCell>
+                        <TableCell className="text-sm text-gray-600">
+                          {proposal.ProductNames || proposal.Products || "N/A"}
+                        </TableCell>
+                        <TableCell className="text-sm text-gray-600">
+                          {proposal.Description || "N/A"}
+                        </TableCell>
+                        <TableCell className="text-sm text-gray-600">
+                          {proposal.SalesRep?.Name || proposal.Rep || "N/A"}
+                        </TableCell>
+                        <TableCell>
+                          {proposal.CreatedDate || proposal.StartDate
+                            ? new Date(
+                                proposal.CreatedDate || proposal.StartDate
+                              ).toLocaleDateString()
+                            : "N/A"}
+                        </TableCell>
+                        <TableCell>
+                          {(() => {
+                            const val =
+                              proposal.Net ??
+                              proposal.Amount ??
+                              proposal.TotalAmount ??
+                              proposal.NetAmount ??
+                              proposal.TotalNet ??
+                              proposal.Total ??
+                              null;
+                            return val
+                              ? `$${parseFloat(val).toLocaleString()}`
+                              : "";
+                          })()}
+                        </TableCell>
+                      </TableRow>
+                    );
+                  })}
+                </TableBody>
+              </Table>
+            </div>
+          </div>
         </CardContent>
       </Card>
 

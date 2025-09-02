@@ -175,7 +175,7 @@ const ProposalTableContent = ({
   };
 
   return (
-    <div className="overflow-x-auto max-h-600px">
+    <div className="table-horizontal-scroll table-smooth-scroll max-h-[600px]">
       {columnOrder.length === 0 ? (
         <div className="p-8 text-center">
           <div className="inline-flex items-center gap-2 text-gray-600">
@@ -184,150 +184,152 @@ const ProposalTableContent = ({
           </div>
         </div>
       ) : (
-        <Table style={{tableLayout: 'fixed'}}>
-          <ProposalTableHeader
-            columnOrder={columnOrder}
-            sortConfig={sortConfig}
-            requestSort={requestSort}
-            draggedColumn={draggedColumn}
-            handleDragStart={handleDragStart}
-            handleDragOver={handleDragOver}
-            handleDragEnd={handleDragEnd}
-            selectAll={selectAll}
-            onSelectAll={onSelectAll}
-            columnWidths={columnWidths}
-            onColumnResize={onColumnResize}
-          />
-          
-          <TableBody>
-            {displayedItems.map((proposal, index) => (
-              <TableRow 
-                key={proposal.id || index} 
-                className="hover:bg-gray-50 border-b border-gray-100 cursor-pointer"
-                onClick={(e) => handleRowClick(e, proposal)}
-              >
-                {/* Checkbox cell */}
-                <TableCell className="py-2.5">
-                  <Checkbox
-                    checked={selectedRows.has(parseInt(proposal.ProposalID))}
-                    onCheckedChange={(checked) => handleRowSelect(parseInt(proposal.ProposalID), checked)}
-                    aria-label={`Select ${proposal.name || proposal.Proposal?.Name || 'proposal'}`}
-                    onClick={(e) => e.stopPropagation()}
-                  />
-                </TableCell>
-                
-                {/* Dynamic cells based on columnOrder */}
-                {columnOrder.map((column) => (
-                  <TableCell 
-                    key={column.id} 
-                    className="py-2.5 text-sm overflow-hidden"
-                    style={{
-                      width: columnWidths[column.id] ? `${columnWidths[column.id]}px` : undefined,
-                      minWidth: column.id === 'editIcon' ? '60px' : '150px',
-                      maxWidth: columnWidths[column.id] 
-                        ? `${columnWidths[column.id]}px` 
-                        : column.id === 'editIcon' ? '60px' : '250px'
-                    }}
-                  >
-                    {/* Special handling for Edit Icon column */}
-                    {column.id === 'editIcon' ? (
-                      shouldShowEditIcon(proposal) ? (
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={(e) => handleEditClick(e, proposal)}
-                          className="h-8 w-8 p-0 hover:bg-blue-50"
-                          title="Edit Proposal"
-                        >
-                          <Edit className="h-4 w-4 text-blue-600" />
-                        </Button>
-                      ) : (
-                        <div className="h-8 w-8 flex items-center justify-center">
-                          {/* Empty space to maintain alignment */}
-                        </div>
-                      )
-                    ) : (
-                      /* Use dynamic cell rendering for API-based columns */
-                      column.propertyMapping ? (
-                        /* Check if this is a ProposalID column and wrap with click handler */
-                        (column.id === 'ProposalID' || 
-                         column.propertyMapping === 'ProposalID' ||
-                         column.id === 'proposalID' ||
-                         column.propertyMapping === 'proposalID' ||
-                         column.id === 'proposalId' ||
-                         column.propertyMapping === 'proposalId' ||
-                         column.id?.toLowerCase().includes('proposalid') ||
-                         column.propertyMapping?.toLowerCase().includes('proposalid')) ? (
-                          <span 
-                            className="cursor-pointer hover:text-blue-600 transition-colors text-blue-500 underline hover:underline-offset-2"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              handleProposalClick(proposal);
-                            }}
-                            title={`View Proposal ${renderCellContent(proposal, column)}`}
+        <div className="table-content-wrapper">
+          <Table style={{tableLayout: 'fixed', width: '100%'}}>
+            <ProposalTableHeader
+              columnOrder={columnOrder}
+              sortConfig={sortConfig}
+              requestSort={requestSort}
+              draggedColumn={draggedColumn}
+              handleDragStart={handleDragStart}
+              handleDragOver={handleDragOver}
+              handleDragEnd={handleDragEnd}
+              selectAll={selectAll}
+              onSelectAll={onSelectAll}
+              columnWidths={columnWidths}
+              onColumnResize={onColumnResize}
+            />
+            
+            <TableBody>
+              {displayedItems.map((proposal, index) => (
+                <TableRow 
+                  key={proposal.id || index} 
+                  className="hover:bg-gray-50 border-b border-gray-100 cursor-pointer"
+                  onClick={(e) => handleRowClick(e, proposal)}
+                >
+                  {/* Checkbox cell */}
+                  <TableCell className="py-1.5">
+                    <Checkbox
+                      checked={selectedRows.has(parseInt(proposal.ProposalID))}
+                      onCheckedChange={(checked) => handleRowSelect(parseInt(proposal.ProposalID), checked)}
+                      aria-label={`Select ${proposal.name || proposal.Proposal?.Name || 'proposal'}`}
+                      onClick={(e) => e.stopPropagation()}
+                    />
+                  </TableCell>
+                  
+                  {/* Dynamic cells based on columnOrder */}
+                  {columnOrder.map((column) => (
+                    <TableCell 
+                      key={column.id} 
+                      className="py-1.5 text-sm overflow-hidden"
+                      style={{
+                        width: columnWidths[column.id] ? `${columnWidths[column.id]}px` : undefined,
+                        minWidth: column.id === 'editIcon' ? '60px' : '150px',
+                        maxWidth: columnWidths[column.id] 
+                          ? `${columnWidths[column.id]}px` 
+                          : column.id === 'editIcon' ? '60px' : '250px'
+                      }}
+                    >
+                      {/* Special handling for Edit Icon column */}
+                      {column.id === 'editIcon' ? (
+                        shouldShowEditIcon(proposal) ? (
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={(e) => handleEditClick(e, proposal)}
+                            className="h-8 w-8 p-0 hover:bg-blue-50"
+                            title="Edit Proposal"
                           >
-                            <TruncatedText 
-                              text={String(renderCellContent(proposal, column))} 
-                              maxLength={15}
-                              className="text-blue-500"
-                              expandable={false}
-                              showTooltip={false}
-                            />
-                          </span>
-                        ) : 
-                        /* Check if this is a company/customer column and wrap with click handler */
-                        (column.id === 'ContactDetails.Name' || 
-                         column.propertyMapping === 'ContactDetails.Name' ||
-                         column.id === 'CustomerName' ||
-                         column.propertyMapping === 'CustomerName' ||
-                         column.id?.toLowerCase().includes('customer') ||
-                         column.propertyMapping?.toLowerCase().includes('customer') ||
-                         column.id?.toLowerCase().includes('company') ||
-                         column.propertyMapping?.toLowerCase().includes('company')) ? (
-                          <span 
-                            className={`cursor-pointer hover:text-blue-600 transition-colors ${selectedCompany === getCompanyName(proposal) ? 'font-bold text-blue-600' : 'text-blue-500'}`}
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              handleCompanyClick(proposal);
-                            }}
-                          >
-                            <span className="truncate block">
-                              {renderCellContent(proposal, column)}
-                            </span>
-                          </span>
+                            <Edit className="h-4 w-4 text-blue-600" />
+                          </Button>
                         ) : (
-                          renderCellContentWithTruncation(proposal, column)
+                          <div className="h-8 w-8 flex items-center justify-center">
+                            {/* Empty space to maintain alignment */}
+                          </div>
                         )
                       ) : (
-                        /* Fallback to legacy rendering for backward compatibility */
-                        renderLegacyCell(proposal, column, {
-                          getStatusBadgeVariant,
-                          getStageBadgeVariant,
-                          getRepColor,
-                          handleCompanyClick,
-                          handleProposalClick,
-                          selectedCompany,
-                          getCompanyName
-                        })
-                      )
-                    )}
+                        /* Use dynamic cell rendering for API-based columns */
+                        column.propertyMapping ? (
+                          /* Check if this is a ProposalID column and wrap with click handler */
+                          (column.id === 'ProposalID' || 
+                           column.propertyMapping === 'ProposalID' ||
+                           column.id === 'proposalID' ||
+                           column.propertyMapping === 'proposalID' ||
+                           column.id === 'proposalId' ||
+                           column.propertyMapping === 'proposalId' ||
+                           column.id?.toLowerCase().includes('proposalid') ||
+                           column.propertyMapping?.toLowerCase().includes('proposalid')) ? (
+                            <span 
+                              className="cursor-pointer hover:text-blue-600 transition-colors text-blue-500 underline hover:underline-offset-2"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleProposalClick(proposal);
+                              }}
+                              title={`View Proposal ${renderCellContent(proposal, column)}`}
+                            >
+                              <TruncatedText 
+                                text={String(renderCellContent(proposal, column))} 
+                                maxLength={15}
+                                className="text-blue-500"
+                                expandable={false}
+                                showTooltip={false}
+                              />
+                            </span>
+                          ) : 
+                          /* Check if this is a company/customer column and wrap with click handler */
+                          (column.id === 'ContactDetails.Name' || 
+                           column.propertyMapping === 'ContactDetails.Name' ||
+                           column.id === 'CustomerName' ||
+                           column.propertyMapping === 'CustomerName' ||
+                           column.id?.toLowerCase().includes('customer') ||
+                           column.propertyMapping?.toLowerCase().includes('customer') ||
+                           column.id?.toLowerCase().includes('company') ||
+                           column.propertyMapping?.toLowerCase().includes('company')) ? (
+                            <span 
+                              className={`cursor-pointer hover:text-blue-600 transition-colors ${selectedCompany === getCompanyName(proposal) ? 'font-bold text-blue-600' : 'text-blue-500'}`}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleCompanyClick(proposal);
+                              }}
+                            >
+                              <span className="truncate block">
+                                {renderCellContent(proposal, column)}
+                              </span>
+                            </span>
+                          ) : (
+                            renderCellContentWithTruncation(proposal, column)
+                          )
+                        ) : (
+                          /* Fallback to legacy rendering for backward compatibility */
+                          renderLegacyCell(proposal, column, {
+                            getStatusBadgeVariant,
+                            getStageBadgeVariant,
+                            getRepColor,
+                            handleCompanyClick,
+                            handleProposalClick,
+                            selectedCompany,
+                            getCompanyName
+                          })
+                        )
+                      )}
+                    </TableCell>
+                  ))}
+                </TableRow>
+              ))}
+              
+              {isLoading && (
+                <TableRow>
+                  <TableCell colSpan={columnOrder.length + 1} className="text-center py-4">
+                    <div className="flex items-center justify-center gap-2">
+                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600"></div>
+                      Loading more proposals...
+                    </div>
                   </TableCell>
-                ))}
-              </TableRow>
-            ))}
-            
-            {isLoading && (
-              <TableRow>
-                <TableCell colSpan={columnOrder.length + 1} className="text-center py-4">
-                  <div className="flex items-center justify-center gap-2">
-                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600"></div>
-                    Loading more proposals...
-                  </div>
-                </TableCell>
-              </TableRow>
-            )}
-          </TableBody>
-        </Table>
+                </TableRow>
+              )}
+            </TableBody>
+          </Table>
+        </div>
       )}
       
       {/* Infinite scroll observer */}

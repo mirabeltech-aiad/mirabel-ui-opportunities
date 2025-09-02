@@ -13,18 +13,30 @@ export const useOpportunityAdvancedSearch = () => {
   const [isSearching, setIsSearching] = useState(false);
   const [searchJSON, setSearchJSON] = useState(null); // Real-time searchJSON
   const [isLoadingRecentSearch, setIsLoadingRecentSearch] = useState(false);
+  const [hasLoadedRecentSearch, setHasLoadedRecentSearch] = useState(false);
+  const [componentMounted, setComponentMounted] = useState(false);
   const navigate = useNavigate();
   const { activeFilters, updateFilters, clearAllFilters } = useOpportunitySearch();
   const searchParams = activeFilters;
   const opportunitiesItems = ["primary-fields", "sales-pipeline", "financial-commercial", "opportunity-details", "account-company", "contact-info", "product-solution", "geographic-territory"];
 
+  // Component mount effect
+  useEffect(() => {
+    console.log('🚀 Opportunity Advanced Search component mounted');
+    setComponentMounted(true);
+    setHasLoadedRecentSearch(false); // Reset flag on mount
+    setSearchJSON(null); // Clear any existing search JSON
+    setOpenAccordions(["primary-fields"]); // Reset accordions to default
+    setIsExpanded(false); // Reset expansion state
+  }, []);
+
   // Monitor searchParams changes to ensure context is updated
   useEffect(() => {
-    console.log('📊 searchParams changed:', searchParams);
-    console.log('📊 Number of searchParams keys:', Object.keys(searchParams).length);
+    console.log('📊 Opportunity searchParams changed:', searchParams);
+    console.log('📊 Number of opportunity searchParams keys:', Object.keys(searchParams).length);
   }, [searchParams]);
 
-  // Load recent search data on component mount
+  // Load recent search data when component mounts or when filters are cleared
   useEffect(() => {
     const loadRecentSearch = async () => {
       try {
@@ -57,19 +69,31 @@ export const useOpportunityAdvancedSearch = () => {
         console.error('❌ Error loading recent search data for opportunities:', error);
       } finally {
         setIsLoadingRecentSearch(false);
+        setHasLoadedRecentSearch(true);
         console.log('🏁 Finished loading recent search data');
       }
     };
 
-    // Only load if no existing filters are set
-    console.log('🔍 Checking if filters are empty:', Object.keys(searchParams).length === 0);
-    if (Object.keys(searchParams).length === 0) {
-      console.log('🚀 Starting to load recent search data...');
+    // Always load recent search data when component mounts or when filters are empty
+    // This ensures we always have the latest saved search data
+    console.log('🔍 Checking if should load recent search for opportunities:', {
+      componentMounted,
+      hasLoadedRecentSearch,
+      searchParamsKeys: Object.keys(searchParams).length,
+      searchParams
+    });
+    
+    if (componentMounted && (!hasLoadedRecentSearch || Object.keys(searchParams).length === 0)) {
+      console.log('🚀 Starting to load recent search data for opportunities...');
       loadRecentSearch();
     } else {
-      console.log('⏭️ Skipping API call - existing filters found:', searchParams);
+      console.log('⏭️ Skipping API call - component not mounted, already loaded, or existing filters found:', {
+        componentMounted,
+        hasLoadedRecentSearch,
+        searchParams
+      });
     }
-  }, []); // Empty dependency array to run only once on mount
+  }, [componentMounted, hasLoadedRecentSearch]); // Depend on componentMounted and hasLoadedRecentSearch
 
   // Function to build searchJSON in real-time
   const buildSearchJSON = useCallback((params) => {
@@ -166,6 +190,8 @@ export const useOpportunityAdvancedSearch = () => {
   const handleClearFilters = useCallback(() => {
     clearAllFilters(); // Use clearAllFilters to preserve tab parameter
     setSearchJSON(null); // Clear searchJSON when filters are cleared
+    setHasLoadedRecentSearch(false); // Reset flag to allow reloading recent search data
+    setComponentMounted(false); // Reset component mounted flag
   }, [clearAllFilters]);
 
   const handleInputChange = useCallback((e) => {
@@ -217,7 +243,8 @@ export const useOpportunityAdvancedSearch = () => {
     handleTabChange,
     isSearching,
     searchJSON,
-    isLoadingRecentSearch
+    isLoadingRecentSearch,
+    tabKey: componentMounted ? 1 : 0 // Add tabKey for force re-render
   };
 };
 export const useProposalAdvancedSearch = () => {
@@ -226,10 +253,22 @@ export const useProposalAdvancedSearch = () => {
   const [isSearching, setIsSearching] = useState(false);
   const [searchJSON, setSearchJSON] = useState(null); // Real-time searchJSON
   const [isLoadingRecentSearch, setIsLoadingRecentSearch] = useState(false);
+  const [hasLoadedRecentSearch, setHasLoadedRecentSearch] = useState(false);
+  const [componentMounted, setComponentMounted] = useState(false);
   const navigate = useNavigate();
   const { activeFilters, updateFilters, clearAllFilters } = useProposalSearch();
   const searchParams = activeFilters;
   const proposalsItems = ["primary-fields", "opportunity-info", "contact-address-info", "proposal-info"];
+
+  // Component mount effect
+  useEffect(() => {
+    console.log('🚀 Proposal Advanced Search component mounted');
+    setComponentMounted(true);
+    setHasLoadedRecentSearch(false); // Reset flag on mount
+    setSearchJSON(null); // Clear any existing search JSON
+    setOpenAccordions(["primary-fields"]); // Reset accordions to default
+    setIsExpanded(false); // Reset expansion state
+  }, []);
 
   // Monitor searchParams changes to ensure context is updated
   useEffect(() => {
@@ -237,7 +276,7 @@ export const useProposalAdvancedSearch = () => {
     console.log('📊 Number of proposal searchParams keys:', Object.keys(searchParams).length);
   }, [searchParams]);
 
-  // Load recent search data on component mount
+  // Load recent search data when component mounts or when filters are cleared
   useEffect(() => {
     const loadRecentSearch = async () => {
       try {
@@ -270,19 +309,31 @@ export const useProposalAdvancedSearch = () => {
         console.error('❌ Error loading recent search data for proposals:', error);
       } finally {
         setIsLoadingRecentSearch(false);
+        setHasLoadedRecentSearch(true);
         console.log('🏁 Finished loading recent search data');
       }
     };
 
-    // Only load if no existing filters are set
-    console.log('🔍 Checking if filters are empty:', Object.keys(searchParams).length === 0);
-    if (Object.keys(searchParams).length === 0) {
-      console.log('🚀 Starting to load recent search data...');
+    // Always load recent search data when component mounts or when filters are empty
+    // This ensures we always have the latest saved search data
+    console.log('🔍 Checking if should load recent search for proposals:', {
+      componentMounted,
+      hasLoadedRecentSearch,
+      searchParamsKeys: Object.keys(searchParams).length,
+      searchParams
+    });
+    
+    if (componentMounted && (!hasLoadedRecentSearch || Object.keys(searchParams).length === 0)) {
+      console.log('🚀 Starting to load recent search data for proposals...');
       loadRecentSearch();
     } else {
-      console.log('⏭️ Skipping API call - existing filters found:', searchParams);
+      console.log('⏭️ Skipping API call - component not mounted, already loaded, or existing filters found:', {
+        componentMounted,
+        hasLoadedRecentSearch,
+        searchParams
+      });
     }
-  }, []); // Empty dependency array to run only once on mount
+  }, [componentMounted, hasLoadedRecentSearch]); // Depend on componentMounted and hasLoadedRecentSearch
 
   // Function to build searchJSON in real-time
   const buildSearchJSON = useCallback((params) => {
@@ -368,6 +419,8 @@ export const useProposalAdvancedSearch = () => {
   const handleClearFilters = useCallback(() => {
     clearAllFilters(); // Use clearAllFilters to preserve tab parameter
     setSearchJSON(null); // Clear searchJSON when filters are cleared
+    setHasLoadedRecentSearch(false); // Reset flag to allow reloading recent search data
+    setComponentMounted(false); // Reset component mounted flag
   }, [clearAllFilters]);
 
   const handleInputChange = useCallback((e) => {
@@ -412,6 +465,7 @@ export const useProposalAdvancedSearch = () => {
     handleToggleExpandCollapse,
     isSearching,
     searchJSON,
-    isLoadingRecentSearch
+    isLoadingRecentSearch,
+    tabKey: componentMounted ? 1 : 0 // Add tabKey for force re-render
   };
 };

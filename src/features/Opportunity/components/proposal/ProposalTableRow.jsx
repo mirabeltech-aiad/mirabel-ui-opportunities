@@ -55,7 +55,7 @@ const ProposalTableRow = ({ proposal, isSelected, onSelect, onCompanySelect, sel
       onDoubleClick={handleRowDoubleClick}
       title="Click to select, double-click to edit"
     >
-      <TableCell className="w-12 px-4 py-2.5">
+      <TableCell className="w-12 px-4 py-1.5">
         <Checkbox 
           checked={isSelected}
           onCheckedChange={(checked) => onSelect(checked)}
@@ -63,15 +63,15 @@ const ProposalTableRow = ({ proposal, isSelected, onSelect, onCompanySelect, sel
           className="focus:ring-ocean-500"
         />
       </TableCell>
-      <TableCell className="px-4 py-2.5">
+      <TableCell className="px-4 py-1.5">
         <ProposalTableBadges.Status status={proposal.status} />
       </TableCell>
-      <TableCell className="px-4 py-2.5">
+      <TableCell className="px-4 py-1.5">
         <div className="font-medium text-blue-600 text-sm cursor-pointer hover:text-blue-700 transition-colors">
           {proposal.name}
         </div>
       </TableCell>
-      <TableCell className="px-4 py-2.5">
+      <TableCell className="px-4 py-1.5">
         <Button
           variant="link"
           className={`p-0 h-auto font-medium text-sm hover:underline transition-colors ${
@@ -82,23 +82,23 @@ const ProposalTableRow = ({ proposal, isSelected, onSelect, onCompanySelect, sel
           {proposal.company || proposal.Customer}
         </Button>
       </TableCell>
-      <TableCell className="px-4 py-2.5 text-sm text-gray-700">{proposal.createdDate}</TableCell>
-      <TableCell className="px-4 py-2.5">
+      <TableCell className="px-4 py-1.5 text-sm text-gray-700">{proposal.createdDate}</TableCell>
+      <TableCell className="px-4 py-1.5">
         <div className="flex items-center gap-2">
           <div className={`w-8 h-8 rounded-full flex items-center justify-center text-white text-xs font-medium ${getRepColor(proposal.assignedRep)}`}>
             {proposal.assignedRep?.substring(0, 2)?.toUpperCase()}
           </div>
         </div>
       </TableCell>
-      <TableCell className="px-4 py-2.5">
+      <TableCell className="px-4 py-1.5">
         <ProposalTableBadges.Stage stage={proposal.stage} />
       </TableCell>
-      <TableCell className="px-4 py-2.5">
+      <TableCell className="px-4 py-1.5">
         <span className="font-medium text-sm text-gray-900">
           ${proposal.amount?.toLocaleString()}.00
         </span>
       </TableCell>
-      <TableCell className="px-4 py-2.5 text-sm text-gray-700">{proposal.projCloseDate}</TableCell>
+      <TableCell className="px-4 py-1.5 text-sm text-gray-700">{proposal.projCloseDate}</TableCell>
     </TableRow>
   );
 };

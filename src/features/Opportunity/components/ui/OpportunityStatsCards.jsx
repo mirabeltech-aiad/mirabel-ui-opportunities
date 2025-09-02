@@ -59,7 +59,7 @@ const StatCard = ({
 };
 const OpportunityStatsCards = ({ stats }) => {
   return (
-    <div className="flex flex-nowrap gap-4 mb-6 mt-1 rounded-none bg-gray-50 py-[7px] px-[7px]">
+    <div className="flex flex-nowrap gap-4 mb-4 mt-1 rounded-none bg-gray-50 py-[7px] px-[7px]">
       <div className="flex-1">
         <StatCard
           value={stats.total.toLocaleString()}

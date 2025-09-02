@@ -195,8 +195,216 @@
   overflow: hidden;
 }
 
+/* Side panel iframe */
 .side-panel-iframe {
   width: 100%;
   height: 100%;
   border: none;
+}
+
+/* Horizontal Scroll Styles for Opportunity & Proposal Grids */
+.table-horizontal-scroll {
+  overflow-x: auto;
+  overflow-y: hidden;
+  scrollbar-width: thin;
+  scrollbar-color: #cbd5e1 #f1f5f9;
+}
+
+.table-horizontal-scroll::-webkit-scrollbar {
+  height: 8px;
+}
+
+.table-horizontal-scroll::-webkit-scrollbar-track {
+  background: #f1f5f9;
+  border-radius: 4px;
+}
+
+.table-horizontal-scroll::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 4px;
+}
+
+.table-horizontal-scroll::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+/* Ensure table content maintains proper width */
+.table-content-wrapper {
+  min-width: 1200px;
+  width: 100%;
+}
+
+/* Smooth scrolling for better UX */
+.table-smooth-scroll {
+  scroll-behavior: smooth;
+}
+
+/* Responsive table behavior */
+@media (max-width: 1024px) {
+  .table-content-wrapper {
+    min-width: 1000px;
+  }
+}
+
+@media (max-width: 768px) {
+  .table-content-wrapper {
+    min-width: 800px;
+  }
+}
+
+/* Enhanced scrollbar for better visibility */
+.table-horizontal-scroll::-webkit-scrollbar {
+  height: 12px;
+}
+
+.table-horizontal-scroll::-webkit-scrollbar-track {
+  background: #f8fafc;
+  border-radius: 6px;
+  border: 1px solid #e2e8f0;
+}
+
+.table-horizontal-scroll::-webkit-scrollbar-thumb {
+  background: #94a3b8;
+  border-radius: 6px;
+  border: 1px solid #64748b;
+}
+
+.table-horizontal-scroll::-webkit-scrollbar-thumb:hover {
+  background: #64748b;
+}
+
+/* Firefox scrollbar styling */
+.table-horizontal-scroll {
+  scrollbar-width: auto;
+  scrollbar-color: #94a3b8 #f8fafc;
+}
+
+/* Ensure all tables have consistent horizontal scroll behavior */
+.table-container {
+  overflow-x: auto;
+  overflow-y: hidden;
+}
+
+/* Table header sticky positioning for better UX */
+.table-header-sticky {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background: white;
+}
+
+/* Ensure table cells don't wrap unnecessarily */
+.table-no-wrap {
+  white-space: nowrap;
+}
+
+/* Responsive table container */
+.table-responsive {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Enhanced table scrollbar for better visibility on all browsers */
+.table-horizontal-scroll {
+  scrollbar-width: thin;
+  scrollbar-color: #94a3b8 #f8fafc;
+}
+
+/* Webkit scrollbar enhancements */
+.table-horizontal-scroll::-webkit-scrollbar {
+  height: 12px;
+  width: 12px;
+}
+
+.table-horizontal-scroll::-webkit-scrollbar-track {
+  background: #f8fafc;
+  border-radius: 6px;
+  border: 1px solid #e2e8f0;
+}
+
+.table-horizontal-scroll::-webkit-scrollbar-thumb {
+  background: #94a3b8;
+  border-radius: 6px;
+  border: 1px solid #64748b;
+}
+
+.table-horizontal-scroll::-webkit-scrollbar-thumb:hover {
+  background: #64748b;
+}
+
+.table-horizontal-scroll::-webkit-scrollbar-corner {
+  background: #f8fafc;
+}
+
+/* Ensure table headers stay visible during scroll */
+.table-header-sticky {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  background: white;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+}
+
+/* Table cell content handling */
+.table-cell-content {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Table row hover effects */
+.table-row-hover:hover {
+  background-color: #f8fafc;
+  transition: background-color 0.15s ease-in-out;
+}
+
+/* Table border styling */
+.table-border {
+  border: 1px solid #e2e8f0;
+  border-radius: 0.5rem;
+}
+
+/* Table shadow for better depth */
+.table-shadow {
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+}
+
+/* Table loading state */
+.table-loading {
+  opacity: 0.6;
+  pointer-events: none;
+}
+
+/* Table empty state */
+.table-empty {
+  text-align: center;
+  padding: 2rem;
+  color: #6b7280;
+}
+
+/* Table selection styling */
+.table-selection {
+  background-color: #eff6ff;
+  border-color: #3b82f6;
+}
+
+/* Table action buttons */
+.table-actions {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+/* Table responsive breakpoints */
+@media (max-width: 640px) {
+  .table-content-wrapper {
+    min-width: 600px;
+  }
+}
+
+@media (max-width: 480px) {
+  .table-content-wrapper {
+    min-width: 500px;
+  }
 }

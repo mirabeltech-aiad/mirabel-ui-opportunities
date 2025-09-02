@@ -744,7 +744,7 @@ const Proposals = () => {
         <X className="h-6 w-6 text-gray-600" />
       </Button>
 
-      <div className="w-full px-4 py-6 flex-1 overflow-auto">
+      <div className="w-full px-4 py-4 flex-1 overflow-auto">
         <div className="flex items-center justify-between mb-2">
           <h1 className="text-2xl font-bold text-[#1a4d80]">
             Proposals Dashboard

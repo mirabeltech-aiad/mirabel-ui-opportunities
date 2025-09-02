@@ -187,7 +187,7 @@ export const API_URLS = {
       EDIT_DETAILS: (contactId) => `/services/Crm/Contacts/EditDetails/${contactId}/1`,
       CONTACT_DETAILS: (contactId) => `/services/Crm/Contacts/Contacts/${contactId}`,
       DISTINCT_CUSTOMERS: '/services/crm/contacts/GetDistinctCustomers/1/false/false/false/false',
-      DISTINCT_CUSTOMER_EMAILS: '/services/crm/contacts/GetCustomerEmails',
+      DISTINCT_CUSTOMER_EMAILS: (userId) => `/services/crm/contacts/GetCustomerEmails/${userId}`,
     },
   
     // Opportunities

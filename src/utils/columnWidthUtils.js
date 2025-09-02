@@ -105,8 +105,18 @@ export const calculateColumnWidth = (headerText, data, column) => {
     maxWidth = Math.max(maxWidth, cellWidth);
   }
   
-  // Apply min/max constraints
-  return Math.max(MIN_COLUMN_WIDTH, Math.min(MAX_COLUMN_WIDTH, maxWidth));
+  // Apply min/max constraints (Status column can be 70px, Assigned Rep can be 90px)
+  let minWidth = MIN_COLUMN_WIDTH;
+  if (column.id === 'Status') {
+    minWidth = 70;
+  } else if (column.id === 'AssignedTo') {
+    minWidth = 90;
+  } else if (column.id === 'Probability') {
+    minWidth = 90;
+  } else if (column.id === 'Amount') {
+    minWidth = 90;
+  }
+  return Math.max(minWidth, Math.min(MAX_COLUMN_WIDTH, maxWidth));
 };
 
 /**
@@ -121,7 +131,19 @@ export const calculateAllColumnWidths = (columns, data) => {
   if (!Array.isArray(columns) || !Array.isArray(data) || data.length === 0) {
     // Return default widths if no data
     columns?.forEach(column => {
-      widths[column.id] = column.id === 'editIcon' ? 60 : MIN_COLUMN_WIDTH;
+      if (column.id === 'editIcon') {
+        widths[column.id] = 60;
+      } else if (column.id === 'Status') {
+        widths[column.id] = 70; // Set Status column default width to 70px
+      } else if (column.id === 'AssignedTo') {
+        widths[column.id] = 90; // Set Assigned Rep column default width to 90px
+      } else if (column.id === 'Probability') {
+        widths[column.id] = 90; // Set Probability column default width to 90px
+      } else if (column.id === 'Amount') {
+        widths[column.id] = 90; // Set Amount column default width to 90px
+      } else {
+        widths[column.id] = MIN_COLUMN_WIDTH;
+      }
     });
     return widths;
   }
@@ -129,6 +151,14 @@ export const calculateAllColumnWidths = (columns, data) => {
   columns.forEach(column => {
     if (column.id === 'editIcon') {
       widths[column.id] = 60;
+    } else if (column.id === 'Status') {
+      widths[column.id] = 70; // Set Status column default width to 70px
+    } else if (column.id === 'AssignedTo') {
+      widths[column.id] = 90; // Set Assigned Rep column default width to 90px
+    } else if (column.id === 'Probability') {
+      widths[column.id] = 90; // Set Probability column default width to 90px
+    } else if (column.id === 'Amount') {
+      widths[column.id] = 90; // Set Amount column default width to 90px
     } else {
       widths[column.id] = calculateColumnWidth(column.label, data, column);
     }
@@ -148,7 +178,17 @@ export const mergeColumnWidths = (calculatedWidths, savedWidths = {}) => {
   
   // Override with saved widths where they exist
   Object.keys(savedWidths).forEach(columnId => {
-    if (savedWidths[columnId] && savedWidths[columnId] >= MIN_COLUMN_WIDTH) {
+    let minWidth = MIN_COLUMN_WIDTH;
+    if (columnId === 'Status') {
+      minWidth = 70;
+    } else if (columnId === 'AssignedTo') {
+      minWidth = 90;
+    } else if (columnId === 'Probability') {
+      minWidth = 90;
+    } else if (columnId === 'Amount') {
+      minWidth = 90;
+    }
+    if (savedWidths[columnId] && savedWidths[columnId] >= minWidth) {
       finalWidths[columnId] = savedWidths[columnId];
     }
   });

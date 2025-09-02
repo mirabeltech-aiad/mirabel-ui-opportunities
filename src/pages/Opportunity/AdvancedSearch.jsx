@@ -36,7 +36,8 @@ const OpportunityAdvancedSearch = ({
     handleToggleExpandCollapse,
     isSearching,
     searchJSON,
-    isLoadingRecentSearch
+    isLoadingRecentSearch,
+    tabKey
   } = useOpportunityAdvancedSearch();
 
   return (
@@ -69,6 +70,7 @@ const OpportunityAdvancedSearch = ({
               isSearching={isSearching}
               searchJSON={searchJSON}
               isLoadingRecentSearch={isLoadingRecentSearch}
+              tabKey={tabKey}
             />
           </CardHeader>
         </Card>
@@ -113,7 +115,8 @@ const ProposalAdvancedSearch = ({
     handleToggleExpandCollapse,
     isSearching,
     searchJSON,
-    isLoadingRecentSearch
+    isLoadingRecentSearch,
+    tabKey
   } = useProposalAdvancedSearch();
 
   return (
@@ -146,6 +149,7 @@ const ProposalAdvancedSearch = ({
               isSearching={isSearching}
               searchJSON={searchJSON}
               isLoadingRecentSearch={isLoadingRecentSearch}
+              tabKey={tabKey}
             />
           </CardHeader>
         </Card>
@@ -173,7 +177,17 @@ const ProposalAdvancedSearch = ({
 // Context clearing components
 const OpportunityContextWrapper = ({ children, onTabChange }) => {
   const { clearAllFilters } = useOpportunitySearch();
-  const [searchParams, setSearchParams] = useSearchParams();
+
+  // Always clear filters when this component mounts (when switching to opportunities)
+  useEffect(() => {
+    console.log("OpportunityContextWrapper: Component mounted - clearing all filters");
+    clearAllFilters();
+    // Force a small delay to ensure clearing is processed
+    setTimeout(() => {
+      console.log("OpportunityContextWrapper: Forcing additional clear after delay");
+      clearAllFilters();
+    }, 100);
+  }, []);
 
   const handleTabChangeWithClear = (newTab) => {
     console.log("OpportunityContextWrapper: Tab change requested to:", newTab);
@@ -181,13 +195,14 @@ const OpportunityContextWrapper = ({ children, onTabChange }) => {
       console.log(
         "OpportunityContextWrapper: Clearing opportunity filters and switching to proposals"
       );
-      // Clear opportunity filters and URL parameters when switching to proposals
+      // Clear opportunity filters when switching to proposals
       clearAllFilters();
-
-      // Ensure URL is clean with only the tab parameter
-      const newSearchParams = new URLSearchParams();
-      newSearchParams.set("tab", "proposals");
-      setSearchParams(newSearchParams, { replace: true });
+    } else if (newTab === "opportunities") {
+      console.log(
+        "OpportunityContextWrapper: Switching to opportunities tab - ensuring clean state"
+      );
+      // Clear any existing filters when switching to opportunities tab
+      clearAllFilters();
     }
     onTabChange(newTab);
   };
@@ -199,7 +214,17 @@ const OpportunityContextWrapper = ({ children, onTabChange }) => {
 
 const ProposalContextWrapper = ({ children, onTabChange }) => {
   const { clearAllFilters } = useProposalSearch();
-  const [searchParams, setSearchParams] = useSearchParams();
+
+  // Always clear filters when this component mounts (when switching to proposals)
+  useEffect(() => {
+    console.log("ProposalContextWrapper: Component mounted - clearing all filters");
+    clearAllFilters();
+    // Force a small delay to ensure clearing is processed
+    setTimeout(() => {
+      console.log("ProposalContextWrapper: Forcing additional clear after delay");
+      clearAllFilters();
+    }, 100);
+  }, []);
 
   const handleTabChangeWithClear = (newTab) => {
     console.log("ProposalContextWrapper: Tab change requested to:", newTab);
@@ -207,12 +232,14 @@ const ProposalContextWrapper = ({ children, onTabChange }) => {
       console.log(
         "ProposalContextWrapper: Clearing proposal filters and switching to opportunities"
       );
-      // Clear proposal filters and URL parameters when switching to opportunities
+      // Clear proposal filters when switching to opportunities
       clearAllFilters();
-
-      // Ensure URL is clean with no tab parameter (opportunities is default)
-      const newSearchParams = new URLSearchParams();
-      setSearchParams(newSearchParams, { replace: true });
+    } else if (newTab === "proposals") {
+      console.log(
+        "ProposalContextWrapper: Switching to proposals tab - ensuring clean state"
+      );
+      // Clear any existing filters when switching to proposals tab
+      clearAllFilters();
     }
     onTabChange(newTab);
   };
@@ -226,23 +253,49 @@ export const AdvancedSearch = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const [isSettingsPanelOpen, setIsSettingsPanelOpen] = useState(false);
   const [activeTab, setActiveTab] = useState("opportunities");
+  const [tabKey, setTabKey] = useState(0);
   const navigate = useNavigate();
 
   // Handle URL tab parameter
   useEffect(() => {
     const tabParam = searchParams.get("tab");
     if (tabParam === "proposals" && activeTab !== "proposals") {
+      console.log("AdvancedSearch: Switching to proposals tab based on URL");
       setActiveTab("proposals");
     } else if (tabParam !== "proposals" && activeTab !== "opportunities") {
+      console.log("AdvancedSearch: Switching to opportunities tab based on URL");
       setActiveTab("opportunities");
     }
   }, [searchParams, activeTab]);
 
   const handleTabChange = (newTab) => {
+    console.log("AdvancedSearch: Tab change requested to:", newTab);
+    
+    // Clear all URL parameters when switching tabs to ensure clean state
+    const newSearchParams = new URLSearchParams();
+    if (newTab === "proposals") {
+      newSearchParams.set("tab", "proposals");
+    }
+    // For opportunities tab, no tab parameter needed (it's the default)
+    
+    setSearchParams(newSearchParams, { replace: true });
     setActiveTab(newTab);
+  };
 
-    // The context clearing components will handle the URL parameter clearing
-    // This function just updates the active tab state
+  // Global tab change handler that clears both contexts
+  const handleGlobalTabChange = (newTab) => {
+    console.log("AdvancedSearch: Global tab change to:", newTab);
+    
+    // Clear all URL parameters when switching tabs to ensure clean state
+    const newSearchParams = new URLSearchParams();
+    if (newTab === "proposals") {
+      newSearchParams.set("tab", "proposals");
+    }
+    // For opportunities tab, no tab parameter needed (it's the default)
+    
+    setSearchParams(newSearchParams, { replace: true });
+    setActiveTab(newTab);
+    setTabKey(prev => prev + 1); // Force re-render by changing key
   };
 
   // Handle settings panel
@@ -257,14 +310,15 @@ export const AdvancedSearch = () => {
   // Render the appropriate component based on active tab
   if (activeTab === "proposals") {
     return (
-      <ProposalSearchProvider>
-        <ProposalContextWrapper onTabChange={handleTabChange}>
+      <ProposalSearchProvider key={`proposals-${tabKey}`}>
+        <ProposalContextWrapper onTabChange={handleGlobalTabChange}>
           <ProposalAdvancedSearch
+            key={`proposal-search-${tabKey}`}
             isSettingsPanelOpen={isSettingsPanelOpen}
             handleOpenSettings={handleOpenSettings}
             handleCloseSettings={handleCloseSettings}
             activeTab={activeTab}
-            handleTabChange={handleTabChange}
+            handleTabChange={handleGlobalTabChange}
           />
         </ProposalContextWrapper>
       </ProposalSearchProvider>
@@ -272,14 +326,15 @@ export const AdvancedSearch = () => {
   }
 
   return (
-    <OpportunitySearchProvider>
-      <OpportunityContextWrapper onTabChange={handleTabChange}>
+    <OpportunitySearchProvider key={`opportunities-${tabKey}`}>
+      <OpportunityContextWrapper onTabChange={handleGlobalTabChange}>
         <OpportunityAdvancedSearch
+          key={`opportunity-search-${tabKey}`}
           isSettingsPanelOpen={isSettingsPanelOpen}
           handleOpenSettings={handleOpenSettings}
           handleCloseSettings={handleCloseSettings}
           activeTab={activeTab}
-          handleTabChange={handleTabChange}
+          handleTabChange={handleGlobalTabChange}
         />
       </OpportunityContextWrapper>
     </OpportunitySearchProvider>
