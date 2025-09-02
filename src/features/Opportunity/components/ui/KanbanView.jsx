@@ -155,7 +155,7 @@ const KanbanView = ({
   return (
     <div
       className="bg-white border border-gray-200 rounded-md shadow-sm flex flex-col h-full"
-      style={{ height: "calc(100vh - 100px)" }}
+      style={{ height: "calc(115vh - 100px)" }}
     >
       {/* Filter Controls */}
       <TableFilterControls
