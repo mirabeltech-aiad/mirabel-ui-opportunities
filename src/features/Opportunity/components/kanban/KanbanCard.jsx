@@ -160,8 +160,8 @@ const KanbanCard = ({
                 <DollarSign className="h-3 w-3 text-emerald-500" />
                 <span className="text-sm font-bold text-emerald-600">
                   {typeof opportunity.amount === "number"
-                    ? `$${opportunity.amount.toLocaleString()}`
-                    : opportunity.amount}
+                    ? opportunity.amount.toLocaleString()
+                    : opportunity.amount || "0"}
                 </span>
               </div>
 

@@ -1,38 +1,49 @@
-
 import React from "react";
 import { Droppable } from "react-beautiful-dnd";
 import { Badge } from "@/components/ui/badge";
 import KanbanCard from "./KanbanCard";
 
-const KanbanColumn = ({ column, opportunities, allOpportunities = [], isUpdating = false, onDeleteOpportunity, onEditOpportunity }) => {
-  const columnTotal = opportunities.reduce((sum, opp) => sum + (typeof opp.amount === 'number' ? opp.amount : 0), 0);
+const KanbanColumn = ({
+  column,
+  opportunities,
+  allOpportunities = [],
+  isUpdating = false,
+  onDeleteOpportunity,
+  onEditOpportunity,
+}) => {
+  const columnTotal = opportunities.reduce(
+    (sum, opp) => sum + (typeof opp.amount === "number" ? opp.amount : 0),
+    0
+  );
 
   // Helper function to get background and border colors from color code
   const getColumnStyles = () => {
     if (!column.colorCode) {
       return {
-        backgroundColor: '#f9fafb', // gray-50
-        borderColor: '#e5e7eb' // gray-200
+        backgroundColor: "#f9fafb", // gray-50
+        borderColor: "#e5e7eb", // gray-200
       };
     }
-    
+
     // Convert hex to RGB for background (light version)
-    const hex = column.colorCode.replace('#', '');
+    const hex = column.colorCode.replace("#", "");
     const r = parseInt(hex.substr(0, 2), 16);
     const g = parseInt(hex.substr(2, 2), 16);
     const b = parseInt(hex.substr(4, 2), 16);
-    
+
     return {
       backgroundColor: `rgba(${r}, ${g}, ${b}, 0.1)`,
-      borderColor: `rgba(${r}, ${g}, ${b}, 0.3)`
+      borderColor: `rgba(${r}, ${g}, ${b}, 0.3)`,
     };
   };
 
   const columnStyles = getColumnStyles();
 
   return (
-    <div 
-      className={`flex-1 min-w-72 rounded-lg border-2 border-dashed flex flex-col h-full ${isUpdating ? 'pointer-events-none' : ''}`}
+    <div
+      className={`flex-1 min-w-72 rounded-lg border-2 border-dashed flex flex-col h-full ${
+        isUpdating ? "pointer-events-none" : ""
+      }`}
       style={columnStyles}
     >
       {/* Column Header */}
@@ -47,7 +58,7 @@ const KanbanColumn = ({ column, opportunities, allOpportunities = [], isUpdating
           ${columnTotal.toLocaleString()} total
         </div>
       </div>
-      
+
       {/* Column Content */}
       <Droppable droppableId={column.id} isDropDisabled={isUpdating}>
         {(provided, snapshot) => (
@@ -55,7 +66,7 @@ const KanbanColumn = ({ column, opportunities, allOpportunities = [], isUpdating
             ref={provided.innerRef}
             {...provided.droppableProps}
             className={`p-3 flex-1 overflow-y-auto min-h-32 ${
-              snapshot.isDraggingOver ? 'bg-gray-50' : ''
+              snapshot.isDraggingOver ? "" : "bg-gray-50"
             }`}
           >
             {opportunities.length === 0 ? (
@@ -65,12 +76,17 @@ const KanbanColumn = ({ column, opportunities, allOpportunities = [], isUpdating
             ) : (
               opportunities.map((opportunity, columnIndex) => {
                 // Use a stable key to prevent unnecessary remounting
-                const stableKey = `card-${opportunity.ID || opportunity.id || opportunity.opportunityName || columnIndex}`;
-                
+                const stableKey = `card-${
+                  opportunity.ID ||
+                  opportunity.id ||
+                  opportunity.opportunityName ||
+                  columnIndex
+                }`;
+
                 return (
-                  <KanbanCard 
+                  <KanbanCard
                     key={stableKey}
-                    opportunity={opportunity} 
+                    opportunity={opportunity}
                     index={columnIndex}
                     isUpdating={isUpdating}
                     onDeleteOpportunity={onDeleteOpportunity}

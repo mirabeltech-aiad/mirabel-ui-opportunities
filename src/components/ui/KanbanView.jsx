@@ -1,10 +1,18 @@
-
 import React from "react";
 import KanbanBoard from "../../features/Opportunity/components/kanban/KanbanBoard";
 import TableFilterControls from "../../features/Opportunity/components/table/TableFilterControls";
 
-const KanbanView = ({ opportunities, view, onViewChange, filters, onFilterChange, users = [], onRefresh }) => {
-  const [localOpportunities, setLocalOpportunities] = React.useState(opportunities);
+const KanbanView = ({
+  opportunities,
+  view,
+  onViewChange,
+  filters,
+  onFilterChange,
+  users = [],
+  onRefresh,
+}) => {
+  const [localOpportunities, setLocalOpportunities] =
+    React.useState(opportunities);
 
   // Update local opportunities when prop changes
   React.useEffect(() => {
@@ -31,10 +39,12 @@ const KanbanView = ({ opportunities, view, onViewChange, filters, onFilterChange
     }
 
     // Find the opportunity being moved
-    const opportunity = localOpportunities.find(opp => opp.id.toString() === draggableId);
-    
+    const opportunity = localOpportunities.find(
+      (opp) => opp.id.toString() === draggableId
+    );
+
     // Update the opportunity's stage
-    const updatedOpportunities = localOpportunities.map(opp => {
+    const updatedOpportunities = localOpportunities.map((opp) => {
       if (opp.id.toString() === draggableId) {
         return { ...opp, stage: destination.droppableId };
       }
@@ -42,13 +52,15 @@ const KanbanView = ({ opportunities, view, onViewChange, filters, onFilterChange
     });
 
     setLocalOpportunities(updatedOpportunities);
-    console.log(`Moved opportunity ${opportunity.opportunityName} from ${source.droppableId} to ${destination.droppableId}`);
+    console.log(
+      `Moved opportunity ${opportunity.opportunityName} from ${source.droppableId} to ${destination.droppableId}`
+    );
   };
 
   return (
     <div className="bg-white border border-gray-200 rounded-md shadow-sm flex flex-col h-full">
       {/* Filter Controls */}
-      <TableFilterControls 
+      <TableFilterControls
         filters={filters}
         onFilterChange={onFilterChange}
         totalItems={filteredOpportunities.length}
@@ -57,13 +69,13 @@ const KanbanView = ({ opportunities, view, onViewChange, filters, onFilterChange
         users={users}
         onRefresh={onRefresh}
       />
-      
+
       {/* Kanban Board */}
-      <KanbanBoard 
+      <KanbanBoard
         opportunities={filteredOpportunities}
         onDragEnd={handleDragEnd}
       />
-      
+
       {/* Footer */}
       <div className="p-2 border-t border-gray-200 flex items-center justify-between flex-shrink-0">
         <div className="text-sm text-gray-500">
