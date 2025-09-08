@@ -230,8 +230,9 @@
 
 /* Ensure table content maintains proper width */
 .table-content-wrapper {
-  min-width: 1200px;
+  min-width: 100%;
   width: 100%;
+  max-width: 100%;
 }
 
 /* Smooth scrolling for better UX */
@@ -242,13 +243,13 @@
 /* Responsive table behavior */
 @media (max-width: 1024px) {
   .table-content-wrapper {
-    min-width: 1000px;
+    min-width: 100%;
   }
 }
 
 @media (max-width: 768px) {
   .table-content-wrapper {
-    min-width: 800px;
+    min-width: 100%;
   }
 }
 
@@ -279,10 +280,52 @@
   scrollbar-color: #94a3b8 #f8fafc;
 }
 
+/* Prevent horizontal scroll during loading */
+.table-loading {
+  overflow-x: hidden;
+}
+
+.table-loading .table-content-wrapper {
+  min-width: 100%;
+  max-width: 100%;
+}
+
+/* Prevent horizontal scroll when no data is available */
+.table-empty-state {
+  overflow-x: hidden;
+}
+
+.table-empty-state .table-content-wrapper {
+  min-width: 100%;
+  max-width: 100%;
+}
+
+.table-empty-state table {
+  width: 100% !important;
+  table-layout: auto !important;
+}
+
+.table-empty-state th {
+  min-width: auto !important;
+  width: auto !important;
+}
+
+.table-empty-state td {
+  width: 100% !important;
+  max-width: 100% !important;
+}
+
 /* Ensure all tables have consistent horizontal scroll behavior */
 .table-container {
   overflow-x: auto;
   overflow-y: hidden;
+}
+
+/* Prevent horizontal overflow on table containers */
+.table-container,
+.table-horizontal-scroll {
+  max-width: 100%;
+  box-sizing: border-box;
 }
 
 /* Table header sticky positioning for better UX */

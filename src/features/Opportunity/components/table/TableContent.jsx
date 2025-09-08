@@ -30,12 +30,16 @@ const TableContent = ({
 }) => {
   return (
     <div className="relative bg-white rounded-lg border border-gray-200 shadow-sm overflow-hidden">
-      <div className="h-[600px] w-full overflow-y-auto">
-        <div className="table-horizontal-scroll table-smooth-scroll min-w-full">
+      <div className="h-[calc(100vh-300px)] w-full overflow-auto">
+        <div className={`table-horizontal-scroll table-smooth-scroll w-full ${isLoading ? 'table-loading' : ''} ${!isLoading && displayedItems.length === 0 ? 'table-empty-state' : ''}`}>
           <div className="table-content-wrapper">
             <Table
               className="w-full border-separate border-spacing-0"
-              style={{ tableLayout: "fixed" }}
+              style={{ 
+                tableLayout: (!isLoading && displayedItems.length === 0) ? "auto" : "auto", 
+                minWidth: (!isLoading && displayedItems.length === 0) ? "100%" : "100%",
+                maxWidth: "100%"
+              }}
             >
               <OpportunityTableHeader
                 columnOrder={columnOrder}
@@ -56,7 +60,8 @@ const TableContent = ({
                   <tr>
                     <td
                       colSpan={columnOrder.length + (isSplitScreenMode ? 1 : 2)}
-                      className="py-8 text-center text-sm text-gray-500"
+                      className="py-8 text-center text-sm text-gray-500 w-full"
+                      style={{ width: "100%" }}
                     >
                       No opportunities to display
                     </td>
