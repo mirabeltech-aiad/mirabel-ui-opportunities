@@ -6,6 +6,7 @@ const HomePage = lazy(() => import('../pages/HomePage'));
 const WelcomePage = lazy(() => import('../pages/Welcome'));
 const Pipeline = lazy(() => import('../pages/Opportunity/Pipeline'));
 const AdvancedSearch = lazy(() => import('../pages/Opportunity/AdvancedSearch'));
+const AdvancedSearchNew = lazy(() => import('../features/Opportunity-new/Advanced-Search/AdvancedSearch'));
 const AddOpportunity = lazy(() => import('../pages/Opportunity/AddOpportunity'));
 const EditOpportunity = lazy(() => import('../pages/Opportunity/EditOpportunity'));
 const EditProposal = lazy(() => import('../pages/Opportunity/EditProposal'));
@@ -43,6 +44,15 @@ export const routes = [
     component: () => (
       <OpportunityProviders>
         <AdvancedSearch />
+      </OpportunityProviders>
+    ),
+    exact: true
+  },
+  {
+    path: '/advanced-search-new',
+    component: () => (
+      <OpportunityProviders>
+        <AdvancedSearchNew />
       </OpportunityProviders>
     ),
     exact: true
