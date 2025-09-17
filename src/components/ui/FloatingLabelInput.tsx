@@ -1,155 +1,180 @@
-
-import React, { useState } from "react";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
-import { cn } from "@/lib/utils";
+import React, { useState, useRef, useId } from 'react'
+import { cn } from '../../utils/cn'
 
 interface FloatingLabelInputProps {
-  id: string;
-  label: string;
-  value: string | number;
-  onChange?: (value: string) => void;
-  type?: "text" | "email" | "tel" | "number" | "date" | "password" | "url";
-  readOnly?: boolean;
-  required?: boolean;
-  className?: string;
-  title?: string;
-  isTextarea?: boolean;
-  rows?: number;
-  minHeight?: string;
-  placeholder?: string;
-  disabled?: boolean;
-  error?: string;
-  
+  label: string
+  value: string
+  onChange: (value: string) => void
+  onFocus?: (e: React.FocusEvent<HTMLInputElement>) => void
+  onBlur?: () => void
+  onKeyDown?: (e: React.KeyboardEvent<HTMLInputElement>) => void
+  type?: 'text' | 'email' | 'password' | 'number' | 'date' | 'tel' | 'url' | 'datetime-local'
+  placeholder?: string
+  required?: boolean
+  error?: string
+  disabled?: boolean
+  className?: string
+  modal?: boolean  // true = 36px height, false = 40px height
+  step?: string
+  min?: string
+  max?: string
+  autoComplete?: string
+  'data-testid'?: string
+  clearOnFocusIfZero?: boolean
 }
 
-/**
- * Standardized Lovable Bootstrap Basic Floating Label Input Component
- * Provides consistent floating label behavior across the entire application
- */
-const FloatingLabelInput: React.FC<FloatingLabelInputProps> = ({
-  id,
+export const FloatingLabelInput: React.FC<FloatingLabelInputProps> = ({
   label,
   value,
   onChange,
-  type = "text",
-  readOnly = false,
-  required = false,
-  className = "",
-  title,
-  isTextarea = false,
-  rows = 3,
-  minHeight = "80px",
+  onFocus,
+  onBlur,
+  onKeyDown,
+  type = 'text',
   placeholder,
+  required = false,
+  error,
   disabled = false,
-  error=""
+  className = '',
+  modal = false,  // false = 40px (regular), true = 36px (modal)
+  step,
+  min,
+  max,
+  autoComplete,
+  'data-testid': testId,
+  clearOnFocusIfZero,
+  ...props
 }) => {
-  const [isFocused, setIsFocused] = useState(false);
+  const [isFocused, setIsFocused] = useState(false)
+  const inputRef = useRef<HTMLInputElement>(null)
+  const id = useId()
+  const labelId = `${id}-label`
+  const errorId = `${id}-error`
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    if (onChange && !readOnly && !disabled) {
-      onChange(e.target.value);
+  const hasValue = value && value.length > 0
+  // For date inputs, always float the label to avoid conflicts with browser placeholder
+  const isFloating = isFocused || hasValue || type === 'date'
+
+  const handleFocus = (e: React.FocusEvent<HTMLInputElement>) => {
+    setIsFocused(true)
+    if (clearOnFocusIfZero) {
+      const normalized = (value || '').trim()
+      if (normalized === '0' || normalized === '0.0' || normalized === '0.00') {
+        onChange('')
+      }
     }
-  };
-
-  const handleFocus = () => {
-    setIsFocused(true);
-  };
+    onFocus?.(e)
+  }
 
   const handleBlur = () => {
-    setIsFocused(false);
-  };
+    setIsFocused(false)
+    onBlur?.()
+  }
 
-  const hasValue = value !== undefined && value !== null && value.toString().trim() !== '';
-  const shouldLiftLabel = isFocused || hasValue;
-  
-  const baseInputClasses = "pt-6 pb-2 px-3 peer w-full border border-input bg-background text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ocean-500 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50";
-  
-  const readOnlyClasses = readOnly ? "bg-gray-100 border-gray-300 text-gray-600" : "";
-  const disabledClasses = disabled ? "cursor-not-allowed opacity-50" : "";
-  
-  // Add error border and focus ring if error is present
-  const hasError = !!error && error.length > 0;
-  const errorInputClasses = hasError ? "border-red-500 focus-visible:ring-red-500" : "";
-  const inputClasses = isTextarea 
-    ? cn(`min-h-[${minHeight}] rounded-md`, baseInputClasses, readOnlyClasses, disabledClasses, className, errorInputClasses)
-    : cn("h-12 rounded-md", baseInputClasses, readOnlyClasses, disabledClasses, className, errorInputClasses);
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    onChange(e.target.value)
+  }
 
-  const labelClasses = cn(
-    "absolute left-3 transition-all duration-200 pointer-events-none z-10 px-1",
-    shouldLiftLabel || (isTextarea && rows > 1)
-      ? "top-1.5 text-xs text-primary bg-background" 
-      : "top-3.5 text-base text-muted-foreground bg-transparent"
-  );
+  const handleLabelClick = () => {
+    inputRef.current?.focus()
+  }
 
   return (
-    <div className="relative w-full">
-      {isTextarea ? (
-        <Textarea
+    <div className={cn("relative mb-4 mt-3", className)}>
+      <div className="relative">
+        {/* Input Field */}
+        <input
+          ref={inputRef}
           id={id}
+          type={type}
           value={value}
           onChange={handleChange}
           onFocus={handleFocus}
           onBlur={handleBlur}
-          className={inputClasses}
-          rows={rows}
-          readOnly={readOnly}
+          onKeyDown={onKeyDown}
           disabled={disabled}
-          title={title}
-          placeholder={placeholder}
-          aria-label={label}
+          placeholder={isFloating && type !== 'date' ? placeholder : ''}
+          step={step}
+          min={min}
+          max={max}
+          autoComplete={autoComplete}
+          data-testid={testId}
+          aria-labelledby={labelId}
+          aria-describedby={error ? errorId : undefined}
+          aria-invalid={!!error}
           aria-required={required}
-        />
-      ) : (
-        <>
-          <Input
-            id={id}
-            type={type}
-            value={value}
-            onChange={handleChange}
-            onFocus={handleFocus}
-            onBlur={handleBlur}
-            readOnly={readOnly}
-            disabled={disabled}
-            className={inputClasses}
-            title={title}
-            placeholder={placeholder}
-            aria-label={label}
-            aria-required={required}
-          />
-          {type === "date" && (
-            <style>{`
-              #${id}::-webkit-datetime-edit-text,
-              #${id}::-webkit-datetime-edit-month-field,
-              #${id}::-webkit-datetime-edit-day-field,
-              #${id}::-webkit-datetime-edit-year-field {
-                color: ${hasValue ? 'inherit' : 'transparent'};
-              }
-              #${id}::-webkit-calendar-picker-indicator {
-                opacity: ${hasValue ? 1 : 0.3};
-                position: absolute;
-                right: 8px;
-                top: 50%;
-                transform: translateY(-50%);
-              }
-            `}</style>
+          className={cn(
+            // Base styles
+            "w-full px-3 border rounded-md transition-all duration-200 ease-out",
+            "bg-white text-gray-900 placeholder-gray-400",
+            "focus:outline-none focus:ring-0",
+
+            // Exact height specifications with proper text centering
+            modal
+              ? "h-9 text-sm" // 36px height for modals
+              : "h-10 text-base", // 40px height for regular pages
+
+            // Padding adjustments based on floating state - better centering
+            isFloating
+              ? (modal ? "pt-2 pb-2" : "pt-2.5 pb-2.5") // Reduced top padding to lift text up
+              : (modal ? "py-2" : "py-2.5"), // Perfectly centered when label is inside
+
+            // Focus border colors - ocean blue
+            "focus:border-ocean-600",
+
+            // Error states
+            error
+              ? "border-red-300 focus:border-red-500"
+              : "border-gray-300",
+
+            // Disabled state
+            disabled && "bg-gray-50 text-gray-500 cursor-not-allowed border-gray-200",
+
+            // Ensure proper z-index for floating label
+            "relative z-0"
           )}
-        </>
-      )}
-      <Label 
-        htmlFor={id}
-        className={labelClasses}
-      >
-        {label}{required ? " *" : ""}
-      </Label>
-      {hasError && (
-        <p id={`${id}-error`} className="mt-1 text-xs text-red-600">
+          {...props}
+        />
+
+        {/* Floating Label */}
+        <label
+          id={labelId}
+          htmlFor={id}
+          onClick={handleLabelClick}
+          className={cn(
+            "absolute left-3 transition-all duration-200 ease-out cursor-text select-none",
+            "pointer-events-none bg-white px-1",
+
+            // Floating state positioning
+            isFloating
+              ? cn(
+                // Floating position - above the input
+                modal ? "-top-2 text-xs" : "-top-2.5 text-xs",
+                "font-medium z-10",
+                // Ocean blue color for active floating labels
+                error ? "text-red-600" : "text-ocean-600"
+              )
+              : cn(
+                // Inside input position - better centered
+                modal ? "top-2 text-sm" : "top-2.5 text-base",
+                "text-gray-500 z-10"
+              ),
+
+            // Disabled state
+            disabled && "text-gray-400"
+          )}
+        >
+          {label}
+          {required && <span className="text-red-500 ml-1">*</span>}
+        </label>
+      </div>
+
+      {/* Error Message */}
+      {error && (
+        <p id={errorId} className="text-red-600 text-sm mt-1" role="alert">
           {error}
         </p>
       )}
     </div>
-  );
-};
-
-export default FloatingLabelInput;
+  )
+}

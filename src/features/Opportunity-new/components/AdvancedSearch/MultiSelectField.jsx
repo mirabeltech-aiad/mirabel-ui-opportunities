@@ -24,7 +24,7 @@ const MultiSelectField = ({ label, value = [], onChange, placeholder = "Select o
 
     try {
       const apiMethod = getApiMethod(fieldKey, tabType);
-      
+
       if (apiMethod) {
         const response = await apiMethod(search);
         // Transform API response to expected format
@@ -61,7 +61,7 @@ const MultiSelectField = ({ label, value = [], onChange, placeholder = "Select o
     const newValue = value.includes(option.id)
       ? value.filter(id => id !== option.id)
       : [...value, option.id];
-    
+
     onChange(newValue);
   };
 
@@ -78,7 +78,7 @@ const MultiSelectField = ({ label, value = [], onChange, placeholder = "Select o
   const handleSearchChange = async (e) => {
     const newSearchTerm = e.target.value;
     setSearchTerm(newSearchTerm);
-    
+
     // Debounce search API calls
     if (newSearchTerm.length > 2) {
       setTimeout(() => {
@@ -108,7 +108,7 @@ const MultiSelectField = ({ label, value = [], onChange, placeholder = "Select o
       <label className="block text-xs font-medium text-gray-600 mb-1">
         {label}
       </label>
-      
+
       <div className="relative">
         <button
           type="button"
@@ -172,11 +172,10 @@ const MultiSelectField = ({ label, value = [], onChange, placeholder = "Select o
                     <div
                       key={option.id}
                       onClick={() => handleSelect(option)}
-                      className={`px-3 py-2 cursor-pointer transition-colors ${
-                        isSelected 
-                          ? 'bg-blue-100 text-blue-800' 
-                          : 'hover:bg-gray-50 text-gray-700'
-                      }`}
+                      className={`px-3 py-2 cursor-pointer transition-colors ${isSelected
+                        ? 'bg-blue-100 text-blue-800'
+                        : 'hover:bg-gray-50 text-gray-700'
+                        }`}
                     >
                       <span className="text-sm">{option.label}</span>
                     </div>

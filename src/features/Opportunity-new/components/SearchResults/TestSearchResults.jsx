@@ -14,6 +14,7 @@ import {
   ExternalLink,
   ChevronDown
 } from 'lucide-react';
+import { EnhancedDataTable } from '../../../../components/ui/advanced-table';
 
 const TestSearchResults = ({ searchType = 'opportunities', searchParams = {} }) => {
   const [viewMode, setViewMode] = useState('table');
@@ -141,69 +142,113 @@ const TestSearchResults = ({ searchType = 'opportunities', searchParams = {} }) 
 
   const stats = isOpportunities ? opportunityStats : proposalStats;
 
+  // Define columns for EnhancedDataTable
   const columns = [
-    { key: 'select', label: '', width: 'w-8' },
-    { key: 'amount', label: 'Amount', width: 'w-24' },
-    { key: 'assignedRep', label: 'Assigned Rep', width: 'w-24' },
-    { key: 'projCloseDate', label: 'Proj Close Date', width: 'w-28' },
-    { key: 'company', label: 'Company Name', width: 'w-32' },
-    { key: 'name', label: `${title.slice(0, -1)} Name`, width: 'w-40' },
-    { key: 'probability', label: 'Probability (%)', width: 'w-28' },
-    { key: 'stage', label: 'Stage', width: 'w-32' },
-    { key: 'status', label: 'Status', width: 'w-20' },
-    { key: 'contactName', label: 'Contact Name', width: 'w-32' },
-    { key: 'actions', label: '', width: 'w-8' }
-  ];
-
-  const renderCell = (item, column) => {
-    switch (column.key) {
-      case 'select':
-        return <input type="checkbox" className="rounded border-gray-300 text-blue-600 focus:ring-blue-500" />;
-      case 'amount':
-        return <span className="font-medium">{item.amount}</span>;
-      case 'assignedRep':
-        return (
-          <div className={`w-8 h-8 rounded-full ${item.assignedRep.color} flex items-center justify-center text-white text-sm font-medium`}>
-            {item.assignedRep.name}
-          </div>
-        );
-      case 'projCloseDate':
-        return <span className="text-sm">{item.projCloseDate}</span>;
-      case 'company':
-        return <span className="font-medium">{item.company}</span>;
-      case 'name':
-        return (
-          <a href={`/${searchType}/${item.id}`} className="text-blue-600 hover:text-blue-800 hover:underline font-medium flex items-center space-x-1">
-            <span>{item.name}</span>
-            <ExternalLink className="h-3 w-3" />
-          </a>
-        );
-      case 'probability':
-        return <span>{item.probability}</span>;
-      case 'stage':
-        return (
-          <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium text-white ${item.stageColor}`}>
-            {item.stage}
-          </span>
-        );
-      case 'status':
-        return (
-          <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${item.statusColor}`}>
-            {item.status}
-          </span>
-        );
-      case 'contactName':
-        return <span>{item.contactName}</span>;
-      case 'actions':
-        return (
-          <button className="p-1 hover:bg-gray-100 rounded">
-            <MoreVertical className="h-4 w-4 text-gray-400" />
-          </button>
-        );
-      default:
-        return null;
+    {
+      id: 'amount',
+      header: 'Amount',
+      accessor: 'amount',
+      sortable: true,
+      type: 'currency',
+      width: 120,
+      render: (value) => <span className="font-medium">{value}</span>
+    },
+    {
+      id: 'assignedRep',
+      header: 'Assigned Rep',
+      accessor: 'assignedRep',
+      sortable: true,
+      width: 120,
+      render: (value) => (
+        <div className={`w-8 h-8 rounded-full ${value.color} flex items-center justify-center text-white text-sm font-medium`}>
+          {value.name}
+        </div>
+      )
+    },
+    {
+      id: 'projCloseDate',
+      header: 'Proj Close Date',
+      accessor: 'projCloseDate',
+      sortable: true,
+      type: 'date',
+      width: 140,
+      render: (value) => <span className="text-sm">{value}</span>
+    },
+    {
+      id: 'company',
+      header: 'Company Name',
+      accessor: 'company',
+      sortable: true,
+      width: 160,
+      render: (value) => <span className="font-medium">{value}</span>
+    },
+    {
+      id: 'name',
+      header: `${title.slice(0, -1)} Name`,
+      accessor: 'name',
+      sortable: true,
+      width: 200,
+      render: (value, row) => (
+        <a href={`/${searchType}/${row.id}`} className="text-blue-600 hover:text-blue-800 hover:underline font-medium flex items-center space-x-1">
+          <span>{value}</span>
+          <ExternalLink className="h-3 w-3" />
+        </a>
+      )
+    },
+    {
+      id: 'probability',
+      header: 'Probability (%)',
+      accessor: 'probability',
+      sortable: true,
+      type: 'percentage',
+      width: 140,
+      render: (value) => <span>{value}</span>
+    },
+    {
+      id: 'stage',
+      header: 'Stage',
+      accessor: 'stage',
+      sortable: true,
+      width: 140,
+      render: (value, row) => (
+        <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium text-white ${row.stageColor}`}>
+          {value}
+        </span>
+      )
+    },
+    {
+      id: 'status',
+      header: 'Status',
+      accessor: 'status',
+      sortable: true,
+      width: 100,
+      render: (value, row) => (
+        <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${row.statusColor}`}>
+          {value}
+        </span>
+      )
+    },
+    {
+      id: 'contactName',
+      header: 'Contact Name',
+      accessor: 'contactName',
+      sortable: true,
+      width: 160,
+      render: (value) => <span>{value}</span>
+    },
+    {
+      id: 'actions',
+      header: '',
+      accessor: () => null,
+      sortable: false,
+      width: 50,
+      render: () => (
+        <button className="p-1 hover:bg-gray-100 rounded">
+          <MoreVertical className="h-4 w-4 text-gray-400" />
+        </button>
+      )
     }
-  };
+  ];
 
   return (
     <div className="h-screen bg-gray-50 flex flex-col">
@@ -306,40 +351,34 @@ const TestSearchResults = ({ searchType = 'opportunities', searchParams = {} }) 
 
       {/* Main Content */}
       <div className="flex-1 overflow-hidden">
-        <div className="bg-white h-full flex flex-col">
-          <div className="flex-1 overflow-auto">
-            <table className="min-w-full divide-y divide-gray-200">
-              <thead className="bg-gray-50 sticky top-0">
-                <tr>
-                  {columns.map((column) => (
-                    <th
-                      key={column.key}
-                      className={`${column.width} px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider`}
-                    >
-                      {column.label}
-                    </th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
-                {sampleData.map((item, index) => (
-                  <tr key={item.id || index} className="hover:bg-gray-50">
-                    {columns.map((column) => (
-                      <td key={column.key} className="px-3 py-4 whitespace-nowrap text-sm text-gray-900">
-                        {renderCell(item, column)}
-                      </td>
-                    ))}
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-          
-          <div className="bg-gray-50 px-6 py-3 border-t border-gray-200">
-            <div className="text-sm text-gray-700">
-              Showing 5 of 605 opportunities - Scroll down to load more
-            </div>
-          </div>
+        <div className="bg-white h-full">
+          <EnhancedDataTable
+            data={sampleData}
+            columns={columns}
+            loading={false}
+            enableSelection={true}
+            enablePagination={true}
+            initialPageSize={25}
+            rowDensity="compact"
+            className="h-full"
+            id="opportunities-table"
+            bulkActionContext={isOpportunities ? 'products' : 'schedules'}
+            onRowClick={(row) => {
+              console.log('Row clicked:', row);
+            }}
+            onRowDoubleClick={(row) => {
+              window.location.href = `/${searchType}/${row.id}`;
+            }}
+            onRowSelect={(selectedRows) => {
+              console.log('Selected rows:', selectedRows);
+            }}
+            onBulkAction={(action, rows) => {
+              console.log('Bulk action:', action, rows);
+            }}
+            onSort={(sortConfig) => {
+              console.log('Sort config:', sortConfig);
+            }}
+          />
         </div>
       </div>
     </div>
