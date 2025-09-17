@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Plus, ChevronDown, X, Loader2 } from 'lucide-react';
-import { getApiMethod } from '../services/advancedSearchApi';
+import { getApiMethod } from '../../services/advancedSearchApi';
 
 const MultiSelectField = ({ label, value = [], onChange, placeholder = "Select options...", fieldKey, tabType = 'opportunities' }) => {
   const [isOpen, setIsOpen] = useState(false);

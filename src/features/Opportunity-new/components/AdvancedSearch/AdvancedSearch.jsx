@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { ChevronUp, ChevronDown, RotateCcw, Settings, Search } from 'lucide-react';
-import MultiSelectField from './components/MultiSelectField';
-import DateRangeField from './components/DateRangeField';
+import MultiSelectField from './MultiSelectField';
+import DateRangeField from './DateRangeField';
+import TestSearchResults from '../SearchResults/TestSearchResults';
 import opportunitiesConfig from './configs/opportunitiesConfig';
 import proposalsConfig from './configs/proposalsConfig';
 
@@ -11,6 +12,8 @@ const AdvancedSearch = () => {
   const [proposalsFormData, setProposalsFormData] = useState({});
   const [opportunitiesExpandedSections, setOpportunitiesExpandedSections] = useState({});
   const [proposalsExpandedSections, setProposalsExpandedSections] = useState({});
+  const [showResults, setShowResults] = useState(false);
+  const [searchParams, setSearchParams] = useState({});
 
   const currentConfig = activeTab === 'opportunities' ? opportunitiesConfig : proposalsConfig;
 
@@ -84,6 +87,27 @@ const AdvancedSearch = () => {
     currentExpandedSections[section.sectionName] !== false
   );
 
+  const handleSearch = () => {
+    const currentFormData = activeTab === 'opportunities' ? opportunitiesFormData : proposalsFormData;
+    setSearchParams(currentFormData);
+    setShowResults(true);
+  };
+
+  const handleBackToSearch = () => {
+    setShowResults(false);
+  };
+
+  // If showing results, render the TestSearchResults component
+  if (showResults) {
+    return (
+      <TestSearchResults
+        searchType={activeTab}
+        searchParams={searchParams}
+        onBackToSearch={handleBackToSearch}
+      />
+    );
+  }
+
   const renderSection = (section) => {
     const isExpanded = currentExpandedSections[section.sectionName] !== false; // Default to expanded
 
@@ -109,7 +133,6 @@ const AdvancedSearch = () => {
             {section.fields.map((field, index) => {
               const fieldKeyWithSection = `${section.sectionName}_${field.key}`;
               const currentFormData = activeTab === 'opportunities' ? opportunitiesFormData : proposalsFormData;
-              
               if (field.type === 'dateRange') {
                 const fromKeyWithSection = `${section.sectionName}_${field.fromKey}`;
                 const toKeyWithSection = `${section.sectionName}_${field.toKey}`;
@@ -179,7 +202,10 @@ const AdvancedSearch = () => {
               <Settings className="h-4 w-4" />
               <span>Settings</span>
             </button>
-            <button className="flex items-center space-x-2 px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">
+            <button 
+              onClick={handleSearch}
+              className="flex items-center space-x-2 px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+            >
               <Search className="h-4 w-4" />
               <span>Search {activeTab === 'opportunities' ? 'Opportunities' : 'Proposals'}</span>
             </button>
