@@ -3,6 +3,7 @@ import React from 'react';
 import { Button } from '../ui/button';
 
 const ErrorFallback = ({ error, resetErrorBoundary }) => {
+  console.log("ErrorFallback", error);
   return (
     <div className="flex justify-center items-center min-h-screen text-center bg-red-50">
       <div className="p-6 max-w-md bg-white rounded shadow-lg">

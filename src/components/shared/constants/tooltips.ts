@@ -217,7 +217,7 @@ export const TOOLTIPS = {
   }
 } as const
 
-import { logger } from '../utils/logger'
+import { logger } from '../../shared/logger'
 
 // Helper function to get tooltip content safely
 export const getTooltip = (path: string): string => {

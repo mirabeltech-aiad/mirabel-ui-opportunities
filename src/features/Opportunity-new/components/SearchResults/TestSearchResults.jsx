@@ -15,9 +15,14 @@ import {
   ChevronDown,
   Edit
 } from 'lucide-react';
+import TableFilterControls from '@/features/Opportunity/components/table/TableFilterControls';
+import CardViewNew from './CardViewNew';
 import { EnhancedDataTable } from '../../../../components/ui/advanced-table';
+import TableFilterControlsHeader from '@/components/ui/TableFilterControlsHeader';
+import EnhancedFilterBar from '../../../../components/ui/EnhancedFilterBar';
 import { useSearchResults } from '../../hooks/useSearchResults';
 import { logger } from '../../../../components/shared/logger';
+import { useNavigate } from 'react-router-dom';
 import { OpportunityStatsCards, ProposalStatsCards } from '../Stats';
 
 // Define stable default outside component to prevent re-renders
@@ -35,13 +40,53 @@ const TestSearchResults = ({ searchType = 'opportunities', searchParams = DEFAUL
     probability: 'All Probability',
     reps: 'All Reps'
   });
+  const navigate = useNavigate();
 
   const isOpportunities = searchType === 'opportunities';
   const title = isOpportunities ? 'Opportunities' : 'Proposals';
 
+  
   // Use the real API service
   const { data, loading, error, refetch } = useSearchResults(searchParams);
-
+  
+  const filterDefinitions = [
+    {
+        id: 'opportunities',
+        placeholder: 'All Opportunities',
+        options: [
+            { value: 'all', label: 'All Opportunities' },
+            //...OPPORTUNITY_TYPES
+        ],
+        value: 'all',
+        onChange: (value) => {
+            //onFiltersChange({ opportunities: value === 'all' ? undefined : value })
+        }
+    },
+    {
+        id: 'probability',
+        placeholder: 'All Probability',
+        options: [
+            { value: 'all', label: 'All Probability' },
+            //...PROBABILITY_TYPES
+        ],
+        value: 'all',
+        onChange: (value) => {
+            //onFiltersChange({ probability: value === 'all' ? undefined : value })
+        }
+    },
+    {
+        id: 'reps',
+        placeholder: 'All Reps',
+        options: [
+            { value: 'all', label: 'All Reps' },
+            //...REPS
+        ],
+        value: 'all',
+        onChange: (value) => {
+            //onFiltersChange({ reps: value === 'all' ? undefined : value })
+        }
+    }
+]
   // Edit functionality
   const handleEditClick = (e, row) => {
     e.stopPropagation();
@@ -311,6 +356,51 @@ const TestSearchResults = ({ searchType = 'opportunities', searchParams = DEFAUL
     }
   ];
 
+  const handleFilterClick = () => {
+    console.log("Filter button clicked, navigating to /advanced-search");
+    try {
+      // Navigate to advanced search with opportunities tab and preserve current filters
+      const advancedSearchParams = new URLSearchParams();
+
+      // Copy all current filters to preserve them, but exclude default "All Opportunities" status
+      for (const [key, value] of Object.entries(filters)) {
+        // Skip empty values, empty arrays, "All" selections, and default "All Opportunities" status
+        if (
+          value &&
+          value.toString().trim() !== "" &&
+          !(key === "status" && value === "All Opportunities")
+        ) {
+          // Handle array values properly for Advanced Search
+          if (Array.isArray(value)) {
+            if (value.length > 0) {
+              // For multi-select fields, join with commas
+              advancedSearchParams.set(key, value.join(","));
+            }
+            // Skip empty arrays (like when "All Reps" is selected)
+          } else {
+            // For single values, pass as is
+            advancedSearchParams.set(key, value);
+          }
+        }
+      }
+
+      // Set the tab parameter to opportunities
+      advancedSearchParams.set("tab", "opportunities");
+
+      const finalUrl = `/advanced-search?${advancedSearchParams.toString()}`;
+      console.log(
+        "Navigating to advanced search with opportunities tab:",
+        finalUrl
+      );
+      console.log("Quick Filter filters being passed:", filters);
+      navigate(finalUrl);
+    } catch (error) {
+      console.error("Navigation error:", error);
+      // Fallback: just refresh the current data if navigation fails
+      //onRefresh?.();
+    }
+  };
+
   return (
     <>
       <style>{`
@@ -356,93 +446,112 @@ const TestSearchResults = ({ searchType = 'opportunities', searchParams = DEFAUL
       </div>
 
       {/* Combined Filter and Action Bar */}
-      <div className="bg-white border-b border-gray-200 px-6 py-3 flex-shrink-0">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-4">
-            <div className="relative">
-              <select className="appearance-none bg-white border border-gray-300 rounded-md px-3 py-2 pr-8 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-                <option>All {title}</option>
-              </select>
-              <ChevronDown className="absolute right-2 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400 pointer-events-none" />
-            </div>
-            <div className="relative">
-              <select className="appearance-none bg-white border border-gray-300 rounded-md px-3 py-2 pr-8 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-                <option>All Probability</option>
-              </select>
-              <ChevronDown className="absolute right-2 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400 pointer-events-none" />
-            </div>
-            <div className="relative">
-              <select className="appearance-none bg-white border border-gray-300 rounded-md px-3 py-2 pr-8 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-                <option>All Reps</option>
-              </select>
-              <ChevronDown className="absolute right-2 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400 pointer-events-none" />
-            </div>
-          </div>
+      {/* <TableFilterControls
+        filters={filters}
+        onFilterChange={setFilters}
+        view={viewMode}
+        onViewChange={setViewMode}
+        onViewsClick={() => setViewMode('table')}
+      /> */}
 
-          <div className="flex items-center space-x-4">
-            <span className="text-sm text-gray-600">
-              {data?.pageInfo ?
-                `${((data.pageInfo.currentPage - 1) * data.pageInfo.pageSize) + 1}-${Math.min(data.pageInfo.currentPage * data.pageInfo.pageSize, data.totalCount)} of ${data.totalCount}` :
-                `1-${tableData.length} of ${tableData.length}`
-              }
-            </span>
-            <div className="flex items-center space-x-1">
-              <button className="p-1 rounded hover:bg-gray-100">
-                <ChevronLeft className="h-4 w-4" />
-              </button>
-              <button className="p-1 rounded hover:bg-gray-100">
-                <ChevronRight className="h-4 w-4" />
-              </button>
-            </div>
+      <EnhancedFilterBar
+         // Data and pagination
+         total={data?.totalCount || 0}
 
-            <div className="flex items-center space-x-1 ml-4">
-              <button className="p-2 text-gray-700 hover:text-gray-900 border border-gray-300 rounded-md hover:bg-gray-50">
-                <Plus className="h-4 w-4" />
-              </button>
+         // Search
+         searchQuery={''}
+         //onSearch={() => {}}
+         //searchPlaceholder=""
 
-              <button className="p-2 text-gray-700 hover:text-gray-900 border border-gray-300 rounded-md hover:bg-gray-50">
-                <RotateCcw className="h-4 w-4" />
-              </button>
+         // Filters
+         onFilterClick={() => {}}
+         filters={filterDefinitions}
+         onResetFilters={() => {}}
+         hasActiveFilters={false}
 
-              <button className="p-2 text-gray-700 hover:text-gray-900 border border-gray-300 rounded-md hover:bg-gray-50">
-                <Settings className="h-4 w-4" />
-              </button>
+         // Actions
+         onRefresh={() => {}}
 
-              <div className="flex items-center border border-gray-300 rounded-md">
-                <button
-                  onClick={() => setViewMode('table')}
-                  className={`p-2 ${viewMode === 'table' ? 'bg-blue-50 text-blue-600' : 'text-gray-600 hover:text-gray-900'}`}
-                >
-                  <List className="h-4 w-4" />
-                </button>
-                <button
-                  onClick={() => setViewMode('grid')}
-                  className={`p-2 border-l border-gray-300 ${viewMode === 'grid' ? 'bg-blue-50 text-blue-600' : 'text-gray-600 hover:text-gray-900'}`}
-                >
-                  <Grid3X3 className="h-4 w-4" />
-                </button>
-                <button
-                  onClick={() => setViewMode('kanban')}
-                  className={`p-2 border-l border-gray-300 ${viewMode === 'kanban' ? 'bg-blue-50 text-blue-600' : 'text-gray-600 hover:text-gray-900'}`}
-                >
-                  <BarChart3 className="h-4 w-4" />
-                </button>
-              </div>
+         // View controls
+         activeView={viewMode}
+         onViewChange={setViewMode}
+         onViewsClick={() => setViewMode('table')}
+      />
 
-              <button className="p-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">
-                <Filter className="h-4 w-4" />
-              </button>
+      {/* <TableFilterControlsHeader
+        primaryFilterLabel="All Opportunities"
+        onPrimaryFilterClick={() => {}}
+        secondaryFilterLabel="All Probability"
+        onSecondaryFilterClick={() => {}}
+        repsFilterLabel="All Reps"
+        onRepsFilterClick={() => {}}
+        pageStart={1}
+        pageEnd={data?.totalCount || 0}
+        totalItems={data?.totalCount || 0}
+        canPrev
+        canNext
+        onPrevPage={() => {}}
+        onNextPage={() => {}}
+        onAdd={() => {}}
+        onRefresh={() => {}}
+        refreshing={false}
+        viewMode="table" // or 'grid'
+        onChangeViewMode={setViewMode}
+        onSettings={() => {}}
+        onSearch={() => {}}
+        onViews={() => {}}
+      />
+       */}
 
-              <button className="p-2 text-gray-700 hover:text-gray-900 border border-gray-300 rounded-md hover:bg-gray-50">
-                <Eye className="h-4 w-4" />
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
+      {
+        viewMode === 'cards' && (
+          <CardViewNew
+          opportunities={tableData}
+          view={viewMode}
+          onViewChange={setViewMode}
+          filters={filters}
+          onFilterChange={setFilters}
+          users={[]}
+          savedSearches={[]}
+          sortConfig={[]}
+          onSort={() => {}}
+          onRefresh={() => {}}
+          currentPage={1}
+          onNextPage={() => {}}
+          onPreviousPage={() => {}}
+          totalCount={data?.totalCount || 0}
+          onCardClick={() => {}}
+          onEditOpportunity={() => {}}
+            //renderCell={renderCell}
+          />
+        )
+      }
+{
+  /*
+  opportunities = [],
+  // filter controls props
+  view,
+  onViewChange,
+  filters,
+  onFilterChange,
+  users,
+  savedSearches,
+  sortConfig,
+  onSort,
+  onRefresh,
+  currentPage,
+  onNextPage,
+  onPreviousPage,
+  totalCount,
+  // card interactions
+  onCardClick,
+  onEditOpportunity,
+  */
+}
 
       {/* Main Content - Scrollable Table Area */}
-      <div className="flex-1 min-h-0 bg-white">
+      {viewMode === 'table' && (
+        <div className="flex-1 min-h-0 bg-white">
         {loading ? (
           <div className="flex items-center justify-center h-64">
             <div className="text-gray-500">Loading...</div>
@@ -482,7 +591,7 @@ const TestSearchResults = ({ searchType = 'opportunities', searchParams = DEFAUL
             />
           </div>
         )}
-      </div>
+      </div>)}
       </div>
     </>
   );
