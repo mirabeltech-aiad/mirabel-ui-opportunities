@@ -3,7 +3,7 @@ import { Button } from './button'
 import { Badge } from './badge'
 import { RotateCcw } from 'lucide-react'
 import { cn } from '../shared/lib/utils'
-import { Tooltip } from './tooltip'
+import { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from './tooltip'
 import { getTooltip } from '../shared/constants/tooltips'
 
 interface ResetButtonProps {
@@ -148,42 +148,49 @@ export const ResetButton: React.FC<ResetButtonProps> = ({
     : 'RESET_BUTTON.DISABLED'
 
   return (
-    <Tooltip content={getTooltip(tooltipKey) || getTooltipText()}>
-      <Button
-        variant="outline"
-        size={size}
-        className={cn(
-          getSizeStyles(),
-          getButtonStyles(),
-          className
-        )}
-        onClick={hasActiveItems ? onReset : undefined}
-        disabled={isDisabled}
-        aria-label={getTooltipText()}
-      >
-        <RotateCcw className={cn(getIconSize(), iconOnly ? '' : 'mr-1')} />
-
-        {/* Show label only if not icon-only mode */}
-        {!iconOnly && (
-          <span className="font-medium">
-            {labels.short}
-            {displayCount && (
-              <>
-                {' '}
-                <Badge
-                  variant="secondary"
-                  className="ml-1 bg-red-100 text-red-800 text-xs h-5 min-w-[20px] px-1.5 rounded-full"
-                >
-                  {displayCount}
-                </Badge>
-              </>
+    <TooltipProvider>
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <Button
+            variant="outline"
+            size={size}
+            className={cn(
+              getSizeStyles(),
+              getButtonStyles(),
+              className
             )}
-            {hasActiveItems && !displayCount && ' ✓'}
-            {!hasActiveItems && ' (0)'}
-          </span>
-        )}
-      </Button>
-    </Tooltip>
+            onClick={hasActiveItems ? onReset : undefined}
+            disabled={isDisabled}
+            aria-label={getTooltipText()}
+          >
+            <RotateCcw className={cn(getIconSize(), iconOnly ? '' : 'mr-1')} />
+
+            {/* Show label only if not icon-only mode */}
+            {!iconOnly && (
+              <span className="font-medium">
+                {labels.short}
+                {displayCount && (
+                  <>
+                    {' '}
+                    <Badge
+                      variant="secondary"
+                      className="ml-1 bg-red-100 text-red-800 text-xs h-5 min-w-[20px] px-1.5 rounded-full"
+                    >
+                      {displayCount}
+                    </Badge>
+                  </>
+                )}
+                {hasActiveItems && !displayCount && ' ✓'}
+                {!hasActiveItems && ' (0)'}
+              </span>
+            )}
+          </Button>
+        </TooltipTrigger>
+        <TooltipContent>
+          <p>{getTooltip(tooltipKey) || getTooltipText()}</p>
+        </TooltipContent>
+      </Tooltip>
+    </TooltipProvider>
   )
 }
 

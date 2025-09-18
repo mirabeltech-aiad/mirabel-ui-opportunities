@@ -312,8 +312,41 @@ const TestSearchResults = ({ searchType = 'opportunities', searchParams = DEFAUL
   ];
 
   return (
-    <div className="h-screen bg-gray-50 flex flex-col">
-      {/* Statistics Cards */}
+    <>
+      <style>{`
+        .table-scroll-container {
+          height: 100%;
+          overflow: auto !important;
+          position: relative;
+        }
+        
+        .table-scroll-container .enhanced-data-table {
+          overflow: visible !important;
+          height: auto !important;
+        }
+        
+        .table-scroll-container .enhanced-data-table > div {
+          overflow: visible !important;
+        }
+        
+        .table-scroll-container .overflow-x-auto {
+          overflow: visible !important;
+        }
+        
+        .table-scroll-container table {
+          width: 100% !important;
+        }
+        
+        /* Ensure table header stays visible during scroll */
+        .table-scroll-container thead {
+          position: sticky !important;
+          top: 0 !important;
+          z-index: 10 !important;
+          background-color: rgb(243, 244, 246) !important;
+        }
+      `}</style>
+      <div className="h-screen bg-gray-50 flex flex-col">
+        {/* Statistics Cards */}
       <div className="bg-white border-b border-gray-200 px-6 py-4 flex-shrink-0">
         {isOpportunities ? (
           <OpportunityStatsCards stats={opportunityStatsData} />
@@ -408,27 +441,27 @@ const TestSearchResults = ({ searchType = 'opportunities', searchParams = DEFAUL
         </div>
       </div>
 
-      {/* Main Content */}
-      <div className="flex-1 overflow-hidden">
-        <div className="bg-white h-full">
-          {loading ? (
-            <div className="flex items-center justify-center h-64">
-              <div className="text-gray-500">Loading...</div>
-            </div>
-          ) : error ? (
-            <div className="flex items-center justify-center h-64">
-              <div className="text-red-500">Error: {error.message}</div>
-            </div>
-          ) : (
+      {/* Main Content - Scrollable Table Area */}
+      <div className="flex-1 min-h-0 bg-white">
+        {loading ? (
+          <div className="flex items-center justify-center h-64">
+            <div className="text-gray-500">Loading...</div>
+          </div>
+        ) : error ? (
+          <div className="flex items-center justify-center h-64">
+            <div className="text-red-500">Error: {error.message}</div>
+          </div>
+        ) : (
+          <div className="table-scroll-container">
             <EnhancedDataTable
               data={tableData}
               columns={columns}
               loading={loading}
               enableSelection={true}
-              enablePagination={true}
-              initialPageSize={25}
+              enablePagination={false}
+              initialPageSize={1000}
               rowDensity="compact"
-              className="h-full"
+              className="table-content"
               id="opportunities-table"
               bulkActionContext={isOpportunities ? 'products' : 'schedules'}
               onRowClick={(row) => {
@@ -447,10 +480,11 @@ const TestSearchResults = ({ searchType = 'opportunities', searchParams = DEFAUL
                 logger.info('Sort config:', sortConfig);
               }}
             />
-          )}
-        </div>
+          </div>
+        )}
       </div>
-    </div>
+      </div>
+    </>
   );
 };
 

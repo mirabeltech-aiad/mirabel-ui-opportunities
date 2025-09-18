@@ -4,6 +4,7 @@ import FilterBar from './FilterBar';
 import { EnhancedDataTable } from '../../../../components/ui/advanced-table';
 import { useSearchResults } from '../../hooks/useSearchResults';
 import { ExternalLink, MoreVertical, Edit } from 'lucide-react';
+import { OpportunityStatsCards, ProposalStatsCards } from '../Stats';
 
 // Helper function to get nested object values
 const getNestedValue = (obj, path) => {
@@ -208,45 +209,120 @@ const SearchResults = ({ searchParams, searchType = 'opportunities' }) => {
     }
   ];
 
-  if (loading) return <div className="loading">Loading search results...</div>;
-  if (error) return <div className="error">Error: {error.message}</div>;
+  // Prepare stats data for the stats cards components
+  const statistics = data?.statistics || {};
+  const opportunityStatsData = {
+    totalCount: statistics.totalCount || 0,
+    totalAmount: statistics.totalAmount || '$0',
+    totalWon: statistics.totalWon || 0,
+    totalWinAmount: statistics.totalWinAmount || '$0',
+    totalOpen: statistics.totalOpen || 0,
+    totalLost: statistics.totalLost || 0,
+    winPercentage: statistics.winPercentage || '0%'
+  };
+
+  const proposalStatsData = {
+    total: statistics.totalCount || 0,
+    amount: typeof statistics.totalAmount === 'string' ? statistics.totalAmount.replace('$', '') : statistics.totalAmount || 0,
+    activeProposals: statistics.totalActive || 0,
+    activeProposalsAmount: typeof statistics.totalConvertedAmount === 'string' ? statistics.totalConvertedAmount.replace('$', '') : statistics.totalConvertedAmount || 0,
+    sentProposals: statistics.totalPending || 0,
+    sentProposalsAmount: typeof statistics.totalConvertedAmount === 'string' ? statistics.totalConvertedAmount.replace('$', '') : statistics.totalConvertedAmount || 0,
+    approvedProposals: statistics.totalConverted || 0,
+    approvedProposalsAmount: typeof statistics.totalConvertedAmount === 'string' ? statistics.totalConvertedAmount.replace('$', '') : statistics.totalConvertedAmount || 0,
+    conversionRate: statistics.conversionRate || '0%'
+  };
+
+  if (loading) return <div className="flex items-center justify-center h-64"><div className="text-gray-500">Loading search results...</div></div>;
+  if (error) return <div className="flex items-center justify-center h-64"><div className="text-red-500">Error: {error.message}</div></div>;
 
   return (
-    <div className="search-results">
-      <StatisticsCards data={data?.statistics} />
-      <FilterBar
-        filters={filters}
-        onFilterChange={handleFilterChange}
-        onExport={handleExport}
-      />
-      <EnhancedDataTable
-        data={data?.results || []}
-        columns={columns}
-        loading={loading}
-        enableSelection={true}
-        enablePagination={true}
-        initialPageSize={25}
-        rowDensity="compact"
-        className="mt-4"
-        id="search-results-table"
-        bulkActionContext={searchType === 'opportunities' ? 'products' : 'schedules'}
-        onRowClick={(row) => {
-          console.log('Row clicked:', row);
-        }}
-        onRowDoubleClick={(row) => {
-          window.location.href = `/${searchType}/${row.ID || row.id}`;
-        }}
-        onRowSelect={(selectedRows) => {
-          console.log('Selected rows:', selectedRows);
-        }}
-        onBulkAction={(action, rows) => {
-          console.log('Bulk action:', action, rows);
-        }}
-        onSort={(sortConfig) => {
-          console.log('Sort config:', sortConfig);
-        }}
-      />
-    </div>
+    <>
+      <style>{`
+        .search-results-scroll-container {
+          height: 100%;
+          overflow: auto !important;
+          position: relative;
+        }
+        
+        .search-results-scroll-container .enhanced-data-table {
+          overflow: visible !important;
+          height: auto !important;
+        }
+        
+        .search-results-scroll-container .enhanced-data-table > div {
+          overflow: visible !important;
+        }
+        
+        .search-results-scroll-container .overflow-x-auto {
+          overflow: visible !important;
+        }
+        
+        .search-results-scroll-container table {
+          width: 100% !important;
+        }
+        
+        /* Ensure table header stays visible during scroll */
+        .search-results-scroll-container thead {
+          position: sticky !important;
+          top: 0 !important;
+          z-index: 10 !important;
+          background-color: rgb(243, 244, 246) !important;
+        }
+      `}</style>
+      <div className="h-screen bg-gray-50 flex flex-col">
+        {/* Statistics Cards */}
+        <div className="bg-white border-b border-gray-200 px-6 py-4 flex-shrink-0">
+          {isOpportunities ? (
+            <OpportunityStatsCards stats={opportunityStatsData} />
+          ) : (
+            <ProposalStatsCards stats={proposalStatsData} />
+          )}
+        </div>
+
+        {/* Filter Bar */}
+        <div className="bg-white border-b border-gray-200 px-6 py-3 flex-shrink-0">
+          <FilterBar
+            filters={filters}
+            onFilterChange={handleFilterChange}
+            onExport={handleExport}
+          />
+        </div>
+
+        {/* Main Content - Scrollable Table Area */}
+        <div className="flex-1 min-h-0 bg-white">
+          <div className="search-results-scroll-container">
+            <EnhancedDataTable
+              data={data?.results || []}
+              columns={columns}
+              loading={loading}
+              enableSelection={true}
+              enablePagination={false}
+              initialPageSize={1000}
+              rowDensity="compact"
+              className="table-content"
+              id="search-results-table"
+              bulkActionContext={searchType === 'opportunities' ? 'products' : 'schedules'}
+              onRowClick={(row) => {
+                console.log('Row clicked:', row);
+              }}
+              onRowDoubleClick={(row) => {
+                window.location.href = `/${searchType}/${row.ID || row.id}`;
+              }}
+              onRowSelect={(selectedRows) => {
+                console.log('Selected rows:', selectedRows);
+              }}
+              onBulkAction={(action, rows) => {
+                console.log('Bulk action:', action, rows);
+              }}
+              onSort={(sortConfig) => {
+                console.log('Sort config:', sortConfig);
+              }}
+            />
+          </div>
+        </div>
+      </div>
+    </>
   );
 };
 
