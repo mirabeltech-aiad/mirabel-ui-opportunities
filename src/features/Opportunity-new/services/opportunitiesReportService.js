@@ -115,7 +115,7 @@ export class OpportunitiesReportService {
       "Source": "",
       "Products": "",
       "LossReason": "",
-      "AssignedTo": "IE=1~",
+      "AssignedTo": "",
       "Arth": "",
       "SalesPresenter": null,
       "Stage": "",

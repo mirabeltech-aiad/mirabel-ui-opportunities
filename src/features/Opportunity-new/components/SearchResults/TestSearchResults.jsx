@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { 
-  Plus, 
-  RotateCcw, 
-  Settings, 
-  Filter, 
-  Eye, 
-  ChevronLeft, 
+import {
+  Plus,
+  RotateCcw,
+  Settings,
+  Filter,
+  Eye,
+  ChevronLeft,
   ChevronRight,
   MoreVertical,
   Grid3X3,
@@ -18,6 +18,7 @@ import {
 import { EnhancedDataTable } from '../../../../components/ui/advanced-table';
 import { useSearchResults } from '../../hooks/useSearchResults';
 import { logger } from '../../../../components/shared/logger';
+import { OpportunityStatsCards, ProposalStatsCards } from '../Stats';
 
 // Define stable default outside component to prevent re-renders
 const DEFAULT_SEARCH_PARAMS = {};
@@ -100,7 +101,7 @@ const TestSearchResults = ({ searchType = 'opportunities', searchParams = DEFAUL
 
   // Use real data from API
   const tableData = data?.results || [];
-  
+
   // Debug logging
   useEffect(() => {
     logger.info('TestSearchResults: tableData:', tableData);
@@ -109,27 +110,28 @@ const TestSearchResults = ({ searchType = 'opportunities', searchParams = DEFAUL
     logger.info('TestSearchResults: data object:', data);
   }, [tableData, loading, data]);
 
-  const opportunityStats = [
-    { value: statistics.totalCount, label: '# OF OPPORTUNITIES', color: 'text-blue-600' },
-    { value: statistics.totalAmount, label: 'OPPORTUNITY AMOUNT', color: 'text-gray-900' },
-    { value: statistics.totalWon, label: 'TOTAL OPPORTUNITY WON', color: 'text-green-600' },
-    { value: statistics.totalOpen, label: 'TOTAL OPPORTUNITY OPEN', color: 'text-blue-600' },
-    { value: statistics.totalLost, label: 'TOTAL OPPORTUNITY LOST', color: 'text-red-600' },
-    { value: statistics.totalWinAmount, label: 'OPPORTUNITY WIN TOTAL', color: 'text-green-600' },
-    { value: statistics.winPercentage, label: 'OPPORTUNITY WIN %', color: 'text-orange-600' }
-  ];
+  // Prepare stats data for the stats cards components
+  const opportunityStatsData = {
+    totalCount: statistics.totalCount,
+    totalAmount: statistics.totalAmount,
+    totalWon: statistics.totalWon,
+    totalWinAmount: statistics.totalWinAmount,
+    totalOpen: statistics.totalOpen,
+    totalLost: statistics.totalLost,
+    winPercentage: statistics.winPercentage
+  };
 
-  const proposalStats = [
-    { value: statistics.totalCount, label: '# OF PROPOSALS', color: 'text-blue-600' },
-    { value: statistics.totalAmount, label: 'PROPOSAL AMOUNT', color: 'text-gray-900' },
-    { value: statistics.totalActive, label: 'TOTAL PROPOSALS ACTIVE', color: 'text-green-600' },
-    { value: statistics.totalPending, label: 'TOTAL PROPOSALS PENDING', color: 'text-yellow-600' },
-    { value: statistics.totalConverted, label: 'TOTAL PROPOSALS CONVERTED', color: 'text-purple-600' },
-    { value: statistics.totalConvertedAmount, label: 'CONVERTED AMOUNT TOTAL', color: 'text-green-600' },
-    { value: statistics.conversionRate, label: 'CONVERSION RATE %', color: 'text-orange-600' }
-  ];
-
-  const stats = isOpportunities ? opportunityStats : proposalStats;
+  const proposalStatsData = {
+    total: statistics.totalCount,
+    amount: typeof statistics.totalAmount === 'string' ? statistics.totalAmount.replace('$', '') : statistics.totalAmount,
+    activeProposals: statistics.totalActive,
+    activeProposalsAmount: typeof statistics.totalConvertedAmount === 'string' ? statistics.totalConvertedAmount.replace('$', '') : statistics.totalConvertedAmount,
+    sentProposals: statistics.totalPending,
+    sentProposalsAmount: typeof statistics.totalConvertedAmount === 'string' ? statistics.totalConvertedAmount.replace('$', '') : statistics.totalConvertedAmount,
+    approvedProposals: statistics.totalConverted,
+    approvedProposalsAmount: typeof statistics.totalConvertedAmount === 'string' ? statistics.totalConvertedAmount.replace('$', '') : statistics.totalConvertedAmount,
+    conversionRate: statistics.conversionRate
+  };
 
   // Define columns for EnhancedDataTable based on real API data structure
   const columns = [
@@ -313,18 +315,11 @@ const TestSearchResults = ({ searchType = 'opportunities', searchParams = DEFAUL
     <div className="h-screen bg-gray-50 flex flex-col">
       {/* Statistics Cards */}
       <div className="bg-white border-b border-gray-200 px-6 py-4 flex-shrink-0">
-        <div className="grid grid-cols-7 gap-4">
-          {stats.map((stat, index) => (
-            <div key={index} className="bg-gray-50 rounded-lg p-4 text-center">
-              <div className={`text-2xl font-bold ${stat.color} mb-1`}>
-                {stat.value}
-              </div>
-              <div className="text-xs text-gray-600 font-medium uppercase tracking-wide">
-                {stat.label}
-              </div>
-            </div>
-          ))}
-        </div>
+        {isOpportunities ? (
+          <OpportunityStatsCards stats={opportunityStatsData} />
+        ) : (
+          <ProposalStatsCards stats={proposalStatsData} />
+        )}
       </div>
 
       {/* Combined Filter and Action Bar */}
@@ -353,7 +348,7 @@ const TestSearchResults = ({ searchType = 'opportunities', searchParams = DEFAUL
 
           <div className="flex items-center space-x-4">
             <span className="text-sm text-gray-600">
-              {data?.pageInfo ? 
+              {data?.pageInfo ?
                 `${((data.pageInfo.currentPage - 1) * data.pageInfo.pageSize) + 1}-${Math.min(data.pageInfo.currentPage * data.pageInfo.pageSize, data.totalCount)} of ${data.totalCount}` :
                 `1-${tableData.length} of ${tableData.length}`
               }
@@ -366,20 +361,20 @@ const TestSearchResults = ({ searchType = 'opportunities', searchParams = DEFAUL
                 <ChevronRight className="h-4 w-4" />
               </button>
             </div>
-            
+
             <div className="flex items-center space-x-1 ml-4">
               <button className="p-2 text-gray-700 hover:text-gray-900 border border-gray-300 rounded-md hover:bg-gray-50">
                 <Plus className="h-4 w-4" />
               </button>
-              
+
               <button className="p-2 text-gray-700 hover:text-gray-900 border border-gray-300 rounded-md hover:bg-gray-50">
                 <RotateCcw className="h-4 w-4" />
               </button>
-              
+
               <button className="p-2 text-gray-700 hover:text-gray-900 border border-gray-300 rounded-md hover:bg-gray-50">
                 <Settings className="h-4 w-4" />
               </button>
-              
+
               <div className="flex items-center border border-gray-300 rounded-md">
                 <button
                   onClick={() => setViewMode('table')}
@@ -400,11 +395,11 @@ const TestSearchResults = ({ searchType = 'opportunities', searchParams = DEFAUL
                   <BarChart3 className="h-4 w-4" />
                 </button>
               </div>
-              
+
               <button className="p-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">
                 <Filter className="h-4 w-4" />
               </button>
-              
+
               <button className="p-2 text-gray-700 hover:text-gray-900 border border-gray-300 rounded-md hover:bg-gray-50">
                 <Eye className="h-4 w-4" />
               </button>
