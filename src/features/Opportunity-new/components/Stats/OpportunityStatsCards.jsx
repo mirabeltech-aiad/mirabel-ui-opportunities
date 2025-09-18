@@ -10,7 +10,7 @@ const StatCard = ({ value, label, icon: Icon, bgColor = 'bg-white', iconColor = 
           <Icon className={`h-5 w-5 ${iconColor}`} />
         </div>
       </div>
-      <div className="text-2xl font-bold text-gray-900">{value}</div>
+      <div className="text-2xl font-bold text-gray-900 truncate" title={value}>{value}</div>
     </div>
   );
 };

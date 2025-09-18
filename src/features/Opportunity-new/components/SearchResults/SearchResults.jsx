@@ -340,28 +340,29 @@ const SearchResults = ({ searchParams, searchType = 'opportunities' }) => {
     }
   ];
 
-  // Prepare stats data
-  const statistics = data?.statistics || {};
+  // Prepare stats data from OpportunityResult array
+  const opportunityResult = data?.opportunityResult || {};
+  
   const opportunityStatsData = {
-    totalCount: statistics.totalCount || 0,
-    totalAmount: statistics.totalAmount || '$0',
-    totalWon: statistics.totalWon || 0,
-    totalWinAmount: statistics.totalWinAmount || '$0',
-    totalOpen: statistics.totalOpen || 0,
-    totalLost: statistics.totalLost || 0,
-    winPercentage: statistics.winPercentage || '0%'
+    totalCount: opportunityResult.TotIds || 0,
+    totalAmount: `$${(opportunityResult.TotOppAmt || 0).toLocaleString()}`,
+    totalWon: opportunityResult.Won || 0,
+    totalWinAmount: `$${(opportunityResult.WinTotal || 0).toLocaleString()}`,
+    totalOpen: opportunityResult.Open || 0,
+    totalLost: opportunityResult.Lost || 0,
+    winPercentage: `${opportunityResult.WinRatio || 0}%`
   };
 
   const proposalStatsData = {
-    total: statistics.totalCount || 0,
-    amount: statistics.totalAmount || 0,
-    activeProposals: statistics.totalActive || 0,
-    activeProposalsAmount: statistics.totalConvertedAmount || 0,
-    sentProposals: statistics.totalPending || 0,
-    sentProposalsAmount: statistics.totalConvertedAmount || 0,
-    approvedProposals: statistics.totalConverted || 0,
-    approvedProposalsAmount: statistics.totalConvertedAmount || 0,
-    conversionRate: statistics.conversionRate || '0%'
+    total: opportunityResult.Proposals || 0,
+    amount: opportunityResult.ProposalsAmount || 0,
+    activeProposals: opportunityResult.ActiveProposals || 0,
+    activeProposalsAmount: opportunityResult.ActiveProposalsAmount || 0,
+    sentProposals: opportunityResult.SentProposals || 0,
+    sentProposalsAmount: opportunityResult.SentProposalsAmount || 0,
+    approvedProposals: opportunityResult.ApprovedProposals || 0,
+    approvedProposalsAmount: opportunityResult.ApprovedProposalsAmount || 0,
+    conversionRate: `${((opportunityResult.ConvertedToContracts / opportunityResult.Proposals) * 100 || 0).toFixed(1)}%`
   };
 
   if (loading) return <div className="flex items-center justify-center h-64"><div className="text-gray-500">Loading search results...</div></div>;
