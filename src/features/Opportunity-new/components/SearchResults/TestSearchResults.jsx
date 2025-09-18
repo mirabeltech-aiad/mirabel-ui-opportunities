@@ -12,7 +12,8 @@ import {
   List,
   BarChart3,
   ExternalLink,
-  ChevronDown
+  ChevronDown,
+  Edit
 } from 'lucide-react';
 import { EnhancedDataTable } from '../../../../components/ui/advanced-table';
 import { useSearchResults } from '../../hooks/useSearchResults';
@@ -39,6 +40,36 @@ const TestSearchResults = ({ searchType = 'opportunities', searchParams = DEFAUL
 
   // Use the real API service
   const { data, loading, error, refetch } = useSearchResults(searchParams);
+
+  // Edit functionality
+  const handleEditClick = (e, row) => {
+    e.stopPropagation();
+    const id = row.ID || row.id;
+    if (id) {
+      if (isOpportunities) {
+        window.location.href = `/edit-opportunity/${id}`;
+      } else {
+        // For proposals, we navigate to edit opportunity with the opportunity ID
+        window.location.href = `/edit-opportunity/${id}`;
+      }
+    }
+  };
+
+  // Check if edit should be shown (similar to old implementation)
+  const shouldShowEdit = (row) => {
+    const id = row.ID || row.id;
+    if (!id || id === 0 || id === '0') {
+      return false;
+    }
+
+    // Don't show edit for certain statuses
+    const status = (row.Status || '').toLowerCase();
+    if (status.includes('closed') || status.includes('locked') || status.includes('archived')) {
+      return false;
+    }
+
+    return true;
+  };
 
   useEffect(() => {
     logger.info('TestSearchResults: Component mounted with searchParams:', searchParams);
@@ -102,6 +133,28 @@ const TestSearchResults = ({ searchType = 'opportunities', searchParams = DEFAUL
 
   // Define columns for EnhancedDataTable based on real API data structure
   const columns = [
+    {
+      id: 'edit',
+      header: '',
+      accessor: () => null,
+      sortable: false,
+      width: 50,
+      render: (value, row) => (
+        shouldShowEdit(row) ? (
+          <button
+            onClick={(e) => handleEditClick(e, row)}
+            className="h-8 w-8 p-0 rounded hover:bg-gray-50 flex items-center justify-center"
+            title={`Edit ${isOpportunities ? 'Opportunity' : 'Proposal'}`}
+          >
+            <Edit className="h-4 w-4 text-gray-600 hover:text-black" />
+          </button>
+        ) : (
+          <div className="h-8 w-8 flex items-center justify-center">
+            {/* Empty space to maintain alignment */}
+          </div>
+        )
+      )
+    },
     {
       id: 'amount',
       header: 'Amount',

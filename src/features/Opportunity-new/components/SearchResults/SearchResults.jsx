@@ -3,7 +3,12 @@ import StatisticsCards from './StatisticsCards';
 import FilterBar from './FilterBar';
 import { EnhancedDataTable } from '../../../../components/ui/advanced-table';
 import { useSearchResults } from '../../hooks/useSearchResults';
-import { ExternalLink, MoreVertical } from 'lucide-react';
+import { ExternalLink, MoreVertical, Edit } from 'lucide-react';
+
+// Helper function to get nested object values
+const getNestedValue = (obj, path) => {
+  return path.split('.').reduce((current, key) => current?.[key], obj);
+};
 
 const SearchResults = ({ searchParams, searchType = 'opportunities' }) => {
   const { data, loading, error, refetch } = useSearchResults(searchParams);
@@ -12,6 +17,38 @@ const SearchResults = ({ searchParams, searchType = 'opportunities' }) => {
     dateRange: null,
     sortBy: 'relevance'
   });
+
+  const isOpportunities = searchType === 'opportunities';
+
+  // Edit functionality
+  const handleEditClick = (e, row) => {
+    e.stopPropagation();
+    const id = row.ID || row.id;
+    if (id) {
+      if (isOpportunities) {
+        window.location.href = `/edit-opportunity/${id}`;
+      } else {
+        // For proposals, we navigate to edit opportunity with the opportunity ID
+        window.location.href = `/edit-opportunity/${id}`;
+      }
+    }
+  };
+
+  // Check if edit should be shown
+  const shouldShowEdit = (row) => {
+    const id = row.ID || row.id;
+    if (!id || id === 0 || id === '0') {
+      return false;
+    }
+
+    // Don't show edit for certain statuses
+    const status = (row.Status || '').toLowerCase();
+    if (status.includes('closed') || status.includes('locked') || status.includes('archived')) {
+      return false;
+    }
+
+    return true;
+  };
 
   const handleFilterChange = (newFilters) => {
     setFilters(prev => ({ ...prev, ...newFilters }));
@@ -24,6 +61,28 @@ const SearchResults = ({ searchParams, searchType = 'opportunities' }) => {
 
   // Define columns for EnhancedDataTable based on real API data structure
   const columns = [
+    {
+      id: 'edit',
+      header: '',
+      accessor: () => null,
+      sortable: false,
+      width: 50,
+      render: (value, row) => (
+        shouldShowEdit(row) ? (
+          <button
+            onClick={(e) => handleEditClick(e, row)}
+            className="h-8 w-8 p-0 rounded hover:bg-gray-50 flex items-center justify-center"
+            title={`Edit ${isOpportunities ? 'Opportunity' : 'Proposal'}`}
+          >
+            <Edit className="h-4 w-4 text-gray-600 hover:text-black" />
+          </button>
+        ) : (
+          <div className="h-8 w-8 flex items-center justify-center">
+            {/* Empty space to maintain alignment */}
+          </div>
+        )
+      )
+    },
     {
       id: 'name',
       header: searchType === 'opportunities' ? 'Opportunity Name' : 'Proposal Name',
@@ -40,10 +99,13 @@ const SearchResults = ({ searchParams, searchType = 'opportunities' }) => {
     {
       id: 'company',
       header: 'Company Name',
-      accessor: 'CompanyName',
+      accessor: 'ContactDetails',
       sortable: true,
       width: 160,
-      render: (value) => <span className="font-medium">{value || 'N/A'}</span>
+      render: (value, row) => {
+        const companyName = getNestedValue(row, 'ContactDetails.Name') || 'N/A';
+        return <span className="font-medium">{companyName}</span>;
+      }
     },
     {
       id: 'amount',
@@ -86,16 +148,18 @@ const SearchResults = ({ searchParams, searchType = 'opportunities' }) => {
     {
       id: 'stage',
       header: 'Stage',
-      accessor: 'Stage',
+      accessor: 'OppStageDetails',
       sortable: true,
       width: 140,
       render: (value, row) => {
+        const stage = getNestedValue(row, 'OppStageDetails.Stage') || 'Unknown';
         const getStageColor = (stage) => {
           const stageColors = {
             'prospecting': 'bg-purple-500',
             'qualification': 'bg-blue-500',
             'proposal': 'bg-yellow-500',
             'negotiation': 'bg-orange-500',
+            'closed won': 'bg-green-500',
             'closed': 'bg-green-500'
           };
           const stageLower = (stage || '').toLowerCase();
@@ -103,8 +167,8 @@ const SearchResults = ({ searchParams, searchType = 'opportunities' }) => {
         };
 
         return (
-          <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium text-white ${getStageColor(value)}`}>
-            {value || 'Unknown'}
+          <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium text-white ${getStageColor(stage)}`}>
+            {stage}
           </span>
         );
       }
@@ -150,7 +214,7 @@ const SearchResults = ({ searchParams, searchType = 'opportunities' }) => {
   return (
     <div className="search-results">
       <StatisticsCards data={data?.statistics} />
-      <FilterBar 
+      <FilterBar
         filters={filters}
         onFilterChange={handleFilterChange}
         onExport={handleExport}

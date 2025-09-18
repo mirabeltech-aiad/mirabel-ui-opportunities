@@ -4,7 +4,7 @@ import { Badge } from './badge'
 import { RotateCcw } from 'lucide-react'
 import { cn } from '../shared/lib/utils'
 import { Tooltip } from './tooltip'
-import { getTooltip } from '@/shared/constants/tooltips'
+import { getTooltip } from '../shared/constants/tooltips'
 
 interface ResetButtonProps {
   onReset: () => void
@@ -47,21 +47,21 @@ export const ResetButton: React.FC<ResetButtonProps> = ({
     if (!hasActiveItems) {
       return `No active ${itemType} to reset`
     }
-    
+
     const count = showCount && activeCount > 0 ? activeCount : ''
     const itemLabel = itemType === 'selection' ? 'selected items' : itemType
-    
+
     if (count) {
       return `Reset ${count} ${itemLabel}`
     }
-    
+
     return `Reset all ${itemLabel}`
   }
 
   // Generate button styling based on variant and state
   const getButtonStyles = () => {
     const baseStyles = 'transition-all duration-200'
-    
+
     if (!hasActiveItems) {
       return cn(
         baseStyles,
@@ -77,14 +77,14 @@ export const ResetButton: React.FC<ResetButtonProps> = ({
           'text-red-600 hover:text-red-700 hover:bg-red-50 border-red-200 hover:border-red-300',
           'focus:ring-2 focus:ring-red-200 focus:ring-opacity-50'
         )
-      
+
       case 'minimal':
         return cn(
           baseStyles,
           'text-gray-600 hover:text-red-600 hover:bg-red-50 border-transparent hover:border-red-200',
           'focus:ring-2 focus:ring-red-200 focus:ring-opacity-50'
         )
-      
+
       case 'secondary':
       default:
         return cn(
@@ -110,7 +110,7 @@ export const ResetButton: React.FC<ResetButtonProps> = ({
           return 'h-9 w-9 p-0'
       }
     }
-    
+
     switch (size) {
       case 'sm':
         return 'h-8 px-2 text-xs'
@@ -143,8 +143,8 @@ export const ResetButton: React.FC<ResetButtonProps> = ({
   const displayCount = showCount && activeCount > 0 ? activeCount : null
   const isDisabled = disabled || !hasActiveItems
 
-  const tooltipKey = hasActiveItems 
-    ? `RESET_BUTTON.${itemType.toUpperCase()}` 
+  const tooltipKey = hasActiveItems
+    ? `RESET_BUTTON.${itemType.toUpperCase()}`
     : 'RESET_BUTTON.DISABLED'
 
   return (
@@ -161,27 +161,27 @@ export const ResetButton: React.FC<ResetButtonProps> = ({
         disabled={isDisabled}
         aria-label={getTooltipText()}
       >
-      <RotateCcw className={cn(getIconSize(), iconOnly ? '' : 'mr-1')} />
-      
-      {/* Show label only if not icon-only mode */}
-      {!iconOnly && (
-        <span className="font-medium">
-          {labels.short}
-          {displayCount && (
-            <>
-              {' '}
-              <Badge 
-                variant="secondary" 
-                className="ml-1 bg-red-100 text-red-800 text-xs h-5 min-w-[20px] px-1.5 rounded-full"
-              >
-                {displayCount}
-              </Badge>
-            </>
-          )}
-          {hasActiveItems && !displayCount && ' ✓'}
-          {!hasActiveItems && ' (0)'}
-        </span>
-      )}
+        <RotateCcw className={cn(getIconSize(), iconOnly ? '' : 'mr-1')} />
+
+        {/* Show label only if not icon-only mode */}
+        {!iconOnly && (
+          <span className="font-medium">
+            {labels.short}
+            {displayCount && (
+              <>
+                {' '}
+                <Badge
+                  variant="secondary"
+                  className="ml-1 bg-red-100 text-red-800 text-xs h-5 min-w-[20px] px-1.5 rounded-full"
+                >
+                  {displayCount}
+                </Badge>
+              </>
+            )}
+            {hasActiveItems && !displayCount && ' ✓'}
+            {!hasActiveItems && ' (0)'}
+          </span>
+        )}
       </Button>
     </Tooltip>
   )

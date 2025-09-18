@@ -151,8 +151,19 @@ To test the real API integration:
 2. Check browser console for API calls and data structure
 3. Verify that real data is displayed in the table
 4. Check statistics cards show real calculated values
+5. Test edit functionality by clicking the edit icons in the table
 
 The TestSearchResults component automatically loads initial data on mount.
+
+## Edit Functionality
+
+Both SearchResults and TestSearchResults components now include edit functionality:
+
+- **Edit Button**: Each row has an edit icon in the first column
+- **Navigation**: Clicking edit navigates to `/edit-opportunity/{id}`
+- **Conditional Display**: Edit button only shows for valid, non-closed opportunities
+- **Status Filtering**: Edit is hidden for closed, locked, or archived records
+- **Proper Integration**: Uses the same pattern as the old Opportunity folder
 
 ## Next Steps
 
