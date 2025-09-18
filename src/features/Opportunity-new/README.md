@@ -39,9 +39,73 @@ src/features/Opportunity-new/
 
 ## API Integration
 
-The components use the existing API services from the legacy folder:
-- `opportunitiesService.js` for opportunities data
-- `proposalsApi.js` for proposals data
+The components now use real API integration with the `opportunities/report/all` endpoint:
+
+### Services
+- **opportunitiesReportService**: Real API integration using the exact pattern from the old folder
+- **advancedSearchApi**: Mock API service (to be replaced)
+
+### Payload Structure
+Uses the exact payload structure from the existing implementation:
+```javascript
+{
+  "IDs": null,
+  "CustomerID": "",
+  "CustomerName": "",
+  "OppName": "",
+  "Type": "",
+  "BusinessUnit": "",
+  "Source": "",
+  "Products": "",
+  "LossReason": "",
+  "AssignedTo": "IE=1~",
+  "Arth": "",
+  "SalesPresenter": null,
+  "Stage": "",
+  "CreatedBy": "",
+  "CreatedFrom": "",
+  "CreatedTo": "",
+  "CloseFrom": "",
+  "CloseTo": "",
+  "ActualCloseFrom": "",
+  "ActualCloseTo": "",
+  "Status": "all",
+  "UserID": 1,
+  "Probability": "",
+  "AdvSearch": { /* nested search parameters */ },
+  "Action": null,
+  "PageSize": 25,
+  "CurPage": 1,
+  "SortBy": "",
+  "ListName": "Latest Search",
+  "ViewType": 0,
+  "ResultType": 1
+  // ... additional fields
+}
+```
+
+### Data Structure
+Returns structured data with statistics, results, and pagination info:
+```javascript
+{
+  success: true,
+  results: [], // Array of opportunity records
+  totalCount: 0,
+  statistics: {
+    totalOpportunities: 0,
+    totalValue: 0,
+    averageValue: 0,
+    openOpportunities: 0,
+    closedWon: 0,
+    closedLost: 0
+  },
+  pageInfo: {
+    currentPage: 1,
+    pageSize: 25,
+    totalPages: 1
+  }
+}
+```
 
 ## Usage
 
@@ -79,10 +143,22 @@ import { SearchResults } from './features/Opportunity-new/SearchResults';
 - Sample data provided for development/testing
 - Error handling and loading states included
 
+## Testing
+
+To test the real API integration:
+
+1. Navigate to `/test-search-results` in the application
+2. Check browser console for API calls and data structure
+3. Verify that real data is displayed in the table
+4. Check statistics cards show real calculated values
+
+The TestSearchResults component automatically loads initial data on mount.
+
 ## Next Steps
 
-1. Test with real API data
+1. ✅ **Real API Integration** - Completed with `opportunities/report/all` endpoint
 2. Implement Grid and Kanban views
 3. Add sorting and advanced filtering
 4. Implement add/edit functionality
 5. Add export capabilities
+6. Connect AdvancedSearch form to the real API service

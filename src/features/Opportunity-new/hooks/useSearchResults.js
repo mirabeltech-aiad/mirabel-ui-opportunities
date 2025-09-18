@@ -1,34 +1,59 @@
-import { useState, useEffect } from 'react';
-import { advancedSearchApi } from '../services/advancedSearchApi';
+import { useState, useEffect, useCallback, useRef } from 'react';
+import { opportunitiesReportService } from '../services/opportunitiesReportService';
+import { logger } from '../../../components/shared/logger';
 
 export const useSearchResults = (searchParams) => {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  const fetchResults = async () => {
-    if (!searchParams) return;
+  // Use refs to prevent infinite loops
+  const isInitialMount = useRef(true);
+  const lastSearchParamsRef = useRef();
 
+  const fetchResults = useCallback(async (params) => {
     setLoading(true);
     setError(null);
 
     try {
-      const results = await advancedSearchApi.search(searchParams);
+      let results;
+
+      if (!params || Object.keys(params).length === 0) {
+        logger.info('useSearchResults: No search params, fetching initial data');
+        results = await opportunitiesReportService.getInitialData();
+      } else {
+        logger.info('useSearchResults: Executing search with params:', params);
+        results = await opportunitiesReportService.executeSearch(params);
+      }
+
+      logger.info('useSearchResults: Results received:', results);
       setData(results);
     } catch (err) {
+      logger.error('useSearchResults: Error fetching results:', err);
       setError(err);
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
   useEffect(() => {
-    fetchResults();
-  }, [searchParams]);
+    // Convert searchParams to string for comparison
+    const currentParamsString = JSON.stringify(searchParams || {});
+    const lastParamsString = JSON.stringify(lastSearchParamsRef.current || {});
 
-  const refetch = () => {
-    fetchResults();
-  };
+    // Only fetch if this is the initial mount or if params actually changed
+    if (isInitialMount.current || currentParamsString !== lastParamsString) {
+      isInitialMount.current = false;
+      lastSearchParamsRef.current = searchParams;
+      fetchResults(searchParams);
+    }
+  }, [searchParams, fetchResults]);
+
+  // No cleanup needed since we removed AbortController
+
+  const refetch = useCallback(() => {
+    fetchResults(searchParams);
+  }, [fetchResults, searchParams]);
 
   return {
     data,

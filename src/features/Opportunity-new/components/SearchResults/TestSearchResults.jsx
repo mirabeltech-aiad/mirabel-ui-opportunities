@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   Plus, 
   RotateCcw, 
@@ -15,8 +15,18 @@ import {
   ChevronDown
 } from 'lucide-react';
 import { EnhancedDataTable } from '../../../../components/ui/advanced-table';
+import { useSearchResults } from '../../hooks/useSearchResults';
+import { logger } from '../../../../components/shared/logger';
 
-const TestSearchResults = ({ searchType = 'opportunities', searchParams = {} }) => {
+// Define stable default outside component to prevent re-renders
+const DEFAULT_SEARCH_PARAMS = {};
+
+// Helper function to get nested object values
+const getNestedValue = (obj, path) => {
+  return path.split('.').reduce((current, key) => current?.[key], obj);
+};
+
+const TestSearchResults = ({ searchType = 'opportunities', searchParams = DEFAULT_SEARCH_PARAMS }) => {
   const [viewMode, setViewMode] = useState('table');
   const [filters, setFilters] = useState({
     all: searchType === 'opportunities' ? 'All Opportunities' : 'All Proposals',
@@ -27,98 +37,46 @@ const TestSearchResults = ({ searchType = 'opportunities', searchParams = {} }) 
   const isOpportunities = searchType === 'opportunities';
   const title = isOpportunities ? 'Opportunities' : 'Proposals';
 
-  // Sample statistics
+  // Use the real API service
+  const { data, loading, error, refetch } = useSearchResults(searchParams);
+
+  useEffect(() => {
+    logger.info('TestSearchResults: Component mounted with searchParams:', searchParams);
+    logger.info('TestSearchResults: Data received:', data);
+    logger.info('TestSearchResults: Loading state:', loading);
+    logger.info('TestSearchResults: Error state:', error);
+  }, [searchParams, data, loading, error]);
+
+  // Use real statistics from API or fallback to sample data
+  const apiStats = data?.statistics || {};
   const statistics = isOpportunities ? {
-    totalCount: '605',
-    totalAmount: '$10,026,759.1',
-    totalWon: '265',
-    totalOpen: '283',
-    totalLost: '57',
-    totalWinAmount: '$1,069,857.6',
-    winPercentage: '82%'
+    totalCount: apiStats.totalOpportunities?.toString() || data?.totalCount?.toString() || '0',
+    totalAmount: `$${(apiStats.totalValue || 0).toLocaleString()}`,
+    totalWon: apiStats.closedWon?.toString() || '0',
+    totalOpen: apiStats.openOpportunities?.toString() || '0',
+    totalLost: apiStats.closedLost?.toString() || '0',
+    totalWinAmount: `$${(apiStats.totalValue || 0).toLocaleString()}`,
+    winPercentage: apiStats.totalOpportunities > 0 ? `${Math.round((apiStats.closedWon / apiStats.totalOpportunities) * 100)}%` : '0%'
   } : {
-    totalCount: '342',
-    totalAmount: '$8,456,234.5',
-    totalActive: '189',
-    totalPending: '98',
-    totalConverted: '55',
-    totalConvertedAmount: '$2,345,678.9',
-    conversionRate: '16%'
+    totalCount: apiStats.totalOpportunities?.toString() || data?.totalCount?.toString() || '0',
+    totalAmount: `$${(apiStats.totalValue || 0).toLocaleString()}`,
+    totalActive: apiStats.openOpportunities?.toString() || '0',
+    totalPending: '0',
+    totalConverted: apiStats.closedWon?.toString() || '0',
+    totalConvertedAmount: `$${(apiStats.totalValue || 0).toLocaleString()}`,
+    conversionRate: apiStats.totalOpportunities > 0 ? `${Math.round((apiStats.closedWon / apiStats.totalOpportunities) * 100)}%` : '0%'
   };
 
-  // Sample data
-  const sampleData = [
-    {
-      id: 1,
-      amount: '$1,000',
-      assignedRep: { name: 'NC', color: 'bg-red-500' },
-      projCloseDate: '9/30/2025',
-      company: 'Crypto.com',
-      name: 'Opportunity-Today',
-      probability: '20%',
-      stage: '2nd...',
-      stageColor: 'bg-green-500',
-      status: 'Open',
-      statusColor: 'bg-blue-100 text-blue-800',
-      contactName: 'Patty Beck'
-    },
-    {
-      id: 2,
-      amount: '$87,000',
-      assignedRep: { name: 'BL', color: 'bg-purple-500' },
-      projCloseDate: '10/29/2017',
-      company: 'SL Powers',
-      name: 'Opportunity',
-      probability: '100%',
-      stage: 'Closed Won',
-      stageColor: 'bg-green-500',
-      status: 'Won',
-      statusColor: 'bg-green-100 text-green-800',
-      contactName: 'Dawn Hardesty'
-    },
-    {
-      id: 3,
-      amount: '$780',
-      assignedRep: { name: 'BL', color: 'bg-purple-500' },
-      projCloseDate: '10/31/2022',
-      company: 'The BWP',
-      name: 'Opportunity',
-      probability: '10%',
-      stage: 'Proposal',
-      stageColor: 'bg-orange-500',
-      status: 'Open',
-      statusColor: 'bg-blue-100 text-blue-800',
-      contactName: 'Samantha Brown'
-    },
-    {
-      id: 4,
-      amount: '$10,000',
-      assignedRep: { name: 'BL', color: 'bg-purple-500' },
-      projCloseDate: '12/30/2022',
-      company: 'Salt & Pepper, Ltd.',
-      name: 'Opportunity',
-      probability: '10%',
-      stage: 'Meeting',
-      stageColor: 'bg-orange-500',
-      status: 'Open',
-      statusColor: 'bg-blue-100 text-blue-800',
-      contactName: 'Brian Riley'
-    },
-    {
-      id: 5,
-      amount: '$10,000',
-      assignedRep: { name: 'BL', color: 'bg-purple-500' },
-      projCloseDate: '10/31/2022',
-      company: 'Salt & Pepper, Ltd.',
-      name: 'Opportunity',
-      probability: '30%',
-      stage: 'Qualification',
-      stageColor: 'bg-yellow-500',
-      status: 'Open',
-      statusColor: 'bg-blue-100 text-blue-800',
-      contactName: 'Brian Riley'
-    }
-  ];
+  // Use real data from API
+  const tableData = data?.results || [];
+  
+  // Debug logging
+  useEffect(() => {
+    logger.info('TestSearchResults: tableData:', tableData);
+    logger.info('TestSearchResults: tableData length:', tableData.length);
+    logger.info('TestSearchResults: loading state:', loading);
+    logger.info('TestSearchResults: data object:', data);
+  }, [tableData, loading, data]);
 
   const opportunityStats = [
     { value: statistics.totalCount, label: '# OF OPPORTUNITIES', color: 'text-blue-600' },
@@ -142,55 +100,70 @@ const TestSearchResults = ({ searchType = 'opportunities', searchParams = {} }) 
 
   const stats = isOpportunities ? opportunityStats : proposalStats;
 
-  // Define columns for EnhancedDataTable
+  // Define columns for EnhancedDataTable based on real API data structure
   const columns = [
     {
       id: 'amount',
       header: 'Amount',
-      accessor: 'amount',
+      accessor: 'Amount',
       sortable: true,
       type: 'currency',
       width: 120,
-      render: (value) => <span className="font-medium">{value}</span>
+      render: (value) => {
+        const amount = parseFloat(value || 0);
+        return <span className="font-medium">${amount.toLocaleString()}</span>;
+      }
     },
     {
-      id: 'assignedRep',
+      id: 'assignedTo',
       header: 'Assigned Rep',
-      accessor: 'assignedRep',
+      accessor: 'AssignedTo',
       sortable: true,
       width: 120,
-      render: (value) => (
-        <div className={`w-8 h-8 rounded-full ${value.color} flex items-center justify-center text-white text-sm font-medium`}>
-          {value.name}
-        </div>
-      )
+      render: (value) => {
+        const initials = (value || 'UN').split(' ').map(n => n[0]).join('').substring(0, 2);
+        const colors = ['bg-red-500', 'bg-blue-500', 'bg-green-500', 'bg-purple-500', 'bg-yellow-500', 'bg-pink-500'];
+        const colorIndex = (value || '').length % colors.length;
+        return (
+          <div className={`w-8 h-8 rounded-full ${colors[colorIndex]} flex items-center justify-center text-white text-sm font-medium`}>
+            {initials}
+          </div>
+        );
+      }
     },
     {
       id: 'projCloseDate',
       header: 'Proj Close Date',
-      accessor: 'projCloseDate',
+      accessor: 'CloseDate',
       sortable: true,
       type: 'date',
       width: 140,
-      render: (value) => <span className="text-sm">{value}</span>
+      render: (value) => {
+        if (!value) return <span className="text-sm">N/A</span>;
+        const date = new Date(value);
+        return <span className="text-sm">{date.toLocaleDateString()}</span>;
+      }
     },
     {
       id: 'company',
       header: 'Company Name',
-      accessor: 'company',
+      accessor: 'ContactDetails',
       sortable: true,
       width: 160,
-      render: (value) => <span className="font-medium">{value}</span>
+      render: (value, row) => {
+        const companyName = getNestedValue(row, 'ContactDetails.Name') || 'N/A';
+        return <span className="font-medium">{companyName}</span>;
+      }
     },
     {
       id: 'name',
       header: `${title.slice(0, -1)} Name`,
-      accessor: 'name',
+      accessor: 'Name',
       sortable: true,
       width: 200,
       render: (value, row) => (
-        <a href={`/${searchType}/${row.id}`} className="text-blue-600 hover:text-blue-800 hover:underline font-medium flex items-center space-x-1">
-          <span>{value}</span>
+        <a href={`/${searchType}/${row.ID || row.id}`} className="text-blue-600 hover:text-blue-800 hover:underline font-medium flex items-center space-x-1">
+          <span>{value || 'Untitled'}</span>
           <ExternalLink className="h-3 w-3" />
         </a>
       )
@@ -198,43 +171,76 @@ const TestSearchResults = ({ searchType = 'opportunities', searchParams = {} }) 
     {
       id: 'probability',
       header: 'Probability (%)',
-      accessor: 'probability',
+      accessor: 'Probability',
       sortable: true,
       type: 'percentage',
       width: 140,
-      render: (value) => <span>{value}</span>
+      render: (value) => <span>{value || '0'}%</span>
     },
     {
       id: 'stage',
       header: 'Stage',
-      accessor: 'stage',
+      accessor: 'OppStageDetails',
       sortable: true,
       width: 140,
-      render: (value, row) => (
-        <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium text-white ${row.stageColor}`}>
-          {value}
-        </span>
-      )
+      render: (value, row) => {
+        const stage = getNestedValue(row, 'OppStageDetails.Stage') || 'Unknown';
+        const getStageColor = (stage) => {
+          const stageColors = {
+            'prospecting': 'bg-purple-500',
+            'qualification': 'bg-blue-500',
+            'proposal': 'bg-yellow-500',
+            'negotiation': 'bg-orange-500',
+            'closed won': 'bg-green-500',
+            'closed': 'bg-green-500'
+          };
+          const stageLower = (stage || '').toLowerCase();
+          return stageColors[stageLower] || 'bg-gray-500';
+        };
+
+        return (
+          <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium text-white ${getStageColor(stage)}`}>
+            {stage}
+          </span>
+        );
+      }
     },
     {
       id: 'status',
       header: 'Status',
-      accessor: 'status',
+      accessor: 'Status',
       sortable: true,
       width: 100,
-      render: (value, row) => (
-        <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${row.statusColor}`}>
-          {value}
-        </span>
-      )
+      render: (value) => {
+        const getStatusColor = (status) => {
+          const statusLower = (status || '').toLowerCase();
+          if (statusLower.includes('open') || statusLower.includes('active')) {
+            return 'bg-green-100 text-green-800';
+          } else if (statusLower.includes('won')) {
+            return 'bg-blue-100 text-blue-800';
+          } else if (statusLower.includes('lost')) {
+            return 'bg-red-100 text-red-800';
+          }
+          return 'bg-gray-100 text-gray-800';
+        };
+
+        return (
+          <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusColor(value)}`}>
+            {value || 'Unknown'}
+          </span>
+        );
+      }
     },
     {
       id: 'contactName',
       header: 'Contact Name',
-      accessor: 'contactName',
+      accessor: 'ContactDetails',
       sortable: true,
       width: 160,
-      render: (value) => <span>{value}</span>
+      render: (value, row) => {
+        const contactName = getNestedValue(row, 'ContactDetails.ContactName') || 'N/A';
+        return <span>{contactName}</span>;
+      }
     },
     {
       id: 'actions',
@@ -293,7 +299,12 @@ const TestSearchResults = ({ searchType = 'opportunities', searchParams = {} }) 
           </div>
 
           <div className="flex items-center space-x-4">
-            <span className="text-sm text-gray-600">1-25 of 605</span>
+            <span className="text-sm text-gray-600">
+              {data?.pageInfo ? 
+                `${((data.pageInfo.currentPage - 1) * data.pageInfo.pageSize) + 1}-${Math.min(data.pageInfo.currentPage * data.pageInfo.pageSize, data.totalCount)} of ${data.totalCount}` :
+                `1-${tableData.length} of ${tableData.length}`
+              }
+            </span>
             <div className="flex items-center space-x-1">
               <button className="p-1 rounded hover:bg-gray-100">
                 <ChevronLeft className="h-4 w-4" />
@@ -352,33 +363,43 @@ const TestSearchResults = ({ searchType = 'opportunities', searchParams = {} }) 
       {/* Main Content */}
       <div className="flex-1 overflow-hidden">
         <div className="bg-white h-full">
-          <EnhancedDataTable
-            data={sampleData}
-            columns={columns}
-            loading={false}
-            enableSelection={true}
-            enablePagination={true}
-            initialPageSize={25}
-            rowDensity="compact"
-            className="h-full"
-            id="opportunities-table"
-            bulkActionContext={isOpportunities ? 'products' : 'schedules'}
-            onRowClick={(row) => {
-              console.log('Row clicked:', row);
-            }}
-            onRowDoubleClick={(row) => {
-              window.location.href = `/${searchType}/${row.id}`;
-            }}
-            onRowSelect={(selectedRows) => {
-              console.log('Selected rows:', selectedRows);
-            }}
-            onBulkAction={(action, rows) => {
-              console.log('Bulk action:', action, rows);
-            }}
-            onSort={(sortConfig) => {
-              console.log('Sort config:', sortConfig);
-            }}
-          />
+          {loading ? (
+            <div className="flex items-center justify-center h-64">
+              <div className="text-gray-500">Loading...</div>
+            </div>
+          ) : error ? (
+            <div className="flex items-center justify-center h-64">
+              <div className="text-red-500">Error: {error.message}</div>
+            </div>
+          ) : (
+            <EnhancedDataTable
+              data={tableData}
+              columns={columns}
+              loading={loading}
+              enableSelection={true}
+              enablePagination={true}
+              initialPageSize={25}
+              rowDensity="compact"
+              className="h-full"
+              id="opportunities-table"
+              bulkActionContext={isOpportunities ? 'products' : 'schedules'}
+              onRowClick={(row) => {
+                logger.info('Row clicked:', row);
+              }}
+              onRowDoubleClick={(row) => {
+                window.location.href = `/${searchType}/${row.ID || row.id}`;
+              }}
+              onRowSelect={(selectedRows) => {
+                logger.info('Selected rows:', selectedRows);
+              }}
+              onBulkAction={(action, rows) => {
+                logger.info('Bulk action:', action, rows);
+              }}
+              onSort={(sortConfig) => {
+                logger.info('Sort config:', sortConfig);
+              }}
+            />
+          )}
         </div>
       </div>
     </div>

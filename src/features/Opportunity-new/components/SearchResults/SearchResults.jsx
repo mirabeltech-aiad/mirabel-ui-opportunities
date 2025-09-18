@@ -22,17 +22,17 @@ const SearchResults = ({ searchParams, searchType = 'opportunities' }) => {
     console.log('Exporting data...');
   };
 
-  // Define columns for EnhancedDataTable
+  // Define columns for EnhancedDataTable based on real API data structure
   const columns = [
     {
       id: 'name',
       header: searchType === 'opportunities' ? 'Opportunity Name' : 'Proposal Name',
-      accessor: 'name',
+      accessor: searchType === 'opportunities' ? 'Name' : 'ProposalName',
       sortable: true,
       width: 200,
       render: (value, row) => (
-        <a href={`/${searchType}/${row.id}`} className="text-blue-600 hover:text-blue-800 hover:underline font-medium flex items-center space-x-1">
-          <span>{value}</span>
+        <a href={`/${searchType}/${row.ID || row.id}`} className="text-blue-600 hover:text-blue-800 hover:underline font-medium flex items-center space-x-1">
+          <span>{value || 'Untitled'}</span>
           <ExternalLink className="h-3 w-3" />
         </a>
       )
@@ -40,52 +40,95 @@ const SearchResults = ({ searchParams, searchType = 'opportunities' }) => {
     {
       id: 'company',
       header: 'Company Name',
-      accessor: 'company',
+      accessor: 'CompanyName',
       sortable: true,
       width: 160,
-      render: (value) => <span className="font-medium">{value}</span>
+      render: (value) => <span className="font-medium">{value || 'N/A'}</span>
     },
     {
       id: 'amount',
       header: 'Amount',
-      accessor: 'amount',
+      accessor: 'Amount',
       sortable: true,
       type: 'currency',
       width: 120,
-      render: (value) => <span className="font-medium">{value}</span>
+      render: (value) => {
+        const amount = parseFloat(value || 0);
+        return <span className="font-medium">${amount.toLocaleString()}</span>;
+      }
     },
     {
       id: 'status',
       header: 'Status',
-      accessor: 'status',
+      accessor: 'Status',
       sortable: true,
       width: 100,
-      render: (value, row) => (
-        <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${row.statusColor || 'bg-gray-100 text-gray-800'}`}>
-          {value}
-        </span>
-      )
+      render: (value, row) => {
+        const getStatusColor = (status) => {
+          const statusLower = (status || '').toLowerCase();
+          if (statusLower.includes('open') || statusLower.includes('active')) {
+            return 'bg-green-100 text-green-800';
+          } else if (statusLower.includes('won')) {
+            return 'bg-blue-100 text-blue-800';
+          } else if (statusLower.includes('lost')) {
+            return 'bg-red-100 text-red-800';
+          }
+          return 'bg-gray-100 text-gray-800';
+        };
+
+        return (
+          <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusColor(value)}`}>
+            {value || 'Unknown'}
+          </span>
+        );
+      }
     },
     {
       id: 'stage',
       header: 'Stage',
-      accessor: 'stage',
+      accessor: 'Stage',
       sortable: true,
       width: 140,
-      render: (value, row) => (
-        <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium text-white ${row.stageColor || 'bg-gray-500'}`}>
-          {value}
-        </span>
-      )
+      render: (value, row) => {
+        const getStageColor = (stage) => {
+          const stageColors = {
+            'prospecting': 'bg-purple-500',
+            'qualification': 'bg-blue-500',
+            'proposal': 'bg-yellow-500',
+            'negotiation': 'bg-orange-500',
+            'closed': 'bg-green-500'
+          };
+          const stageLower = (stage || '').toLowerCase();
+          return stageColors[stageLower] || 'bg-gray-500';
+        };
+
+        return (
+          <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium text-white ${getStageColor(value)}`}>
+            {value || 'Unknown'}
+          </span>
+        );
+      }
     },
     {
-      id: 'date',
-      header: 'Date',
-      accessor: 'date',
+      id: 'assignedTo',
+      header: 'Assigned To',
+      accessor: 'AssignedTo',
+      sortable: true,
+      width: 140,
+      render: (value) => <span className="text-sm">{value || 'Unassigned'}</span>
+    },
+    {
+      id: 'createdDate',
+      header: 'Created Date',
+      accessor: 'CreatedDate',
       sortable: true,
       type: 'date',
       width: 120,
-      render: (value) => <span className="text-sm">{value}</span>
+      render: (value) => {
+        if (!value) return <span className="text-sm">N/A</span>;
+        const date = new Date(value);
+        return <span className="text-sm">{date.toLocaleDateString()}</span>;
+      }
     },
     {
       id: 'actions',
@@ -127,7 +170,7 @@ const SearchResults = ({ searchParams, searchType = 'opportunities' }) => {
           console.log('Row clicked:', row);
         }}
         onRowDoubleClick={(row) => {
-          window.location.href = `/${searchType}/${row.id}`;
+          window.location.href = `/${searchType}/${row.ID || row.id}`;
         }}
         onRowSelect={(selectedRows) => {
           console.log('Selected rows:', selectedRows);
