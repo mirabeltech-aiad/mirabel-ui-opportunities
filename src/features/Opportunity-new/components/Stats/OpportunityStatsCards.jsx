@@ -3,14 +3,14 @@ import { TrendingUp, TrendingDown, DollarSign, Target, CheckCircle, XCircle, Clo
 
 const StatCard = ({ value, label, icon: Icon, bgColor = 'bg-white', iconColor = 'text-blue-500' }) => {
   return (
-    <div className={`${bgColor} rounded-xl p-6 shadow-sm border border-gray-100 hover:shadow-md transition-shadow`}>
-      <div className="flex items-center justify-between mb-4">
+    <div className={`${bgColor} rounded-xl p-4 shadow-sm border border-gray-100 hover:shadow-md transition-shadow`}>
+      <div className="flex items-center justify-between mb-3">
         <div className="text-sm font-medium text-gray-600">{label}</div>
         <div className={`p-2 rounded-lg ${iconColor.replace('text-', 'bg-').replace('-500', '-50')}`}>
           <Icon className={`h-5 w-5 ${iconColor}`} />
         </div>
       </div>
-      <div className="text-2xl font-bold text-gray-900 truncate" title={value}>{value}</div>
+      <div className="text-xl font-bold text-gray-900 truncate" title={value}>{value}</div>
     </div>
   );
 };
