@@ -8,7 +8,6 @@ const Pipeline = lazy(() => import('../pages/Opportunity/Pipeline'));
 const AdvancedSearch = lazy(() => import('../pages/Opportunity/AdvancedSearch'));
 const AdvancedSearchNew = lazy(() => import('../features/Opportunity-new/components/AdvancedSearch/AdvancedSearch'));
 const SearchResults = lazy(() => import('../features/Opportunity-new/components/SearchResults/SearchResults'));
-const TestSearchResults = lazy(() => import('../features/Opportunity-new/components/SearchResults/TestSearchResults'));
 const AddOpportunity = lazy(() => import('../pages/Opportunity/AddOpportunity'));
 const EditOpportunity = lazy(() => import('../pages/Opportunity/EditOpportunity'));
 const EditProposal = lazy(() => import('../pages/Opportunity/EditProposal'));
@@ -122,24 +121,16 @@ export const routes = [
     ),
     exact: true
   },
-  {
-    path: '/test-search-results',
-    component: () => (
-      <OpportunityProviders>
-        <TestSearchResults />
-      </OpportunityProviders>
-    ),
-    exact: true
-  },
-  {
-    path: '/reports',
-    component: () => (
-      <OpportunityProviders>
-        <Reports />
-      </OpportunityProviders>
-    ),
-    exact: true
-  }
+
+  // {
+  //   path: '/reports',
+  //   component: () => (
+  //     <OpportunityProviders>
+  //       <Reports />
+  //     </OpportunityProviders>
+  //   ),
+  //   exact: true
+  // }
 ];
 
 

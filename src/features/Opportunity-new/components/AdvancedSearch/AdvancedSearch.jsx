@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { ChevronUp, ChevronDown, RotateCcw, Settings, Search } from 'lucide-react';
 import MultiSelectField from './MultiSelectField';
 import DateRangeField from './DateRangeField';
-import TestSearchResults from '../SearchResults/TestSearchResults';
+import SearchResults from '../SearchResults/SearchResults';
 import opportunitiesConfig from './configs/opportunitiesConfig';
 import proposalsConfig from './configs/proposalsConfig';
 
@@ -97,10 +97,10 @@ const AdvancedSearch = () => {
     setShowResults(false);
   };
 
-  // If showing results, render the TestSearchResults component
+  // If showing results, render the SearchResults component
   if (showResults) {
     return (
-      <TestSearchResults
+      <SearchResults
         searchType={activeTab}
         searchParams={searchParams}
         onBackToSearch={handleBackToSearch}

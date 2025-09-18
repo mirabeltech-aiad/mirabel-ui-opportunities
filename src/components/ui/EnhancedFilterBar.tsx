@@ -20,7 +20,7 @@ import {
   Search,
   ChevronLeft,
   ChevronRight,
-  
+
 } from 'lucide-react'
 import { Badge } from './badge'
 import { FilterResetButton } from './ResetButton'
@@ -69,7 +69,7 @@ interface EnhancedFilterBarProps {
 
   // Unified filter system (new approach)
   filterManager?: FilterStateManager;
-  
+
   // Legacy filter system (backward compatibility)
   filters?: (LegacyFilter | LegacyMultiSelectFilter)[];
   onSearch?: (query: string) => void;
@@ -93,10 +93,10 @@ export const EnhancedFilterBar: FC<EnhancedFilterBarProps> = ({
   activeSortPreset = null,
   searchPlaceholder = "Search...",
   hideViewIcons = [],
-  
+
   // Unified system
   filterManager,
-  
+
   // Legacy system
   filters = [],
   onSearch,
@@ -107,7 +107,7 @@ export const EnhancedFilterBar: FC<EnhancedFilterBarProps> = ({
 }) => {
   // Determine which system to use
   const useUnifiedSystem = !!filterManager
-  
+
   // Get filter data based on system
   const getFilterData = () => {
     if (useUnifiedSystem && filterManager) {
@@ -137,9 +137,9 @@ export const EnhancedFilterBar: FC<EnhancedFilterBarProps> = ({
         {searchFilter && (
           <SearchInput
             value={searchFilter.value || ''}
-            onChange={useUnifiedSystem && filterManager 
+            onChange={useUnifiedSystem && filterManager
               ? (value) => filterManager.setFilterValue('search', value)
-              : searchFilter.onChange || (() => {})
+              : searchFilter.onChange || (() => { })
             }
             placeholder={searchPlaceholder}
             className="w-40 h-9"
@@ -180,26 +180,26 @@ export const EnhancedFilterBar: FC<EnhancedFilterBarProps> = ({
                       key={unifiedFilter.id}
                       className={index > 0 ? 'border-l border-gray-300' : ''}
                     >
-                      <Select 
-                        value={unifiedFilter.value || ''} 
+                      <Select
+                        value={unifiedFilter.value || ''}
                         onValueChange={(value) => filterManager!.setFilterValue(unifiedFilter.id, value)}
                       >
-                        <SelectTrigger 
+                        <SelectTrigger
                           filter
                           className={`
                           h-9 min-w-[120px] px-2.5 text-sm font-normal
                           transition-all duration-200 ease-in-out
                           hover:shadow-sm
                           ${hasSelection
-                            ? 'text-gray-900 bg-blue-50 hover:bg-blue-100 shadow-sm'
-                            : 'text-gray-500 hover:bg-gray-50'
-                          }
+                              ? 'text-gray-900 bg-blue-50 hover:bg-blue-100 shadow-sm'
+                              : 'text-gray-500 hover:bg-gray-50'
+                            }
                         `}>
                           <div className="flex items-center justify-between w-full">
                             <SelectValue placeholder={unifiedFilter.placeholder} />
                             {hasSelection && (
-                              <Badge 
-                                variant="secondary" 
+                              <Badge
+                                variant="secondary"
                                 className="h-4 px-1.5 text-xs bg-blue-600 text-white ml-2"
                               >
                                 1
@@ -211,10 +211,10 @@ export const EnhancedFilterBar: FC<EnhancedFilterBarProps> = ({
                           {unifiedFilter.options
                             ?.filter((option: FilterOption) => option.value !== '') // Filter out empty string values
                             ?.map((option: FilterOption) => (
-                            <SelectItem key={option.value} value={option.value}>
-                              {option.label}
-                            </SelectItem>
-                          ))}
+                              <SelectItem key={option.value} value={option.value}>
+                                {option.label}
+                              </SelectItem>
+                            ))}
                         </SelectContent>
                       </Select>
                     </div>
@@ -252,22 +252,22 @@ export const EnhancedFilterBar: FC<EnhancedFilterBarProps> = ({
                       className={index > 0 ? 'border-l border-gray-300' : ''}
                     >
                       <Select value={singleFilter.value} onValueChange={singleFilter.onChange}>
-                        <SelectTrigger 
+                        <SelectTrigger
                           filter
                           className={`
                           h-9 min-w-[120px] px-2.5 text-sm font-normal
                           transition-all duration-200 ease-in-out
                           hover:shadow-sm
                           ${hasSelection
-                            ? 'text-gray-900 bg-blue-50 hover:bg-blue-100 shadow-sm'
-                            : 'text-gray-500 hover:bg-gray-50'
-                          }
+                              ? 'text-gray-900 bg-blue-50 hover:bg-blue-100 shadow-sm'
+                              : 'text-gray-500 hover:bg-gray-50'
+                            }
                         `}>
                           <div className="flex items-center justify-between w-full">
                             <SelectValue placeholder={singleFilter.placeholder} />
                             {hasSelection && (
-                              <Badge 
-                                variant="secondary" 
+                              <Badge
+                                variant="secondary"
                                 className="h-4 px-1.5 text-xs bg-blue-600 text-white ml-2"
                               >
                                 1
@@ -279,10 +279,10 @@ export const EnhancedFilterBar: FC<EnhancedFilterBarProps> = ({
                           {singleFilter.options
                             .filter(option => option.value !== '') // Filter out empty string values
                             .map((option) => (
-                            <SelectItem key={option.value} value={option.value}>
-                              {option.label}
-                            </SelectItem>
-                          ))}
+                              <SelectItem key={option.value} value={option.value}>
+                                {option.label}
+                              </SelectItem>
+                            ))}
                         </SelectContent>
                       </Select>
                     </div>
@@ -333,7 +333,7 @@ export const EnhancedFilterBar: FC<EnhancedFilterBarProps> = ({
       </div>
 
       {/* Right Section */}
-      
+
       <div className="flex items-center gap-1">
 
         <Tooltip>
@@ -342,7 +342,7 @@ export const EnhancedFilterBar: FC<EnhancedFilterBarProps> = ({
               variant="outline"
               size="sm"
               className="h-9 w-9 p-0"
-              onClick={() => {}}
+              onClick={() => { }}
             >
               <Plus className="h-4 w-4" />
             </Button>
@@ -374,7 +374,7 @@ export const EnhancedFilterBar: FC<EnhancedFilterBarProps> = ({
               variant="outline"
               size="sm"
               className="h-9 w-9 p-0"
-              onClick={() => {}}
+              onClick={() => { }}
             >
               <Settings className="h-4 w-4" />
             </Button>
@@ -392,7 +392,7 @@ export const EnhancedFilterBar: FC<EnhancedFilterBarProps> = ({
           />
         )}
 
-       
+
 
 
         {/* View Toggle Buttons - Only show when onViewChange is provided */}
@@ -460,14 +460,14 @@ export const EnhancedFilterBar: FC<EnhancedFilterBarProps> = ({
         {onViewsClick && (
           <Tooltip>
             <TooltipTrigger asChild>
-            <Button
-              variant="outline"
-              size="sm"
-              className="h-9 px-4"
-              onClick={onViewsClick}
-            >
-              Views
-            </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                className="h-9 px-4"
+                onClick={onViewsClick}
+              >
+                Views
+              </Button>
             </TooltipTrigger>
             <TooltipContent side="bottom" sideOffset={5}>
               Manage custom views
@@ -476,7 +476,7 @@ export const EnhancedFilterBar: FC<EnhancedFilterBarProps> = ({
         )}
 
         {/* Filter Button - Only show when onFilterClick is provided */}
-        
+
       </div>
     </div>
   )
