@@ -315,29 +315,43 @@ export const EnhancedFilterBar: FC<EnhancedFilterBarProps> = ({
             marginLeft: handleReset ? '' : '14vw'
           }}
         >
-          <Button
-            variant="ghost"
-            size="icon"
-            className="h-7 w-7"
-            onClick={() => {onNextPage && onNextPage({CurPage: page - 1}); setPage && setPage(page - 1)}}
-            disabled={page <= 1}
-            aria-label="Previous page"
-          >
-            <ChevronLeft className="h-4 w-4" />
-          </Button>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-7 w-7"
+                onClick={() => {onNextPage && onNextPage({CurPage: page - 1}); setPage && setPage(page - 1)}}
+                disabled={page <= 1}
+                aria-label="Previous page"
+              >
+                <ChevronLeft className="h-4 w-4" />
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent side="bottom" sideOffset={5}>
+              Previous page
+            </TooltipContent>
+          </Tooltip>
           <span>
             {((page - 1) * perPage) + 1}-{Math.min(page * perPage, total)} of {total}
           </span>
-          <Button
-            variant="ghost"
-            size="icon"
-            className="h-7 w-7"
-            onClick={() => {onNextPage && onNextPage({CurPage: page + 1}); setPage && setPage(page + 1)}}
-            disabled={page * perPage >= total}
-            aria-label="Next page"
-          >
-            <ChevronRight className="h-4 w-4" />
-          </Button>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-7 w-7"
+                onClick={() => {onNextPage && onNextPage({CurPage: page + 1}); setPage && setPage(page + 1)}}
+                disabled={page * perPage >= total}
+                aria-label="Next page"
+              >
+                <ChevronRight className="h-4 w-4" />
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent side="bottom" sideOffset={5}>
+              Next page
+            </TooltipContent>
+          </Tooltip>
         </div>
       </div>
 
@@ -458,12 +472,19 @@ export const EnhancedFilterBar: FC<EnhancedFilterBarProps> = ({
           </TooltipContent>
         </Tooltip> */}
         {onFilterClick && (
-          <Button
-            className="bg-ocean-500 text-white hover:bg-ocean-600 h-9 px-4"
-            onClick={onFilterClick}
-          >
-            <Filter className="h-4 w-4 mr-2" />
-          </Button>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                className="bg-ocean-500 text-white hover:bg-ocean-600 h-9 px-4"
+                onClick={onFilterClick}
+              >
+                <Filter className="h-4 w-4 mr-2" />
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent side="bottom" sideOffset={5}>
+              Advanced search
+            </TooltipContent>
+          </Tooltip>
         )}
         {/* Views Button - Only show when onViewsClick is provided */}
         {onViewsClick && (

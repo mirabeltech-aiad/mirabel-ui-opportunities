@@ -9,6 +9,7 @@ import { logger } from '../../../../components/shared/logger';
 import { useNavigate } from 'react-router-dom';
 import { getDefaultColumnOrder } from '../../hooks/helperData';
 import ViewsSidebar from '@/components/ui/views/ViewsSidebar';
+import { NewLoader } from '@/components/ui/NewLoader';
 
 // Helper function to get nested object values
 const getNestedValue = (obj, path) => {
@@ -371,7 +372,7 @@ const SearchResults = ({ searchParams,setShowResults, searchType = 'opportunitie
     conversionRate: `${((opportunityResult.ConvertedToContracts / opportunityResult.Proposals) * 100 || 0).toFixed(1)}%`
   };
 
-  if (loading) return <div className="flex items-center justify-center h-64"><div className="text-gray-500">Loading search results...</div></div>;
+  
   if (error) return <div className="flex items-center justify-center h-64"><div className="text-red-500">Error: {error.message}</div></div>;
 
   return (
@@ -455,7 +456,10 @@ const SearchResults = ({ searchParams,setShowResults, searchType = 'opportunitie
         </div>
 
         {/* Card View */}
-        {viewMode === 'cards' && (
+        {loading && (
+          <NewLoader />
+        )}
+        { !loading && viewMode === 'cards' && (
           <CardViewNew
             opportunities={data?.results || []}
             view={viewMode}
@@ -477,8 +481,8 @@ const SearchResults = ({ searchParams,setShowResults, searchType = 'opportunitie
         )}
 
         {/* Table View */}
-        {viewMode === 'table' && (
-          <div className="flex-1 min-h-0 mt-6">
+        { !loading && viewMode === 'table' && (
+          <div className="flex-1 min-h-0">
             <div className="search-results-scroll-container">
               <EnhancedDataTable
                 data={data?.results || []}
