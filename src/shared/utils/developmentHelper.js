@@ -125,12 +125,15 @@ export const isDevelopmentMode = () => {
 
 // Initialize development environment
 export const initializeDevelopmentEnvironment = () => {
-    if (isDevelopmentMode()) {
-        // Set session data in localStorage
-        localStorage.setItem("MMClientVars", JSON.stringify(sessionValues));
-        sessionStorage.setItem("ClientID", sessionValues.ClientID);
+    // Always initialize session data when using static domain configuration
+    // This ensures the app has proper session data for API calls
+    localStorage.setItem("MMClientVars", JSON.stringify(sessionValues));
+    sessionStorage.setItem("ClientID", sessionValues.ClientID);
 
+    if (isDevelopmentMode()) {
         console.log('✅ Development session initialized');
+    } else {
+        console.log('✅ Production session initialized with static domain configuration');
     }
 };
 

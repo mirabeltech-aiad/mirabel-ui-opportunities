@@ -33,32 +33,13 @@ function App() {
   const [isLoaded, setIsLoaded] = useState(false);
   useLayoutEffect(() => {
     const initializeApp = async () => {
-      // Initialize environment first (sets up localStorage in dev mode)
-      if (isDevelopmentMode()) {
-        initializeDevelopmentEnvironment();
-      }
+      // Initialize environment first (sets up localStorage with session data)
+      initializeDevelopmentEnvironment();
 
-      // In production, monitor for session data and redirect if needed
+      // In production, session data should be initialized by developmentHelper
+      // No need for additional session monitoring since we're using static configuration
       if (!isDevelopmentMode()) {
-        const checkSessionAndRedirect = () => {
-          const mmClientVars = localStorage && localStorage.getItem("MMClientVars");
-          if (!mmClientVars) {
-            console.log('⏳ No session data found, checking again in 5 seconds...');
-            // Give more time for the API call to complete
-            setTimeout(() => {
-              const retryMMClientVars = localStorage && localStorage.getItem("MMClientVars");
-              if (!retryMMClientVars) {
-                console.log('❌ No session data after 5 seconds, redirecting to login');
-                window.location.href = `${getTopPath()}/intranet/home/login.aspx`;
-              }
-            }, 5000);
-          } else {
-            console.log('✅ Session data found');
-          }
-        };
-
-        // Start monitoring after a short delay to let Home component load
-        setTimeout(checkSessionAndRedirect, 1000);
+        console.log('✅ Production mode: Using static domain configuration');
       }
     };
 
