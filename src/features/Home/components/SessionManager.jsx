@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { getSessionData } from "@/utils/sessionHelpers";
-import axiosService from "@/services/axiosService";
+import axiosService from "@/services/axiosService.js";
 import { AUTH_API, STATIC_URLS } from "@/utils";
 
 const HEARTBEAT_INTERVAL = 10 * 60 * 1000; // 10 minutes

@@ -1,4 +1,4 @@
-import axiosService from './axiosService';
+import axiosService from './axiosService.js';
 import { getUserInfo } from '../utils/sessionHelpers';
 import { API_CRM_CONTACTS_SEARCH_QUICK } from '../utils/apiUrls';
 

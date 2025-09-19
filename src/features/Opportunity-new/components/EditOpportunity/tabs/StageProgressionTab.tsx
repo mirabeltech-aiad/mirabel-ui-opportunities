@@ -3,7 +3,7 @@ import { CheckCircle, Circle, Clock, TrendingUp } from 'lucide-react';
 import { FloatingLabelSelect } from '@/shared/components/ui/FloatingLabelSelect';
 import { OpportunityFormData } from '../../../types/opportunity';
 import { OPPORTUNITY_STATUS_OPTIONS } from '../../../constants/opportunityOptions';
-import axiosService from '@/services/axiosService';
+import axiosService from '@/services/axiosService.js';
 
 interface StageProgressionTabProps {
   formData: OpportunityFormData;

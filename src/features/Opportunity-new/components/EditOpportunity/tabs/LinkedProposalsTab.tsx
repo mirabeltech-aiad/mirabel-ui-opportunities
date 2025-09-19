@@ -4,7 +4,7 @@ import { FloatingLabelSearchInput } from '@/shared/components/ui/FloatingLabelSe
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Link2Off, Search } from 'lucide-react';
 import { OpportunityFormData } from '../../../types/opportunity';
-import axiosService from '@/services/axiosService';
+import axiosService from '@/services/axiosService.js';
 
 interface LinkedProposalsTabProps {
   formData: OpportunityFormData;

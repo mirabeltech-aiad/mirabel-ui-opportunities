@@ -1,4 +1,4 @@
-import axiosService from '@/services/axiosService';
+import axiosService from '@/services/axiosService.js';
 import { getCurrentUserId } from '@/utils/userUtils';
 import { API_URLS } from '@/utils/apiUrls';
 const axiosInstance = axiosService;

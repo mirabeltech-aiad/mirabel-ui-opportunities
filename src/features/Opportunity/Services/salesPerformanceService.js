@@ -1,4 +1,4 @@
-import axiosService from '@/services/axiosService';
+import axiosService from '@/services/axiosService.js';
 import { getCurrentUserId } from '@/utils/userUtils';
 const axiosInstance = axiosService;
 class SalesPerformanceService {

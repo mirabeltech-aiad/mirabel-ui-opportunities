@@ -1,4 +1,4 @@
-import axiosService from '@/services/axiosService';
+import axiosService from '@/services/axiosService.js';
 import { getCurrentUserId } from '@/utils/userUtils';
 import { 
   ACTIVITY_TYPES,

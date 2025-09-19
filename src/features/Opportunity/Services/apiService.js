@@ -1,4 +1,4 @@
-import axiosService from '@/services/axiosService';
+import axiosService from '@/services/axiosService.js';
 import { getCurrentUserId, getCurrentUserInfo } from '@/utils/userUtils';
 import { isActiveSession } from '@/utils/sessionHelpers';
 import { session } from '@/utils/session';

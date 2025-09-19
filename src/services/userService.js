@@ -1,4 +1,4 @@
-import axiosService from './axiosService';
+import axiosService from './axiosService.js';
 import { getUserInfo } from '../utils/sessionHelpers';
 import {
   API_USER_ACCOUNT_GET,

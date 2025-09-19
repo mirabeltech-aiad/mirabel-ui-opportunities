@@ -1,4 +1,4 @@
-import axiosService from '@/services/axiosService';
+import axiosService from '@/services/axiosService.js';
 import API_URLS from '@/utils/apiUrls';
 const axiosInstance = axiosService;
 class ContactsApi {

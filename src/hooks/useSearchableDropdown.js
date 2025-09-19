@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import axiosService from '@/services/axiosService';
+import axiosService from '@/services/axiosService.js';
 import { API_URLS } from '@/utils/apiUrls';
 
 // Generic, minimal searchable dropdown hook
