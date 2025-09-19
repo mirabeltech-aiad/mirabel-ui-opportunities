@@ -1,0 +1,539 @@
+/* Enhanced Data Table Styling - Based on Design System Standards */
+
+/* Import design tokens */
+@import '../../../design-system/tokens/index.css';
+
+/* CRITICAL: Force table styling to override any global styles */
+/* This ensures our table styles take precedence over any conflicting CSS */
+
+/* Reset all table elements within our components */
+.enhanced-data-table *,
+.advanced-data-table * {
+  box-sizing: border-box;
+}
+
+/* Force table structure */
+.enhanced-data-table table,
+.advanced-data-table table {
+  display: table !important;
+  table-layout: auto !important;
+  border-collapse: collapse !important;
+  border-spacing: 0 !important;
+  width: 100% !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+.enhanced-data-table thead,
+.advanced-data-table thead {
+  display: table-header-group !important;
+}
+
+.enhanced-data-table tbody,
+.advanced-data-table tbody {
+  display: table-row-group !important;
+}
+
+.enhanced-data-table tr,
+.advanced-data-table tr {
+  display: table-row !important;
+}
+
+.enhanced-data-table th,
+.enhanced-data-table td,
+.advanced-data-table th,
+.advanced-data-table td {
+  display: table-cell !important;
+}
+
+/* Universal table styling - Apply to both enhanced and advanced data tables */
+.enhanced-data-table,
+.advanced-data-table,
+[class*="enhanced-data-table"],
+[class*="advanced-data-table"] {
+  /* Ensure all table containers get base styling */
+  background: rgb(255, 255, 255) !important;
+  border: 1px solid rgb(229, 231, 235) !important;
+  border-radius: 8px !important;
+  overflow: hidden !important;
+  width: 100% !important;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06) !important;
+}
+
+/* CRITICAL: Force table styling with high specificity */
+/* This ensures our table styles override any conflicting CSS */
+
+/* Universal table styling fallback */
+.enhanced-data-table table,
+.enhanced-data-table .data-table,
+.advanced-data-table table,
+.advanced-data-table .data-table,
+div[class*="enhanced-data-table"] table,
+div[class*="advanced-data-table"] table {
+  border-collapse: collapse !important;
+  width: 100% !important;
+}
+
+.enhanced-data-table tbody tr,
+.advanced-data-table tbody tr,
+div[class*="enhanced-data-table"] tbody tr,
+div[class*="advanced-data-table"] tbody tr {
+  border-bottom: 1px solid rgb(243, 244, 246) !important;
+}
+
+.enhanced-data-table thead,
+.advanced-data-table thead,
+div[class*="enhanced-data-table"] thead,
+div[class*="advanced-data-table"] thead {
+  background-color: rgb(243, 244, 246) !important;
+}
+
+.enhanced-data-table thead th,
+.advanced-data-table thead th,
+div[class*="enhanced-data-table"] thead th,
+div[class*="advanced-data-table"] thead th {
+  background-color: rgb(243, 244, 246) !important;
+  border-bottom: 1px solid rgb(209, 213, 219) !important;
+  padding: 12px 16px !important;
+  font-weight: 600 !important;
+  color: rgb(55, 65, 81) !important;
+}
+
+.enhanced-data-table tbody td,
+.advanced-data-table tbody td,
+div[class*="enhanced-data-table"] tbody td,
+div[class*="advanced-data-table"] tbody td {
+  padding: 12px 16px !important;
+  color: rgb(17, 24, 39) !important;
+}
+
+/* Table Container - Following tables.md standards */
+.enhanced-data-table,
+.advanced-data-table,
+div.enhanced-data-table,
+div.advanced-data-table {
+  background: rgb(255, 255, 255) !important; /* --color-white */
+  border: 1px solid rgb(229, 231, 235) !important; /* --color-gray-200 */
+  border-radius: 8px !important;
+  overflow: hidden !important;
+  width: 100% !important;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06) !important;
+}
+
+/* Table - Following tables.md standards */
+.enhanced-data-table .data-table,
+.enhanced-data-table table.data-table,
+.enhanced-data-table table,
+.advanced-data-table .data-table,
+.advanced-data-table table.data-table,
+.advanced-data-table table {
+  width: 100% !important;
+  border-collapse: collapse !important;
+  font-size: 0.875rem !important; /* 14px - text-sm */
+  margin: 0 !important;
+  border-spacing: 0 !important;
+}
+
+/* Header - Following tables.md standards with enhanced contrast */
+.enhanced-data-table .table-header,
+.enhanced-data-table thead.table-header,
+.advanced-data-table .table-header,
+.advanced-data-table thead.table-header {
+  background-color: rgb(243, 244, 246) !important; /* --color-gray-100 - Better contrast */
+}
+
+.enhanced-data-table .table-header-row,
+.enhanced-data-table .table-header tr {
+  height: 48px !important;
+}
+
+.enhanced-data-table .table-header-cell,
+.enhanced-data-table .table-header th {
+  padding: 12px 16px !important;
+  text-align: left !important;
+  font-weight: 600 !important; /* font-semibold */
+  color: rgb(55, 65, 81) !important; /* --color-gray-700 - Darker text for better contrast */
+  border-bottom: 1px solid rgb(209, 213, 219) !important; /* --color-gray-300 - More visible border */
+  font-size: 0.875rem !important; /* text-sm */
+  line-height: 1.2 !important;
+  background-color: rgb(243, 244, 246) !important; /* --color-gray-100 - Better contrast */
+}
+
+/* Body - Following tables.md standards */
+.enhanced-data-table .table-body,
+.enhanced-data-table tbody.table-body {
+  background-color: rgb(255, 255, 255) !important; /* --color-white */
+}
+
+.enhanced-data-table .table-row,
+.enhanced-data-table tbody tr {
+  height: 48px !important; /* Standard row height - will be overridden for compact */
+  transition: background-color 150ms ease-in-out !important;
+  border-bottom: 1px solid rgb(243, 244, 246) !important; /* --color-gray-100 */
+}
+
+.enhanced-data-table .table-row:hover,
+.enhanced-data-table tbody tr:hover {
+  background-color: rgb(249, 250, 251) !important; /* --color-gray-50 */
+}
+
+.enhanced-data-table .table-row.selected,
+.enhanced-data-table tbody tr.selected {
+  background-color: rgb(240, 249, 255) !important; /* --color-ocean-50 */
+  border-color: rgb(186, 230, 253) !important; /* --color-ocean-200 */
+}
+
+/* Cells - Following tables.md standards */
+.enhanced-data-table .table-cell,
+.enhanced-data-table tbody td {
+  padding: 12px 16px !important;
+  vertical-align: middle !important;
+  color: rgb(17, 24, 39) !important; /* --color-gray-900 */
+  font-size: 0.875rem !important; /* text-sm */
+  line-height: 1.4 !important;
+  border-right: none !important;
+}
+
+/* Action cell styling - Products table standard */
+.enhanced-data-table .table-cell--action,
+.enhanced-data-table td.table-cell--action,
+.enhanced-data-table th.table-cell--action {
+  padding: 8px !important;
+  width: 50px !important;
+  min-width: 50px !important;
+  max-width: 50px !important;
+  text-align: center !important;
+}
+
+/* Action buttons - Products table standard */
+.table-cell--action button {
+  height: 36px !important; /* h-9 */
+  width: 36px !important; /* w-9 */
+  padding: 0 !important; /* p-0 */
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  border-radius: 6px !important;
+  border: none !important;
+  background: transparent !important;
+  cursor: pointer !important;
+  transition: all 200ms ease-in-out !important;
+}
+
+.table-cell--action button:hover {
+  background-color: rgb(243, 244, 246) !important; /* hover:bg-gray-100 */
+}
+
+.table-cell--action button.text-red-600 {
+  color: rgb(220, 38, 38) !important; /* text-red-600 */
+}
+
+.table-cell--action button.text-red-600:hover {
+  color: rgb(185, 28, 28) !important; /* hover:text-red-700 */
+  background-color: rgb(254, 242, 242) !important; /* hover:bg-red-50 */
+}
+
+/* Icon sizing - Products table standard */
+.table-cell--action button svg {
+  height: 16px !important; /* h-4 */
+  width: 16px !important; /* w-4 */
+}
+
+/* Text alignment utilities */
+.table-cell.text-left { text-align: left; }
+.table-cell.text-center { text-align: center; }
+.table-cell.text-right { text-align: right; }
+
+/* Row Density Variants - Products Table Standard (32px compact) */
+
+/* Compact density - Products table standard */
+.enhanced-data-table[data-density="compact"] .table-row,
+.enhanced-data-table[data-density="compact"] tbody tr,
+.enhanced-data-table[data-density="compact"] tbody tr.table-row {
+  height: 32px !important; /* Products table standard */
+  min-height: 32px !important;
+  max-height: 32px !important;
+}
+
+.enhanced-data-table[data-density="compact"] .table-cell,
+.enhanced-data-table[data-density="compact"] tbody tr td,
+.enhanced-data-table[data-density="compact"] tbody td.table-cell {
+  padding-top: 6px !important;
+  padding-bottom: 6px !important;
+  padding-left: 16px !important;
+  padding-right: 16px !important;
+}
+
+/* Normal density */
+.enhanced-data-table[data-density="normal"] .table-row,
+.enhanced-data-table[data-density="normal"] tbody tr {
+  height: 48px !important;
+  min-height: 48px !important;
+  max-height: 48px !important;
+}
+
+.enhanced-data-table[data-density="normal"] .table-cell,
+.enhanced-data-table[data-density="normal"] tbody tr td {
+  padding-top: 12px !important;
+  padding-bottom: 12px !important;
+  padding-left: 16px !important;
+  padding-right: 16px !important;
+}
+
+/* Comfortable density */
+.enhanced-data-table[data-density="comfortable"] .table-row,
+.enhanced-data-table[data-density="comfortable"] tbody tr {
+  height: 64px !important;
+  min-height: 64px !important;
+  max-height: 64px !important;
+}
+
+.enhanced-data-table[data-density="comfortable"] .table-cell,
+.enhanced-data-table[data-density="comfortable"] tbody tr td {
+  padding-top: 16px !important;
+  padding-bottom: 16px !important;
+  padding-left: 16px !important;
+  padding-right: 16px !important;
+}
+
+/* Force compact density for schedules table specifically */
+#schedules-table .enhanced-data-table,
+#schedules-table.enhanced-data-table,
+div#schedules-table .enhanced-data-table {
+  background: rgb(255, 255, 255) !important;
+  border: 1px solid rgb(229, 231, 235) !important;
+  border-radius: 8px !important;
+  overflow: hidden !important;
+}
+
+#schedules-table .table-row,
+#schedules-table tbody tr,
+#schedules-table .enhanced-data-table tbody tr {
+  height: 32px !important; /* Products table standard */
+  min-height: 32px !important;
+  max-height: 32px !important;
+  border-bottom: 1px solid rgb(243, 244, 246) !important;
+}
+
+#schedules-table .table-cell,
+#schedules-table tbody tr td,
+#schedules-table .enhanced-data-table tbody tr td {
+  padding-top: 6px !important;
+  padding-bottom: 6px !important;
+  padding-left: 16px !important;
+  padding-right: 16px !important;
+}
+
+#schedules-table .table-header,
+#schedules-table thead,
+#schedules-table .enhanced-data-table thead {
+  background-color: rgb(243, 244, 246) !important;
+}
+
+#schedules-table .table-header-cell,
+#schedules-table thead th,
+#schedules-table .enhanced-data-table thead th {
+  background-color: rgb(243, 244, 246) !important;
+  border-bottom: 1px solid rgb(209, 213, 219) !important;
+  padding: 12px 16px !important;
+}
+
+/* Loading skeleton */
+.table-row .animate-pulse {
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: .5;
+  }
+}
+
+/* Focus styles for accessibility */
+.table-header-cell:focus,
+.table-row:focus {
+  outline: 2px solid var(--color-ocean-500);
+  outline-offset: 2px;
+}
+
+/* COMPREHENSIVE ADVANCED DATA TABLE SUPPORT */
+/* Ensure AdvancedDataTable gets all the same styling as EnhancedDataTable */
+
+.advanced-data-table {
+  background: rgb(255, 255, 255) !important;
+  border: 1px solid rgb(229, 231, 235) !important;
+  border-radius: 8px !important;
+  overflow: hidden !important;
+  width: 100% !important;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06) !important;
+}
+
+.advanced-data-table table {
+  width: 100% !important;
+  border-collapse: collapse !important;
+  font-size: 0.875rem !important;
+  margin: 0 !important;
+  border-spacing: 0 !important;
+}
+
+.advanced-data-table thead {
+  background-color: rgb(243, 244, 246) !important;
+}
+
+.advanced-data-table thead th {
+  background-color: rgb(243, 244, 246) !important;
+  border-bottom: 1px solid rgb(209, 213, 219) !important;
+  padding: 12px 16px !important;
+  font-weight: 600 !important;
+  color: rgb(55, 65, 81) !important;
+  text-align: left !important;
+  font-size: 0.875rem !important;
+}
+
+.advanced-data-table tbody {
+  background-color: rgb(255, 255, 255) !important;
+}
+
+.advanced-data-table tbody tr {
+  height: 48px !important;
+  transition: background-color 150ms ease-in-out !important;
+  border-bottom: 1px solid rgb(243, 244, 246) !important;
+}
+
+.advanced-data-table tbody tr:hover {
+  background-color: rgb(249, 250, 251) !important;
+}
+
+.advanced-data-table tbody tr.selected {
+  background-color: rgb(240, 249, 255) !important;
+  border-color: rgb(186, 230, 253) !important;
+}
+
+.advanced-data-table tbody td {
+  padding: 12px 16px !important;
+  vertical-align: middle !important;
+  color: rgb(17, 24, 39) !important;
+  font-size: 0.875rem !important;
+  line-height: 1.4 !important;
+  border-right: none !important;
+}
+
+/* Action buttons in AdvancedDataTable */
+.advanced-data-table .table-cell--action button,
+.advanced-data-table td button {
+  height: 36px !important;
+  width: 36px !important;
+  padding: 0 !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  border-radius: 6px !important;
+  border: none !important;
+  background: transparent !important;
+  cursor: pointer !important;
+  transition: all 200ms ease-in-out !important;
+}
+
+.advanced-data-table .table-cell--action button:hover,
+.advanced-data-table td button:hover {
+  background-color: rgb(243, 244, 246) !important;
+}
+
+.advanced-data-table .table-cell--action button svg,
+.advanced-data-table td button svg {
+  height: 16px !important;
+  width: 16px !important;
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  .table-row {
+    border-bottom: 2px solid var(--color-gray-200);
+  }
+  
+  .table-cell {
+    border-right: 1px solid var(--color-gray-200);
+  }
+}
+
+/* Responsive behavior */
+@media (max-width: 1024px) {
+  .enhanced-data-table {
+    overflow-x: auto;
+  }
+  
+  .data-table {
+    min-width: 800px;
+  }
+}
+
+@media (max-width: 640px) {
+  .table-cell {
+    padding: 8px 12px;
+  }
+  
+  .table-header-cell {
+    padding: 12px;
+  }
+  
+  .data-table {
+    min-width: 600px;
+  }
+}
+
+/* Typography Standards - Products Table Pattern */
+
+/* Primary text (names, titles) - Products table standard */
+.table-text-primary {
+  font-weight: 600 !important; /* font-semibold */
+  font-size: 0.875rem !important; /* text-sm */
+  color: rgb(7, 89, 133) !important; /* text-ocean-800 */
+  display: block !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  max-width: 100% !important;
+}
+
+/* Secondary text (descriptions) */
+.table-text-secondary {
+  font-size: 0.75rem !important; /* text-xs */
+  color: rgb(75, 85, 99) !important; /* text-gray-600 */
+}
+
+/* Regular data text */
+.table-text-data {
+  font-size: 0.875rem !important; /* text-sm */
+  color: rgb(55, 65, 81) !important; /* text-gray-700 */
+}
+
+/* Muted text (empty states) */
+.table-text-muted {
+  color: rgb(156, 163, 175) !important; /* text-gray-400 */
+}
+
+/* Badge styling - Products table standard */
+.table-badge {
+  display: inline-flex !important;
+  padding: 4px 8px !important; /* px-2 py-1 */
+  font-size: 0.75rem !important; /* text-xs */
+  font-weight: 500 !important; /* font-medium */
+  border-radius: 9999px !important; /* rounded-full */
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+/* Active status badge */
+.table-badge--active {
+  background-color: rgb(220, 252, 231) !important; /* bg-green-100 */
+  color: rgb(22, 101, 52) !important; /* text-green-800 */
+}
+
+/* Inactive status badge */
+.table-badge--inactive {
+  background-color: rgb(254, 226, 226) !important; /* bg-red-100 */
+  color: rgb(153, 27, 27) !important; /* text-red-800 */
+}

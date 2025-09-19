@@ -10,6 +10,7 @@ const AdvancedSearchNew = lazy(() => import('../features/Opportunity-new/compone
 const SearchResults = lazy(() => import('../features/Opportunity-new/components/SearchResults/SearchResults'));
 const AddOpportunity = lazy(() => import('../pages/Opportunity/AddOpportunity'));
 const EditOpportunity = lazy(() => import('../pages/Opportunity/EditOpportunity'));
+const EditOpportunityNew = lazy(() => import('../pages/Opportunity/EditOpportunityNew'));
 const EditProposal = lazy(() => import('../pages/Opportunity/EditProposal'));
 const Proposals = lazy(() => import('../pages/Opportunity/Proposals'));
 const LinkedProposals = lazy(() => import('../pages/Opportunity/LinkedProposals'));
@@ -72,6 +73,15 @@ export const routes = [
     component: () => (
       <OpportunityProviders>
         <EditOpportunity />
+      </OpportunityProviders>
+    ),
+    exact: true
+  },
+  {
+    path: '/edit-opportunity-new/:id',
+    component: () => (
+      <OpportunityProviders>
+        <EditOpportunityNew />
       </OpportunityProviders>
     ),
     exact: true
