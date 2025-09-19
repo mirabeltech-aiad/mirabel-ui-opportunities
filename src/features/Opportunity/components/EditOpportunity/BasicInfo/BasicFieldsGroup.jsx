@@ -1,6 +1,6 @@
 import React from "react";
-import FloatingLabelInput from "@/components/ui/FloatingLabelInput";
-import FloatingLabelSelect from "@/components/ui/FloatingLabelSelect";
+import { FloatingLabelInput } from "@/shared/components/ui/FloatingLabelInput";
+import { FloatingLabelSelect } from "@/shared/components/ui/FloatingLabelSelect";
 import Loader from "@/components/ui/loader";
 
 const BasicFieldsGroup = ({
@@ -24,7 +24,7 @@ const BasicFieldsGroup = ({
   isProbabilityDisabled, // ✅ Add probability disabled prop
 }) => {
   // Get the display value for opportunity type - ensure it matches dropdown options
-  
+
   const getOpportunityTypeDisplayValue = () => {
     // If it's an object with a name property, use the name
     if (
@@ -67,7 +67,7 @@ const BasicFieldsGroup = ({
             value={formData.company}
             onChange={(value) => handleInputChange("company", value)}
             required
-            disabled={formData.contactDetails.ID >0 || formData.opportunityId>0}
+            disabled={formData.contactDetails.ID > 0 || formData.opportunityId > 0}
             className={
               formData.customerId || shouldDisableFields ? "bg-gray-100" : ""
             }
@@ -142,7 +142,7 @@ const BasicFieldsGroup = ({
             type="number"
             value={formData.amount}
             onChange={(value) => handleInputChange("amount", value)}
-            disabled={(!isAddMode && formData.proposalId>0) || isAmountDisabledByProposal}
+            disabled={(!isAddMode && formData.proposalId > 0) || isAmountDisabledByProposal}
             className={
               shouldDisableFields || isAmountDisabledByProposal
                 ? "bg-gray-100"

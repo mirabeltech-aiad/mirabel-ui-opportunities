@@ -30,7 +30,7 @@ interface FloatingLabelSelectProps {
   'data-testid'?: string
 }
 
-export const FloatingLabelSelect: React.FC<FloatingLabelSelectProps> = ({
+const FloatingLabelSelect: React.FC<FloatingLabelSelectProps> = ({
   label,
   value,
   onChange,
@@ -286,3 +286,6 @@ export const FloatingLabelSelect: React.FC<FloatingLabelSelectProps> = ({
     </div>
   )
 }
+
+export { FloatingLabelSelect }
+export default FloatingLabelSelect

@@ -23,7 +23,7 @@ interface FloatingLabelInputProps {
   clearOnFocusIfZero?: boolean
 }
 
-export const FloatingLabelInput: React.FC<FloatingLabelInputProps> = ({
+const FloatingLabelInput: React.FC<FloatingLabelInputProps> = ({
   label,
   value,
   onChange,
@@ -178,3 +178,6 @@ export const FloatingLabelInput: React.FC<FloatingLabelInputProps> = ({
     </div>
   )
 }
+
+export { FloatingLabelInput }
+export default FloatingLabelInput
