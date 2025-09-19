@@ -4,7 +4,7 @@ import { FieldUpdate, BulkUpdateResults } from '../types'
 import { useFieldOperations } from './useFieldOperations'
 import { PRODUCT_FIELDS } from '../constants/productFields'
 
-/**
+/***
  * Custom hook for executing bulk updates
  */
 export const useBulkUpdateExecution = () => {
