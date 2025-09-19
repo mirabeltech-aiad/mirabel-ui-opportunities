@@ -1,9 +1,10 @@
 // Development helper utilities - matches mirabel.mm.ui pattern
 
 // Development API Configuration - Core credentials for API calls
+// Uses environment variables when available, falls back to hardcoded values
 export const devApiConfig = {
-    "baseUrl": "https://smoke-feature21.magazinemanager.com",
-    "domain": "smoke-feature21",
+    "baseUrl": import.meta.env.VITE_API_URL || "https://smoke-feature21.magazinemanager.com",
+    "domain": import.meta.env.VITE_API_DOMAIN || "smoke-feature21",
     "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJMb2dnZWRJblVzZXJJRCI6IjIzIiwiTG9nZ2VkSW5TaXRlQ2xpZW50SUQiOiIxMDAxNSIsIkxvZ2dlZEluU2l0ZUN1bHR1cmVVSSI6ImVuLVVTIiwiRGF0ZVRpbWUiOiI5LzgvMjAyNSA3OjQ2OjM3IEFNIiwiTG9nZ2VkSW5TaXRlQ3VycmVuY3lTeW1ib2wiOiIiLCJMb2dnZWRJblNpdGVEYXRlRm9ybWF0IjoiIiwiRG9tYWluIjoic21va2UtZmVhdHVyZTIxIiwiTG9nZ2VkSW5TaXRlVGltZUFkZCI6WyIwIiwiMCJdLCJTb3VyY2UiOiJUTU0iLCJFbWFpbCI6InNhQG1hZ2F6aW5lbWFuYWdlci5jb20iLCJJc0FQSVVzZXIiOiJGYWxzZSIsIkV4dGVybmFsQXV0aCI6IiIsIm5iZiI6MTc1NzMxNzU5NywiZXhwIjoxNzYwMzE3NTk3LCJpYXQiOjE3NTczMTc1OTcsImlzcyI6Ik1hZ2F6aW5lTWFuYWdlciIsImF1ZCI6IioifQ.cKagdODFU6uT0_5_G6j-EbMS8215bur2YkqWsxcilKo"
 };
 // export const devApiConfig = {
@@ -13,7 +14,7 @@ export const devApiConfig = {
 // };
 
 // Development URL (legacy compatibility)
-export const devURL = devApiConfig.Host;
+export const devURL = devApiConfig.baseUrl;
 
 // Promise management for iframe communication
 export const promises = {};

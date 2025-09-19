@@ -39,10 +39,11 @@ const getEnvironmentConfig = () => {
     };
   }
   
+  // In production, use the static domain from devApiConfig instead of Amplify URL
   return {
-    baseURL: window.location.origin,
-    domain: window.location.hostname,
-    token: getSessionValue("Token") || ""
+    baseURL: devApiConfig.baseUrl,
+    domain: devApiConfig.domain,
+    token: devApiConfig.token
   };
 };
 
