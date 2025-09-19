@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Phone, Mail, Calendar, FileText, CheckSquare } from "lucide-react";
 import ActivityPinIcon from "./ActivityPinIcon";
-import pinService from "../../services/pinService";
+import pinService from "../../Services/pinService.js";
 
 const ActivityRenderer = ({
   activities,

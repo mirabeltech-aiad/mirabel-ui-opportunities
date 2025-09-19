@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import apiService from "../Services/apiService";
 import { getCurrentUserId } from "@/utils/userUtils";
 import { toast } from "@/features/Opportunity/hooks/use-toast";
-import pinService from "../services/pinService";
+import pinService from "../Services/pinService.js";
 import {
   ACTIVITY_TYPES,
   ACTIVITY_SOURCE_TYPES,
