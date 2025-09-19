@@ -39,10 +39,11 @@ const getEnvironmentConfig = () => {
     };
   }
   
+  // In production, use the static domain from devApiConfig instead of Amplify URL
   return {
-    baseURL: window.location.origin,
-    domain: window.location.hostname,
-    token: getSessionValue("Token") || ""
+    baseURL: devApiConfig.baseUrl,
+    domain: devApiConfig.domain,
+    token: devApiConfig.token
   };
 };
 
@@ -53,7 +54,7 @@ const axiosInstance = axios.create({
     "Content-Type": "application/json",
   },
   timeout: CONFIG.timeout,
-  withCredentials: !isDevelopmentMode(), // Always send credentials (needed for production)
+  withCredentials: false, // Disable credentials to avoid CORS preflight issues
 });
 
 // Request Interceptor
@@ -61,19 +62,21 @@ axiosInstance.interceptors.request.use((config) => {
   const envConfig = getEnvironmentConfig();
   
   config.baseURL = envConfig.baseURL;
+  
+  // Set headers to avoid CORS preflight requests
   config.headers.Authorization = envConfig.token ? `Bearer ${envConfig.token}` : '';
   config.headers.domain = envConfig.domain;
-  config.headers['X-Requested-With'] = 'XMLHttpRequest';
   
-  // In development mode, adjust configuration for CORS
+  // Remove X-Requested-With to avoid CORS preflight
+  // config.headers['X-Requested-With'] = 'XMLHttpRequest';
+  
+  // In development mode, add debugging
   if (isDevelopmentMode()) {
     config.metadata = { startTime: new Date() };
-    //console.log(`🚀 API Request: ${config.method?.toUpperCase()} ${config.url}`);
-    
-    // Remove authorization header in development to avoid CORS preflight
-    if (!envConfig.token) {
-      delete config.headers.Authorization;
-    }
+    console.log(`🚀 API Request: ${config.method?.toUpperCase()} ${config.url}`);
+  } else {
+    // In production, ensure we're not triggering CORS preflight
+    console.log(`🚀 Production API Request: ${config.method?.toUpperCase()} ${envConfig.baseURL}${config.url}`);
   }
 
   return config;
@@ -179,7 +182,7 @@ async function refreshTokenWithWebMethodCall() {
     { refreshToken },
     {
       headers: { 'Content-Type': 'application/json' },
-      withCredentials: true,
+      withCredentials: false,
       timeout: 10000
     }
   );
