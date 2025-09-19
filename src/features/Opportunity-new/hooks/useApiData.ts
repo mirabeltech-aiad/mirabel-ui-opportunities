@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import axiosService from '@/services/axiosService';
+import axiosService from '@/services/axiosService.js';
 // Simplified types for API data
 
 interface LoadingState {

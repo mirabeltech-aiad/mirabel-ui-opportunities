@@ -42,7 +42,7 @@ import {
 import { CSS } from "@dnd-kit/utilities";
 import { useAvailableColumns } from "@/features/Opportunity/hooks/useAvailableColumns";
 import apiService from "@/features/Opportunity/Services/apiService";
-import { proposalService } from "@/features/Opportunity/services/proposalService";
+import { proposalService } from "@/features/Opportunity/Services/proposalService.js";
 import { getCurrentUserId } from "@/utils/userUtils";
 import Loader from "@/components/ui/loader";
 

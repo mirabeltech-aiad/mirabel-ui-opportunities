@@ -1,6 +1,6 @@
 // src/hooks/useApi.js
 import { useQuery, useMutation } from "@tanstack/react-query";
-import axiosService from "../services/axiosService";
+import axiosService from "../services/axiosService.js";
 
 // GET method
 export const useApiGet = (key, endpoint, options = {}) => {

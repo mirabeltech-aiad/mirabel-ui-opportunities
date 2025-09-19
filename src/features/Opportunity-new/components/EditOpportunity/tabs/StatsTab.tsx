@@ -9,7 +9,7 @@ import {
   Users, 
   Clock 
 } from 'lucide-react';
-import axiosService from '@/services/axiosService';
+import axiosService from '@/services/axiosService.js';
 
 interface StatsTabProps {
   opportunityId?: string;

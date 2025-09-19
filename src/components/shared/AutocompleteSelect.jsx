@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect } from "react";
 import { ChevronDown, ChevronUp, X } from "lucide-react";
 import ReactDOM from "react-dom";
 import { cn } from "@/lib/utils";
-import axiosService from '@/services/axiosService';
+import axiosService from '@/services/axiosService.js';
 import { getCurrentUserId } from '@/utils/userUtils';
 import { API_URLS } from "@/utils/apiUrls"; 
 const axiosInstance = axiosService;

@@ -4,7 +4,7 @@ import { FloatingLabelInput } from '@/shared/components/ui/FloatingLabelInput';
 import { FloatingLabelSelect } from '@/shared/components/ui/FloatingLabelSelect';
 import { Textarea } from '@/components/ui/textarea';
 import { Plus, Calendar, User, Flag } from 'lucide-react';
-import axiosService from '@/services/axiosService';
+import axiosService from '@/services/axiosService.js';
 interface TasksTabProps {
   companyId?: string;
   opportunityId?: string;

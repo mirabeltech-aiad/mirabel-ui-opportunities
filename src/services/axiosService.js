@@ -7,13 +7,13 @@ import { AUTH_API, STATIC_URLS } from '../utils/apiUrls';
  * Consolidated AxiosService with built-in axios instance configuration
  * Includes authentication, token refresh, error handling, and convenience methods
  * Can be used directly without 'new' keyword: AxiosService.get()
- */
+ **/
 
 // Configuration
 const CONFIG = {
   timeout: 30000,
 };
-
+// new
 // Token refresh queue management
 let isRefreshing = false;
 let failedQueue = [];
@@ -382,4 +382,4 @@ const axiosService = {
 };
 
 // Export singleton instance as default
-export default axiosService; 
+export default axiosService;

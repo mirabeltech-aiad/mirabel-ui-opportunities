@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Calendar, User, Clock, MessageSquare } from 'lucide-react';
-import axiosService from '@/services/axiosService';
+import axiosService from '@/services/axiosService.js';
 
 interface ActivitiesTabProps {
   opportunityId?: string;

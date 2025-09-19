@@ -9,7 +9,7 @@ import ProposalCardView from "@/components/ui/ProposalCardView";
 import ProposalKanbanView from "@/components/ui/ProposalKanbanView";
 import ProposalSplitScreenView from "@/components/ui/ProposalSplitScreenView";
 import ActiveFiltersDisplay from "@/features/Opportunity/components/table/ActiveFiltersDisplay";
-import { proposalService } from "../../features/Opportunity/Services/proposalService";
+import { proposalService } from "../../features/Opportunity/Services/proposalService.js";
 import { useProposalSearch } from "@/features/Opportunity/contexts/ProposalSearchContext";
 
 const Proposals = () => {

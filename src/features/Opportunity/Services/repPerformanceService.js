@@ -1,4 +1,4 @@
-import axiosService from '@/services/axiosService';
+import axiosService from '@/services/axiosService.js';
 import { getCurrentUserId } from '@/utils/userUtils';
 import { validateApiResponse, validateTableData, sanitizeNumericValue, sanitizeStringValue } from '@/features/Opportunity/utils/reports/validationHelpers';
 import { API_URLS } from '@/utils/apiUrls';
