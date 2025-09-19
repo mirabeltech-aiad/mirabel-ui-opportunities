@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { ChevronUp, ChevronDown, RotateCcw, Settings, Search } from 'lucide-react';
 import MultiSelectField from './MultiSelectField';
 import DateRangeField from './DateRangeField';
@@ -104,6 +104,7 @@ const AdvancedSearch = () => {
         searchType={activeTab}
         searchParams={searchParams}
         onBackToSearch={handleBackToSearch}
+        setShowResults={setShowResults}
       />
     );
   }

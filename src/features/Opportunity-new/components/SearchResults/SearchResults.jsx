@@ -7,13 +7,15 @@ import { ExternalLink, MoreVertical, Edit } from 'lucide-react';
 import { OpportunityStatsCards, ProposalStatsCards } from '../Stats';
 import { logger } from '../../../../components/shared/logger';
 import { useNavigate } from 'react-router-dom';
+import { getDefaultColumnOrder } from '../../hooks/helperData';
+import ViewsSidebar from '@/components/ui/views/ViewsSidebar';
 
 // Helper function to get nested object values
 const getNestedValue = (obj, path) => {
   return path.split('.').reduce((current, key) => current?.[key], obj);
 };
 
-const SearchResults = ({ searchParams, searchType = 'opportunities' }) => {
+const SearchResults = ({ searchParams,setShowResults, searchType = 'opportunities' }) => {
   const { data, loading, error, refetch } = useSearchResults(searchParams);
   const [viewMode, setViewMode] = useState('table');
   const [filters, setFilters] = useState({
@@ -23,6 +25,7 @@ const SearchResults = ({ searchParams, searchType = 'opportunities' }) => {
   });
   const [page, setPage] = useState(1);
   const navigate = useNavigate();
+  const [isViewsSidebarOpen, setIsViewsSidebarOpen] = useState(false);
 
   const isOpportunities = searchType === 'opportunities';
   const title = isOpportunities ? 'Opportunities' : 'Proposals';
@@ -135,13 +138,15 @@ const SearchResults = ({ searchParams, searchType = 'opportunities' }) => {
       // Set the tab parameter to opportunities
       advancedSearchParams.set("tab", "opportunities");
 
-      const finalUrl = `/advanced-search?${advancedSearchParams.toString()}`;
+      const finalUrl = `/app/advanced-search-new`;
       logger.info(
         "Navigating to advanced search with opportunities tab:",
         finalUrl
       );
       logger.info("Quick Filter filters being passed:", filters);
-      navigate(finalUrl);
+      // window.open(finalUrl);
+      setShowResults(false);
+      // navigate(finalUrl);
     } catch (error) {
       logger.error("Navigation error:", error);
       // Fallback: just refresh the current data if navigation fails
@@ -150,12 +155,12 @@ const SearchResults = ({ searchParams, searchType = 'opportunities' }) => {
   };
 
   // Debug logging
-  useEffect(() => {
-    logger.info('SearchResults: Component mounted with searchParams:', searchParams);
-    logger.info('SearchResults: Data received:', data);
-    logger.info('SearchResults: Loading state:', loading);
-    logger.info('SearchResults: Error state:', error);
-  }, [searchParams, data, loading, error]);
+  // useEffect(() => {
+  //   logger.info('SearchResults: Component mounted with searchParams:', searchParams);
+  //   logger.info('SearchResults: Data received:', data);
+  //   logger.info('SearchResults: Loading state:', loading);
+  //   logger.info('SearchResults: Error state:', error);
+  // }, [searchParams, data, loading, error]);
 
   // Define columns for EnhancedDataTable
   const columns = [
@@ -412,7 +417,6 @@ const SearchResults = ({ searchParams, searchType = 'opportunities' }) => {
             <ProposalStatsCards stats={proposalStatsData} />
           )}
         </div>
-
         {/* Enhanced Filter Bar */}
         <div className="bg-white border-b border-gray-200 flex-shrink-0">
           <div className="px-2">
@@ -445,7 +449,7 @@ const SearchResults = ({ searchParams, searchType = 'opportunities' }) => {
               // View controls
               activeView={viewMode}
               onViewChange={setViewMode}
-              onViewsClick={() => setViewMode('table')}
+              onViewsClick={() => setIsViewsSidebarOpen(true)}
             />
           </div>
         </div>
@@ -507,6 +511,16 @@ const SearchResults = ({ searchParams, searchType = 'opportunities' }) => {
           </div>
         )}
       </div>
+
+      {/* Views Sidebar */}
+      <ViewsSidebar
+        isOpen={isViewsSidebarOpen}
+        onClose={() => setIsViewsSidebarOpen(false)}
+        columnOrder={getDefaultColumnOrder()}
+        onColumnOrderChange={() => {}}
+        onViewSelected={() => {}}
+        pageType="opportunities"
+      />
     </>
   );
 };
