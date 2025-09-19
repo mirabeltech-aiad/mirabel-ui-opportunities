@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import FloatingLabelInput from "@/components/ui/FloatingLabelInput";
+import FloatingLabelInput from "@/shared/components/ui/FloatingLabelInput";
 import FloatingLabelSelect from "@/components/ui/FloatingLabelSelect";
 import MultiSelectDropdown from "@/components/ui/MultiSelectDropdown";
 import AutocompleteSelect from "@/components/shared/AutocompleteSelect";

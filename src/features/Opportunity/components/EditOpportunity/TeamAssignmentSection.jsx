@@ -1,6 +1,6 @@
 
 import React from "react";
-import FloatingLabelInput from "@/components/ui/FloatingLabelInput";
+import FloatingLabelInput from "@/shared/components/ui/FloatingLabelInput";
 
 const TeamAssignmentSection = ({ formData, handleInputChange }) => {
   return (

@@ -1,5 +1,5 @@
 import React from "react";
-import FloatingLabelInput from "@/components/ui/FloatingLabelInput";
+import FloatingLabelInput from "@/shared/components/ui/FloatingLabelInput";
 import MultiSelectDropdown from "@/components/ui/MultiSelectDropdown";
 
 const BusinessInfoGroup = ({

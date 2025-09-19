@@ -1,6 +1,6 @@
 
 import React from "react";
-import FloatingLabelInput from "@/components/ui/FloatingLabelInput";
+import FloatingLabelInput from "@/shared/components/ui/FloatingLabelInput";
 import FloatingLabelSelect from "@/components/ui/FloatingLabelSelect";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";

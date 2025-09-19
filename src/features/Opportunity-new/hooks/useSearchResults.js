@@ -11,7 +11,7 @@ export const useSearchResults = (searchParams) => {
   const isInitialMount = useRef(true);
   const lastSearchParamsRef = useRef();
 
-  const fetchResults = useCallback(async (params) => {
+  const fetchResults = useCallback(async (params, newParams=null) => {
     setLoading(true);
     setError(null);
 
@@ -20,7 +20,7 @@ export const useSearchResults = (searchParams) => {
 
       if (!params || Object.keys(params).length === 0) {
         logger.info('useSearchResults: No search params, fetching initial data');
-        results = await opportunitiesReportService.getInitialData();
+        results = await opportunitiesReportService.getInitialData(newParams);
       } else {
         logger.info('useSearchResults: Executing search with params:', params);
         results = await opportunitiesReportService.executeSearch(params);
@@ -51,8 +51,8 @@ export const useSearchResults = (searchParams) => {
 
   // No cleanup needed since we removed AbortController
 
-  const refetch = useCallback(() => {
-    fetchResults(searchParams);
+  const refetch = useCallback((newParams=null) => {
+    fetchResults(searchParams, newParams);
   }, [fetchResults, searchParams]);
 
   return {

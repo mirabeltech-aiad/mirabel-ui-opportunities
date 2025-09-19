@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import FloatingLabelInput from "@/components/ui/FloatingLabelInput";
+import FloatingLabelInput from "@/shared/components/ui/FloatingLabelInput";
 import MultiSelectDropdown from "@/components/ui/MultiSelectDropdown";
 import EnhancedProposalIdField from "@/features/Opportunity/components/ProposalsAdvancedSearch/EnhancedProposalIdField";
 import EnhancedProposalNameField from "@/features/Opportunity/components/ProposalsAdvancedSearch/EnhancedProposalNameField";

@@ -56,6 +56,7 @@ interface EnhancedFilterBarProps {
   // Core props
   total?: number;
   page?: number;
+  setPage?: (page: number) => void;
   perPage?: number;
   activeView?: 'table' | 'cards' | 'kanban' | 'split';
   onViewChange?: (view: 'table' | 'cards' | 'kanban' | 'split') => void;
@@ -78,12 +79,14 @@ interface EnhancedFilterBarProps {
   hasActiveFilters?: boolean;
   // Compact UI options
   compactResetButton?: boolean;
+  onNextPage?: (params: {CurPage: number}) => void;
 }
 
 export const EnhancedFilterBar: FC<EnhancedFilterBarProps> = ({
   total = 0,
   page = 1,
-  perPage = 10,
+  setPage,
+  perPage = 25,
   activeView = 'table',
   onViewChange,
   onRefresh,
@@ -103,7 +106,8 @@ export const EnhancedFilterBar: FC<EnhancedFilterBarProps> = ({
   searchQuery = '',
   onResetFilters,
   hasActiveFilters = false,
-  compactResetButton = false
+  compactResetButton = false,
+  onNextPage
 }) => {
   // Determine which system to use
   const useUnifiedSystem = !!filterManager
@@ -305,12 +309,17 @@ export const EnhancedFilterBar: FC<EnhancedFilterBarProps> = ({
         )}
 
         {/* Pagination Info Only */}
-        <div className="flex items-center gap-2 text-sm text-gray-600 whitespace-nowrap">
+        <div 
+          className="flex items-center gap-2 text-sm text-gray-600 whitespace-nowrap"
+          style={{
+            marginLeft: handleReset ? '' : '14vw'
+          }}
+        >
           <Button
             variant="ghost"
             size="icon"
             className="h-7 w-7"
-            onClick={() => console.log('Previous page')}
+            onClick={() => {onNextPage && onNextPage({CurPage: page - 1}); setPage && setPage(page - 1)}}
             disabled={page <= 1}
             aria-label="Previous page"
           >
@@ -323,7 +332,7 @@ export const EnhancedFilterBar: FC<EnhancedFilterBarProps> = ({
             variant="ghost"
             size="icon"
             className="h-7 w-7"
-            onClick={() => console.log('Next page')}
+            onClick={() => {onNextPage && onNextPage({CurPage: page + 1}); setPage && setPage(page + 1)}}
             disabled={page * perPage >= total}
             aria-label="Next page"
           >

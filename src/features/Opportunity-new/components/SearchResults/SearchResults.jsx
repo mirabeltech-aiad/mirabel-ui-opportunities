@@ -21,6 +21,7 @@ const SearchResults = ({ searchParams, searchType = 'opportunities' }) => {
     probability: 'All Probability',
     reps: 'All Reps'
   });
+  const [page, setPage] = useState(1);
   const navigate = useNavigate();
 
   const isOpportunities = searchType === 'opportunities';
@@ -418,7 +419,8 @@ const SearchResults = ({ searchParams, searchType = 'opportunities' }) => {
             <EnhancedFilterBar
               // Data and pagination
               total={data?.totalCount || 0}
-
+              page={page}
+              setPage={setPage}
               // Search
               searchQuery={''}
               searchPlaceholder={`Search ${title.toLowerCase()}...`}
@@ -426,20 +428,20 @@ const SearchResults = ({ searchParams, searchType = 'opportunities' }) => {
               // Filters
               onFilterClick={handleFilterClick}
               filters={filterDefinitions}
-              onResetFilters={() => {
-                setFilters({
-                  all: searchType === 'opportunities' ? 'All Opportunities' : 'All Proposals',
-                  probability: 'All Probability',
-                  reps: 'All Reps'
-                });
-              }}
+              // onResetFilters={() => {
+              //   setFilters({
+              //     all: searchType === 'opportunities' ? 'All Opportunities' : 'All Proposals',
+              //     probability: 'All Probability',
+              //     reps: 'All Reps'
+              //   });
+              // }}
               hasActiveFilters={Object.values(filters).some(value =>
                 value && !value.toString().startsWith('All')
               )}
 
               // Actions
               onRefresh={refetch}
-
+              onNextPage={refetch}
               // View controls
               activeView={viewMode}
               onViewChange={setViewMode}

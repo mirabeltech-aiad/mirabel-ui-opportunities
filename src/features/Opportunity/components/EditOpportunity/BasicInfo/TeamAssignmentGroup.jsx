@@ -1,5 +1,5 @@
 import React from "react";
-import FloatingLabelInput from "@/components/ui/FloatingLabelInput";
+import FloatingLabelInput from "@/shared/components/ui/FloatingLabelInput";
 import FloatingLabelSelect from "@/components/ui/FloatingLabelSelect";
 import Loader from "@/components/ui/loader";
 import { isLostReasonRequired, hasValidLostReason } from "@/features/Opportunity/utils/validationHelpers";

@@ -291,9 +291,9 @@ export class OpportunitiesReportService {
    * Get initial data for the search results page
    * @returns {Promise<Object>} Initial search results
    */
-  async getInitialData() {
+  async getInitialData(newParams=null) {
     try {
-      const defaultPayload = this.buildDefaultPayload();
+      const defaultPayload = this.buildDefaultPayload(newParams);
       return await this.executeSearch(defaultPayload);
     } catch (error) {
       logger.error('OpportunitiesReportService: Failed to get initial data:', error);
