@@ -18,7 +18,8 @@ import { useOpportunityForm } from '../../hooks/useOpportunityForm';
 const EditOpportunity: React.FC = () => {
     const { id } = useParams<{ id: string }>();
     const navigate = useNavigate();
-    const isAddMode = !id;
+
+    const isAddMode = !id || id === '0';
     const [activeTab, setActiveTab] = useState('opportunity-info');
 
     const {
@@ -57,7 +58,16 @@ const EditOpportunity: React.FC = () => {
         navigate('/opportunities');
     };
 
-    const tabs: TabItem[] = [
+    const tabs: TabItem[] = isAddMode ? [
+        {
+            id: 'opportunity-info',
+            label: 'Opportunity Information'
+        },
+        {
+            id: 'linked-proposals',
+            label: 'Proposals'
+        }
+    ] : [
         {
             id: 'opportunity-info',
             label: 'Opportunity Information'

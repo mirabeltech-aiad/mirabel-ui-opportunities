@@ -109,7 +109,7 @@ export const useOpportunityForm = (opportunityId?: string) => {
 
   // Load opportunity data on mount
   useEffect(() => {
-    if (opportunityId) {
+    if (opportunityId && opportunityId !== '0') {
       loadOpportunityData();
     } else {
       // For new opportunities, set defaults
@@ -123,7 +123,7 @@ export const useOpportunityForm = (opportunityId?: string) => {
   }, [opportunityId]);
 
   const loadOpportunityData = async () => {
-    if (!opportunityId) return;
+    if (!opportunityId || opportunityId === '0') return;
 
     setIsLoading(true);
     try {
@@ -148,6 +148,7 @@ export const useOpportunityForm = (opportunityId?: string) => {
 
   // Handle input changes with validation and business logic
   const handleInputChange = useCallback((field: string, value: any) => {
+
     const oldValue = formData[field as keyof OpportunityFormData];
 
     // Skip confirmation for proposal-driven updates
@@ -180,7 +181,7 @@ export const useOpportunityForm = (opportunityId?: string) => {
         updatedData.probability = STAGE_PERCENTAGES[value].toString();
       }
 
-      // Auto-update probability when status changes
+      // Auto-update probability and stage when status changes
       if (field === 'status') {
         if (value === 'Won') {
           updatedData.probability = '100';
@@ -188,6 +189,21 @@ export const useOpportunityForm = (opportunityId?: string) => {
         } else if (value === 'Lost') {
           updatedData.probability = '0';
           updatedData.stage = 'Closed Lost';
+        }
+      }
+
+      // Auto-update status based on probability
+      if (field === 'probability') {
+        const probValue = parseInt(value);
+        if (probValue === 100) {
+          updatedData.status = 'Won';
+          updatedData.stage = 'Closed Won';
+        } else if (probValue === 0) {
+          updatedData.status = 'Lost';
+          updatedData.stage = 'Closed Lost';
+        } else if (prev.status === 'Won' || prev.status === 'Lost') {
+          // Reset status to Open if probability is changed from 100% or 0%
+          updatedData.status = 'Open';
         }
       }
 

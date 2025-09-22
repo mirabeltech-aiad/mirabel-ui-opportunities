@@ -5,6 +5,7 @@ import { Button } from './button'
 import { cn } from '../../utils/cn'
 
 export interface FloatingLabelSearchInputProps {
+  id:string,
   value: string
   onChange: (value: string) => void
   label?: string
@@ -76,6 +77,7 @@ const FloatingLabelSearchInput = React.forwardRef<HTMLInputElement, FloatingLabe
       if (e.key === 'Escape') {
         handleClear()
       }
+      
     }
 
     return (

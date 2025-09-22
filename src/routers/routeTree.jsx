@@ -78,7 +78,16 @@ export const routes = [
     exact: true
   },
   {
-    path: '/edit-opportunity-new/:id',
+    path: '/edit-opportunity-new/:id?',
+    component: () => (
+      <OpportunityProviders>
+        <EditOpportunityNew />
+      </OpportunityProviders>
+    ),
+    exact: true
+  },
+  {
+    path: '/add-opportunity-new',
     component: () => (
       <OpportunityProviders>
         <EditOpportunityNew />

@@ -44,6 +44,9 @@ export class OpportunityService {
     }
   }
 
+    
+      
+
   // Create or update opportunity
   async saveOpportunity(formData: OpportunityFormData): Promise<any> {
     try {
@@ -390,6 +393,21 @@ export class OpportunityService {
         Name: safeGet(data, 'SubContactDetails.ContactFullName') || safeGet(data, 'SubContactDetails.ContactName')
       }
     };
+  }
+  // Get proposals based on opportunity criteria
+  async getProposalsBasedOnOpportunity(type: string, searchParams: any): Promise<any[]> {
+    try {
+      const response = await axiosService.post(API_URLS.PROPOSALS.BY_CRITERIA, searchParams);
+      
+      if (response?.content && Array.isArray(response.content.List)) {
+        return response.content.List;
+      }
+      
+      return [];
+    } catch (error) {
+      console.error('Failed to fetch proposals based on opportunity:', error);
+      throw error;
+    }
   }
 }
 

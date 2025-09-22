@@ -52,10 +52,15 @@ export const FloatingDropdown: React.FC<FloatingDropdownProps> = ({
   // Update trigger position when opened or on scroll/resize
   useEffect(() => {
     if (isOpen) {
-      // Initial position update
-      requestAnimationFrame(() => {
+      // Initial position update with multiple attempts to ensure accuracy
+      const updateWithRetry = () => {
         updatePosition()
-      })
+        // Retry after a short delay to ensure DOM is fully rendered
+        setTimeout(updatePosition, 10)
+        setTimeout(updatePosition, 50)
+      }
+      
+      requestAnimationFrame(updateWithRetry)
       
       const handleScroll = throttle(updatePosition, 16)
       const handleResize = throttle(updatePosition, 100)
@@ -69,6 +74,7 @@ export const FloatingDropdown: React.FC<FloatingDropdownProps> = ({
       }
     } else {
       setIsPositioned(false)
+      setTriggerRect(null)
     }
   }, [isOpen, updatePosition])
 
@@ -122,16 +128,30 @@ export const FloatingDropdown: React.FC<FloatingDropdownProps> = ({
   const dropdownStyles = useMemo(() => {
     if (!triggerRect) return {}
     
+    // Better positioning calculation
+    const viewportHeight = window.innerHeight
+    const spaceBelow = viewportHeight - triggerRect.bottom
+    const spaceAbove = triggerRect.top
+    const dropdownHeight = 320 // Approximate max height
+    
+    // Position above if not enough space below
+    const shouldPositionAbove = spaceBelow < dropdownHeight && spaceAbove > dropdownHeight
+    
     return {
-      top: triggerRect.bottom + window.scrollY + 4,
+      top: shouldPositionAbove 
+        ? triggerRect.top + window.scrollY - dropdownHeight - 4
+        : triggerRect.bottom + window.scrollY + 4,
       left: position === 'right' 
         ? triggerRect.right + window.scrollX - triggerRect.width
         : triggerRect.left + window.scrollX,
       width: width === 'w-full' ? triggerRect.width : undefined,
       minWidth: width === 'w-full' ? triggerRect.width : 320,
-      transformOrigin: position === 'right' ? 'top right' : 'top left',
+      maxWidth: width === 'w-full' ? triggerRect.width : 400,
+      transformOrigin: shouldPositionAbove 
+        ? (position === 'right' ? 'bottom right' : 'bottom left')
+        : (position === 'right' ? 'top right' : 'top left'),
       boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)',
-      zIndex: getStableZIndex('dropdown'),
+      zIndex: 9999, // Higher z-index to ensure it appears above everything
       // Apply stable animation styles
       ...animationStyles,
       // Prevent sub-pixel rendering issues
@@ -149,7 +169,7 @@ export const FloatingDropdown: React.FC<FloatingDropdownProps> = ({
       </div>
 
       {/* Floating Dropdown - Use portal to escape overflow constraints */}
-      {isOpen && triggerRect && createPortal(
+      {isOpen && createPortal(
         <div
           ref={dropdownRef}
           className={cn(
@@ -157,14 +177,15 @@ export const FloatingDropdown: React.FC<FloatingDropdownProps> = ({
             width,
             maxHeight,
             // Prevent flickering with stable positioning
-            !isPositioned && "opacity-0"
+            (!isPositioned || !triggerRect) && "opacity-0 pointer-events-none"
           )}
           onClick={(e) => e.stopPropagation()}
+          onMouseDown={(e) => e.stopPropagation()}
           role="menu"
           tabIndex={-1}
-          style={dropdownStyles}
+          style={triggerRect ? dropdownStyles : { opacity: 0, pointerEvents: 'none' }}
         >
-          {children}
+          {triggerRect && children}
         </div>,
         document.body
       )}

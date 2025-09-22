@@ -1,7 +1,7 @@
 /* Enhanced Data Table Styling - Based on Design System Standards */
 
 /* Import design tokens */
-@import '../../../design-system/tokens/index.css';
+/* @import '../../../design-system/tokens/index.css'; */
 
 /* CRITICAL: Force table styling to override any global styles */
 /* This ensures our table styles take precedence over any conflicting CSS */

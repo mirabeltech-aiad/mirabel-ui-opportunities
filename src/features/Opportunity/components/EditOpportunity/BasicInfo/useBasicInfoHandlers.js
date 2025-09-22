@@ -14,25 +14,26 @@ export const useBasicInfoHandlers = (
   const handleBusinessUnitChange = (values) => {
     // values is an array of selected values
 
-    const selectedOptions = values.map(value =>
+    const businessUnitIds =values ;
+    /* values.map(value =>
       apiBusinessUnits.find(option => option.value === value)
-    ).filter(Boolean); // Remove any undefined entries
+    ).filter(Boolean); */// Remove any undefined entries
 
     // Store array of selected business unit names (to match loaded data format)
-    const businessUnitNames = selectedOptions.map(option => option.name || option.label || option.value);
+    //const businessUnitNames = selectedOptions.map(option => option.name || option.label || option.value);
 
     // Store array of business unit IDs
-    const businessUnitIds = selectedOptions.map(option => option.id);
+   // const businessUnitIds = selectedOptions.map(value => value);
 
     // Store detailed business unit information
-    const businessUnitDetails = selectedOptions.map(option => ({
-      ID: option.id,
-      Name: option.name || option.label || option.value
-    }));
+    // const businessUnitDetails = selectedOptions.map(option => ({
+    //   ID: option.id,
+    //   Name: option.name || option.label || option.value
+    // }));
 
     // Use batch update to ensure all changes happen in a single React update cycle
     const batchUpdates = {
-      businessUnit: businessUnitNames,
+      //businessUnit: businessUnitNames,
       businessUnitId: businessUnitIds,
       businessUnitDetails: businessUnitDetails
     };
@@ -42,9 +43,9 @@ export const useBasicInfoHandlers = (
       handleBatchInputChange(batchUpdates);
     } else {
       // Fallback to individual calls
-      handleInputChange("businessUnit", businessUnitNames);
+     // handleInputChange("businessUnit", businessUnitNames);
       handleInputChange("businessUnitId", businessUnitIds);
-      handleInputChange("businessUnitDetails", businessUnitDetails);
+      //handleInputChange("businessUnitDetails", businessUnitDetails);
     }
   };
 

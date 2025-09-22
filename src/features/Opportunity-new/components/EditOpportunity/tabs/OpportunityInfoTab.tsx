@@ -1,15 +1,20 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { FormInput } from '../../ui/FormInput';
-import { FloatingLabelSelect } from '@/shared/components/ui/FloatingLabelSelect';
+import FloatingLabelSelect from '@/components/ui/FloatingLabelSelect';
+import { FloatingMultiSelect } from '@/shared/components/ui/FloatingMultiSelect';
 import { Textarea } from '@/components/ui/textarea';
 import { TabProps } from '../../../types/opportunity';
-import { 
-  OPPORTUNITY_STATUS_OPTIONS, 
+import {
+  OPPORTUNITY_STATUS_OPTIONS,
   OPPORTUNITY_PROBABILITY_OPTIONS,
   OPPORTUNITY_LEAD_SOURCES,
   OPPORTUNITY_LEAD_TYPES,
   OPPORTUNITY_LEAD_STATUS
 } from '../../../constants/opportunityOptions';
+import { useBasicInfoData } from '@/features/Opportunity/components/EditOpportunity/BasicInfo/useBasicInfoData';
+import { useBasicInfoHandlers } from '@/features/Opportunity/components/EditOpportunity/BasicInfo/useBasicInfoHandlers';
+import CustomerSearchBar from '../shared//CustomerSearchBar';
+
 interface OpportunityInfoTabProps extends TabProps {
   isAddMode: boolean;
 }
@@ -18,377 +23,415 @@ const OpportunityInfoTab: React.FC<OpportunityInfoTabProps> = ({
   formData,
   handleInputChange,
   handleBatchInputChange,
-  getFieldError
+  getFieldError,
+  hasSubmitted,
+  isAddMode
 }) => {
-  // Mock data for now - replace with actual API calls
-  const opportunityTypes: any[] = [];
-  const stages: any[] = [];
-  const businessUnits: any[] = [];
-  const products: any[] = [];
-  const users: any[] = [];
-  const contacts: any[] = [];
-  const lossReasons: any[] = [];
-  const isLoading = {
-    opportunityTypes: false,
-    stages: false,
-    businessUnits: false,
-    products: false,
-    users: false,
-    contacts: false,
-    lossReasons: false
+  const [isCustomerSelected, setIsCustomerSelected] = useState(false);
+
+  // Check if customer is selected
+  useEffect(() => {
+    const customerSelected = !!(formData.customerId || formData.contactDetails?.ID || formData.company);
+    setIsCustomerSelected(customerSelected);
+  }, [formData.customerId, formData.contactDetails?.ID, formData.company]);
+  // Use the existing data hooks from the working implementation
+  const {
+    apiOpportunityTypes,
+    apiStages,
+    businessUnitOptionsToUse,
+    productOptionsToUse,
+    userOptionsToUse,
+    contactOptions,
+    apiLossReasons,
+    addModeStatusOptions,
+    isLoadingOpportunityTypes,
+    isLoadingStages,
+    isLoadingBusinessUnits,
+    isLoadingProducts,
+    isLoadingUsers,
+    isLoadingContacts,
+    isLoadingLossReasons,
+    shouldDisableFields,
+    shouldDisableProposalLinkedFields,
+  } = useBasicInfoData(
+    formData,
+    isAddMode,
+    isCustomerSelected,
+    !!(formData.proposalId && formData.proposalId.trim() !== '')
+  );
+
+  // Customer selection handler for Add mode
+  const handleCustomerSelect = (customer: any) => {
+    if (customer) {
+      handleBatchInputChange({
+        company: customer.name || customer.company,
+        customerId: customer.id,
+        contactDetails: {
+          ID: customer.id,
+          Name: customer.name || customer.company
+        },
+        // Enable fields by setting default values
+        amount: "0",
+        probability: "10",
+        status: "Open",
+        createdBy: "Current User",
+        createdDate: new Date().toISOString().split('T')[0],
+        forecastRevenue: "0"
+      });
+      setIsCustomerSelected(true);
+    } else {
+      // Clear customer data
+      handleBatchInputChange({
+        company: "",
+        customerId: "",
+        contactDetails: {},
+        amount: "",
+        probability: "",
+        status: "",
+        businessUnit: [],
+        businessUnitId: [],
+        businessUnitDetails: [],
+        product: [],
+        productId: [],
+        productDetails: []
+      });
+      setIsCustomerSelected(false);
+    }
   };
+
+  // Use the existing handlers from the working implementation
+  const {
+    handleOpportunityTypeChange,
+    handleStageChange,
+    handleBusinessUnitChange: originalHandleBusinessUnitChange,
+    handleProductChange,
+    handleAssignedRepChange,
+    handleSalesPresenterChange,
+    handleLossReasonChange,
+    handleContactNameChange,
+  } = useBasicInfoHandlers(
+    handleInputChange,
+    handleBatchInputChange,
+    businessUnitOptionsToUse,
+    apiOpportunityTypes,
+    productOptionsToUse,
+    userOptionsToUse,
+    apiLossReasons,
+    apiStages,
+    contactOptions
+  );
+
+  // Enhanced business unit change handler that filters products
+ 
 
   // Check if proposal is linked to determine field disable state
   const isProposalLinked = !!(formData.proposalId && formData.proposalId.trim() !== '');
 
+  // Get the display value for opportunity type
+  const getOpportunityTypeDisplayValue = () => {
+    if (typeof formData.opportunityType === "object" && formData.opportunityType?.name) {
+      return formData.opportunityType.name;
+    }
+    if (typeof formData.opportunityType === "string") {
+      return formData.opportunityType;
+    }
+    return "";
+  };
+
   return (
     <div className="space-y-6">
+      {/* Customer Search Bar - Only in Add Mode */}
+      {isAddMode && (
+        <div className="bg-blue-50 p-4 rounded-lg border border-blue-200">
+          <h3 className="text-lg font-semibold text-blue-900 mb-3">Select Customer</h3>
+          <p className="text-sm text-blue-700 mb-4">
+            Search and select a customer to enable the opportunity form fields.
+          </p>
+
+          <CustomerSearchBar
+            onSearch={() => { }}
+            onCustomerSelect={handleCustomerSelect}
+            placeholder="Type customer name to search..."
+          />
+
+          {!isCustomerSelected && (
+            <p className="text-sm text-orange-600 mt-3">
+              ⚠️ Please select a customer to enable the form fields below.
+            </p>
+          )}
+
+          {isCustomerSelected && (
+            <div className="mt-3 p-2 bg-green-50 border border-green-200 rounded">
+              <p className="text-sm text-green-700">
+                ✅ Customer selected: <strong>{formData.company}</strong>
+              </p>
+            </div>
+          )}
+        </div>
+      )}
+
       {/* Basic Information Section */}
       <div className="bg-white p-6 rounded-lg border border-gray-200">
         <h3 className="text-lg font-semibold text-gray-900 mb-4">Basic Information</h3>
-        
+
         <div className="grid grid-cols-1 md:grid-cols-12 gap-4">
           {/* Row 1: Name (6), Company (4), Status (2) */}
           <div className="md:col-span-6">
             <FormInput
               label="Opportunity Name"
-              value={formData.name}
+              value={formData.name || ''}
               onChange={(value) => handleInputChange('name', value)}
               error={getFieldError('name')}
               placeholder="Enter opportunity name"
               required
+              disabled={shouldDisableFields}
             />
           </div>
-          
+
           <div className="md:col-span-4">
             <FormInput
               label="Company Name"
-              value={formData.company}
+              value={formData.company || ''}
               onChange={(value) => handleInputChange('company', value)}
               error={getFieldError('company')}
               placeholder="Enter company name"
               required
+              disabled={(formData.contactDetails?.ID && formData.contactDetails.ID > 0) || (formData.opportunityId && formData.opportunityId.trim() !== '') || shouldDisableFields}
             />
           </div>
-          
+
           <div className="md:col-span-2">
             <FloatingLabelSelect
-              id="status"
-              label="Status *"
-              value={formData.status}
+              label="Status"
+              value={formData.status || ''}
               onChange={(value) => handleInputChange('status', value)}
-              options={OPPORTUNITY_STATUS_OPTIONS}
+              options={isAddMode ? addModeStatusOptions : OPPORTUNITY_STATUS_OPTIONS}
               error={getFieldError('status')}
+              required
+              disabled={shouldDisableFields}
+              allowClear={false}
             />
           </div>
 
           {/* Row 2: Contact (4), Stage (4), Amount (2), Probability (2) */}
           <div className="md:col-span-4">
             <FloatingLabelSelect
-              id="contactName"
               label="Contact Name"
-              value={formData.contactName}
-              onChange={(value) => handleInputChange('contactName', value)}
-              options={contacts.map((contact: any) => ({
-                value: contact.Name,
-                label: contact.ContactFullName || contact.Name
-              }))}
+              value={formData.contactName || ''}
+              onChange={handleContactNameChange}
+              options={contactOptions}
               error={getFieldError('contactName')}
-              loading={isLoading.contacts}
+              disabled={isLoadingContacts || shouldDisableFields}
+              placeholder={isLoadingContacts ? "Loading..." : "Select contact"}
             />
           </div>
-          
+
           <div className="md:col-span-4">
             <FloatingLabelSelect
-              id="stage"
-              label="Stage *"
-              value={formData.stage}
-              onChange={(value) => handleInputChange('stage', value)}
-              options={stages.map((stage: any) => ({
-                value: stage.Stage,
-                label: stage.Stage
-              }))}
-              error={getFieldError('stage')}
-              loading={isLoading.stages}
+              label="Stage"
+              value={formData.stageDetails?.Stage || ''}
+              onChange={handleStageChange}
+              options={apiStages}
+              error={getFieldError('stageDetails')}
+              required
+              disabled={isLoadingStages || shouldDisableFields}
+              placeholder={isLoadingStages ? "Loading..." : "Select stage"}
+              allowClear={false}
             />
           </div>
-          
+
           <div className="md:col-span-2">
             <FormInput
               label="Amount"
               type="number"
-              value={formData.amount}
+              value={formData.amount || ''}
               onChange={(value) => handleInputChange('amount', value)}
               error={getFieldError('amount')}
               placeholder="0.00"
-              disabled={isProposalLinked}
+              disabled={(!isAddMode && formData.proposalId && formData.proposalId.trim() !== '') || shouldDisableProposalLinkedFields("amount") || (isAddMode && !formData.customerId && !formData.contactDetails?.ID)}
               required
             />
           </div>
-          
+
           <div className="md:col-span-2">
             <FloatingLabelSelect
-              id="probability"
-              label="Probability *"
-              value={formData.probability}
+              label="Probability (%)"
+              value={formData.probability || ''}
               onChange={(value) => handleInputChange('probability', value)}
               options={OPPORTUNITY_PROBABILITY_OPTIONS}
               error={getFieldError('probability')}
+              required
+              disabled={shouldDisableFields}
+              allowClear={false}
             />
           </div>
 
           {/* Row 3: Opportunity Type (4), Business Unit (4), Product (4) */}
           <div className="md:col-span-4">
             <FloatingLabelSelect
-              id="opportunityType"
-              label="Opportunity Type *"
-              value={formData.opportunityType.id}
-              onChange={(value: any) => {
-                const selectedType = opportunityTypes.find((type: any) => type.ID.toString() === value);
-                handleInputChange('opportunityType', {
-                  id: value,
-                  name: selectedType?.Name || ''
-                });
-              }}
-              options={opportunityTypes.map((type: any) => ({
-                value: type.ID.toString(),
-                label: type.Name
-              }))}
+              label="Opportunity Type"
+              value={getOpportunityTypeDisplayValue()}
+              onChange={handleOpportunityTypeChange}
+              options={apiOpportunityTypes}
               error={getFieldError('opportunityType')}
-              loading={isLoading.opportunityTypes}
-            />
-          </div>
-          
-          <div className="md:col-span-4">
-            <FloatingLabelSelect
-              id="businessUnit"
-              label="Business Unit"
-              value={formData.businessUnit}
-              onChange={(value: any) => {
-                const selectedUnits = businessUnits.filter((unit: any) => 
-                  value.includes(unit.Name)
-                );
-                handleBatchInputChange({
-                  businessUnit: value,
-                  businessUnitId: selectedUnits.map((unit: any) => unit.ID.toString()),
-                  businessUnitDetails: selectedUnits
-                });
-              }}
-              options={businessUnits.map((unit: any) => ({
-                value: unit.Name,
-                label: unit.Name
-              }))}
-              multiple
-              disabled={isProposalLinked}
-              loading={isLoading.businessUnits}
-            />
-          </div>
-          
-          <div className="md:col-span-4">
-            <FloatingLabelSelect
-              id="product"
-              label="Product"
-              value={formData.product}
-              onChange={(value: any) => {
-                const selectedProducts = products.filter((product: any) => 
-                  value.includes(product.Name)
-                );
-                handleBatchInputChange({
-                  product: value,
-                  productId: selectedProducts.map((product: any) => product.ID.toString()),
-                  productDetails: selectedProducts
-                });
-              }}
-              options={products.map((product: any) => ({
-                value: product.Name,
-                label: product.Name
-              }))}
-              multiple
-              disabled={isProposalLinked}
-              loading={isLoading.products}
+              required
+              disabled={isLoadingOpportunityTypes || shouldDisableFields}
+              placeholder={isLoadingOpportunityTypes ? "Loading..." : "Select opportunity type"}
+              allowClear={false}
             />
           </div>
 
-          {/* Row 4: Campaign Source (4), Close Date (3), Assigned Rep (5) */}
           <div className="md:col-span-4">
-            <FloatingLabelSelect
-              id="primaryCampaignSource"
+            <div className="relative" style={{ zIndex: 1000 }}>
+              <FloatingMultiSelect
+                label="Business Unit"
+                value={formData.businessUnitId || []}
+                onChange={(values) => handleInputChange('businessUnitId', values)}
+               // onChange={handleBusinessUnitChange}
+                options={businessUnitOptionsToUse.map(option => ({
+                  value: option.id,
+                  label: option.label
+                }))}
+                placeholder={isLoadingBusinessUnits ? "Loading..." : "Select business units"}
+                disabled={
+                  isLoadingBusinessUnits ||
+                  (!isAddMode && formData.proposalId && formData.proposalId.trim() !== '') ||
+                  shouldDisableProposalLinkedFields("businessUnit") ||
+                  (isAddMode && !formData.customerId && !formData.contactDetails?.ID)
+                }
+                className="w-full"
+                searchable={true}
+                showSelectedCount={true}
+              />
+            </div>
+          </div>
+
+          <div className="md:col-span-4">
+            <div className="relative" style={{ zIndex: 999 }}>
+              <FloatingMultiSelect
+                label="Product"
+                value={formData.productId || []}
+                 onChange={(values) => handleInputChange('productId', values)}
+                options={productOptionsToUse.map(option => ({
+                  value: option.id,
+                  label: option.label
+                }))}
+                placeholder={isLoadingProducts ? "Loading..." : "Select products"}
+                disabled={
+                  isLoadingProducts ||
+                  (!isAddMode && formData.proposalId && formData.proposalId.trim() !== '') ||
+                  shouldDisableProposalLinkedFields("product") ||
+                  (isAddMode && !formData.customerId && !formData.contactDetails?.ID)
+                }
+                className="w-full"
+                searchable={true}
+                showSelectedCount={true}
+              />
+            </div>
+          </div>
+
+          {/* Row 4: Primary Campaign Source (4), Projected Close Date (3), Assign To (5) */}
+          <div className="md:col-span-4">
+            <FormInput
               label="Primary Campaign Source"
-              value={formData.primaryCampaignSource}
+              value={formData.primaryCampaignSource || ''}
               onChange={(value) => handleInputChange('primaryCampaignSource', value)}
-              options={OPPORTUNITY_LEAD_SOURCES}
+              placeholder="Enter campaign source"
+              disabled={shouldDisableFields}
             />
           </div>
-          
+
           <div className="md:col-span-3">
             <FormInput
               label="Projected Close Date"
               type="date"
-              value={formData.projCloseDate}
+              value={formData.projCloseDate || ''}
               onChange={(value) => handleInputChange('projCloseDate', value)}
               error={getFieldError('projCloseDate')}
               required
-            />
-          </div>
-          
-          <div className="md:col-span-5">
-            <FloatingLabelSelect
-              id="assignedRep"
-              label="Assigned Rep"
-              value={formData.assignedRep}
-              onChange={(value: any) => {
-                const selectedUser = users.find((user: any) => user.Name === value);
-                handleBatchInputChange({
-                  assignedRep: value,
-                  assignedRepDetails: selectedUser ? {
-                    ID: selectedUser.ID,
-                    Name: selectedUser.Name
-                  } : {}
-                });
-              }}
-              options={users.map((user: any) => ({
-                value: user.Name,
-                label: user.Name
-              }))}
-              loading={isLoading.users}
+              disabled={shouldDisableFields}
             />
           </div>
 
-          {/* Row 5: Sales Presenter (4), Loss Reason (4), Forecast Revenue (4) */}
-          <div className="md:col-span-4">
+          <div className="md:col-span-5">
             <FloatingLabelSelect
-              id="salesPresentation"
-              label="Sales Presenter"
-              value={formData.salesPresentation}
-              onChange={(value: any) => {
-                const selectedUser = users.find((user: any) => user.Name === value);
-                handleBatchInputChange({
-                  salesPresentation: value,
-                  salesPresenterDetails: selectedUser ? {
-                    ID: selectedUser.ID,
-                    Name: selectedUser.Name
-                  } : {}
-                });
-              }}
-              options={users.map((user: any) => ({
-                value: user.Name,
-                label: user.Name
-              }))}
-              loading={isLoading.users}
+              label="Assign To"
+              value={formData.assignedRepDetails?.Name || formData.assignedRep || ''}
+              onChange={handleAssignedRepChange}
+              options={userOptionsToUse}
+              disabled={isLoadingUsers || shouldDisableFields}
+              placeholder={isLoadingUsers ? "Loading..." : "Select assigned rep"}
             />
           </div>
-          
+
+          {/* Row 5: Sales Representative (4), Closed Lost Reason (4), Forecast Revenue (4) - disabled */}
           <div className="md:col-span-4">
             <FloatingLabelSelect
-              id="lostReason"
-              label="Loss Reason"
-              value={formData.lostReason}
-              onChange={(value: any) => {
-                const selectedReason = lossReasons.find((reason: any) => reason.Name === value);
-                handleBatchInputChange({
-                  lostReason: value,
-                  lossReasonDetails: selectedReason ? {
-                    ID: selectedReason.ID,
-                    Name: selectedReason.Name
-                  } : {}
-                });
-              }}
-              options={lossReasons.map((reason: any) => ({
-                value: reason.Name,
-                label: reason.Name
-              }))}
-              loading={isLoading.lossReasons}
+              label="Sales Representative"
+              value={formData.salesPresenterDetails?.Name || formData.salesPresentation || ''}
+              onChange={handleSalesPresenterChange}
+              options={userOptionsToUse}
+              disabled={isLoadingUsers || shouldDisableFields}
+              placeholder={isLoadingUsers ? "Loading..." : "Select sales representative"}
             />
           </div>
-          
+
+          <div className="md:col-span-4">
+            <FloatingLabelSelect
+              label="Closed Lost Reason"
+              value={formData.lossReasonDetails?.Name || formData.lostReason || ''}
+              onChange={handleLossReasonChange}
+              options={apiLossReasons}
+              disabled={isLoadingLossReasons || shouldDisableFields}
+              placeholder={isLoadingLossReasons ? "Loading..." : "Select loss reason"}
+            />
+          </div>
+
           <div className="md:col-span-4">
             <FormInput
               label="Forecast Revenue"
               type="number"
-              value={formData.forecastRevenue}
+              value={formData.forecastRevenue || ''}
               onChange={(value) => handleInputChange('forecastRevenue', value)}
               placeholder="0.00"
-              disabled
+              disabled={true} // Always disabled - calculated field
             />
           </div>
 
-          {/* Row 6: Created By (4), Created Date (3) */}
+          {/* Row 6: Created By (4) - disabled, Created Date (3) - disabled */}
           <div className="md:col-span-4">
             <FormInput
               label="Created By"
-              value={formData.createdBy}
+              value={formData.createdBy || ''}
               onChange={(value) => handleInputChange('createdBy', value)}
               error={getFieldError('createdBy')}
               placeholder="Enter creator name"
-              required
+              disabled={true} // Always disabled - system field
             />
           </div>
-          
+
           <div className="md:col-span-3">
             <FormInput
               label="Created Date"
               type="date"
-              value={formData.createdDate}
+              value={formData.createdDate || ''}
               onChange={(value) => handleInputChange('createdDate', value)}
               error={getFieldError('createdDate')}
-              required
+              disabled={true} // Always disabled - system field
             />
           </div>
-        </div>
-      </div>
 
-      {/* Additional Information Section */}
-      <div className="bg-white p-6 rounded-lg border border-gray-200">
-        <h3 className="text-lg font-semibold text-gray-900 mb-4">Additional Information</h3>
-        
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-          <FloatingLabelSelect
-            id="leadSource"
-            label="Lead Source"
-            value={formData.leadSource}
-            onChange={(value) => handleInputChange('leadSource', value)}
-            options={OPPORTUNITY_LEAD_SOURCES}
-          />
-          
-          <FloatingLabelSelect
-            id="leadType"
-            label="Lead Type"
-            value={formData.leadType}
-            onChange={(value) => handleInputChange('leadType', value)}
-            options={OPPORTUNITY_LEAD_TYPES}
-          />
-          
-          <FloatingLabelSelect
-            id="leadStatus"
-            label="Lead Status"
-            value={formData.leadStatus}
-            onChange={(value) => handleInputChange('leadStatus', value)}
-            options={OPPORTUNITY_LEAD_STATUS}
-          />
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Next Steps
-            </label>
-            <Textarea
-              value={formData.nextSteps}
-              onChange={(e) => handleInputChange('nextSteps', e.target.value)}
-              placeholder="Enter next steps..."
-              rows={3}
-            />
-          </div>
-          
-          <div>
+          {/* Row 7: Notes (12) - moved to top section */}
+          <div className="md:col-span-12">
             <label className="block text-sm font-medium text-gray-700 mb-2">
               Notes
             </label>
             <Textarea
-              value={formData.notes}
+              value={formData.notes || ''}
               onChange={(e) => handleInputChange('notes', e.target.value)}
-              placeholder="Enter notes..."
+              placeholder="Enter notes (minimum 10 characters required)"
               rows={3}
+              disabled={shouldDisableFields}
             />
             {getFieldError('notes') && (
               <p className="mt-1 text-sm text-red-600">{getFieldError('notes')}</p>

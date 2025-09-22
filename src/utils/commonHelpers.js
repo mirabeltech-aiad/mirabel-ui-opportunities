@@ -122,3 +122,67 @@ export const numberWithCommas = function (number) {
     /Android|webOS|iPhone|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
       navigator.userAgent
     );
+
+    
+
+export const getRepColor = (Name, distinctReps) => {
+  const repColorCodes = ["#469FBB", "#f80c9c", "#FF5733", "#C81549", "#0B831C", "#A8B41C", "#0C475A", "#900C3F", "#27AE60", "#9064DF"];
+  
+  // Split name by space or comma and get first part
+  const nameParts = Name.split(/[\s,]+/);
+  const firstName = nameParts[0] || '';
+  
+  // Generate hash from first name
+  let hash = 0;
+  for (let i = 0; i < firstName.length; i++) {
+    const char = firstName.charCodeAt(i);
+    hash = ((hash << 5) - hash) + char;
+    hash = hash & hash; // Convert to 32-bit integer
+  }
+  
+  // Get color index based on hash
+  const colorIndex = Math.abs(hash) % repColorCodes.length;
+  return repColorCodes[colorIndex];
+};
+
+// Get initials from name
+export const getInitials = (name) => {
+  if (!name) return '';
+  
+  const nameParts = name.split(/[\s,]+/).filter(part => part.length > 0);
+  
+  if (nameParts.length === 1) {
+    // Single name - take first 2 characters
+    return nameParts[0].substring(0, 2).toUpperCase();
+  } else {
+    // Multiple names - take first character of first two parts
+    return (nameParts[0].charAt(0) + nameParts[1].charAt(0)).toUpperCase();
+  }
+};
+
+// Return rounded circle div with initials based on name
+export const getRepAvatar = (name, size = 'md', className = '') => {
+  const color = getRepColor(name);
+  const initials = getInitials(name);
+  
+  // Size variants
+  const sizeClasses = {
+    xs: 'w-6 h-6 text-xs',
+    sm: 'w-8 h-8 text-sm',
+    md: 'w-10 h-10 text-sm',
+    lg: 'w-12 h-12 text-base',
+    xl: 'w-16 h-16 text-lg'
+  };
+  
+  const sizeClass = sizeClasses[size] || sizeClasses.md;
+  
+  return `
+    <div 
+      class="inline-flex items-center justify-center rounded-full font-semibold text-white ${sizeClass} ${className}"
+      style="background-color: ${color}"
+      title="${name}"
+    >
+      ${initials}
+    </div>
+  `;
+};

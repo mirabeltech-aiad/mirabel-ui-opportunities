@@ -166,23 +166,23 @@ const LinkedProposalsSection = ({
     // Parse proposal data according to reference
     const proposalProductIds = selectedProposalData.ProductID
       ? selectedProposalData.ProductID.toString()
-          .split(",")
-          .filter((id) => id.trim())
+        .split(",")
+        .filter((id) => id.trim())
       : [];
     const proposalProductNames = selectedProposalData.ProductNames
       ? selectedProposalData.ProductNames.split(",")
-          .map((name) => name.trim())
-          .filter((name) => name)
+        .map((name) => name.trim())
+        .filter((name) => name)
       : [];
     const proposalBusinessUnitIds = selectedProposalData.BusinessUnitIDs
       ? selectedProposalData.BusinessUnitIDs.toString()
-          .split(",")
-          .filter((id) => id.trim())
+        .split(",")
+        .filter((id) => id.trim())
       : [];
     const proposalBusinessUnitNames = selectedProposalData.BusinessUnitNames
       ? selectedProposalData.BusinessUnitNames.split(",")
-          .map((name) => name.trim())
-          .filter((name) => name)
+        .map((name) => name.trim())
+        .filter((name) => name)
       : [];
 
     // Create updated opportunity data - immediately link and populate
@@ -218,9 +218,9 @@ const LinkedProposalsSection = ({
         proposalId.toString(),
         selectedProposalData.Name || selectedProposalData.ProposalName || "",
         selectedProposalData.Net ??
-          selectedProposalData.Amount ??
-          selectedProposalData.TotalAmount ??
-          0,
+        selectedProposalData.Amount ??
+        selectedProposalData.TotalAmount ??
+        0,
         selectedProposalData.ProductID,
         selectedProposalData.ProductNames,
         selectedProposalData.BusinessUnitIDs,
@@ -301,7 +301,7 @@ const LinkedProposalsSection = ({
               (proposal) =>
                 proposal.ID === selectedProposalRef.current ||
                 proposal.ID?.toString() ===
-                  selectedProposalRef.current?.toString()
+                selectedProposalRef.current?.toString()
             );
             // Fallback: if API omitted it, reuse the last known selected row
             if (!currentlySelected && lastSelectedProposalRef.current) {
@@ -324,8 +324,8 @@ const LinkedProposalsSection = ({
             ) {
               const insertIndex =
                 typeof lastSelectedIndexRef.current === "number" &&
-                lastSelectedIndexRef.current >= 0 &&
-                lastSelectedIndexRef.current <= unlinkedProposals.length
+                  lastSelectedIndexRef.current >= 0 &&
+                  lastSelectedIndexRef.current <= unlinkedProposals.length
                   ? lastSelectedIndexRef.current
                   : unlinkedProposals.length;
               unlinkedProposals.splice(insertIndex, 0, currentlySelected);
@@ -344,7 +344,7 @@ const LinkedProposalsSection = ({
               (proposal) =>
                 proposal.ID === selectedProposalRef.current ||
                 proposal.ID?.toString() ===
-                  selectedProposalRef.current?.toString()
+                selectedProposalRef.current?.toString()
             );
             if (!currentlySelected && lastSelectedProposalRef.current) {
               const ls = lastSelectedProposalRef.current;
@@ -366,8 +366,8 @@ const LinkedProposalsSection = ({
             ) {
               const insertIndex =
                 typeof lastSelectedIndexRef.current === "number" &&
-                lastSelectedIndexRef.current >= 0 &&
-                lastSelectedIndexRef.current <= unlinkedProposals.length
+                  lastSelectedIndexRef.current >= 0 &&
+                  lastSelectedIndexRef.current <= unlinkedProposals.length
                   ? lastSelectedIndexRef.current
                   : unlinkedProposals.length;
               unlinkedProposals.splice(insertIndex, 0, currentlySelected);
@@ -531,7 +531,7 @@ const LinkedProposalsSection = ({
                         className={cn(
                           "hover:bg-gray-50 cursor-pointer",
                           (isLinkedByParent || isChecked) &&
-                            "bg-green-50 border-green-200"
+                          "bg-green-50 border-green-200"
                         )}
                         onClick={() => handleSelectProposal(proposal.ID)}
                       >
@@ -569,8 +569,8 @@ const LinkedProposalsSection = ({
                         <TableCell>
                           {proposal.CreatedDate || proposal.StartDate
                             ? new Date(
-                                proposal.CreatedDate || proposal.StartDate
-                              ).toLocaleDateString()
+                              proposal.CreatedDate || proposal.StartDate
+                            ).toLocaleDateString()
                             : "N/A"}
                         </TableCell>
                         <TableCell>

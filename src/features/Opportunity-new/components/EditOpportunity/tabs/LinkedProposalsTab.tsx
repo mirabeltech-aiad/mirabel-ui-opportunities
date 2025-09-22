@@ -1,10 +1,14 @@
 import React, { useState, useEffect } from 'react';
-import { Button } from '@/components/ui/button';
-import { FloatingLabelSearchInput } from '@/shared/components/ui/FloatingLabelSearchInput';
-import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
-import { Link2Off, Search } from 'lucide-react';
+import { Button } from '@/shared/components/ui/button';
+import { RadioGroup, RadioGroupItem } from '@/shared/components/ui/radio-group';
+import { Link2Off, ExternalLink, AlertCircle, CheckCircle2 } from 'lucide-react';
 import { OpportunityFormData } from '../../../types/opportunity';
-import axiosService from '@/services/axiosService.js';
+import { Alert, AlertDescription } from '@/shared/components/ui/alert';
+import { opportunityService } from '../../../services/opportunityService';
+import AdvancedDataTable from '@/shared/components/ui/advanced-table/AdvancedDataTable';
+import { ColumnDefinition } from '@/shared/components/ui/advanced-table/types/column.types';
+import { getRepColor } from '@/utils/commonHelpers';
+import RepAvatar from '@/shared/components/ui/RepAvatar';
 
 interface LinkedProposalsTabProps {
   formData: OpportunityFormData;
@@ -15,15 +19,23 @@ interface LinkedProposalsTabProps {
   isProposalReplacement: (proposalId: string) => boolean;
   originalProposalId: string;
 }
-
+interface SalesRep {
+  ID: string,
+  Name: string
+}
 interface Proposal {
   ID: string;
-  Name: string;
+  Name: string,
+  ProductNames: string;
   Status: string;
   Amount: number;
   CustomerName: string;
-  Products: Array<{ ID: number; Name: string }>;
-  BusinessUnits: Array<{ ID: number; Name: string }>;
+  Products: string;
+  Description: string;
+  Rep: SalesRep;
+  CreatedDate: string;
+  OpportunityID: number;
+  repWithInitials: HTMLElement
 }
 
 const LinkedProposalsTab: React.FC<LinkedProposalsTabProps> = ({
@@ -35,52 +47,205 @@ const LinkedProposalsTab: React.FC<LinkedProposalsTabProps> = ({
   isProposalReplacement,
   originalProposalId
 }) => {
-  const [searchTerm, setSearchTerm] = useState('');
   const [proposals, setProposals] = useState<Proposal[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [selectedProposal, setSelectedProposal] = useState(formData.proposalId);
+  const [error, setError] = useState<string | null>(null);
 
-  // Search for proposals
+  // Format currency
+  const formatCurrency = (amount: number) => {
+    return new Intl.NumberFormat('en-US', {
+      style: 'currency',
+      currency: 'USD',
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0,
+    }).format(amount);
+  };
+
+  // Format date
+  const formatDate = (dateString: string) => {
+    return new Date(dateString).toLocaleDateString('en-US', {
+      month: 'numeric',
+      day: 'numeric',
+      year: 'numeric'
+    });
+  };
+
+  // Define columns for AdvancedDataTable
+  const columns: ColumnDefinition<Proposal>[] = [
+    {
+      id: 'select',
+      header: '',
+      accessor: () => '',
+      render: (value, row) => (
+        <RadioGroup value={selectedProposal} onValueChange={handleProposalSelect}>
+          <RadioGroupItem value={row.ID} />
+        </RadioGroup>
+      ),
+      sortable: false,
+      width: 50
+    },
+    {
+      id: 'name',
+      header: 'Proposal Name',
+      accessor: 'Name',
+      render: (value, row) => (
+        <div>
+          <div className="text-sm font-medium text-gray-900">{row.Name}</div>
+          <div className="text-xs text-gray-500">#{row.ID}</div>
+        </div>
+      )
+    },
+    {
+      id: 'products',
+      header: 'Products',
+      accessor: 'ProductNames',
+      render: (value, row) => (
+        <div className="text-sm text-gray-900 max-w-xs truncate">
+          {row.ProductNames}
+        </div>
+      )
+    },
+    {
+      id: 'description',
+      header: 'Description',
+      accessor: 'Description',
+      render: (value, row) => (
+        <div className="text-sm text-gray-900 max-w-xs truncate">
+          {row.Description}
+        </div>
+      )
+    },
+    {
+      id: 'rep',
+      header: 'Rep',
+      accessor: (row) => row.Rep?.Name || '',
+      render: (value, row) => {
+        const repName = row.Rep?.Name || 'N/A';
+        return (
+          <div className="flex items-center gap-2">
+            <RepAvatar name={repName} size="sm" />
+            <span className="text-sm text-gray-900">{repName}</span>
+          </div>
+        );
+      }
+    },
+    {
+      id: 'createdDate',
+      header: 'Created Date',
+      accessor: 'CreatedDate',
+      render: (value, row) => (
+        <div className="text-sm text-gray-900">
+          {formatDate(row.CreatedDate)}
+        </div>
+      )
+    },
+    {
+      id: 'amount',
+      header: 'Amount',
+      accessor: 'Amount',
+      render: (value, row) => (
+        <div className="text-sm font-medium text-gray-900">
+          {formatCurrency(row.Amount)}
+        </div>
+      )
+    },
+    {
+      id: 'actions',
+      header: 'Actions',
+      accessor: () => '',
+      render: (value, row) => (
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={() => window.open(`/proposals/${row.ID}`, '_blank')}
+        >
+          <ExternalLink className="h-4 w-4" />
+        </Button>
+      ),
+      sortable: false,
+      width: 80
+    }
+  ];
+
+  // Search for proposals based on BU/Product from formData
   const searchProposals = async () => {
-    if (!searchTerm.trim()) return;
+    if (!formData.customerId && !formData.contactDetails?.ID) {
+      setError('Please select a customer first');
+      return;
+    }
+
+    if (!formData.businessUnitId?.length && !formData.productId?.length) {
+      setError('Please select at least one Business Unit or Product');
+      return;
+    }
 
     setIsLoading(true);
+    setError(null);
+
     try {
-      const payload = {
-        Customer: formData.company || searchTerm,
-        ProductIDs: [],
-        BusinessUnitIDs: [],
+      // Build search parameters DTO
+      const BaseSearchParametersDTO = {
+        Customer: formData.company || "",
+        ProductIDs: formData.productId?.join(",") || "",
+        BusinessUnitIDs: formData.businessUnitId?.join(",") || "",
         Status: 'Active',
         ExcludeLinked: true
       };
 
-      const response = await axiosService.post('/services/production/proposals/bycriteria/ALL', payload);
-      
-      if (response?.content && Array.isArray(response.content)) {
-        setProposals(response.content);
+      // Use the opportunityService method with the specified logic
+      const data = await opportunityService.getProposalsBasedOnOpportunity("ALL", BaseSearchParametersDTO);
+
+      // Apply the filtering logic as specified
+      if (formData.productId?.length > 1 || formData.company !== "") {
+        // Filter proposals that match current opportunity ID (if editing existing)
+        if (opportunityId) {
+          const proposalPageRecordData = data.filter((item) => item.ID == opportunityId);
+          // You can use proposalPageRecordData if needed for current proposal
+        }
+
+        // Filter proposals that are not linked to any opportunity (OpportunityID == 0)
+        const availableProposals = data.filter((item) => item.OpportunityID == 0);
+        // Get distinct rep names and apply colors
+        const distinctReps = [...new Set(availableProposals.map(p => p.SalesRep?.Name).filter(Boolean))];
+
+        const proposalsWithColors = availableProposals.map(proposal => ({
+          ...proposal,
+          repWithInitials: proposal.Rep?.Name ? getRepColor(proposal.Rep.Name, distinctReps) : undefined
+        }));
+
+        setProposals(proposalsWithColors);
       }
+
+      // Check if no proposals are available
+      if (data === null ||
+        data.length === 0 ||
+        data.filter((item) => item.OpportunityID == 0).length === 0) {
+        setError("No Proposal Available");
+        setProposals([]);
+      }
+
     } catch (error) {
       console.error('Failed to search proposals:', error);
+      setError('Failed to fetch proposal');
+      setProposals([]);
     } finally {
       setIsLoading(false);
     }
   };
 
   // Handle proposal selection
-  const handleProposalSelect = (proposal: Proposal) => {
-    setSelectedProposal(proposal.ID);
-    
+  const handleProposalSelect = (proposalId: string) => {
+    const proposal = proposals.find(p => p.ID === proposalId);
+    if (!proposal) return;
+
+    setSelectedProposal(proposalId);
+
     // Update form data with proposal information
     handleBatchInputChange({
       proposalId: proposal.ID,
       proposalName: proposal.Name,
       amount: proposal.Amount.toString(),
-      product: proposal.Products.map(p => p.Name),
-      productId: proposal.Products.map(p => p.ID.toString()),
-      productDetails: proposal.Products,
-      businessUnit: proposal.BusinessUnits.map(bu => bu.Name),
-      businessUnitId: proposal.BusinessUnits.map(bu => bu.ID.toString()),
-      businessUnitDetails: proposal.BusinessUnits
     });
   };
 
@@ -97,13 +262,12 @@ const LinkedProposalsTab: React.FC<LinkedProposalsTabProps> = ({
     }
   };
 
-  // Auto-search when component mounts if company is available
+  // Auto-search when BU/Product changes
   useEffect(() => {
-    if (formData.company) {
-      setSearchTerm(formData.company);
+    if (formData.businessUnitId?.length || formData.productId?.length) {
       searchProposals();
     }
-  }, [formData.company]);
+  }, [formData.businessUnitId, formData.productId, formData.customerId]);
 
   return (
     <div className="space-y-6">
@@ -111,18 +275,21 @@ const LinkedProposalsTab: React.FC<LinkedProposalsTabProps> = ({
       {formData.proposalId && (
         <div className="bg-blue-50 p-4 rounded-lg border border-blue-200">
           <div className="flex items-center justify-between">
-            <div>
-              <h3 className="text-lg font-semibold text-blue-900">Currently Linked Proposal</h3>
-              <p className="text-blue-700 mt-1">
-                <strong>{formData.proposalName}</strong> (ID: {formData.proposalId})
-              </p>
-              {isProposalReplacement(formData.proposalId) && (
-                <p className="text-orange-700 text-sm mt-1">
-                  ⚠️ This is a new selection. Save the opportunity to confirm the change.
+            <div className="flex items-center gap-2">
+              <CheckCircle2 className="h-5 w-5 text-blue-600" />
+              <div>
+                <h3 className="text-lg font-semibold text-blue-900">Currently Linked Proposal</h3>
+                <p className="text-blue-700 mt-1">
+                  <strong>{formData.proposalName}</strong> (ID: {formData.proposalId})
                 </p>
-              )}
+                {isProposalReplacement(formData.proposalId) && (
+                  <p className="text-orange-700 text-sm mt-1">
+                    ⚠️ This is a new selection. Save the opportunity to confirm the change.
+                  </p>
+                )}
+              </div>
             </div>
-            
+
             {shouldShowUnlinkOption() && (
               <Button
                 variant="outline"
@@ -138,124 +305,68 @@ const LinkedProposalsTab: React.FC<LinkedProposalsTabProps> = ({
         </div>
       )}
 
-      {/* Search Section */}
-      <div className="bg-white p-6 rounded-lg border border-gray-200">
-        <h3 className="text-lg font-semibold text-gray-900 mb-4">Search Available Proposals</h3>
-        
-        <div className="flex gap-4 mb-4">
-          <div className="flex-1">
-            <FloatingLabelSearchInput
-              id="proposalSearch"
-              label="Search by Company or Proposal Name"
-              value={searchTerm}
-              onChange={setSearchTerm}
-              placeholder="Enter company name or proposal name..."
-              onSearch={searchProposals}
-            />
+      {/* Available Proposals Section */}
+      <div className="bg-white rounded-lg border border-gray-200">
+        <div className="p-6 border-b border-gray-200">
+          <div className="flex items-center justify-between">
+            <div>
+              <h3 className="text-lg font-semibold text-gray-900">
+                Available Proposals for {formData.company || 'Selected Customer'}
+              </h3>
+              <p className="text-sm text-gray-600 mt-1">
+                {proposals.length} proposal(s) found • Select a proposal to auto-populate fields (optional)
+              </p>
+            </div>
+            <Button
+              onClick={searchProposals}
+              disabled={isLoading || (!formData.businessUnitId?.length && !formData.productId?.length)}
+              variant="outline"
+            >
+              {isLoading ? 'Loading...' : 'Refresh'}
+            </Button>
           </div>
-          
-          <Button
-            onClick={searchProposals}
-            disabled={!searchTerm.trim() || isLoading}
-            className="px-6"
-          >
-            <Search className="h-4 w-4 mr-2" />
-            {isLoading ? 'Searching...' : 'Search'}
-          </Button>
         </div>
 
-        {/* Search Results */}
-        {proposals.length > 0 && (
-          <div className="mt-6">
-            <h4 className="text-md font-medium text-gray-900 mb-3">
-              Available Proposals ({proposals.length})
-            </h4>
-            
-            <RadioGroup
-              value={selectedProposal}
-              onValueChange={(value) => {
-                const proposal = proposals.find(p => p.ID === value);
-                if (proposal) {
-                  handleProposalSelect(proposal);
-                }
-              }}
-              className="space-y-3"
-            >
-              {proposals.map((proposal) => (
-                <div
-                  key={proposal.ID}
-                  className="flex items-start space-x-3 p-4 border border-gray-200 rounded-lg hover:bg-gray-50"
-                >
-                  <RadioGroupItem
-                    value={proposal.ID}
-                    id={`proposal-${proposal.ID}`}
-                    className="mt-1"
-                  />
-                  
-                  <div className="flex-1 min-w-0">
-                    <label
-                      htmlFor={`proposal-${proposal.ID}`}
-                      className="block cursor-pointer"
-                    >
-                      <div className="flex items-center justify-between">
-                        <h5 className="text-sm font-medium text-gray-900">
-                          {proposal.Name}
-                        </h5>
-                        <span className="text-sm text-gray-500">
-                          ${proposal.Amount.toLocaleString()}
-                        </span>
-                      </div>
-                      
-                      <p className="text-sm text-gray-600 mt-1">
-                        Customer: {proposal.CustomerName}
-                      </p>
-                      
-                      {proposal.Products.length > 0 && (
-                        <p className="text-xs text-gray-500 mt-1">
-                          Products: {proposal.Products.map(p => p.Name).join(', ')}
-                        </p>
-                      )}
-                      
-                      {proposal.BusinessUnits.length > 0 && (
-                        <p className="text-xs text-gray-500 mt-1">
-                          Business Units: {proposal.BusinessUnits.map(bu => bu.Name).join(', ')}
-                        </p>
-                      )}
-                      
-                      <div className="flex items-center justify-between mt-2">
-                        <span className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${
-                          proposal.Status === 'Active' 
-                            ? 'bg-green-100 text-green-800'
-                            : 'bg-gray-100 text-gray-800'
-                        }`}>
-                          {proposal.Status}
-                        </span>
-                        
-                        <span className="text-xs text-gray-400">
-                          ID: {proposal.ID}
-                        </span>
-                      </div>
-                    </label>
-                  </div>
-                </div>
-              ))}
-            </RadioGroup>
+        {/* Error Message */}
+        {error && (
+          <div className="p-4 border-b border-gray-200">
+            <Alert variant="destructive">
+              <AlertCircle className="h-4 w-4" />
+              <AlertDescription>{error}</AlertDescription>
+            </Alert>
           </div>
         )}
 
-        {/* No Results Message */}
-        {searchTerm && !isLoading && proposals.length === 0 && (
-          <div className="text-center py-8 text-gray-500">
-            <p>No available proposals found for "{searchTerm}"</p>
-            <p className="text-sm mt-1">Try searching with a different company name or proposal name.</p>
+        {/* Proposals Table with AdvancedDataTable */}
+        {proposals.length > 0 ? (
+          <div className="p-4">
+            <AdvancedDataTable
+              data={proposals}
+              columns={columns}
+              loading={isLoading}
+              enableSelection={false}
+              enablePagination={true}
+              initialPageSize={10}
+              className="border border-gray-200 rounded-lg"
+              onRowClick={(row) => handleProposalSelect(row.ID)}
+            />
+          </div>
+        ) : !isLoading && !error && (
+          <div className="p-8 text-center text-gray-500">
+            <AlertCircle className="h-12 w-12 mx-auto mb-4 text-gray-400" />
+            <p className="text-lg font-medium">No proposals found</p>
+            <p className="text-sm mt-1">
+              {!formData.businessUnitId?.length && !formData.productId?.length
+                ? 'Please select Business Unit or Product in the Opportunity Information tab to see available proposals.'
+                : 'No active proposals match the selected Business Unit and Product criteria.'}
+            </p>
           </div>
         )}
 
-        {/* Instructions */}
-        {!searchTerm && (
-          <div className="text-center py-8 text-gray-500">
-            <p>Enter a company name or proposal name to search for available proposals.</p>
-            <p className="text-sm mt-1">Only unlinked, active proposals will be shown.</p>
+        {isLoading && (
+          <div className="p-8 text-center">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-4"></div>
+            <p className="text-gray-500">Loading proposals...</p>
           </div>
         )}
       </div>
@@ -264,3 +375,5 @@ const LinkedProposalsTab: React.FC<LinkedProposalsTabProps> = ({
 };
 
 export default LinkedProposalsTab;
+
+
