@@ -3,7 +3,7 @@ import { useNavigate, useSearchParams, useLocation } from "react-router-dom";
 import OpportunityStatsCards from "../../features/Opportunity/components/ui/OpportunityStatsCards";
 import OpportunitiesTable from "../../features/Opportunity/components/ui/OpportunitiesTable";
 import OpportunityCardView from "../../features/Opportunity/components/ui/OpportunityCardView";
-import KanbanView from "../../features/Opportunity/components/ui/KanbanView";
+import KanbanView from "../../features/opportunity-new/components/kanban/KanbanView";
 import SplitScreenView from "../../features/Opportunity/components/ui/SplitScreenView";
 import ViewToggle from "@/components/ui/ViewToggle";
 import { useApiData } from "@/features/Opportunity/hooks/useApiData";
@@ -48,6 +48,7 @@ const Pipeline = () => {
   const [selectedView, setSelectedView] = useState(null);
   const [selectedCompany, setSelectedCompany] = useState(null);
   const [selectedCompanyData, setSelectedCompanyData] = useState(null);
+  const [kanbanOpportunities, setKanbanOpportunities] = useState([]);
 
   const [filters, setFilters] = useState({
     quickStatus: "All Opportunities",
@@ -597,6 +598,7 @@ const Pipeline = () => {
   // Handle view change with auto-selection for split view - memoized to prevent re-renders
   const handleViewChange = useCallback(
     (newView) => {
+      console.log("Pipeline: onViewChange invoked ->", newView);
       setView(newView);
 
       // Auto-select first company when switching to split view
@@ -671,6 +673,42 @@ const Pipeline = () => {
       }
     }
   }, [opportunities, view, selectedCompany]);
+
+  // Load data specifically for Kanban view if main data loading fails
+  useEffect(() => {
+    const loadKanbanData = async () => {
+      if (view === "kanban" && (!opportunities || opportunities.length === 0)) {
+        console.log('Pipeline: Loading data specifically for Kanban view...');
+        try {
+          const result = await opportunitiesService.getFormattedOpportunities({
+            quickStatus: 'All Opportunities'
+          });
+          
+          if (result.opportunitiesData && Array.isArray(result.opportunitiesData)) {
+            console.log('Pipeline: Loaded Kanban data:', result.opportunitiesData.length);
+            setKanbanOpportunities(result.opportunitiesData);
+            
+            // Update stats if available
+            if (result.opportunityResult) {
+              setStats({
+                total: result.opportunityResult.TotIds || 0,
+                amount: result.opportunityResult.TotOppAmt || 0,
+                won: result.opportunityResult.Won || 0,
+                open: result.opportunityResult.Open || 0,
+                lost: result.opportunityResult.Lost || 0,
+                winTotal: result.opportunityResult.WinTotal || 0,
+                winPercentage: result.opportunityResult.WinRatio || 0,
+              });
+            }
+          }
+        } catch (error) {
+          console.error('Pipeline: Error loading Kanban data:', error);
+        }
+      }
+    };
+
+    loadKanbanData();
+  }, [view, opportunities]);
 
   useEffect(() => {
     // Update stats from opportunityResult when it changes
@@ -1265,54 +1303,73 @@ const Pipeline = () => {
 
   // Build common props object to pass to all views - memoized to prevent re-renders
   const commonProps = useMemo(
-    () => ({
-      opportunities: opportunities.map((o) => ({
+    () => {
+      // Use kanbanOpportunities for Kanban view if regular opportunities are empty
+      const sourceOpportunities = (view === "kanban" && opportunities.length === 0 && kanbanOpportunities.length > 0) 
+        ? kanbanOpportunities 
+        : opportunities;
+        
+      const mappedOpportunities = sourceOpportunities.map((o) => ({
         ...o,
         _leadSourceOptions: leadSourcesMaster,
         _leadTypeOptions: leadTypesMaster,
-      })),
-      view,
-      onViewChange: handleViewChange,
-      filters,
-      onFilterChange: handleFilterChange,
-      users,
-      onRefresh: () => {
-        console.log(
-          "Pipeline: Refresh triggered - will use current filters with Advanced Search processing"
-        );
+      }));
+      
+      console.log('Pipeline: Building commonProps with opportunities:', {
+        originalCount: opportunities.length,
+        kanbanCount: kanbanOpportunities.length,
+        sourceCount: sourceOpportunities.length,
+        mappedCount: mappedOpportunities.length,
+        view,
+        stagesCount: stages.length
+      });
+      
+      return {
+        opportunities: mappedOpportunities,
+        view,
+        onViewChange: handleViewChange,
+        filters,
+        onFilterChange: handleFilterChange,
+        users,
+        onRefresh: () => {
+          console.log(
+            "Pipeline: Refresh triggered - will use current filters with Advanced Search processing"
+          );
 
-        // Process filters using the same logic as Advanced Search
-        const processedFilters = processOpportunitySearchParams(filters);
-        console.log("Refresh: Processed filters:", processedFilters);
+          // Process filters using the same logic as Advanced Search
+          const processedFilters = processOpportunitySearchParams(filters);
+          console.log("Refresh: Processed filters:", processedFilters);
 
-        // Build API filters and make the call directly (same as Advanced Search)
-        const apiFilters = buildApiFiltersFromUIFilters(
-          processedFilters,
-          savedSearches,
-          users
-        );
-        console.log(
-          "Refresh: Making API call with processed filters:",
-          apiFilters
-        );
+          // Build API filters and make the call directly (same as Advanced Search)
+          const apiFilters = buildApiFiltersFromUIFilters(
+            processedFilters,
+            savedSearches,
+            users
+          );
+          console.log(
+            "Refresh: Making API call with processed filters:",
+            apiFilters
+          );
 
-        // Make the API call directly to ensure it uses the same function as Advanced Search
-        // This ensures the same API function is called as when clicking "Search Opportunities" in Advanced Search
-        refetchData(apiFilters);
-      },
-      totalCount,
-      currentPage,
-      onNextPage: handleNextPage,
-      onPreviousPage: handlePreviousPage,
-      savedSearches, // Ensure savedSearches is included in commonProps
-      stages, // Add stages to commonProps so all views receive stage data
-      prospectingStages, // Add prospecting stages for dropdown binding
-      onAddOpportunity: handleAddOpportunity, // Add the add opportunity handler
-      onViewSelected: handleViewSelected, // Add the view selection handler
-      apiColumnConfig, // Pass the opportunityResult which contains ColumnConfig
-    }),
+          // Make the API call directly to ensure it uses the same function as Advanced Search
+          // This ensures the same API function is called as when clicking "Search Opportunities" in Advanced Search
+          refetchData(apiFilters);
+        },
+        totalCount,
+        currentPage,
+        onNextPage: handleNextPage,
+        onPreviousPage: handlePreviousPage,
+        savedSearches, // Ensure savedSearches is included in commonProps
+        stages, // Add stages to commonProps so all views receive stage data
+        prospectingStages, // Add prospecting stages for dropdown binding
+        onAddOpportunity: handleAddOpportunity, // Add the add opportunity handler
+        onViewSelected: handleViewSelected, // Add the view selection handler
+        apiColumnConfig, // Pass the opportunityResult which contains ColumnConfig
+      };
+    },
     [
       opportunities,
+      kanbanOpportunities,
       view,
       handleViewChange,
       filters,
@@ -1343,7 +1400,7 @@ const Pipeline = () => {
   }
 
   const renderView = () => {
-    console.log("Pipeline: Rendering view:", view);
+    console.log("Pipeline: Rendering view:", view, "with opportunities:", opportunities.length);
     if (isLoading) {
       return (
         <div className="flex justify-center items-center h-64">
@@ -1362,6 +1419,14 @@ const Pipeline = () => {
 
     switch (view) {
       case "kanban":
+        console.log("Pipeline: Rendering KanbanView with props:", {
+          opportunitiesCount: commonProps.opportunities.length,
+          stagesCount: commonProps.stages.length
+        });
+        console.log("Pipeline: Rendering NEW KanbanView with props:", {
+          opportunitiesCount: commonProps.opportunities.length,
+          stagesCount: commonProps.stages.length,
+        });
         return <KanbanView {...commonProps} />;
       case "cards":
         return <OpportunityCardView {...commonProps} />;
@@ -1390,7 +1455,8 @@ const Pipeline = () => {
     <div className="flex-1 flex flex-col bg-white w-full overflow-hidden">
       <div className="w-full px-2 py-1 flex-1 mx-0">
         <div className="flex items-center justify-between mb-2">
-          <h1 className="text-2xl font-bold text-[#1a4d80]"></h1>
+          <h1 className="text-2xl font-bold text-[#1a4d80]">Opportunities</h1>
+          <ViewToggle view={view} onViewChange={(v) => { console.log('Pipeline: ViewToggle onClick ->', v); handleViewChange(v); }} />
         </div>
 
         {view !== "kanban" && view !== "split" && (

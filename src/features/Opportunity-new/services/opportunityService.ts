@@ -87,7 +87,7 @@ export class OpportunityService {
   async updateOpportunityStage(opportunityId: string, stageId: number, userId?: string): Promise<any> {
     try {
       const userIdToUse = userId || getCurrentUserId();
-      const endpoint = `${API_URLS.OPPORTUNITIES.BASE}/Field/PipelineStageID/${opportunityId}/0/${userIdToUse}/Insert`;
+      const endpoint = `/services/Opportunities/Field/PipelineStageID/${opportunityId}/0/${userIdToUse}/Insert`;
       const response = await axiosService.post(endpoint, stageId);
       return response;
     } catch (error) {

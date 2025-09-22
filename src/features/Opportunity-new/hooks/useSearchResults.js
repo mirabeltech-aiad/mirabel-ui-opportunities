@@ -1,8 +1,10 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { opportunitiesReportService } from '../services/opportunitiesReportService';
+import { proposalsReportService } from '../services/proposalsReportService';
+import { searchPayloadBuilder } from '../services/searchPayloadBuilder';
 import { logger } from '../../../components/shared/logger';
 
-export const useSearchResults = (searchParams) => {
+export const useSearchResults = (searchParams, searchType = 'opportunities') => {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -17,13 +19,28 @@ export const useSearchResults = (searchParams) => {
 
     try {
       let results;
+      
+      // Choose the appropriate service based on search type
+      const service = searchType === 'proposals' ? proposalsReportService : opportunitiesReportService;
+      
+      logger.info(`useSearchResults: Using ${searchType} service`);
 
       if (!params || Object.keys(params).length === 0) {
         logger.info('useSearchResults: No search params, fetching initial data');
-        results = await opportunitiesReportService.getInitialData(newParams);
+        results = await service.getInitialData(newParams);
       } else {
-        logger.info('useSearchResults: Executing search with params:', params);
-        results = await opportunitiesReportService.executeSearch(params);
+        if (searchType === 'proposals') {
+          // For proposals, use the service's default payload for now
+          // TODO: Update this to use searchPayloadBuilder when filter mapping is ready
+          logger.info('useSearchResults: Using default proposals payload');
+          results = await service.getInitialData();
+        } else {
+          logger.info('useSearchResults: Converting form data to API payload');
+          // Convert form data to proper API payload
+          const apiPayload = searchPayloadBuilder.buildPayload(params, searchType);
+          logger.info('useSearchResults: Executing search with API payload:', apiPayload);
+          results = await service.executeSearch(apiPayload);
+        }
       }
 
       logger.info('useSearchResults: Results received:', results);
@@ -34,7 +51,7 @@ export const useSearchResults = (searchParams) => {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [searchType]);
 
   useEffect(() => {
     // Convert searchParams to string for comparison

@@ -16,8 +16,8 @@ const getNestedValue = (obj, path) => {
   return path.split('.').reduce((current, key) => current?.[key], obj);
 };
 
-const SearchResults = ({ searchParams,setShowResults, searchType = 'opportunities' }) => {
-  const { data, loading, error, refetch } = useSearchResults(searchParams);
+const SearchResults = ({ searchParams, setShowResults, searchType = 'opportunities' }) => {
+  const { data, loading, error, refetch } = useSearchResults(searchParams, searchType);
   const [viewMode, setViewMode] = useState('table');
   const [filters, setFilters] = useState({
     all: searchType === 'opportunities' ? 'All Opportunities' : 'All Proposals',
@@ -32,49 +32,74 @@ const SearchResults = ({ searchParams,setShowResults, searchType = 'opportunitie
   const title = isOpportunities ? 'Opportunities' : 'Proposals';
 
   // Filter definitions for EnhancedFilterBar
-  const filterDefinitions = [
-    {
-      id: 'opportunities',
-      placeholder: 'All Opportunities',
-      options: [
-        { value: 'all', label: 'All Opportunities' },
-        { value: 'active', label: 'Active Opportunities' },
-        { value: 'won', label: 'Won Opportunities' },
-        { value: 'lost', label: 'Lost Opportunities' }
-      ],
-      value: 'all',
-      onChange: (value) => {
-        setFilters(prev => ({ ...prev, opportunities: value === 'all' ? undefined : value }));
-      }
-    },
-    {
-      id: 'probability',
-      placeholder: 'All Probability',
-      options: [
-        { value: 'all', label: 'All Probability' },
-        { value: 'high', label: 'High (80-100%)' },
-        { value: 'medium', label: 'Medium (40-79%)' },
-        { value: 'low', label: 'Low (0-39%)' }
-      ],
-      value: 'all',
-      onChange: (value) => {
-        setFilters(prev => ({ ...prev, probability: value === 'all' ? undefined : value }));
-      }
-    },
-    {
-      id: 'reps',
-      placeholder: 'All Reps',
-      options: [
-        { value: 'all', label: 'All Reps' },
-        { value: 'assigned', label: 'Assigned' },
-        { value: 'unassigned', label: 'Unassigned' }
-      ],
-      value: 'all',
-      onChange: (value) => {
-        setFilters(prev => ({ ...prev, reps: value === 'all' ? undefined : value }));
-      }
+  const getFilterDefinitions = () => {
+    if (searchType === 'proposals') {
+      // For proposals, only show "All Proposal Reps" filter
+      return [
+        {
+          id: 'proposalReps',
+          placeholder: 'All Proposal Reps',
+          options: [
+            { value: 'all', label: 'All Proposal Reps' },
+            // TODO: Add actual proposal reps from API
+            { value: 'rep1', label: 'Rep 1' },
+            { value: 'rep2', label: 'Rep 2' }
+          ],
+          value: 'all',
+          onChange: (value) => {
+            setFilters(prev => ({ ...prev, proposalReps: value === 'all' ? undefined : value }));
+          }
+        }
+      ];
+    } else {
+      // For opportunities, show the original filters
+      return [
+        {
+          id: 'opportunities',
+          placeholder: 'All Opportunities',
+          options: [
+            { value: 'all', label: 'All Opportunities' },
+            { value: 'active', label: 'Active Opportunities' },
+            { value: 'won', label: 'Won Opportunities' },
+            { value: 'lost', label: 'Lost Opportunities' }
+          ],
+          value: 'all',
+          onChange: (value) => {
+            setFilters(prev => ({ ...prev, opportunities: value === 'all' ? undefined : value }));
+          }
+        },
+        {
+          id: 'probability',
+          placeholder: 'All Probability',
+          options: [
+            { value: 'all', label: 'All Probability' },
+            { value: 'high', label: 'High (80-100%)' },
+            { value: 'medium', label: 'Medium (40-79%)' },
+            { value: 'low', label: 'Low (0-39%)' }
+          ],
+          value: 'all',
+          onChange: (value) => {
+            setFilters(prev => ({ ...prev, probability: value === 'all' ? undefined : value }));
+          }
+        },
+        {
+          id: 'reps',
+          placeholder: 'All Reps',
+          options: [
+            { value: 'all', label: 'All Reps' },
+            { value: 'assigned', label: 'Assigned' },
+            { value: 'unassigned', label: 'Unassigned' }
+          ],
+          value: 'all',
+          onChange: (value) => {
+            setFilters(prev => ({ ...prev, reps: value === 'all' ? undefined : value }));
+          }
+        }
+      ];
     }
-  ];
+  };
+
+  const filterDefinitions = getFilterDefinitions();
 
   // Edit functionality
   const handleEditClick = (e, row) => {
@@ -164,192 +189,317 @@ const SearchResults = ({ searchParams,setShowResults, searchType = 'opportunitie
   // }, [searchParams, data, loading, error]);
 
   // Define columns for EnhancedDataTable
-  const columns = [
-    {
-      id: 'edit',
-      header: '',
-      accessor: () => null,
-      sortable: false,
-      width: 50,
-      render: (value, row) => (
-        shouldShowEdit(row) ? (
-          <button
-            onClick={(e) => handleEditClick(e, row)}
-            className="h-8 w-8 p-0 rounded hover:bg-gray-50 flex items-center justify-center"
-            title={`Edit ${isOpportunities ? 'Opportunity' : 'Proposal'}`}
-          >
-            <Edit className="h-4 w-4 text-gray-600 hover:text-black" />
-          </button>
-        ) : (
-          <div className="h-8 w-8 flex items-center justify-center">
-            {/* Empty space to maintain alignment */}
-          </div>
-        )
-      )
-    },
-    {
-      id: 'name',
-      header: searchType === 'opportunities' ? 'Opportunity Name' : 'Proposal Name',
-      accessor: searchType === 'opportunities' ? 'Name' : 'ProposalName',
-      sortable: true,
-      width: 200,
-      render: (value, row) => (
-        <a href={`/${searchType}/${row.ID || row.id}`} className="text-blue-600 hover:text-blue-800 hover:underline font-medium flex items-center space-x-1">
-          <span>{value || 'Untitled'}</span>
-          <ExternalLink className="h-3 w-3" />
-        </a>
-      )
-    },
-    {
-      id: 'company',
-      header: 'Company Name',
-      accessor: 'ContactDetails',
-      sortable: true,
-      width: 160,
-      render: (value, row) => {
-        const companyName = getNestedValue(row, 'ContactDetails.Name') || 'N/A';
-        return <span className="font-medium">{companyName}</span>;
-      }
-    },
-    {
-      id: 'amount',
-      header: 'Amount',
-      accessor: 'Amount',
-      sortable: true,
-      type: 'currency',
-      width: 120,
-      render: (value) => {
-        const amount = parseFloat(value || 0);
-        return <span className="font-medium">${amount.toLocaleString()}</span>;
-      }
-    },
-    {
-      id: 'status',
-      header: 'Status',
-      accessor: 'Status',
-      sortable: true,
-      width: 100,
-      render: (value) => {
-        const getStatusColor = (status) => {
-          const statusLower = (status || '').toLowerCase();
-          if (statusLower.includes('open') || statusLower.includes('active')) {
-            return 'bg-green-100 text-green-800';
-          } else if (statusLower.includes('won')) {
-            return 'bg-blue-100 text-blue-800';
-          } else if (statusLower.includes('lost')) {
-            return 'bg-red-100 text-red-800';
-          }
-          return 'bg-gray-100 text-gray-800';
-        };
-
-        return (
-          <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusColor(value)}`}>
-            {value || 'Unknown'}
-          </span>
-        );
-      }
-    },
-    {
-      id: 'stage',
-      header: 'Stage',
-      accessor: 'OppStageDetails',
-      sortable: true,
-      width: 140,
-      render: (value, row) => {
-        const stage = getNestedValue(row, 'OppStageDetails.Stage') || 'Unknown';
-        const getStageColor = (stage) => {
-          const stageColors = {
-            'prospecting': 'bg-purple-500',
-            'qualification': 'bg-blue-500',
-            'proposal': 'bg-yellow-500',
-            'negotiation': 'bg-orange-500',
-            'closed won': 'bg-green-500',
-            'closed': 'bg-green-500'
-          };
-          const stageLower = (stage || '').toLowerCase();
-          return stageColors[stageLower] || 'bg-gray-500';
-        };
-
-        return (
-          <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium text-white ${getStageColor(stage)}`}>
-            {stage}
-          </span>
-        );
-      }
-    },
-    {
-      id: 'assignedTo',
-      header: 'Assigned Rep',
-      accessor: 'AssignedTo',
-      sortable: true,
-      width: 120,
-      render: (value) => {
-        if (!value || value === 'Unassigned') {
-          return <span className="text-sm text-gray-500">Unassigned</span>;
-        }
-        const initials = value.split(' ').map(n => n[0]).join('').substring(0, 2);
-        const colors = ['bg-red-500', 'bg-blue-500', 'bg-green-500', 'bg-purple-500', 'bg-yellow-500', 'bg-pink-500'];
-        const colorIndex = value.length % colors.length;
-        return (
-          <div className="flex items-center space-x-2">
-            <div className={`w-8 h-8 rounded-full ${colors[colorIndex]} flex items-center justify-center text-white text-sm font-medium`}>
-              {initials}
+  const getColumns = () => {
+    const baseColumns = [
+      {
+        id: 'edit',
+        header: '',
+        accessor: () => null,
+        sortable: false,
+        width: 50,
+        render: (value, row) => (
+          shouldShowEdit(row) ? (
+            <button
+              onClick={(e) => handleEditClick(e, row)}
+              className="h-8 w-8 p-0 rounded hover:bg-gray-50 flex items-center justify-center"
+              title={`Edit ${isOpportunities ? 'Opportunity' : 'Proposal'}`}
+            >
+              <Edit className="h-4 w-4 text-gray-600 hover:text-black" />
+            </button>
+          ) : (
+            <div className="h-8 w-8 flex items-center justify-center">
+              {/* Empty space to maintain alignment */}
             </div>
-            <span className="text-sm">{value}</span>
-          </div>
-        );
+          )
+        )
+      },
+      {
+        id: 'name',
+        header: searchType === 'opportunities' ? 'Opportunity Name' : 'Proposal Name',
+        accessor: searchType === 'opportunities' ? 'Name' : 'Proposal',
+        sortable: true,
+        width: 200,
+        render: (value, row) => {
+          let displayName = '';
+          if (searchType === 'proposals') {
+            displayName = getNestedValue(row, 'Proposal.Name') || row.ProposalName || 'Untitled';
+          } else {
+            displayName = value || row.Name || 'Untitled';
+          }
+          return (
+            <a href={`/${searchType}/${row.ID || row.id}`} className="text-blue-600 hover:text-blue-800 hover:underline font-medium flex items-center space-x-1">
+              <span>{displayName}</span>
+              <ExternalLink className="h-3 w-3" />
+            </a>
+          );
+        }
+      },
+      {
+        id: 'company',
+        header: 'Company Name',
+        accessor: 'ContactDetails',
+        sortable: true,
+        width: 160,
+        render: (value, row) => {
+          const companyName = getNestedValue(row, 'ContactDetails.Name') ||
+            getNestedValue(row, 'ContactDetails.CompanyName') ||
+            row.CompanyName || 'N/A';
+          return <span className="font-medium">{companyName}</span>;
+        }
+      },
+      {
+        id: 'amount',
+        header: searchType === 'proposals' ? 'Proposal Amount' : 'Amount',
+        accessor: searchType === 'proposals' ? 'Proposal' : 'Amount',
+        sortable: true,
+        type: 'currency',
+        width: 120,
+        render: (value, row) => {
+          let amount = 0;
+          if (searchType === 'proposals') {
+            amount = parseFloat(getNestedValue(row, 'Proposal.Amount') || row.ProposalTotal || 0);
+          } else {
+            amount = parseFloat(value || row.Amount || 0);
+          }
+          return <span className="font-medium">${amount.toLocaleString()}</span>;
+        }
+      },
+      {
+        id: 'status',
+        header: searchType === 'proposals' ? 'Proposal Status' : 'Status',
+        accessor: searchType === 'proposals' ? 'Proposal' : 'Status',
+        sortable: true,
+        width: 100,
+        render: (value, row) => {
+          let status = '';
+          if (searchType === 'proposals') {
+            status = getNestedValue(row, 'Proposal.Status') || row.ProposalStatus || 'Unknown';
+          } else {
+            status = value || row.Status || 'Unknown';
+          }
+
+          const getStatusColor = (status) => {
+            const statusLower = (status || '').toLowerCase();
+            if (statusLower.includes('open') || statusLower.includes('active') || statusLower.includes('draft')) {
+              return 'bg-green-100 text-green-800';
+            } else if (statusLower.includes('won') || statusLower.includes('approved')) {
+              return 'bg-blue-100 text-blue-800';
+            } else if (statusLower.includes('lost') || statusLower.includes('rejected')) {
+              return 'bg-red-100 text-red-800';
+            } else if (statusLower.includes('sent') || statusLower.includes('pending')) {
+              return 'bg-yellow-100 text-yellow-800';
+            }
+            return 'bg-gray-100 text-gray-800';
+          };
+
+          return (
+            <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusColor(status)}`}>
+              {status}
+            </span>
+          );
+        }
       }
-    },
-    {
-      id: 'probability',
-      header: 'Probability (%)',
-      accessor: 'Probability',
-      sortable: true,
-      type: 'percentage',
-      width: 140,
-      render: (value) => <span>{value || '0'}%</span>
-    },
-    {
-      id: 'projCloseDate',
-      header: 'Proj Close Date',
-      accessor: 'CloseDate',
-      sortable: true,
-      type: 'date',
-      width: 140,
-      render: (value) => {
-        if (!value) return <span className="text-sm">N/A</span>;
-        const date = new Date(value);
-        return <span className="text-sm">{date.toLocaleDateString()}</span>;
-      }
-    },
-    {
-      id: 'contactName',
-      header: 'Contact Name',
-      accessor: 'ContactDetails',
-      sortable: true,
-      width: 160,
-      render: (value, row) => {
-        const contactName = getNestedValue(row, 'ContactDetails.ContactName') || 'N/A';
-        return <span>{contactName}</span>;
-      }
-    },
-    {
-      id: 'actions',
-      header: '',
-      accessor: () => null,
-      sortable: false,
-      width: 50,
-      render: () => (
-        <button className="p-1 hover:bg-gray-100 rounded">
-          <MoreVertical className="h-4 w-4 text-gray-400" />
-        </button>
-      )
+    ];
+
+    // Add opportunity-specific columns
+    if (isOpportunities) {
+      baseColumns.push(
+        {
+          id: 'stage',
+          header: 'Stage',
+          accessor: 'OppStageDetails',
+          sortable: true,
+          width: 140,
+          render: (value, row) => {
+            const stage = getNestedValue(row, 'OppStageDetails.Stage') || row.Stage || 'Unknown';
+            const getStageColor = (stage) => {
+              const stageColors = {
+                'prospecting': 'bg-purple-500',
+                'qualification': 'bg-blue-500',
+                'proposal': 'bg-yellow-500',
+                'negotiation': 'bg-orange-500',
+                'closed won': 'bg-green-500',
+                'closed': 'bg-green-500'
+              };
+              const stageLower = (stage || '').toLowerCase();
+              return stageColors[stageLower] || 'bg-gray-500';
+            };
+
+            return (
+              <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium text-white ${getStageColor(stage)}`}>
+                {stage}
+              </span>
+            );
+          }
+        },
+        {
+          id: 'probability',
+          header: 'Probability (%)',
+          accessor: 'Probability',
+          sortable: true,
+          type: 'percentage',
+          width: 140,
+          render: (value) => <span>{value || '0'}%</span>
+        },
+        {
+          id: 'projCloseDate',
+          header: 'Proj Close Date',
+          accessor: 'CloseDate',
+          sortable: true,
+          type: 'date',
+          width: 140,
+          render: (value) => {
+            if (!value) return <span className="text-sm">N/A</span>;
+            const date = new Date(value);
+            return <span className="text-sm">{date.toLocaleDateString()}</span>;
+          }
+        }
+      );
+    } else {
+      // Add proposal-specific columns
+      baseColumns.push(
+        {
+          id: 'proposalId',
+          header: 'Proposal ID',
+          accessor: 'ProposalID',
+          sortable: true,
+          width: 100,
+          render: (value, row) => {
+            const proposalId = value || getNestedValue(row, 'Proposal.ID') || 'N/A';
+            return <span className="font-medium">#{proposalId}</span>;
+          }
+        },
+        {
+          id: 'proposalRep',
+          header: 'Proposal Rep',
+          accessor: 'Proposal',
+          sortable: true,
+          width: 120,
+          render: (value, row) => {
+            const proposalRep = getNestedValue(row, 'Proposal.SalesRep.Name') || row.ProposalRep || 'Unassigned';
+            if (!proposalRep || proposalRep === 'Unassigned') {
+              return <span className="text-sm text-gray-500">Unassigned</span>;
+            }
+            const initials = proposalRep.split(' ').map(n => n[0]).join('').substring(0, 2);
+            const colors = ['bg-red-500', 'bg-blue-500', 'bg-green-500', 'bg-purple-500', 'bg-yellow-500', 'bg-pink-500'];
+            const colorIndex = proposalRep.length % colors.length;
+            return (
+              <div className="flex items-center space-x-2">
+                <div className={`w-8 h-8 rounded-full ${colors[colorIndex]} flex items-center justify-center text-white text-sm font-medium`}>
+                  {initials}
+                </div>
+                <span className="text-sm">{proposalRep}</span>
+              </div>
+            );
+          }
+        },
+        {
+          id: 'approvalStatus',
+          header: 'Approval Status',
+          accessor: 'Proposal',
+          sortable: true,
+          width: 140,
+          render: (value, row) => {
+            const approvalStatus = getNestedValue(row, 'Proposal.ApprovalStatus') || row.ApprovalStatus || 'N/A';
+
+            const getApprovalColor = (status) => {
+              const statusLower = (status || '').toLowerCase();
+              if (statusLower.includes('approved')) {
+                return 'bg-green-100 text-green-800';
+              } else if (statusLower.includes('pending')) {
+                return 'bg-yellow-100 text-yellow-800';
+              } else if (statusLower.includes('rejected')) {
+                return 'bg-red-100 text-red-800';
+              } else if (statusLower.includes('blank')) {
+                return 'bg-gray-100 text-gray-600';
+              }
+              return 'bg-gray-100 text-gray-800';
+            };
+
+            return (
+              <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getApprovalColor(approvalStatus)}`}>
+                {approvalStatus}
+              </span>
+            );
+          }
+        },
+        {
+          id: 'proposalDate',
+          header: 'Proposal Date',
+          accessor: 'Proposal',
+          sortable: true,
+          type: 'date',
+          width: 140,
+          render: (value, row) => {
+            const proposalDate = getNestedValue(row, 'Proposal.ProposalDate') || row.ProposalDate;
+            if (!proposalDate) return <span className="text-sm">N/A</span>;
+            const date = new Date(proposalDate);
+            return <span className="text-sm">{date.toLocaleDateString()}</span>;
+          }
+        }
+      );
     }
-  ];
+
+    // Add common columns
+    baseColumns.push(
+      {
+        id: 'assignedTo',
+        header: 'Assigned Rep',
+        accessor: 'AssignedTo',
+        sortable: true,
+        width: 120,
+        render: (value) => {
+          if (!value || value === 'Unassigned') {
+            return <span className="text-sm text-gray-500">Unassigned</span>;
+          }
+          const initials = value.split(' ').map(n => n[0]).join('').substring(0, 2);
+          const colors = ['bg-red-500', 'bg-blue-500', 'bg-green-500', 'bg-purple-500', 'bg-yellow-500', 'bg-pink-500'];
+          const colorIndex = value.length % colors.length;
+          return (
+            <div className="flex items-center space-x-2">
+              <div className={`w-8 h-8 rounded-full ${colors[colorIndex]} flex items-center justify-center text-white text-sm font-medium`}>
+                {initials}
+              </div>
+              <span className="text-sm">{value}</span>
+            </div>
+          );
+        }
+      },
+      {
+        id: 'contactName',
+        header: 'Contact Name',
+        accessor: 'ContactDetails',
+        sortable: true,
+        width: 160,
+        render: (value, row) => {
+          const contactName = getNestedValue(row, 'ContactDetails.ContactName') ||
+            getNestedValue(row, 'ContactDetails.Name') ||
+            row.ContactName || 'N/A';
+          return <span>{contactName}</span>;
+        }
+      },
+      {
+        id: 'actions',
+        header: '',
+        accessor: () => null,
+        sortable: false,
+        width: 50,
+        render: () => (
+          <button className="p-1 hover:bg-gray-100 rounded">
+            <MoreVertical className="h-4 w-4 text-gray-400" />
+          </button>
+        )
+      }
+    );
+
+    return baseColumns;
+  };
+
+  const columns = getColumns();
 
   // Prepare stats data from OpportunityResult array
   const opportunityResult = data?.opportunityResult || {};
-  
+
   const opportunityStatsData = {
     totalCount: opportunityResult.TotIds || 0,
     totalAmount: `$${(opportunityResult.TotOppAmt || 0).toLocaleString()}`,
@@ -369,10 +519,12 @@ const SearchResults = ({ searchParams,setShowResults, searchType = 'opportunitie
     sentProposalsAmount: opportunityResult.SentProposalsAmount || 0,
     approvedProposals: opportunityResult.ApprovedProposals || 0,
     approvedProposalsAmount: opportunityResult.ApprovedProposalsAmount || 0,
-    conversionRate: `${((opportunityResult.ConvertedToContracts / opportunityResult.Proposals) * 100 || 0).toFixed(1)}%`
+    conversionRate: opportunityResult.Proposals > 0 ?
+      `${((opportunityResult.ConvertedToContracts / opportunityResult.Proposals) * 100 || 0).toFixed(1)}%` :
+      '0%'
   };
 
-  
+
   if (error) return <div className="flex items-center justify-center h-64"><div className="text-red-500">Error: {error.message}</div></div>;
 
   return (
@@ -433,13 +585,6 @@ const SearchResults = ({ searchParams,setShowResults, searchType = 'opportunitie
               // Filters
               onFilterClick={handleFilterClick}
               filters={filterDefinitions}
-              // onResetFilters={() => {
-              //   setFilters({
-              //     all: searchType === 'opportunities' ? 'All Opportunities' : 'All Proposals',
-              //     probability: 'All Probability',
-              //     reps: 'All Reps'
-              //   });
-              // }}
               hasActiveFilters={Object.values(filters).some(value =>
                 value && !value.toString().startsWith('All')
               )}
@@ -459,7 +604,7 @@ const SearchResults = ({ searchParams,setShowResults, searchType = 'opportunitie
         {loading && (
           <NewLoader />
         )}
-        { !loading && viewMode === 'cards' && (
+        {!loading && viewMode === 'cards' && (
           <CardViewNew
             opportunities={data?.results || []}
             view={viewMode}
@@ -481,7 +626,7 @@ const SearchResults = ({ searchParams,setShowResults, searchType = 'opportunitie
         )}
 
         {/* Table View */}
-        { !loading && viewMode === 'table' && (
+        {!loading && viewMode === 'table' && (
           <div className="flex-1 min-h-0">
             <div className="search-results-scroll-container">
               <EnhancedDataTable
@@ -521,8 +666,8 @@ const SearchResults = ({ searchParams,setShowResults, searchType = 'opportunitie
         isOpen={isViewsSidebarOpen}
         onClose={() => setIsViewsSidebarOpen(false)}
         columnOrder={getDefaultColumnOrder()}
-        onColumnOrderChange={() => {}}
-        onViewSelected={() => {}}
+        onColumnOrderChange={() => { }}
+        onViewSelected={() => { }}
         pageType="opportunities"
       />
     </>

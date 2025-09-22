@@ -1,5 +1,5 @@
 import React from 'react';
-import { TrendingUp, TrendingDown, DollarSign, FileText, Send, CheckCircle, Clock, BarChart3, Users } from 'lucide-react';
+import { FileText, DollarSign, Send, CheckCircle, Clock, TrendingUp, Users, BarChart3 } from 'lucide-react';
 
 const StatCard = ({ value, label, icon: Icon, bgColor = 'bg-white', iconColor = 'text-blue-500' }) => {
   return (
@@ -25,7 +25,7 @@ const ProposalStatsCards = ({ stats }) => {
         iconColor="text-blue-500"
       />
       <StatCard
-        value={`$${stats.amount}`}
+        value={`$${(stats.amount || 0).toLocaleString()}`}
         label="Total Amount"
         icon={DollarSign}
         iconColor="text-green-500"
@@ -37,10 +37,16 @@ const ProposalStatsCards = ({ stats }) => {
         iconColor="text-blue-500"
       />
       <StatCard
+        value={`$${(stats.activeProposalsAmount || 0).toLocaleString()}`}
+        label="Active Amount"
+        icon={DollarSign}
+        iconColor="text-blue-500"
+      />
+      <StatCard
         value={stats.sentProposals}
         label="Sent Proposals"
         icon={Send}
-        iconColor="text-purple-500"
+        iconColor="text-orange-500"
       />
       <StatCard
         value={stats.approvedProposals}
@@ -49,16 +55,10 @@ const ProposalStatsCards = ({ stats }) => {
         iconColor="text-green-500"
       />
       <StatCard
-        value={`$${stats.activeProposalsAmount}`}
-        label="Active Amount"
-        icon={DollarSign}
-        iconColor="text-green-500"
-      />
-      <StatCard
-        value={stats.conversionRate || '0%'}
+        value={stats.conversionRate}
         label="Conversion Rate"
         icon={BarChart3}
-        iconColor="text-orange-500"
+        iconColor="text-purple-500"
       />
     </div>
   );
