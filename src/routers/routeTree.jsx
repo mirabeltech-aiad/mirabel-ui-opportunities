@@ -12,6 +12,8 @@ const AddOpportunity = lazy(() => import('../pages/Opportunity/AddOpportunity'))
 const EditOpportunity = lazy(() => import('../pages/Opportunity/EditOpportunity'));
 const EditOpportunityNew = lazy(() => import('../pages/Opportunity/EditOpportunityNew'));
 const EditProposal = lazy(() => import('../pages/Opportunity/EditProposal'));
+const KanbanTest = lazy(() => import('../pages/Opportunity/KanbanTest'));
+const KanbanPage = lazy(() => import('../pages/Opportunity/KanbanPage'));
 const Proposals = lazy(() => import('../pages/Opportunity/Proposals'));
 const LinkedProposals = lazy(() => import('../pages/Opportunity/LinkedProposals'));
 const ProposalCodeExport = lazy(() => import('../pages/Opportunity/ProposalCodeExport'));
@@ -136,6 +138,24 @@ export const routes = [
     component: () => (
       <OpportunityProviders>
         <SearchResults />
+      </OpportunityProviders>
+    ),
+    exact: true
+  },
+  {
+    path: '/kanban-test',
+    component: () => (
+      <OpportunityProviders>
+        <KanbanTest />
+      </OpportunityProviders>
+    ),
+    exact: true
+  },
+  {
+    path: '/kanban',
+    component: () => (
+      <OpportunityProviders>
+        <KanbanPage />
       </OpportunityProviders>
     ),
     exact: true

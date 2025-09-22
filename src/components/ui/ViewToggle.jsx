@@ -9,7 +9,10 @@ const ViewToggle = ({ view, onViewChange }) => {
       <Button
         variant={view === 'table' ? 'default' : 'ghost'}
         size="icon"
-        onClick={() => onViewChange('table')}
+        onClick={() => {
+          console.log('ViewToggle: click -> table');
+          onViewChange('table');
+        }}
         className="h-8 w-8 !rounded-none"
       >
         <List className="h-4 w-4" />
@@ -17,7 +20,10 @@ const ViewToggle = ({ view, onViewChange }) => {
       <Button
         variant={view === 'cards' ? 'default' : 'ghost'}
         size="icon"
-        onClick={() => onViewChange('cards')}
+        onClick={() => {
+          console.log('ViewToggle: click -> cards');
+          onViewChange('cards');
+        }}
         className="h-8 w-8 !rounded-none"
       >
         <LayoutGrid className="h-4 w-4" />
@@ -25,7 +31,10 @@ const ViewToggle = ({ view, onViewChange }) => {
       <Button
         variant={view === 'kanban' ? 'default' : 'ghost'}
         size="icon"
-        onClick={() => onViewChange('kanban')}
+        onClick={() => {
+          console.log('ViewToggle: click -> kanban');
+          onViewChange('kanban');
+        }}
         className="h-8 w-8 !rounded-none"
       >
         <Kanban className="h-4 w-4" />
@@ -33,7 +42,10 @@ const ViewToggle = ({ view, onViewChange }) => {
       <Button
         variant={view === 'split' ? 'default' : 'ghost'}
         size="icon"
-        onClick={() => onViewChange('split')}
+        onClick={() => {
+          console.log('ViewToggle: click -> split');
+          onViewChange('split');
+        }}
         className="h-8 w-8 !rounded-none"
       >
         <PanelRight className="h-4 w-4" />
