@@ -5,10 +5,8 @@ import { opportunitiesService } from "@/features/Opportunity/Services/opportunit
 import { useSidePanel } from "@/components/shared/useSidePanel";
 import {
   findOpportunityByDragId,
-  getOpportunityDragId,
+  getDragId,
   extractOpportunityIdFromDragId,
-  getActiveDraggableIds,
-  isDraggableIdActive,
 } from "../../utils/kanbanUtils";
 
 const KanbanView = ({
@@ -139,7 +137,7 @@ const KanbanView = ({
 
       // Update local state optimistically
       const updatedOpportunities = localOpportunities.map((opp, index) => {
-        const oppDragId = getOpportunityDragId(opp, index);
+        const oppDragId = getDragId(opp, index);
         if (oppDragId === draggableId) {
           return { ...opp, stage: destination.droppableId };
         }
@@ -168,7 +166,7 @@ const KanbanView = ({
 
       // Remove from local state
       const updatedOpportunities = localOpportunities.filter((opp, index) => {
-        const oppDragId = getOpportunityDragId(opp, index);
+        const oppDragId = getDragId(opp, index);
         return oppDragId !== String(opportunityId);
       });
 

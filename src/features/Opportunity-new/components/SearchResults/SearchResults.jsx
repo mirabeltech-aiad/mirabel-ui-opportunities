@@ -10,6 +10,7 @@ import { useNavigate } from 'react-router-dom';
 import { getDefaultColumnOrder } from '../../hooks/helperData';
 import ViewsSidebar from '@/components/ui/views/ViewsSidebar';
 import { NewLoader } from '@/components/ui/NewLoader';
+import KanbanView from '../kanban/KanbanView';
 
 // Helper function to get nested object values
 const getNestedValue = (obj, path) => {
@@ -596,6 +597,8 @@ const SearchResults = ({ searchParams, setShowResults, searchType = 'opportuniti
               activeView={viewMode}
               onViewChange={setViewMode}
               onViewsClick={() => setIsViewsSidebarOpen(true)}
+              // Hide Kanban view for proposals
+              hideViewIcons={searchType === 'proposals' ? ['kanban'] : []}
             />
           </div>
         </div>
@@ -623,6 +626,30 @@ const SearchResults = ({ searchParams, setShowResults, searchType = 'opportuniti
             onCardClick={() => { }}
             onEditOpportunity={() => { }}
           />
+        )}
+
+        {/* Kanban View - Only for opportunities */}
+        {!loading && viewMode === 'kanban' && isOpportunities && (
+          <div className="flex-1 min-h-0">
+            <KanbanView
+              opportunities={data?.results || []}
+              view={viewMode}
+              onViewChange={setViewMode}
+              filters={filters}
+              onFilterChange={setFilters}
+              users={[]}
+              onRefresh={refetch}
+              totalCount={data?.totalCount || 0}
+              currentPage={page}
+              onNextPage={() => setPage(page + 1)}
+              onPreviousPage={() => setPage(page - 1)}
+              savedSearches={{
+                allOpportunities: [],
+                myOpportunities: [],
+              }}
+              onAddOpportunity={() => { }}
+            />
+          </div>
         )}
 
         {/* Table View */}
