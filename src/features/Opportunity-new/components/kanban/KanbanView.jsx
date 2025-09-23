@@ -1,7 +1,7 @@
 import React from "react";
 import KanbanBoard from "./KanbanBoard";
 import EditOpportunityPanel from "./EditOpportunityPanel";
-import { opportunitiesService } from "@/features/Opportunity/Services/opportunitiesService";
+import { opportunityService } from "../../services/opportunityService";
 import { useSidePanel } from "@/components/shared/useSidePanel";
 import {
   findOpportunityByDragId,
@@ -68,7 +68,7 @@ const KanbanView = ({
       setIsLoading(true);
       
       try {
-        const result = await opportunitiesService.getFormattedOpportunities({
+        const result = await opportunityService.getFormattedOpportunities({
           quickStatus: 'All Opportunities'
         });
         
@@ -130,7 +130,7 @@ const KanbanView = ({
       }
 
       // Call the opportunity service method for drag and drop stage update
-      await opportunitiesService.updateOpportunityStageByDrag(
+      await opportunityService.updateOpportunityStageByDrag(
         opportunityId,
         destination.droppableId
       );
@@ -162,7 +162,7 @@ const KanbanView = ({
     setIsUpdating(true);
 
     try {
-      await opportunitiesService.deleteOpportunity(opportunityId);
+      await opportunityService.deleteOpportunity(opportunityId);
 
       // Remove from local state
       const updatedOpportunities = localOpportunities.filter((opp, index) => {
