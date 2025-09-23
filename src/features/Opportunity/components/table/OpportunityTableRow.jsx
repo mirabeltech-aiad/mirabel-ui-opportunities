@@ -637,9 +637,8 @@ const OpportunityTableRow = ({
           }
         >
           <span
-            className={`h-4 w-4 rounded-full flex items-center justify-center ${
-              isCompleted ? "bg-green-500" : "bg-gray-300"
-            }`}
+            className={`h-4 w-4 rounded-full flex items-center justify-center ${isCompleted ? "bg-green-500" : "bg-gray-300"
+              }`}
           >
             <Check className="h-3 w-3 text-white" />
           </span>
@@ -662,11 +661,10 @@ const OpportunityTableRow = ({
         return (
           <Button
             variant="link"
-            className={`p-0 h-auto font-medium text-sm hover:underline transition-colors justify-start max-w-full ${
-              selectedCompany === (value || opportunity.companyName)
+            className={`p-0 h-auto font-medium text-sm hover:underline transition-colors justify-start max-w-full ${selectedCompany === (value || opportunity.companyName)
                 ? "text-blue-600"
                 : "text-gray-900 hover:text-blue-600"
-            }`}
+              }`}
             onClick={handleCompanyClick}
             title={value || opportunity.companyName || "Unknown Company"}
           >
@@ -725,11 +723,11 @@ const OpportunityTableRow = ({
         const selectedDisplaysFromRow = Array.isArray(value)
           ? value
           : typeof value === "string"
-          ? value
+            ? value
               .split(",")
               .map((s) => s.trim())
               .filter(Boolean)
-          : [];
+            : [];
         const selectedDisplays =
           leadSourceDisplaysByContactId[contactIdForRow] ??
           selectedDisplaysFromRow;
@@ -802,11 +800,11 @@ const OpportunityTableRow = ({
         const selectedDisplaysFromRow = Array.isArray(value)
           ? value
           : typeof value === "string"
-          ? value
+            ? value
               .split(",")
               .map((s) => s.trim())
               .filter(Boolean)
-          : [];
+            : [];
         const selectedDisplays =
           leadTypeDisplaysByContactId[contactIdForRow] ??
           selectedDisplaysFromRow;
@@ -979,9 +977,8 @@ const OpportunityTableRow = ({
   return (
     <>
       <TableRow
-        className={`transition-colors border-b border-gray-100 cursor-pointer select-none ${
-          isSelected ? "bg-blue-50 hover:bg-blue-100" : "hover:bg-gray-50"
-        }`}
+        className={`transition-colors border-b border-gray-100 cursor-pointer select-none ${isSelected ? "bg-blue-50 hover:bg-blue-100" : "hover:bg-gray-50"
+          }`}
         onClick={handleRowClick}
         onDoubleClick={handleRowDoubleClick}
         title="Click to select, double-click to edit"
@@ -1010,9 +1007,8 @@ const OpportunityTableRow = ({
         {columnOrder.map((column) => (
           <TableCell
             key={column.id}
-            className={`px-4 py-1.5 text-sm border-r border-gray-50 last:border-r-0 overflow-hidden ${
-              column.id === 'AssignedTo' ? 'text-center' : ''
-            }`}
+            className={`px-4 py-1.5 text-sm border-r border-gray-50 last:border-r-0 overflow-hidden ${column.id === 'AssignedTo' ? 'text-center' : ''
+              }`}
             style={{
               width: columnWidths[column.id]
                 ? `${columnWidths[column.id]}px`

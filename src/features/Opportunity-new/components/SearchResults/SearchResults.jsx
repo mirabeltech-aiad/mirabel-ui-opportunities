@@ -3,7 +3,7 @@ import CardViewNew from './CardViewNew';
 import { EnhancedDataTable } from '../../../../components/ui/advanced-table';
 import { EnhancedFilterBar } from '../../../../components/ui/EnhancedFilterBar';
 import { useSearchResults } from '../../hooks/useSearchResults';
-import { ExternalLink, MoreVertical, Edit } from 'lucide-react';
+import { ExternalLink, MoreVertical, Edit, Check } from 'lucide-react';
 import { OpportunityStatsCards, ProposalStatsCards } from '../Stats';
 import { logger } from '../../../../components/shared/logger';
 import { useNavigate } from 'react-router-dom';
@@ -650,8 +650,139 @@ const SearchResults = ({ searchParams, setShowResults, searchType = 'opportuniti
       visibleColumns
     });
 
-    // Create base column definition with unique ID based on mapping path
+    // Create unique ID for the column
     const uniqueId = mappingPath ? mappingPath.replace(/\./g, '_') : (renderId || 'unknown');
+
+    // Helper functions for stage timeline functionality
+    const getStageDateByLabel = (row, stageLabel) => {
+      if (!stageLabel) return null;
+      // 1) Stages dictionary coming from API (preferred)
+      if (row.Stages && typeof row.Stages === "object") {
+        const direct = row.Stages[stageLabel];
+        if (direct) return direct;
+      }
+      // 2) Flattened keys like Stage_<Name> or stage_<Name>
+      const variants = [
+        `Stage_${stageLabel}`,
+        `stage_${stageLabel}`,
+        `Stage_${stageLabel.replace(/\s+/g, "_")}`,
+        `stage_${stageLabel.replace(/\s+/g, "_")}`,
+      ];
+      for (const key of variants) {
+        if (row[key]) return row[key];
+      }
+      return null;
+    };
+
+    const formatDate = (dateString) => {
+      if (!dateString) return '';
+      try {
+        return new Date(dateString).toLocaleDateString();
+      } catch {
+        return dateString;
+      }
+    };
+
+    const handleStageCheckToggle = async (row, stageLabel) => {
+      try {
+        const stageMeta = masterData.stages.find((s) => s.name === stageLabel);
+        if (!stageMeta) {
+          console.error("Invalid stage. Please reload and try again.");
+          return;
+        }
+
+        // Optional: row-level restrictions if provided by API
+        const isReadOnly =
+          row?.CanView === 1 ||
+          row?.canView === 1 ||
+          row?.isReadOnly === true;
+        if (isReadOnly) {
+          console.error("You do not have permission to modify this opportunity.");
+          return;
+        }
+
+        // Guard: block edits for closed states
+        const stageLc = String(row?.stage || "").toLowerCase();
+        if (stageLc === "closed won" || stageLc === "closed lost") {
+          console.error("Closed opportunities cannot be modified via the grid. Use the Edit page.");
+          return;
+        }
+
+        const currentDate = getStageDateByLabel(row, stageLabel);
+        const shouldInsert = !currentDate;
+
+        // Call the API to toggle the stage date
+        await opportunityService.toggleOpportunityStageDate(
+          row.ID || row.id,
+          stageMeta.id,
+          shouldInsert
+        );
+
+        // Trigger refresh to update the data
+        refetch?.();
+      } catch (error) {
+        console.error("Stage toggle failed", error);
+      }
+    };
+
+    // Check if this column represents a stage timeline checkmark
+    const labelText = (visibleColumns || propertyMappingName || dbName || '').toLowerCase();
+    const isStageTimelineColumn = masterData.stages?.some(
+      (s) => String(s.name).toLowerCase() === labelText
+    );
+
+    if (
+      isStageTimelineColumn &&
+      columnType !== "stage" &&
+      columnType !== "status" &&
+      columnType !== "assignedRep"
+    ) {
+      const stage = masterData.stages.find(
+        (s) => String(s.name).toLowerCase() === labelText
+      );
+      
+      return {
+        id: uniqueId,
+        header: visibleColumns || propertyMappingName || dbName || 'Unknown',
+        accessor: mappingPath,
+        sortable: true,
+        width: 120,
+        columnType: 'stageTimeline',
+        render: (value, row) => {
+          const stageDate = getStageDateByLabel(row, stage?.name);
+          const isCompleted = Boolean(stageDate);
+          
+          return (
+            <button
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                handleStageCheckToggle(row, stage?.name);
+              }}
+              className="flex items-center gap-2 text-sm text-gray-700 hover:text-gray-900"
+              title={
+                isCompleted
+                  ? `Completed on ${formatDate(stageDate)}`
+                  : "Not completed"
+              }
+            >
+              <span
+                className={`h-4 w-4 rounded-full flex items-center justify-center ${
+                  isCompleted ? "bg-green-500" : "bg-gray-300"
+                }`}
+              >
+                <Check className="h-3 w-3 text-white" />
+              </span>
+              <span className="min-w-[84px] inline-block">
+                {isCompleted ? formatDate(stageDate) : ""}
+              </span>
+            </button>
+          );
+        }
+      };
+    }
+
+    // Create base column definition with unique ID based on mapping path
     const baseColumn = {
       id: uniqueId,
       header: visibleColumns || propertyMappingName || dbName || 'Unknown',
