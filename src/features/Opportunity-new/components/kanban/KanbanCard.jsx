@@ -133,9 +133,12 @@ const KanbanCard = ({
               <div className="flex items-center gap-1">
                 <DollarSign className="h-3 w-3 text-emerald-500" />
                 <span className="text-sm font-bold text-emerald-600">
-                  {typeof opportunity.amount === "number"
-                    ? opportunity.amount.toLocaleString()
-                    : opportunity.amount || "0"}
+                  {(() => {
+                    const raw = opportunity.amount ?? opportunity.Amount ?? 0;
+                    const num = typeof raw === 'number' ? raw : parseFloat(String(raw).replace(/[^0-9.-]/g, ''));
+                    const safe = isNaN(num) ? 0 : num;
+                    return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(safe);
+                  })()}
                 </span>
               </div>
 

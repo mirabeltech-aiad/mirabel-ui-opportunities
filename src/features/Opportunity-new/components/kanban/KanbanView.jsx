@@ -30,8 +30,13 @@ const KanbanView = ({
 }) => {
   const [localOpportunities, setLocalOpportunities] =
     React.useState(opportunities);
+  const [localStages, setLocalStages] = React.useState(stages);
   const [isUpdating, setIsUpdating] = React.useState(false);
   const [isLoading, setIsLoading] = React.useState(false);
+  const [stagesLoading, setStagesLoading] = React.useState(true);
+  const [stagesFetched, setStagesFetched] = React.useState(false);
+  const stagesLoadStartedRef = React.useRef(false);
+  const [opportunitiesFetched, setOpportunitiesFetched] = React.useState(false);
   const { isOpen, data: opportunityId, openPanel, closePanel } = useSidePanel();
 
   // Debug logging for props
@@ -46,54 +51,117 @@ const KanbanView = ({
     });
   }, [opportunities, stages, view, onRefresh, totalCount, currentPage]);
 
-  // Load data if Pipeline doesn't provide it
+  // Fetch stages once for the Kanban view (similar to old Pipeline)
   React.useEffect(() => {
-    const loadData = async () => {
-      console.log("KanbanView: Checking data from Pipeline:", {
-        opportunitiesCount: opportunities?.length || 0,
-        hasOnRefresh: !!onRefresh,
-        opportunitiesProvided: !!opportunities
-      });
-
-      // Always use Pipeline data if provided, even if empty (means Pipeline loaded but found no results)
-      if (opportunities !== undefined) {
-        console.log("KanbanView: Using opportunities from Pipeline:", opportunities.length);
-        setLocalOpportunities(opportunities);
-        setIsLoading(false);
-        return;
-      }
-
-      // Only load data directly if Pipeline hasn't provided any data yet (undefined)
-      console.log("KanbanView: No data from Pipeline yet, loading directly...");
-      setIsLoading(true);
-      
+    const fetchStages = async () => {
       try {
-        const result = await opportunityService.getFormattedOpportunities({
-          quickStatus: 'All Opportunities'
-        });
+        setStagesLoading(true);
+        console.log("KanbanView: Fetching stages from API...");
         
-        console.log("KanbanView: Direct API result:", result);
-        
-        if (result.opportunitiesData && Array.isArray(result.opportunitiesData)) {
-          console.log("KanbanView: Setting opportunities from direct API:", result.opportunitiesData.length);
-          setLocalOpportunities(result.opportunitiesData);
+        const response = await opportunityService.getOpportunityStages();
+        console.log("KanbanView: Stages API response:", response);
+
+        if (response?.content?.List) {
+          const sortedStages = response.content.List.sort(
+            (a, b) => a.SortOrder - b.SortOrder
+          ).map((stageData) => ({
+            id: stageData.ID,
+            name: stageData.Stage,
+            colorCode: stageData.ColorCode,
+            description: stageData.Description,
+            sortOrder: stageData.SortOrder,
+          }));
+          
+          console.log("KanbanView: Processed stages:", sortedStages);
+          setLocalStages(sortedStages);
         } else {
-          console.warn("KanbanView: No data from direct API call");
-          setLocalOpportunities([]);
+          console.warn("KanbanView: No stages found in API response");
+          setLocalStages([]);
         }
       } catch (error) {
-        console.error("KanbanView: Error loading data directly:", error);
-        setLocalOpportunities([]);
+        console.error("KanbanView: Error fetching stages:", error);
+        setLocalStages([]);
       } finally {
-        setIsLoading(false);
+        setStagesLoading(false);
+        setStagesFetched(true);
       }
     };
 
-    loadData();
-  }, [opportunities]);
+    // Check if we have valid stages from parent
+    const hasValidParentStages = stages && Array.isArray(stages) && stages.length > 0;
+    
+    if (hasValidParentStages && !stagesFetched) {
+      console.log("KanbanView: Using stages provided by parent:", stages.length);
+      setLocalStages(stages);
+      setStagesLoading(false);
+      setStagesFetched(true);
+    } else if (!stagesFetched && !hasValidParentStages && !stagesLoadStartedRef.current) {
+      // Only fetch once if we don't have parent stages
+      stagesLoadStartedRef.current = true;
+      console.log("KanbanView: No valid stages from parent, fetching from API");
+      fetchStages();
+    }
+  }, [stages, stagesFetched]);
+
+  // Load opportunities data if Pipeline doesn't provide it
+  React.useEffect(() => {
+    const loadOpportunities = async () => {
+      console.log("KanbanView: Checking opportunities data from Pipeline:", {
+        opportunitiesCount: opportunities?.length || 0,
+        hasOnRefresh: !!onRefresh,
+        opportunitiesProvided: !!opportunities,
+        opportunitiesFetched
+      });
+
+      // Always use Pipeline data if provided, even if empty (means Pipeline loaded but found no results)
+      if (opportunities !== undefined && !opportunitiesFetched) {
+        console.log("KanbanView: Using opportunities from Pipeline:", opportunities.length);
+        setLocalOpportunities(opportunities);
+        setIsLoading(false);
+        setOpportunitiesFetched(true);
+        return;
+      }
+
+      // Only load data directly if Pipeline hasn't provided any data yet and we haven't fetched before
+      if (!opportunitiesFetched && !isLoading && opportunities === undefined) {
+        console.log("KanbanView: No opportunities data from Pipeline yet, loading directly...");
+        setIsLoading(true);
+        
+        try {
+          // Use the same approach as old Pipeline - build filters and call the API
+          const apiFilters = filters && Object.keys(filters).length > 0 
+            ? filters 
+            : { quickStatus: 'All Opportunities' };
+            
+          console.log("KanbanView: Loading opportunities with filters:", apiFilters);
+          
+          const result = await opportunityService.getFormattedOpportunities(apiFilters);
+          
+          console.log("KanbanView: Direct API result:", result);
+          
+          if (result.opportunitiesData && Array.isArray(result.opportunitiesData)) {
+            console.log("KanbanView: Setting opportunities from direct API:", result.opportunitiesData.length);
+            setLocalOpportunities(result.opportunitiesData);
+          } else {
+            console.warn("KanbanView: No data from direct API call");
+            setLocalOpportunities([]);
+          }
+          setOpportunitiesFetched(true);
+        } catch (error) {
+          console.error("KanbanView: Error loading opportunities directly:", error);
+          setLocalOpportunities([]);
+          setOpportunitiesFetched(true);
+        } finally {
+          setIsLoading(false);
+        }
+      }
+    };
+
+    loadOpportunities();
+  }, [opportunities, opportunitiesFetched, isLoading, filters]); // More specific dependencies
 
   // Use opportunities directly since API filtering is applied at the server level
-  const filteredOpportunities = localOpportunities;
+  const filteredOpportunities = React.useMemo(() => localOpportunities, [localOpportunities]);
 
   const handleDragEnd = async (result) => {
     const { destination, source, draggableId } = result;
@@ -129,10 +197,24 @@ const KanbanView = ({
         return;
       }
 
+      // Find the stage ID for the destination stage name
+      const destinationStage = localStages.find(stage => 
+        stage.name === destination.droppableId || 
+        stage.name?.toLowerCase() === destination.droppableId?.toLowerCase()
+      );
+      
+      if (!destinationStage) {
+        console.error("Could not find stage ID for:", destination.droppableId);
+        setIsUpdating(false);
+        return;
+      }
+
+      console.log("KanbanView: Moving opportunity", opportunityId, "to stage", destinationStage.name, "with ID", destinationStage.id);
+
       // Call the opportunity service method for drag and drop stage update
       await opportunityService.updateOpportunityStageByDrag(
         opportunityId,
-        destination.droppableId
+        destinationStage.id
       );
 
       // Update local state optimistically
@@ -195,13 +277,15 @@ const KanbanView = ({
     closePanel();
   };
 
-  if (isLoading) {
+  if (isLoading || stagesLoading) {
     return (
       <div className="bg-white border border-gray-200 rounded-md shadow-sm flex flex-col h-full">
         <div className="flex-1 p-4 flex items-center justify-center">
           <div className="text-center">
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-2"></div>
-            <p className="text-gray-600">Loading opportunities...</p>
+            <p className="text-gray-600">
+              {stagesLoading ? 'Loading stages...' : 'Loading opportunities...'}
+            </p>
           </div>
         </div>
       </div>
@@ -210,18 +294,10 @@ const KanbanView = ({
 
   return (
     <div className="bg-white border border-gray-200 rounded-md shadow-sm flex flex-col h-full">
-      {/* Debug info at the top */}
-      <div className="p-2 bg-yellow-100 border-b text-xs">
-        <strong>KanbanView Debug:</strong> 
-        Opportunities: {filteredOpportunities?.length || 0} | 
-        Stages: {stages?.length || 0} | 
-        View: {view} |
-        Loading: {isLoading ? 'Yes' : 'No'}
-      </div>
       
       <KanbanBoard
         opportunities={filteredOpportunities}
-        stages={stages}
+        stages={localStages}
         onDragEnd={handleDragEnd}
         isUpdating={isUpdating}
         onDeleteOpportunity={handleDeleteOpportunity}

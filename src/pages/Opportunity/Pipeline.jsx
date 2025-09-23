@@ -3,14 +3,15 @@ import { useNavigate, useSearchParams, useLocation } from "react-router-dom";
 import OpportunityStatsCards from "../../features/Opportunity/components/ui/OpportunityStatsCards";
 import OpportunitiesTable from "../../features/Opportunity/components/ui/OpportunitiesTable";
 import OpportunityCardView from "../../features/Opportunity/components/ui/OpportunityCardView";
-import KanbanView from "../../features/opportunity-new/components/kanban/KanbanView";
+import KanbanView from "../../features/Opportunity-new/components/kanban/KanbanView";
 import SplitScreenView from "../../features/Opportunity/components/ui/SplitScreenView";
 import ViewToggle from "@/components/ui/ViewToggle";
 import { useApiData } from "@/features/Opportunity/hooks/useApiData";
 import { useOpportunitySearch } from "@/features/Opportunity/contexts/OpportunitySearchContext";
 import { processOpportunitySearchParams } from "@/features/Opportunity/components/AdvancedSearch/searchHelpers";
 import Loader from "@/components/ui/loader";
-import { opportunitiesService } from "@/features/Opportunity/Services/opportunitiesService";
+// Do not import from old Opportunity folder
+import { opportunityService as opportunitiesService } from "@/features/Opportunity-new/services/opportunityService";
 import apiService from "@/features/Opportunity/Services/apiService";
 import contactsApi from "@/services/contactsApi";
 
