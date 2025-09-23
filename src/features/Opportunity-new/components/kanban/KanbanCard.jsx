@@ -20,6 +20,14 @@ const KanbanCard = ({
   onDeleteOpportunity,
   onEditOpportunity,
 }) => {
+  const readPath = (obj, path) => {
+    try {
+      return path.split('.').reduce((acc, key) => acc?.[key], obj);
+    } catch { return undefined; }
+  };
+
+  const coalesce = (...vals) => vals.find(v => v !== undefined && v !== null && String(v).trim() !== "");
+
   const handleEditOpportunity = (e) => {
     e.preventDefault();
     e.stopPropagation();
@@ -67,6 +75,41 @@ const KanbanCard = ({
     return null;
   }
 
+  const title = coalesce(
+    opportunity.opportunityName,
+    opportunity.name,
+    opportunity.Name,
+    readPath(opportunity, 'Proposal.Name')
+  );
+
+  const company = coalesce(
+    opportunity.companyName,
+    opportunity.company,
+    readPath(opportunity, 'ContactDetails.Name'),
+    opportunity.CustomerName
+  );
+
+  const assigned = coalesce(
+    opportunity.assignedRep,
+    opportunity.assignedTo,
+    readPath(opportunity, 'AssignedTODetails.Name'),
+    readPath(opportunity, 'OwnerDetails.Name'),
+    readPath(opportunity, 'SalesPresenterDetails.SalesRepName')
+  );
+
+  const closeDate = coalesce(
+    opportunity.projCloseDate,
+    opportunity.closeDate,
+    opportunity.CloseDate,
+    readPath(opportunity, 'Proposal.CloseDate')
+  );
+
+  const status = coalesce(
+    opportunity.status,
+    opportunity.Status,
+    readPath(opportunity, 'Proposal.Status')
+  );
+
   return (
     <Draggable
       draggableId={draggableId}
@@ -93,8 +136,8 @@ const KanbanCard = ({
           >
             <CardHeader className="pb-1 p-2">
               <div className="flex items-start justify-between">
-                <CardTitle className="text-sm font-semibold text-gray-900 line-clamp-2 leading-tight flex-1">
-                  {opportunity.opportunityName || opportunity.name}
+                <CardTitle className="text-sm font-semibold text-gray-900 line-clamp-2 leading-tight flex-1" title={String(title || '')}>
+                  {title}
                 </CardTitle>
                 <div className="flex gap-1 flex-shrink-0">
                   <Button
@@ -123,8 +166,8 @@ const KanbanCard = ({
               </div>
               <div className="flex items-center gap-2 mt-0.5">
                 <Building2 className="h-3 w-3 text-indigo-500" />
-                <span className="text-xs text-gray-600 font-medium">
-                  {opportunity.companyName || opportunity.company}
+                <span className="text-xs text-gray-600 font-medium" title={String(company || '')}>
+                  {company}
                 </span>
               </div>
             </CardHeader>
@@ -142,26 +185,26 @@ const KanbanCard = ({
                 </span>
               </div>
 
-              <div className="flex items-center gap-1">
+              <div className="flex items-center gap-1" title={String(assigned || '')}>
                 <User className="h-3 w-3 text-purple-500" />
                 <span className="text-xs text-gray-600">
-                  {opportunity.assignedRep || opportunity.assignedTo}
+                  {assigned}
                 </span>
               </div>
 
-              <div className="flex items-center gap-1">
+              <div className="flex items-center gap-1" title={String(closeDate || '')}>
                 <Calendar className="h-3 w-3 text-orange-500" />
                 <span className="text-xs text-gray-600">
-                  {opportunity.projCloseDate || opportunity.closeDate}
+                  {closeDate}
                 </span>
               </div>
 
               <div className="flex justify-between items-center pt-1">
                 <Badge
-                  variant={getStatusVariant(opportunity.status)}
+                  variant={getStatusVariant(status)}
                   className="text-xs"
                 >
-                  {opportunity.status}
+                  {status}
                 </Badge>
                 <span className="text-xs text-gray-400">#{draggableId}</span>
               </div>
