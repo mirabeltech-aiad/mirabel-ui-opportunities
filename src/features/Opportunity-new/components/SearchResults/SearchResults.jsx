@@ -177,12 +177,17 @@ const SearchResults = ({ searchParams, setShowResults, searchType = 'opportuniti
   };
 
   // Debug logging
-  // useEffect(() => {
-  //   logger.info('SearchResults: Component mounted with searchParams:', searchParams);
-  //   logger.info('SearchResults: Data received:', data);
-  //   logger.info('SearchResults: Loading state:', loading);
-  //   logger.info('SearchResults: Error state:', error);
-  // }, [searchParams, data, loading, error]);
+  useEffect(() => {
+    if (data) {
+      logger.info('SearchResults: Component mounted with searchParams:', searchParams);
+      logger.info('SearchResults: Data received:', data);
+      logger.info('SearchResults: Data keys:', Object.keys(data || {}));
+      logger.info('SearchResults: apiColumnConfig:', data?.apiColumnConfig);
+      logger.info('SearchResults: ColumnConfig:', data?.ColumnConfig);
+      logger.info('SearchResults: Loading state:', loading);
+      logger.info('SearchResults: Error state:', error);
+    }
+  }, [searchParams, data, loading, error]);
 
   // Helper function to get nested object values
   const getNestedValue = (obj, path) => {
@@ -223,32 +228,59 @@ const SearchResults = ({ searchParams, setShowResults, searchType = 'opportuniti
       )
     });
 
-    // Generate columns from API config - process ALL columns (following old system pattern)
-    logger.info('SearchResults: Processing ALL columns from API:', columnConfig.map(col => ({
-      VisibleColumns: col.VisibleColumns,
-      PropertyMappingName: col.PropertyMappingName,
-      IsDefault: col.IsDefault
+    // Deduplicate columns by PropertyMappingName to prevent duplicates
+    const seenMappings = new Set();
+    const uniqueColumnConfig = [];
+
+    columnConfig.forEach((col, index) => {
+      // Use propertyMappingName as the primary key for deduplication (note: camelCase from service transformation)
+      const mappingKey = col.propertyMappingName || col.dbName || col.visibleColumns;
+
+      if (mappingKey && !seenMappings.has(mappingKey)) {
+        seenMappings.add(mappingKey);
+        uniqueColumnConfig.push(col);
+        logger.info('SearchResults: Added unique column:', {
+          visibleColumns: col.visibleColumns,
+          propertyMappingName: col.propertyMappingName,
+          isDefault: col.isDefault,
+          mappingKey: mappingKey
+        });
+      } else {
+        logger.info('SearchResults: Skipped duplicate column:', {
+          visibleColumns: col.visibleColumns,
+          propertyMappingName: col.propertyMappingName,
+          isDefault: col.isDefault,
+          mappingKey: mappingKey,
+          reason: 'Duplicate PropertyMappingName'
+        });
+      }
+    });
+
+    logger.info('SearchResults: Processing unique columns:', uniqueColumnConfig.map(col => ({
+      visibleColumns: col.visibleColumns,
+      propertyMappingName: col.propertyMappingName,
+      isDefault: col.isDefault
     })));
 
     // Debug: Check specifically for Product and Loss Reason columns
-    const productColumn = columnConfig.find(col =>
-      col.PropertyMappingName === 'ProductDetails.Name' ||
-      col.VisibleColumns === 'Product'
+    const productColumn = uniqueColumnConfig.find(col =>
+      col.propertyMappingName === 'ProductDetails.Name' ||
+      col.visibleColumns === 'Product'
     );
-    const lossReasonColumn = columnConfig.find(col =>
-      col.PropertyMappingName === 'OppLossReasonDetails.Name' ||
-      col.VisibleColumns === 'Loss Reason'
+    const lossReasonColumn = uniqueColumnConfig.find(col =>
+      col.propertyMappingName === 'OppLossReasonDetails.Name' ||
+      col.visibleColumns === 'Loss Reason'
     );
 
     logger.info('SearchResults: Product column found:', productColumn);
     logger.info('SearchResults: Loss Reason column found:', lossReasonColumn);
 
-    columnConfig.forEach(col => {
+    uniqueColumnConfig.forEach(col => {
       logger.info('SearchResults: Processing column config:', {
-        VisibleColumns: col.VisibleColumns,
-        PropertyMappingName: col.PropertyMappingName,
-        DBColumnsNames: col.DBColumnsNames,
-        IsDefault: col.IsDefault
+        visibleColumns: col.visibleColumns,
+        propertyMappingName: col.propertyMappingName,
+        dbName: col.dbName,
+        isDefault: col.isDefault
       });
 
       const columnDef = createColumnFromConfig(col);
@@ -262,10 +294,10 @@ const SearchResults = ({ searchParams, setShowResults, searchType = 'opportuniti
         columns.push(columnDef);
       } else {
         logger.error('SearchResults: Failed to create column for config:', {
-          VisibleColumns: col.VisibleColumns,
-          PropertyMappingName: col.PropertyMappingName,
-          DBColumnsNames: col.DBColumnsNames,
-          IsDefault: col.IsDefault
+          visibleColumns: col.visibleColumns,
+          propertyMappingName: col.propertyMappingName,
+          dbName: col.dbName,
+          isDefault: col.isDefault
         });
       }
     });
@@ -296,10 +328,10 @@ const SearchResults = ({ searchParams, setShowResults, searchType = 'opportuniti
 
   // Create individual column from API config - following the old system's pattern
   const createColumnFromConfig = (config) => {
-    // Use correct case for API fields (following old system pattern)
-    const propertyMappingName = config.PropertyMappingName || config.propertyMappingName || config.propertyMapping || "";
-    const visibleColumns = config.VisibleColumns || config.visibleColumns || config.label || config.displayName || "";
-    const dbName = config.DBColumnsNames || config.dbName || config.DBName || "";
+    // Use correct case for API fields (note: service transforms to camelCase)
+    const propertyMappingName = config.propertyMappingName || config.PropertyMappingName || config.propertyMapping || "";
+    const visibleColumns = config.visibleColumns || config.VisibleColumns || config.label || config.displayName || "";
+    const dbName = config.dbName || config.DBColumnsNames || config.DBName || "";
 
     // Helper function to get nested value using dot notation (same as old system)
     const getValueByPath = (obj, path) => {
@@ -468,9 +500,10 @@ const SearchResults = ({ searchParams, setShowResults, searchType = 'opportuniti
       visibleColumns
     });
 
-    // Create base column definition
+    // Create base column definition with unique ID based on mapping path
+    const uniqueId = mappingPath ? mappingPath.replace(/\./g, '_') : (renderId || 'unknown');
     const baseColumn = {
-      id: renderId || mappingPath || 'unknown',
+      id: uniqueId,
       header: visibleColumns || propertyMappingName || dbName || 'Unknown',
       accessor: mappingPath,
       sortable: true,
@@ -981,14 +1014,17 @@ const SearchResults = ({ searchParams, setShowResults, searchType = 'opportuniti
 
   // Define columns for EnhancedDataTable - fully API-driven
   const getColumns = () => {
-    // Always try to use API column config first
-    if (data?.apiColumnConfig && data.apiColumnConfig.length > 0) {
-      logger.info('SearchResults: Using API column configuration');
-      return generateColumnsFromConfig(data.apiColumnConfig);
+    // Check multiple possible locations for column config
+    const columnConfig = data?.apiColumnConfig || data?.ColumnConfig || data?.content?.Data?.ColumnConfig;
+
+    if (columnConfig && Array.isArray(columnConfig) && columnConfig.length > 0) {
+      logger.info('SearchResults: Using API column configuration:', columnConfig);
+      return generateColumnsFromConfig(columnConfig);
     }
 
     // If no API config, return minimal columns to avoid conflicts
     logger.warn('SearchResults: No API column configuration available, using minimal columns');
+    logger.info('SearchResults: Available data keys:', Object.keys(data || {}));
     return [
       {
         id: 'edit',
