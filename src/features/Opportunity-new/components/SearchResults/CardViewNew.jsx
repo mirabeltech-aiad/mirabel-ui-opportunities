@@ -131,7 +131,7 @@ const OpportunityItemCard = ({ opportunity, onClick, onEdit }) => {
 
   const amountValue = formatAmount(opportunity?.amount ?? opportunity?.Amount);
   const probability = opportunity?.probability ?? opportunity?.Probability;
-  const stage = opportunity?.stage ?? opportunity?.Stage ?? "";
+  const stage = opportunity?.OppStageDetails ? opportunity?.OppStageDetails.Stage : opportunity?.stage ?? opportunity?.Stage ?? "";
   const status = opportunity?.status ?? opportunity?.Status ?? "";
   const companyName = opportunity?.companyName ?? opportunity?.CompanyName ?? opportunity?.company ?? opportunity?.Customer;
   const title = opportunity?.opportunityName ?? opportunity?.name ?? opportunity?.OpportunityName ?? opportunity?.Name ?? "";
@@ -204,11 +204,9 @@ const OpportunityItemCard = ({ opportunity, onClick, onEdit }) => {
           </div>
 
           <div className="h-5 mt-2">
-            {probability && String(probability) !== "0" && (
-              <div className="text-xs text-gray-500">
-                <span className="text-cyan-600 font-medium">{probability}%</span> probability
-              </div>
-            )}
+            <div className="text-xs text-gray-500">
+              <span className="text-cyan-600 font-medium">{`${probability>0 && String(probability) !== "0" ? probability : 0}%`}</span> probability
+            </div>
           </div>
         </div>
       </CardContent>
