@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, useCallback, useMemo } from "react";
 import { useNavigate, useSearchParams, useLocation } from "react-router-dom";
-import OpportunityStatsCards from "../../features/Opportunity/components/ui/OpportunityStatsCards";
+import { OpportunityStatsCards } from "@/features/Opportunity-new/components/Stats";
 import OpportunitiesTable from "../../features/Opportunity/components/ui/OpportunitiesTable";
 import OpportunityCardView from "../../features/Opportunity/components/ui/OpportunityCardView";
 import KanbanView from "../../features/Opportunity-new/components/kanban/KanbanView";
@@ -1461,7 +1461,17 @@ const Pipeline = () => {
         </div>
 
         {view !== "kanban" && view !== "split" && (
-          <OpportunityStatsCards stats={stats} />
+          <OpportunityStatsCards
+            stats={{
+              totalCount: stats.total || 0,
+              totalAmount: `$${(stats.amount || 0).toLocaleString()}`,
+              totalWon: stats.won || 0,
+              totalWinAmount: `$${(stats.winTotal || 0).toLocaleString()}`,
+              totalOpen: stats.open || 0,
+              totalLost: stats.lost || 0,
+              winPercentage: `${stats.winPercentage || 0}%`
+            }}
+          />
         )}
 
         {/* Only render real API data; show loader or empty when appropriate */}

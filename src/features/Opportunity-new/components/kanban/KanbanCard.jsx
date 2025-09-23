@@ -28,6 +28,24 @@ const KanbanCard = ({
 
   const coalesce = (...vals) => vals.find(v => v !== undefined && v !== null && String(v).trim() !== "");
 
+  const formatDateForDisplay = (value) => {
+    if (!value) return "";
+    try {
+      // If already like MM/DD/YYYY, return as-is
+      if (typeof value === 'string' && /^\d{1,2}\/\d{1,2}\/\d{2,4}$/.test(value.trim())) {
+        return value;
+      }
+      const d = new Date(value);
+      if (isNaN(d.getTime())) return String(value);
+      const mm = String(d.getMonth() + 1).padStart(2, '0');
+      const dd = String(d.getDate()).padStart(2, '0');
+      const yyyy = d.getFullYear();
+      return `${mm}/${dd}/${yyyy}`;
+    } catch {
+      return String(value);
+    }
+  };
+
   const handleEditOpportunity = (e) => {
     e.preventDefault();
     e.stopPropagation();
@@ -195,7 +213,7 @@ const KanbanCard = ({
               <div className="flex items-center gap-1" title={String(closeDate || '')}>
                 <Calendar className="h-3 w-3 text-orange-500" />
                 <span className="text-xs text-gray-600">
-                  {closeDate}
+                  {formatDateForDisplay(closeDate)}
                 </span>
               </div>
 
