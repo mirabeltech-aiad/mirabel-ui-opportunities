@@ -49,6 +49,7 @@ const SearchResults = ({ searchParams, setShowResults, searchType = 'opportuniti
 
   const isOpportunities = searchType === 'opportunities';
   const title = isOpportunities ? 'Opportunities' : 'Proposals';
+  // const [isLoading, setIsLoading] = useState(false);
 
   // Enhance rows with dropdown options
   const enhanceRowsWithOptions = (rows) => {
@@ -1361,6 +1362,11 @@ const SearchResults = ({ searchParams, setShowResults, searchType = 'opportuniti
     return baseColumns;
   };
 
+  const handleRefetch = () => {
+    setIsViewsSidebarOpen(false);
+    refetch();
+  }
+
   // Define columns for EnhancedDataTable - fully API-driven
   const getColumns = () => {
     // Check multiple possible locations for column config
@@ -1621,14 +1627,19 @@ const SearchResults = ({ searchParams, setShowResults, searchType = 'opportuniti
       </div>
 
       {/* Views Sidebar */}
-      <ViewsSidebar
-        isOpen={isViewsSidebarOpen}
-        onClose={() => setIsViewsSidebarOpen(false)}
-        columnOrder={getDefaultColumnOrder()}
-        onColumnOrderChange={() => { }}
-        onViewSelected={() => { }}
-        pageType="opportunities"
-      />
+      <div className={`${loading ? 'mask' : 'none'}`}>
+
+        <ViewsSidebar
+          isOpen={isViewsSidebarOpen}
+          onClose={() => setIsViewsSidebarOpen(false)}
+          columnOrder={getDefaultColumnOrder()}
+          onColumnOrderChange={() => { }}
+          onViewSelected={() => { }}
+          pageType="opportunities"
+          handleRefetch={()=> handleRefetch()}
+          // setLoading={setIsLoading}
+          />
+      </div>
     </>
   );
 };
