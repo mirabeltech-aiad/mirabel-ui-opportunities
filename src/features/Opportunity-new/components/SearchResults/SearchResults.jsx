@@ -1632,14 +1632,16 @@ const SearchResults = ({ searchParams, setShowResults, searchType = 'opportuniti
         }
       `}</style>
       <div className="h-screen bg-gray-50 flex flex-col">
-        {/* Statistics Cards */}
-        <div className="bg-white border-b border-gray-200 px-6 py-4 flex-shrink-0">
-          {isOpportunities ? (
-            <OpportunityStatsCards stats={opportunityStatsData} />
-          ) : (
-            <ProposalStatsCards stats={proposalStatsData} />
-          )}
-        </div>
+        {/* Statistics Cards: hide in kanban and split views */}
+        {viewMode !== 'kanban' && viewMode !== 'split' && (
+          <div className="bg-white border-b border-gray-200 px-6 py-4 flex-shrink-0">
+            {isOpportunities ? (
+              <OpportunityStatsCards stats={opportunityStatsData} />
+            ) : (
+              <ProposalStatsCards stats={proposalStatsData} />
+            )}
+          </div>
+        )}
         {/* Enhanced Filter Bar */}
         <div className="bg-white border-b border-gray-200 flex-shrink-0">
           <div className="px-2">
