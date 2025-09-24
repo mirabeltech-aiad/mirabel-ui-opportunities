@@ -76,7 +76,7 @@ const SearchResults = ({ searchParams, setShowResults, searchType = 'opportuniti
   // Filter definitions for EnhancedFilterBar
   const getFilterDefinitions = () => {
     if (searchType === 'proposals') {
-      // For proposals, show Proposal Reps as PowerMultiSelect
+      // For proposals, use PowerMultiSelect with reps loaded from API
       return [
         {
           id: 'proposalReps',
@@ -96,7 +96,7 @@ const SearchResults = ({ searchParams, setShowResults, searchType = 'opportuniti
           id: 'opportunities',
           placeholder: 'All Opportunities',
           options: quickStatusOptions,
-          value: (filters && filters.opportunities) ? filters.opportunities : 'all',
+          value: 'all',
           onChange: (value) => {
             setFilters(prev => ({ ...prev, opportunities: value === 'all' ? undefined : value }));
           }
@@ -104,24 +104,21 @@ const SearchResults = ({ searchParams, setShowResults, searchType = 'opportuniti
         {
           id: 'probability',
           placeholder: 'All Probability',
-          options: [
-            { value: 'all', label: 'All Probability' },
-            { value: 'IE=80~IE=90~IE=100~', label: 'High (80-100%)' },
-            { value: 'IE=40~IE=50~IE=60~IE=70~', label: 'Medium (40-79%)' },
-            { value: 'IE=0~IE=10~IE=20~IE=30~', label: 'Low (0-39%)' }
-          ],
-          value: 'all',
-          onChange: (value) => {
-            setFilters(prev => ({ ...prev, probability: value === 'all' ? undefined : value }));
+          type: 'multi-select',
+          options: probabilityOptions,
+          value: Array.isArray(filters.probability) ? filters.probability : [],
+          onChange: (values) => {
+            setFilters(prev => ({ ...prev, probability: values }));
           }
         },
         {
           id: 'reps',
           placeholder: 'All Reps',
+          type: 'multi-select',
           options: repsOptions,
-          value: 'all',
-          onChange: (value) => {
-            setFilters(prev => ({ ...prev, reps: value === 'all' ? undefined : value }));
+          value: Array.isArray(filters.reps) ? filters.reps : [],
+          onChange: (values) => {
+            setFilters(prev => ({ ...prev, reps: values }));
           }
         }
       ];
