@@ -4,7 +4,7 @@ import { API_URLS } from '@/utils/apiUrls';
 
 export const userServiceNew = {
   async getUsersForDropdown(): Promise<Array<{display: string; value: string; id: string}>> {
-    const endpoint = API_URLS.USER.ACCOUNTS_MASTER(getCurrentUserId());
+    const endpoint = API_URLS.USER.ACCOUNTS_MASTER(1);
     const response = await axiosService.get(endpoint);
     const users = response?.content?.List || [];
     return users
@@ -17,7 +17,7 @@ export const userServiceNew = {
   },
 
   async getSavedSearches(): Promise<{ allOpportunities: any[]; myOpportunities: any[] }> {
-    const endpoint = `/services/crm/contacts/search/SavedSearchesList/22/${getCurrentUserId()}/1`;
+    const endpoint = `/services/crm/contacts/search/SavedSearchesList/22/1/1`;
     const response = await axiosService.get(endpoint);
     const searches = response?.content?.List || [];
     const filtered = Array.isArray(searches) ? searches : [];
