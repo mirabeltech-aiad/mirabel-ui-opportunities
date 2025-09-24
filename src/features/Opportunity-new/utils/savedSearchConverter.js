@@ -366,7 +366,7 @@ export const convertApiResponseToSearchParams = (apiResponse) => {
             searchParams[key] = value.split(',').map(v => v.trim()).filter(Boolean);
           } else {
             // Single string value - for date fields, keep as string; for others, use array
-            if (key.includes('Date') || key.includes('From') || key.includes('To')) {
+            if (key.includes('Date') || key.includes('From') || key.includes('To') || key.includes('status')) {
               searchParams[key] = value;
             } else {
               searchParams[key] = [value];
