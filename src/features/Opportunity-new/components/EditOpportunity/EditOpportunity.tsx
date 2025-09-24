@@ -10,10 +10,11 @@ import LinkedProposalsTab from './tabs/LinkedProposalsTab';
 import TasksTab from './tabs/TasksTab';
 import ActivitiesTab from './tabs/ActivitiesTab';
 import StageProgressionTab from './tabs/StageProgressionTab';
-import StatsTab from './tabs/StatsTab';
+
 import StatusChangeConfirmDialog from './StatusChangeConfirmDialog';
 import Loader from '@/components/ui/loader';
 import { useOpportunityForm } from '../../hooks/useOpportunityForm';
+import OpportunityStatsSection from './tabs/OpportunityStatsSection';
 
 const EditOpportunity: React.FC = () => {
     const { id } = useParams<{ id: string }>();
@@ -142,7 +143,7 @@ const EditOpportunity: React.FC = () => {
                 );
             case 'stats':
                 return (
-                    <StatsTab
+                    <OpportunityStatsSection
                         opportunityId={id}
                     />
                 );

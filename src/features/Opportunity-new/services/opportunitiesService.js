@@ -1,40 +1,10 @@
 import axiosService from '@/services/axiosService.js';
-import apiService from '../../Opportunity/Services/apiService';
+import apiService from './apiService';
 import { getCurrentUserId } from '@/utils/userUtils';
 import { API_URLS } from '@/utils/apiUrls';
-import { OpportunityFormData } from '../types/opportunity';
-
-// Helper function to format date for API (MM/DD/YYYY format)
-const formatDateForApi = (dateString: string): string => {
-  if (!dateString) return "";
-  const date = new Date(dateString);
-  return date.toLocaleDateString('en-US', { 
-    month: '2-digit', 
-    day: '2-digit', 
-    year: 'numeric' 
-  });
-};
-
-// Helper function to format date from API - avoid timezone issues
-const formatApiDate = (dateString: string): string => {
-  if (!dateString || dateString === "0001-01-01T00:00:00") return "";
-  const datePart = dateString.split('T')[0];
-  return datePart;
-};
-
-// Helper function to safely get nested object values
-const safeGet = (obj: any, path: string, defaultValue: any = ''): any => {
-  try {
-    return path.split('.').reduce((current, key) => {
-      return current && current[key] !== undefined ? current[key] : defaultValue;
-    }, obj);
-  } catch (e) {
-    return defaultValue;
-  }
-};
-
-// Utility functions for payload formatting (from opportunitiesService.js)
-export const getIcodeFromArray = (arr: any[]): string => {
+const axiosInstance = axiosService;
+// Utility functions for payload formatting
+export const getIcodeFromArray = (arr) => {
   if (!arr || arr.length === 0) return "";
 
   let str = "";
@@ -50,7 +20,7 @@ export const getIcodeFromArray = (arr: any[]): string => {
   return str;
 };
 
-const formatDate = (dateString: string): string => {
+const formatDate = (dateString) => {
   if (!dateString) return '';
   const date = new Date(dateString);
   const month = String(date.getMonth() + 1).padStart(2, '0');
@@ -60,7 +30,7 @@ const formatDate = (dateString: string): string => {
 };
 
 // Helper function to process probability value for backend
-const processProbabilityValue = (probabilityFilter: any): string => {
+const processProbabilityValue = (probabilityFilter) => {
   if (!probabilityFilter || probabilityFilter === "All") {
     return "";
   }
@@ -94,399 +64,9 @@ const processProbabilityValue = (probabilityFilter: any): string => {
   return "";
 };
 
-export class OpportunityService {
-  // Get opportunity details by ID
-  async getOpportunityDetails(opportunityId: string): Promise<any> {
-    try {
-      const response = await axiosService.get(`${API_URLS.OPPORTUNITIES.BASE}/${opportunityId}`);
-      return response;
-    } catch (error) {
-      console.error('Failed to fetch opportunity details:', error);
-      throw error;
-    }
-  }
+export const opportunitiesService = {
+  async getOpportunities(filters = {}) {
 
-    
-      
-
-  // Create or update opportunity
-  async saveOpportunity(formData: OpportunityFormData): Promise<any> {
-    try {
-      const payload = this.buildOpportunityPayload(formData);
-      console.log('OpportunityService: Saving opportunity with payload:', payload);
-      
-      const response = await axiosService.post(API_URLS.OPPORTUNITIES.BASE, payload);
-      console.log('OpportunityService: Save response:', response);
-      
-      return response;
-    } catch (error) {
-      console.error('Failed to save opportunity:', error);
-      throw error;
-    }
-  }
-
-  // Delete opportunity
-  async deleteOpportunity(opportunityId: string, userId?: string): Promise<any> {
-    try {
-      const userIdToUse = userId || getCurrentUserId();
-      const response = await axiosService.delete(`${API_URLS.OPPORTUNITIES.BASE}/${opportunityId}/${userIdToUse}`);
-      return response;
-    } catch (error) {
-      console.error('Failed to delete opportunity:', error);
-      throw error;
-    }
-  }
-
-  // Get opportunity history
-  async getOpportunityHistory(opportunityId: string): Promise<any> {
-    try {
-      const response = await axiosService.get(`${API_URLS.OPPORTUNITIES.BASE}/History/${opportunityId}/10/1`);
-      return response;
-    } catch (error) {
-      console.error('Failed to fetch opportunity history:', error);
-      throw error;
-    }
-  }
-
-  // Get opportunity stages
-  async getOpportunityStages(): Promise<any> {
-    try {
-      console.log('OpportunityService: Fetching opportunity stages');
-      const response = await axiosService.get(API_URLS.ADMIN.OPPORTUNITY_STAGES);
-      console.log('OpportunityService: Stages API Response:', response);
-      return response;
-    } catch (error) {
-      console.error('Failed to fetch opportunity stages:', error);
-      throw error;
-    }
-  }
-
-  // Update opportunity stage via drag and drop
-  async updateOpportunityStage(opportunityId: string, stageId: number, userId?: string): Promise<any> {
-    try {
-      const userIdToUse = userId || getCurrentUserId();
-      const endpoint = `/services/Opportunities/Field/PipelineStageID/${opportunityId}/0/${userIdToUse}/Insert`;
-      const response = await axiosService.post(endpoint, stageId);
-      return response;
-    } catch (error) {
-      console.error('Failed to update opportunity stage:', error);
-      throw error;
-    }
-  }
-
-  // Build API payload from form data
-  private buildOpportunityPayload(formData: OpportunityFormData): any {
-    return {
-      ID: formData.opportunityId ? parseInt(formData.opportunityId) : 0,
-      Name: formData.name || "Opportunity",
-      Status: formData.status || "Open",
-      CloseDate: formatDateForApi(formData.projCloseDate),
-      Amount: formData.amount ? formData.amount.toString() : "0.00",
-      Probability: formData.probability ? parseInt(formData.probability) : 0,
-      Source: formData.primaryCampaignSource || null,
-      Notes: formData.notes || "",
-      NextStep: formData.nextSteps || "",
-      CreatedDate: formatDateForApi(formData.createdDate),
-      ModfiedDate: new Date().toLocaleString('en-US', {
-        year: 'numeric',
-        month: 'numeric',
-        day: 'numeric',
-        hour: '2-digit',
-        minute: '2-digit',
-        second: '2-digit',
-        hour12: false
-      }).replace(/(\d+)\/(\d+)\/(\d+),\s(\d+):(\d+):(\d+)/, '$3-$1-$2 $4:$5:$6'),
-      OppStageDetails: {
-        ID: formData.stageDetails?.ID ? parseInt(formData.stageDetails.ID.toString()) : null,
-        Stage: formData.stage || ""
-      },
-      ContactDetails: formData.contactDetails?.ID ? {
-        ID: parseInt(formData.contactDetails.ID.toString()),
-        SalesRepID: parseInt(formData.assignedRepDetails?.ID?.toString() || '0')
-      } : {
-        ID: 1611, // Default contact ID
-        SalesRepID: parseInt(formData.assignedRepDetails?.ID?.toString() || '0')
-      },
-      ProductDetails: formData.productDetails && formData.productDetails.length > 0
-        ? formData.productDetails.map(product => ({
-          Details: null,
-          Products: null,
-          ListOfProducts: null,
-          ID: parseInt(product.ID.toString()) || 0,
-          Name: product.Name || ""
-        }))
-        : formData.product && formData.product.length > 0
-          ? formData.product.map((name, index) => ({
-            Details: null,
-            Products: null,
-            ListOfProducts: null,
-            ID: parseInt(formData.productId[index]) || 0,
-            Name: name
-          }))
-          : [{
-            Details: null,
-            Products: null,
-            ListOfProducts: null,
-            ID: 47,
-            Name: "Classified Services"
-          }],
-      OwnerDetails: {
-        ID: parseInt(formData.assignedRepDetails?.ID?.toString() || '0')
-      },
-      AssignedTODetails: formData.assignedRepDetails?.ID ? {
-        ID: parseInt(formData.assignedRepDetails.ID.toString()),
-        Name: formData.assignedRepDetails.Name || formData.assignedRep || ""
-      } : {
-        ID: 71, // Default assigned rep ID
-        Name: formData.assignedRep || ""
-      },
-      SalesPresenterDetails: formData.salesPresenterDetails?.ID ? {
-        ID: parseInt(formData.salesPresenterDetails.ID.toString()),
-        Name: formData.salesPresenterDetails.Name || formData.salesPresentation || ""
-      } : {
-        ID: 0,
-        Name: "*Unassigned*"
-      },
-      OppTypeDetails: {
-        ID: formData.opportunityType?.id ? parseInt(formData.opportunityType.id) : null,
-        Name: formData.opportunityType?.name || ""
-      },
-      BusinessUnitDetails: formData.businessUnitDetails && formData.businessUnitDetails.length > 0
-        ? formData.businessUnitDetails.map(bu => ({
-          ID: parseInt(bu.ID.toString()) || 0,
-          Name: bu.Name || ""
-        }))
-        : formData.businessUnit && formData.businessUnit.length > 0
-          ? formData.businessUnit.map((name, index) => ({
-            ID: parseInt(formData.businessUnitId[index]) || 0,
-            Name: name
-          }))
-          : [{ ID: "", Name: "" }],
-      BusinessUnitIDS: formData.businessUnitId && formData.businessUnitId.length > 0
-        ? formData.businessUnitId.join(",")
-        : "",
-      ProductIDS: formData.productId && formData.productId.length > 0
-        ? formData.productId.join(",")
-        : "",
-      OppLossReasonDetails: formData.lossReasonDetails?.ID ? {
-        ID: parseInt(formData.lossReasonDetails.ID.toString()),
-        Name: formData.lossReasonDetails.Name || formData.lostReason || ""
-      } : {
-        ID: null,
-        Name: formData.lostReason || ""
-      },
-      StageAction: "Add",
-      SubContactDetails: formData.contactDetails?.ID ? {
-        ID: parseInt(formData.contactDetails.ID.toString()),
-        Name: formData.contactDetails.Name || formData.contactName || ""
-      } : {
-        ID: 0,
-        Name: formData.contactName || ""
-      },
-      ProposalID: formData.proposalId || ""
-    };
-  }
-
-  // Map API response to form data
-  mapApiResponseToFormData(data: any): OpportunityFormData {
-    // Helper functions for multiselect business units
-    const getBusinessUnitValues = (data: any): string[] => {
-      try {
-        if (data.BusinessUnitDetailsArr && Array.isArray(data.BusinessUnitDetailsArr) && data.BusinessUnitDetailsArr.length > 0) {
-          return data.BusinessUnitDetailsArr.map((bu: any) => bu.Name || '').filter((name: string) => name);
-        }
-        if (data.BusinessUnitDetails && data.BusinessUnitDetails.Name) {
-          return [data.BusinessUnitDetails.Name];
-        }
-        return [];
-      } catch (e) {
-        return [];
-      }
-    };
-
-    const getBusinessUnitIds = (data: any): string[] => {
-      try {
-        if (data.BusinessUnitDetailsArr && Array.isArray(data.BusinessUnitDetailsArr) && data.BusinessUnitDetailsArr.length > 0) {
-          return data.BusinessUnitDetailsArr.map((bu: any) => bu.ID.toString()).filter((id: string) => id);
-        }
-        if (data.BusinessUnitDetails && data.BusinessUnitDetails.ID) {
-          return [data.BusinessUnitDetails.ID.toString()];
-        }
-        return [];
-      } catch (e) {
-        return [];
-      }
-    };
-
-    const getBusinessUnitDetailsArray = (data: any) => {
-      try {
-        if (data.BusinessUnitDetailsArr && Array.isArray(data.BusinessUnitDetailsArr) && data.BusinessUnitDetailsArr.length > 0) {
-          return data.BusinessUnitDetailsArr.map((bu: any) => ({
-            ID: bu.ID,
-            Name: bu.Name || ''
-          }));
-        }
-        if (data.BusinessUnitDetails && data.BusinessUnitDetails.Name) {
-          return [{
-            ID: data.BusinessUnitDetails.ID,
-            Name: data.BusinessUnitDetails.Name
-          }];
-        }
-        return [];
-      } catch (e) {
-        return [];
-      }
-    };
-
-    // Helper functions for multiselect products
-    const getProductValues = (data: any): string[] => {
-      try {
-        if (data.ProductsArr && Array.isArray(data.ProductsArr) && data.ProductsArr.length > 0) {
-          return data.ProductsArr.map((product: any) => product.Name || '').filter((name: string) => name);
-        }
-        if (data.ProductDetails && data.ProductDetails.Name) {
-          return [data.ProductDetails.Name];
-        }
-        return [];
-      } catch (e) {
-        return [];
-      }
-    };
-
-    const getProductIds = (data: any): string[] => {
-      try {
-        if (data.ProductsArr && Array.isArray(data.ProductsArr) && data.ProductsArr.length > 0) {
-          return data.ProductsArr.map((product: any) => product.ID.toString()).filter((id: string) => id);
-        }
-        if (data.ProductDetails && data.ProductDetails.ID) {
-          return [data.ProductDetails.ID.toString()];
-        }
-        return [];
-      } catch (e) {
-        return [];
-      }
-    };
-
-    const getProductDetailsArray = (data: any) => {
-      try {
-        if (data.ProductsArr && Array.isArray(data.ProductsArr) && data.ProductsArr.length > 0) {
-          return data.ProductsArr.map((product: any) => ({
-            ID: product.ID,
-            Name: product.Name
-          }));
-        }
-        if (data.ProductDetails && data.ProductDetails.Name) {
-          return [{
-            ID: safeGet(data, 'ProductDetails.ID'),
-            Name: safeGet(data, 'ProductDetails.Name')
-          }];
-        }
-        return [];
-      } catch (e) {
-        return [];
-      }
-    };
-
-    return {
-      opportunityId: data.ID?.toString() || '',
-      proposalId: safeGet(data, 'ProposalID'),
-      proposalName: safeGet(data, 'ProposalName'),
-      name: safeGet(data, 'Name'),
-      company: safeGet(data, 'ContactDetails.Name'),
-      contactName: safeGet(data, 'SubContactDetails.ContactFullName') ||
-        safeGet(data, 'SubContactDetails.ContactName') ||
-        `${safeGet(data, 'SubContactDetails.FirstName')} ${safeGet(data, 'SubContactDetails.LastName')}`.trim(),
-      status: safeGet(data, 'Status'),
-      stage: safeGet(data, 'OppStageDetails.Stage'),
-      stageDetails: data.OppStageDetails || {},
-      amount: safeGet(data, 'Amount', ''),
-      probability: safeGet(data, 'Probability', ''),
-      stagePercentage: safeGet(data, 'OppStageDetails.PercentClosed', ''),
-      opportunityType: {
-        id: safeGet(data, 'OppTypeDetails.ID'),
-        name: safeGet(data, 'OppTypeDetails.Name')
-      },
-      opportunityTypeId: safeGet(data, 'OppTypeDetails.ID'),
-      businessUnit: getBusinessUnitValues(data),
-      businessUnitId: getBusinessUnitIds(data),
-      businessUnitDetails: getBusinessUnitDetailsArray(data),
-      product: getProductValues(data),
-      productId: getProductIds(data),
-      productDetails: getProductDetailsArray(data),
-      primaryCampaignSource: safeGet(data, 'Source'),
-      assignedRep: safeGet(data, 'AssignedTODetails.Name'),
-      assignedRepDetails: {
-        ID: safeGet(data, 'AssignedTODetails.ID'),
-        Name: safeGet(data, 'AssignedTODetails.Name')
-      },
-      createdBy: safeGet(data, 'OwnerDetails.Name') || safeGet(data, 'OwnerDetails.SalesRepName'),
-      source: safeGet(data, 'Source'),
-      leadSource: safeGet(data, 'LeadSource'),
-      leadType: safeGet(data, 'LeadType'),
-      leadStatus: safeGet(data, 'LeadStatus'),
-      salesPresentation: safeGet(data, 'SalesPresenterDetails.Name') || safeGet(data, 'SalesPresenterDetails.SalesRepName'),
-      salesPresenterDetails: {
-        ID: safeGet(data, 'SalesPresenterDetails.ID'),
-        Name: safeGet(data, 'SalesPresenterDetails.Name') || safeGet(data, 'SalesPresenterDetails.SalesRepName')
-      },
-      projCloseDate: formatApiDate(safeGet(data, 'CloseDate')),
-      actualCloseDate: formatApiDate(safeGet(data, 'ActualCloseDate')),
-      createdDate: formatApiDate(safeGet(data, 'CreatedDateTo')) || formatApiDate(safeGet(data, 'CreatedDate')),
-      description: safeGet(data, 'Description'),
-      priority: '',
-      location: '',
-      remote: false,
-      industry: '',
-      companySize: '',
-      budget: '',
-      decisionMaker: safeGet(data, 'SubContactDetails.ContactName'),
-      timeframe: '',
-      competitors: '',
-      nextSteps: safeGet(data, 'NextStep'),
-      lastActivity: safeGet(data, 'LastActivity'),
-      territory: '',
-      campaign: safeGet(data, 'Source'),
-      referralSource: '',
-      productInterest: getProductValues(data)[0] || '',
-      painPoints: '',
-      currentSolution: '',
-      decisionCriteria: '',
-      implementationDate: '',
-      contractLength: '',
-      renewalDate: '',
-      lostReason: safeGet(data, 'OppLossReasonDetails.Name'),
-      winReason: '',
-      tags: '',
-      notes: safeGet(data, 'Notes'),
-      forecastRevenue: safeGet(data, 'Amount', ''),
-      lossReasonDetails: {
-        ID: safeGet(data, 'OppLossReasonDetails.ID'),
-        Name: safeGet(data, 'OppLossReasonDetails.Name')
-      },
-      contactDetails: {
-        ID: safeGet(data, 'SubContactDetails.ID'),
-        Name: safeGet(data, 'SubContactDetails.ContactFullName') || safeGet(data, 'SubContactDetails.ContactName')
-      }
-    };
-  }
-  // Get proposals based on opportunity criteria
-  async getProposalsBasedOnOpportunity(type: string, searchParams: any): Promise<any[]> {
-    try {
-      const response = await axiosService.post(API_URLS.PROPOSALS.BY_CRITERIA, searchParams);
-      
-      if (response?.content && Array.isArray(response.content.List)) {
-        return response.content.List;
-      }
-      
-      return [];
-    } catch (error) {
-      console.error('Failed to fetch proposals based on opportunity:', error);
-      throw error;
-    }
-  }
-
-  // Search and reporting functionality (from opportunitiesService.js)
-  async getOpportunities(filters: any = {}): Promise<any> {
     // Filter out UI-specific parameters that shouldn't be sent to API
     const { fromAdvancedSearch: FROM_ADV, ...apiFilters } = filters;
 
@@ -501,8 +81,8 @@ export class OpportunityService {
         oppNameValue = searchParams.opportunityNameBasic;
       } else {
         // Concatenate if it's an array, otherwise use as-is
-        oppNameValue = Array.isArray(searchParams.opportunityNameBasic) ?
-          searchParams.opportunityNameBasic.join('') :
+        oppNameValue = Array.isArray(searchParams.opportunityNameBasic) ? 
+          searchParams.opportunityNameBasic.join('') : 
           searchParams.opportunityNameBasic;
       }
     } else if (searchParams.opportunityName) {
@@ -511,24 +91,36 @@ export class OpportunityService {
         oppNameValue = searchParams.opportunityName;
       } else {
         // Concatenate if it's an array, otherwise use as-is
-        oppNameValue = Array.isArray(searchParams.opportunityName) ?
-          searchParams.opportunityName.join('') :
+        oppNameValue = Array.isArray(searchParams.opportunityName) ? 
+          searchParams.opportunityName.join('') : 
           searchParams.opportunityName;
       }
     }
 
+
     // Format Company Name with SW= prefix for search
     let customerNameValue = "";
     if (searchParams.companyNameBasic) {
+      // Split by comma and format each value with SW= prefix and ~ suffix
+      // const values = searchParams.companyNameBasic.split(',').filter(v => v.trim());
+      // customerNameValue = values.map(v => `SW=${v.trim()}~`).join('');
       customerNameValue = searchParams.companyNameBasic;
     } else if (searchParams.companyName) {
+      // Handle companyName the same way for consistency
+      // const values = searchParams.companyName.split(',').filter(v => v.trim());
+      // customerNameValue = values.map(v => `SW=${v.trim()}~`).join('');
       customerNameValue = searchParams.companyName;
     } else if (searchParams.customerName) {
+      // Handle customerName the same way for consistency
+      // const values = searchParams.customerName.split(',').filter(v => v.trim());
+      // customerNameValue = values.map(v => `SW=${v.trim()}~`).join('');
       customerNameValue = searchParams.customerName;
     }
 
+
     // Process probability value for backend
     const probabilityValue = processProbabilityValue(searchParams.probability);
+
 
     // Format Email with SW= prefix for search (like company name)
     let emailValue = "";
@@ -539,6 +131,7 @@ export class OpportunityService {
         : String(searchParams.contactEmail).split(',').filter(v => v.trim());
       emailValue = values.map(v => `SW=${v.trim()}~`).join('');
     }
+
 
     const requestPayload = {
       ActualCloseFrom: formatDate(searchParams.actualCloseFrom) || formatDate(searchParams.actualCloseDate) || formatDate(searchParams.actualCloseDateFrom) || "",
@@ -552,28 +145,38 @@ export class OpportunityService {
       CreatedBy: searchParams.createdRep ? getIcodeFromArray(Array.isArray(searchParams.createdRep) ? searchParams.createdRep : String(searchParams.createdRep).split(',').map(v => v.trim()).filter(v => v)) : "",
       CreatedFrom: formatDate(searchParams.createdFrom) || formatDate(searchParams.createdDateFrom) || "",
       CreatedTo: formatDate(searchParams.createdTo) || formatDate(searchParams.createdDateTo) || "",
+      // CurPage is set later with final defaults
+      // CustomerID provided in Additional fields section
       CustomerName: customerNameValue,
+      // InternalApprovalStage finalized in trailing defaults
       LeadQuality: null,
       ListId: searchParams.ListID || 0,
       LossReason: searchParams.lossReason || searchParams.winLossReason || "",
       OppIDs: null,
       OppName: oppNameValue,
+      // PageSize will be finalized below
       PageSize: 25,
+
       Probability: probabilityValue,
       Products: searchParams.products ? getIcodeFromArray(Array.isArray(searchParams.products) ? searchParams.products : String(searchParams.products).split(',').map(v => v.trim()).filter(v => v)) : (searchParams.product ? getIcodeFromArray(Array.isArray(searchParams.product) ? searchParams.product : String(searchParams.product).split(',').map(v => v.trim()).filter(v => v)) : ""),
+      // Proposal fields are defined later with final defaults
       ProspectStage: null,
       ProspectingStage: -1,
       ProspectingStageFromDate: "",
       ProspectingStageToDate: "",
       Results: 0,
       SalesPresenter: searchParams.salesPresenter || searchParams.salesPresentation ? getIcodeFromArray([searchParams.salesPresenter || searchParams.salesPresentation]) : null,
+      // SortBy is set later with final defaults
       Source: searchParams.source ? getIcodeFromArray(Array.isArray(searchParams.source) ? searchParams.source : String(searchParams.source).split(',').map(v => v.trim()).filter(v => v)) : (searchParams.primaryCampaign ? getIcodeFromArray([searchParams.primaryCampaign]) : ""),
       Stage: searchParams.stage ? getIcodeFromArray(Array.isArray(searchParams.stage) ? searchParams.stage : String(searchParams.stage).split(',').map(v => v.trim()).filter(v => v)) : "",
       State: searchParams.state ? getIcodeFromArray(Array.isArray(searchParams.state) ? searchParams.state : String(searchParams.state).split(',').map(v => v.trim()).filter(v => v)) : null,
       Status: searchParams.status || searchParams.quickStatus || "",
       Type: searchParams.type ? getIcodeFromArray([searchParams.type]) : "",
       UserID: getCurrentUserId(),
+      // ViewType is set later with final defaults
       WorkFlows: null,
+
+      // Additional fields for backward compatibility
       IDs: null,
       CustomerID: searchParams.customerID || "",
       AdvSearch: {
@@ -636,7 +239,9 @@ export class OpportunityService {
         ProspectingStageFromDate: "",
         ProspectingStageToDate: "",
         LeadStatus: (() => {
+          // Try different case variations
           const leadStatusValue = searchParams.leadStatus || searchParams.LeadStatus || searchParams.leadstatus;
+
           if (leadStatusValue) {
             const processedValue = getIcodeFromArray(Array.isArray(leadStatusValue) ? leadStatusValue : String(leadStatusValue).split(',').map(v => v.trim()).filter(v => v));
             return processedValue;
@@ -644,6 +249,7 @@ export class OpportunityService {
             return null;
           }
         })(),
+        //searchParams.leadStatus || null,
         InActive: false,
         CampaignStatus: "",
         CampaignName: searchParams.campaign || searchParams.primaryCampaign || "",
@@ -661,12 +267,14 @@ export class OpportunityService {
         ProductTags: searchParams.tags || "",
         BusinessUnitTags: ""
       },
+      // Final defaults and report paging/sorting
       Action: null,
       CurPage: searchParams.CurPage !== undefined ? searchParams.CurPage : 1,
       SortBy: "",
       ListName: "Latest Search",
       ViewType: 0,
       ResultType: 1,
+      // Proposal-related defaults (kept as empty strings)
       ProposalRep: "",
       ProposalName: "",
       ProposalStatus: "",
@@ -682,12 +290,19 @@ export class OpportunityService {
       ListID: searchParams.ListID || 0
     };
 
+    
+
     try {
+      // Import API_URLS to use centralized URL configuration
+      const { API_URLS } = await import('@/utils/apiUrls');
+
       // Fetch opportunities data and column configuration in parallel
       const [response, columnConfigResponse] = await Promise.all([
-        axiosService.post(API_URLS.OPPORTUNITIES.REPORT_ALL, requestPayload),
+        axiosInstance.post(API_URLS.OPPORTUNITIES.REPORT_ALL, requestPayload),
         this.getOpportunityColumnConfig()
       ]);
+
+      
 
       // Handle the response structure and extract opportunities
       let opportunities = [];
@@ -705,7 +320,7 @@ export class OpportunityService {
         totalCount = contentData.Total || opportunities.length;
         opportunityResult = (contentData.OpportunityResult && contentData.OpportunityResult[0]) || {};
 
-        // Check for ColumnConfig in the main search response
+        // Check for ColumnConfig in the main search response (as per updated documentation)
         if (contentData.ColumnConfig && Array.isArray(contentData.ColumnConfig)) {
           apiColumnConfig = contentData.ColumnConfig.map(item => ({
             id: item.PropertyMappingName ? item.PropertyMappingName.toLowerCase() : item.DBColumnsNames?.toLowerCase(),
@@ -719,6 +334,7 @@ export class OpportunityService {
           }));
         }
       } else if (responseData && responseData.Data) {
+      
         opportunities = responseData.Data.Opportunities || [];
         totalCount = responseData.Data.Total || opportunities.length;
         opportunityResult = (responseData.Data.OpportunityResult && responseData.Data.OpportunityResult[0]) || {};
@@ -737,6 +353,7 @@ export class OpportunityService {
           }));
         }
       } else if (Array.isArray(responseData)) {
+       
         opportunities = responseData;
         totalCount = opportunities.length;
       }
@@ -764,28 +381,14 @@ export class OpportunityService {
       console.error('Failed to fetch opportunities:', error);
       return { opportunities: [], totalCount: 0, opportunityResult: {}, apiColumnConfig: [] };
     }
-  }
+  },
 
-  // Method to get column configuration from API for opportunities
-  async getOpportunityColumnConfig(): Promise<any> {
-    try {
-      console.log('OpportunityService: Fetching opportunity column configuration from API');
-      const response = await apiService.get(API_URLS.ADVANCED_SEARCH.RESULT_VIEW_COLUMN_OPPORTUNITIES);
-      console.log('OpportunityService: Column config API response:', response);
-      return response;
-    } catch (error) {
-      console.error('OpportunityService: Failed to fetch opportunity column config:', error);
-      throw error;
-    }
-  }
-
-  // Format opportunity data for table display
-  formatOpportunityForTable(opportunity: any): any {
+  formatOpportunityForTable(opportunity) {
     console.log('Formatting opportunity for table:', opportunity);
     console.log('Original opportunity object keys:', Object.keys(opportunity));
 
     // Handle cases where opportunity might have nested structure or missing properties
-    const safeGetValue = (obj: any, path: string, defaultValue: any = '') => {
+    const safeGetValue = (obj, path, defaultValue = '') => {
       try {
         return path.split('.').reduce((current, key) => {
           if (current && typeof current === 'object' && current[key] !== undefined) {
@@ -803,13 +406,15 @@ export class OpportunityService {
       }
     };
 
+    // Enhanced logging for debugging column mapping issues
+
     const formatted = {
       id: opportunity.ID || Math.random().toString(),
       status: safeGetValue(opportunity, 'Status', 'Open'),
       nextStep: safeGetValue(opportunity, 'NextStep', ''),
       product: safeGetValue(opportunity, 'ProductDetails.Name', opportunity.ProductName || ''),
       opportunityName: safeGetValue(opportunity, 'Name', 'Opportunity'),
-      name: safeGetValue(opportunity, 'Name', 'Opportunity'),
+      name: safeGetValue(opportunity, 'Name', 'Opportunity'), // Alias for opportunityName
       companyName: safeGetValue(opportunity, 'ContactDetails.Name', opportunity.CustomerName || 'Unknown Company'),
       contactName: safeGetValue(opportunity, 'SubContactDetails.Name', opportunity.SubContactName || ''),
       assignedRep: safeGetValue(opportunity, 'AssignedTo', 'Unassigned'),
@@ -858,6 +463,7 @@ export class OpportunityService {
       ContactDetails: opportunity.ContactDetails,
       SubContactDetails: opportunity.SubContactDetails,
       OppStageDetails: opportunity.OppStageDetails,
+      // Also preserve other potential ID fields as fallbacks
       ContactID: opportunity.ContactDetails?.ID || opportunity.ContactID,
 
       // Preserve stage data and other original opportunity data
@@ -877,10 +483,31 @@ export class OpportunityService {
       proposalAmount: opportunity.Proposal?.Amount || opportunity.ProposalAmount || 0,
       internalApprovalStage: safeGetValue(opportunity, 'Proposal.InternalApproval.StageName', opportunity.InternalApprovalStage || ''),
 
+      // Add proposal history fields
+      histCreated: safeGetValue(opportunity, 'ProposalHistory.Created', opportunity.Hist_created || ''),
+      histActive: safeGetValue(opportunity, 'ProposalHistory.Active', opportunity.Hist_Active || ''),
+      histInactive: safeGetValue(opportunity, 'ProposalHistory.Inactive', opportunity.Hist_Inactive || ''),
+      histConvertedToContract: safeGetValue(opportunity, 'ProposalHistory.ConvertedToContract', opportunity.Hist_ConvertedtoContract || ''),
+      histSent: safeGetValue(opportunity, 'ProposalHistory.Sent', opportunity.Hist_Sent || ''),
+      histApproved: safeGetValue(opportunity, 'ProposalHistory.Approved', opportunity.Hist_Approved || ''),
+      histReset: safeGetValue(opportunity, 'ProposalHistory.Reset', opportunity.Hist_Reset || ''),
+
+      // Map stage timeline columns directly from the API response
+      stageLeadAssigned: opportunity['stage_Lead Assigned'] || '',
+      stageQualification: opportunity['Stage_Qualification'] || '',
+      stageInitialContact: opportunity['Stage_Initial contact'] || '',
+      stageMeeting: opportunity['Stage_Meeting '] || opportunity['Stage_Meeting'] || '',
+      stageProposal: opportunity['stage_Proposal'] || '',
+      stage2ndMeeting: opportunity['Stage_2nd Meeting'] || '',
+      stage3rdMeeting: opportunity['stage_3rd Meeting'] || '',
+      stageJulyMeeting: opportunity['stage_July meeting'] || '',
+      stageClosedWon: opportunity['Stage_Closed Won'] || '',
+      stageClosedLost: opportunity['Stage_Closed Lost'] || '',
+
       // Map all remaining fields from the original opportunity object to ensure no data is lost
       ...Object.keys(opportunity).reduce((acc, key) => {
         // Only add fields that don't already exist in the formatted object
-        if (!acc.hasOwnProperty(key) && key !== 'ContactDetails' && key !== 'SubContactDetails' && key !== 'OppStageDetails') {
+        if (Object.prototype.hasOwnProperty.call(acc, key) === false && key !== 'ContactDetails' && key !== 'SubContactDetails' && key !== 'OppStageDetails') {
           const value = opportunity[key];
           // Handle nested objects by extracting their Name or Display property if available
           if (value && typeof value === 'object' && value.Name) {
@@ -892,15 +519,34 @@ export class OpportunityService {
           }
         }
         return acc;
-      }, {} as any)
+      }, {})
     };
 
     console.log('Formatted opportunity result:', formatted);
     console.log('Formatted opportunity keys:', Object.keys(formatted));
     return formatted;
-  }
+  },
 
-  async getFormattedOpportunities(filters: any = {}): Promise<any> {
+  // Method to get column configuration from API for opportunities
+  async getOpportunityColumnConfig() {
+    try {
+      console.log('OpportunitiesService: Fetching opportunity column configuration from API');
+
+      // Import API_URLS and use the correct endpoint for opportunities
+      const { API_URLS } = await import('@/utils/apiUrls');
+      const response = await apiService.get(API_URLS.ADVANCED_SEARCH.RESULT_VIEW_COLUMN_OPPORTUNITIES);
+
+      console.log('OpportunitiesService: Column config API response:', response);
+
+      return response;
+
+    } catch (error) {
+      console.error('OpportunitiesService: Failed to fetch opportunity column config:', error);
+      throw error;
+    }
+  },
+
+  async getFormattedOpportunities(filters = {}) {
     const { opportunities, totalCount, opportunityResult, apiColumnConfig } = await this.getOpportunities(filters);
     console.log('Raw opportunities before formatting:', opportunities);
     console.log('Raw opportunities type:', typeof opportunities);
@@ -915,54 +561,93 @@ export class OpportunityService {
     console.log('Formatted opportunities:', formatted);
     console.log('Formatted opportunities length:', formatted.length);
     return { opportunitiesData: formatted, totalCount, opportunityResult, apiColumnConfig };
-  }
-
+  },
   // Kanban drag and drop stage update
-  async updateOpportunityStageByDrag(opportunityId: string, stageId: number, loggedInUserId?: string): Promise<any> {
+  async updateOpportunityStageByDrag(opportunityId, stageId, loggedInUserId = null) {
     const userId = loggedInUserId || getCurrentUserId();
     const endpoint = `/services/Opportunities/Field/PipelineStageID/${opportunityId}/0/${userId}/Insert`;
-    const response = await axiosService.post(endpoint, stageId);
+    const response = await axiosInstance.post(endpoint, stageId);
     return response;
-  }
+  },
 
-  // Get opportunity metadata
-  async getOpportunityTypes(): Promise<any> {
-    console.log('OpportunityService: Fetching opportunity types');
-    const response = await axiosService.get(API_URLS.ADMIN.OPPORTUNITY_TYPES);
-    console.log('OpportunityService: Opportunity Types API Response:', response);
+  // Opportunity CRUD operations
+  async updateOpportunity(opportunityData) {
+    console.log('OpportunitiesService: Making POST request to /services/Opportunities');
+    console.log('OpportunitiesService: Payload being sent:', opportunityData);
+    const response = await axiosInstance.post(API_URLS.OPPORTUNITIES.BASE, opportunityData);
+    console.log('OpportunitiesService: Response received:', response);
     return response;
-  }
+  },
 
-  async getOpportunityLossReasons(): Promise<any> {
-    console.log('OpportunityService: Fetching opportunity loss reasons');
-    const response = await axiosService.get(API_URLS.ADMIN.OPPORTUNITY_LOSS_REASONS);
-    console.log('OpportunityService: Loss Reasons API Response:', response);
+  async createOpportunity(opportunityData) {
+    console.log('OpportunitiesService: Creating new opportunity with POST request to /services/Opportunities');
+    console.log('OpportunitiesService: Create opportunity payload being sent:', opportunityData);
+    const response = await axiosInstance.post(API_URLS.OPPORTUNITIES.BASE, opportunityData);
+    console.log('OpportunitiesService: Create opportunity response received:', response);
     return response;
-  }
+  },
 
-  async getOpportunityStages(): Promise<any> {
-    console.log('OpportunityService: Fetching opportunity stages');
-    const response = await axiosService.get(API_URLS.ADMIN.OPPORTUNITY_STAGES);
-    console.log('OpportunityService: Stages API Response:', response);
+  async deleteOpportunity(opportunityId, loggedInUserId = null) {
+    const userId = loggedInUserId || getCurrentUserId();
+    console.log('OpportunitiesService: Deleting opportunity with ID:', opportunityId, 'User ID:', userId);
+    const endpoint = `/services/Opportunities/${opportunityId}/${userId}`;
+    const response = await axiosInstance.delete(endpoint);
+    console.log('OpportunitiesService: Delete opportunity response received:', response);
     return response;
-  }
+  },
 
+  async getOpportunityDetails(opportunityId) {
+    console.log('OpportunitiesService: Fetching opportunity details for ID:', opportunityId);
+    const response = await axiosInstance.get(`/services/Opportunities/${opportunityId}`);
+    return response;
+  },
+
+  async getOpportunityHistory(opportunityId) {
+    console.log('OpportunitiesService: Fetching opportunity history for ID:', opportunityId);
+    const response = await axiosInstance.get(`/services/Opportunities/History/${opportunityId}/10/1`);
+    return response;
+  },
+
+  // Opportunity metadata
+  async getOpportunityTypes() {
+    console.log('OpportunitiesService: Fetching opportunity types');
+    const response = await axiosInstance.get(API_URLS.ADMIN.OPPORTUNITY_TYPES);
+    console.log('OpportunitiesService: Opportunity Types API Response:', response);
+    return response;
+  },
+
+  async getOpportunityLossReasons() {
+    console.log('OpportunitiesService: Fetching opportunity loss reasons');
+    const response = await axiosInstance.get(API_URLS.ADMIN.OPPORTUNITY_LOSS_REASONS);
+    console.log('OpportunitiesService: Loss Reasons API Response:', response);
+    return response;
+  },
+
+  async getOpportunityStages() {
+    console.log('OpportunitiesService: Fetching opportunity stages');
+    const response = await axiosInstance.get(API_URLS.ADMIN.OPPORTUNITY_STAGES);
+    console.log('OpportunitiesService: Stages API Response:', response);
+    return response;
+  },
+
+  async updateOpportunityStage(stageId, opportunityId) {
+    console.log('OpportunitiesService: Updating opportunity stage for ID:', opportunityId, 'to stage:', stageId);
+    const endpoint = `/services/Opportunities/Field/PipelineStageID/${opportunityId}/0/${getCurrentUserId()}/Insert`;
+    const response = await axiosInstance.post(endpoint, stageId);
+    console.log('OpportunitiesService: Stage update response received:', response);
+    return response;
+  }  ,
   // Toggle a stage timeline date (checkmark columns) using Insert/Delete actions
-  async toggleOpportunityStageDate(opportunityId: string, stageId: number, shouldInsert: boolean): Promise<any> {
+  async toggleOpportunityStageDate(opportunityId, stageId, shouldInsert) {
     try {
       const action = shouldInsert ? 'Insert' : 'Delete';
       const endpoint = `/services/Opportunities/Field/PipelineStageID/${opportunityId}/0/${getCurrentUserId()}/${action}`;
-      console.log('OpportunityService: Toggling stage timeline date:', { opportunityId, stageId, action });
-      const response = await axiosService.post(endpoint, stageId);
+      console.log('OpportunitiesService: Toggling stage timeline date:', { opportunityId, stageId, action });
+      const response = await axiosInstance.post(endpoint, stageId);
       return response;
     } catch (error) {
-      console.error('OpportunityService: Failed to toggle stage timeline date', { opportunityId, stageId, shouldInsert, error });
+      console.error('OpportunitiesService: Failed to toggle stage timeline date', { opportunityId, stageId, shouldInsert, error });
       throw error;
     }
   }
-}
-
-export const opportunityService = new OpportunityService();
-
-// Backward compatibility export
-export const opportunitiesService = opportunityService;
+};

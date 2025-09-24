@@ -13,6 +13,7 @@ interface FloatingLabelSearchInputProps {
   error?: string | null;
   disabled?: boolean;
   className?: string;
+  onClear?:()=> void;
 }
 
 export const FloatingLabelSearchInput: React.FC<FloatingLabelSearchInputProps> = ({
@@ -24,7 +25,8 @@ export const FloatingLabelSearchInput: React.FC<FloatingLabelSearchInputProps> =
   placeholder,
   error,
   disabled = false,
-  className = ''
+  className = '',
+  onClear
 }) => {
   const [isFocused, setIsFocused] = useState(false);
   const hasValue = value && value.length > 0;

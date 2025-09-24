@@ -123,7 +123,17 @@ export const numberWithCommas = function (number) {
       navigator.userAgent
     );
 
-    
+export const formatDate = (dateString) => {
+  const date = new Date(dateString);
+  return date.toLocaleDateString('en-US', {
+    month: 'short',
+    day: 'numeric',
+    year: 'numeric'
+  });
+};
+
+
+
 
 export const getRepColor = (Name, distinctReps) => {
   const repColorCodes = ["#469FBB", "#f80c9c", "#FF5733", "#C81549", "#0B831C", "#A8B41C", "#0C475A", "#900C3F", "#27AE60", "#9064DF"];

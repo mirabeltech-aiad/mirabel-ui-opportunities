@@ -1,8 +1,32 @@
-
 import React, { useState, useEffect } from "react";
-import TimelineContainer from "./StageTrail/TimelineContainer";
-import EmptyStageTrail from "./StageTrail/EmptyStageTrail";
+import TimelineContainer from "./StageTrail/TimelineContainer.tsx";
+import EmptyStageTrail from "./StageTrail/EmptyStageTrail.tsx";
 import { opportunitiesService } from "@/features/Opportunity/Services/opportunitiesService";
+
+interface StageChange {
+  id: string;
+  date: string;
+  fromStage: string;
+  toStage: string;
+  user: string;
+  timestamp: number;
+  description: string;
+  stageName: string;
+  previousStage: string;
+  updatedBy: string;
+  updatedOn: string;
+  colorCode: string;
+}
+interface Stage {
+  id: string;
+  name: string;
+  colorCode: string;
+}
+
+interface StageTrailSectionProps {
+  opportunityId?: string;
+  stages: Stage[];
+}
 
 /**
  * StageTrailSection Component
@@ -10,24 +34,11 @@ import { opportunitiesService } from "@/features/Opportunity/Services/opportunit
  * Displays the complete stage progression timeline for an opportunity.
  * Shows all stage changes in chronological order with timestamps and user information.
  * Provides visual feedback when no stage changes have occurred yet.
- * 
- * @param {Object} props - Component props
- * @param {string|number} props.opportunityId - Unique identifier for the opportunity
- * 
- * @returns {JSX.Element} Stage trail section with timeline or empty state
- * 
- * @example
- * <StageTrailSection opportunityId="OPP-001" />
- * 
- * @description
- * This component fetches stage change data from the opportunity history API
- * and filters for stage-related changes only. It transforms the API data
- * into the format expected by the TimelineContainer component.
  */
-const StageTrailSection = ({ opportunityId }) => {
-  const [stageChanges, setStageChanges] = useState([]);
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState(null);
+const StageTrailSection: React.FC<StageTrailSectionProps> = ({ opportunityId, stages }) => {
+  const [stageChanges, setStageChanges] = useState<StageChange[]>([]);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchStageChanges = async () => {
@@ -35,27 +46,29 @@ const StageTrailSection = ({ opportunityId }) => {
         setStageChanges([]);
         return;
       }
-      
+
       setIsLoading(true);
       setError(null);
-      
+
       try {
-           
+      
+
         const response = await opportunitiesService.getOpportunityHistory(opportunityId);
-          
+
         if (response && response.content && response.content.Data && response.content.Data.Audit) {
           const auditData = response.content.Data.Audit;
-          
+
           // Filter for stage-related changes only
-          const stageAuditData = auditData.filter(item => 
+          const stageAuditData = auditData.filter((item: any) =>
             item.FieldName && item.FieldName.toLowerCase().includes('stage')
           );
-                    
+
+
           // Transform API data to match the expected format for TimelineContainer
-          const transformedStageChanges = stageAuditData.map((item, index) => {
+          const transformedStageChanges: StageChange[] = stageAuditData.map((item: any, index: number) => {
             // Parse the date to get a proper Date object
             const changeDate = new Date(item.UpdatedOn);
-            
+
             return {
               id: `stage-${opportunityId}-${index}`,
               date: item.UpdatedOn,
@@ -68,21 +81,23 @@ const StageTrailSection = ({ opportunityId }) => {
               stageName: item.FieldValueNew || 'Unknown',
               previousStage: item.FieldValueOld || 'Unknown',
               updatedBy: item.UpdatedBy || 'System',
-              updatedOn: item.UpdatedOn
+              updatedOn: item.UpdatedOn,
+              colorCode: stages.find(x => x.name === item.FieldValueNew)?.colorCode || '#000000'
             };
           });
-          
+
           // Sort by date (newest first)
-          const sortedStageChanges = transformedStageChanges.sort((a, b) => 
-            new Date(b.date) - new Date(a.date)
+          const sortedStageChanges = transformedStageChanges.sort((a, b) =>
+            new Date(b.date).getTime() - new Date(a.date).getTime()
           );
+
           setStageChanges(sortedStageChanges);
         } else {
-         
+          console.log('StageTrailSection: No audit data found in response');
           setStageChanges([]);
         }
       } catch (error) {
-        console.error('StageTrailSection: Failed to fetch stage changes:', error);
+
         setError('Failed to load stage progression data');
         setStageChanges([]);
       } finally {

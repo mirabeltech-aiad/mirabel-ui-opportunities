@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { KanbanView } from '@/features/opportunity-new/components/kanban';
+import { KanbanView } from '@/features/Opportunity-new/components/kanban';
 import { useApiData } from '@/features/Opportunity/hooks/useApiData';
 import { opportunitiesService } from '@/features/Opportunity/Services/opportunitiesService';
 

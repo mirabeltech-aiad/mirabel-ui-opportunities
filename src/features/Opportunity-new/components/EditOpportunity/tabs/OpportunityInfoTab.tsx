@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { FormInput } from '../../ui/FormInput';
 import FloatingLabelSelect from '@/components/ui/FloatingLabelSelect';
 import { FloatingMultiSelect } from '@/shared/components/ui/FloatingMultiSelect';
-import { Textarea } from '@/components/ui/textarea';
+import { Textarea } from '@/shared/components/ui/textarea';
 import { TabProps } from '../../../types/opportunity';
 import {
   OPPORTUNITY_STATUS_OPTIONS,
@@ -122,7 +122,7 @@ const OpportunityInfoTab: React.FC<OpportunityInfoTabProps> = ({
   );
 
   // Enhanced business unit change handler that filters products
- 
+
 
   // Check if proposal is linked to determine field disable state
   const isProposalLinked = !!(formData.proposalId && formData.proposalId.trim() !== '');
@@ -287,7 +287,7 @@ const OpportunityInfoTab: React.FC<OpportunityInfoTabProps> = ({
                 label="Business Unit"
                 value={formData.businessUnitId || []}
                 onChange={(values) => handleInputChange('businessUnitId', values)}
-               // onChange={handleBusinessUnitChange}
+                // onChange={handleBusinessUnitChange}
                 options={businessUnitOptionsToUse.map(option => ({
                   value: option.id,
                   label: option.label
@@ -311,7 +311,7 @@ const OpportunityInfoTab: React.FC<OpportunityInfoTabProps> = ({
               <FloatingMultiSelect
                 label="Product"
                 value={formData.productId || []}
-                 onChange={(values) => handleInputChange('productId', values)}
+                onChange={(values) => handleInputChange('productId', values)}
                 options={productOptionsToUse.map(option => ({
                   value: option.id,
                   label: option.label

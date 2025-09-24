@@ -2,16 +2,20 @@
 export const OPPORTUNITY_STATUS_OPTIONS = [
   { value: 'Open', label: 'Open' },
   { value: 'Won', label: 'Won' },
-  { value: 'Lost', label: 'Lost' },
-  { value: 'Draft', label: 'Draft' }
+  { value: 'Lost', label: 'Lost' }
 ];
 
 export const OPPORTUNITY_PROBABILITY_OPTIONS = [
   { value: '0', label: '0%' },
   { value: '10', label: '10%' },
-  { value: '25', label: '25%' },
+  { value: '20', label: '20%' },
+  { value: '30', label: '30%' },
+  { value: '40', label: '40%' },
   { value: '50', label: '50%' },
-  { value: '75', label: '75%' },
+  { value: '60', label: '60%' },
+  { value: '70', label: '70%' },
+  { value: '80', label: '80%' },
+  { value: '90', label: '90%' },
   { value: '100', label: '100%' }
 ];
 
@@ -59,4 +63,21 @@ export const STAGE_PERCENTAGES: Record<string, number> = {
   'Negotiation': 75,
   'Closed Won': 100,
   'Closed Lost': 0
+};
+
+// Stage name constants for consistency
+export const STAGE_NAMES = {
+  CLOSED_WON: 'Closed Won',
+  CLOSED_LOST: 'Closed Lost',
+  LEAD: 'Lead',
+  DISCOVERY: 'Discovery',
+  DEMO: '1st Demo',
+  PROPOSAL: 'Proposal',
+  NEGOTIATION: 'Negotiation'
+} as const;
+
+// Helper function to find stage ID by name from loaded stages
+export const findStageIdByName = (stages: Array<{ id: string, name: string }>, stageName: string): string | null => {
+  const stage = stages.find(s => s.name === stageName);
+  return stage ? stage.id : null;
 };
