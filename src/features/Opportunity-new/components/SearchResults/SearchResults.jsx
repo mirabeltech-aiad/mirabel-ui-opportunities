@@ -56,7 +56,10 @@ const SearchResults = ({ searchParams, setShowResults, searchType = 'opportuniti
 
   // Reps options state (must be declared before use in filter definitions)
   const [repsOptions, setRepsOptions] = useState([]);
-  const probabilityOptions = Array.from({ length: 11 }, (_, i) => ({ value: String(i * 10), label: `${i * 10}%` }));
+  const probabilityOptions = [
+    { value: 'all', label: 'All Probabilities' },
+    ...Array.from({ length: 11 }, (_, i) => ({ value: String(i * 10), label: `${i * 10}%` }))
+  ];
 
   const isOpportunities = searchType === 'opportunities';
   const title = isOpportunities ? 'Opportunities' : 'Proposals';
@@ -108,7 +111,24 @@ const SearchResults = ({ searchParams, setShowResults, searchType = 'opportuniti
           options: probabilityOptions,
           value: Array.isArray(filters.probability) ? filters.probability : [],
           onChange: (values) => {
-            setFilters(prev => ({ ...prev, probability: values }));
+            const prev = Array.isArray(filters.probability) ? filters.probability : [];
+            let next = Array.isArray(values) ? [...values] : [];
+            const hasAllNow = next.includes('all');
+            const hadAllPrev = prev.includes('all');
+            if (hasAllNow && !hadAllPrev) {
+              // user selected All -> keep only All
+              next = ['all'];
+            } else if (hasAllNow && hadAllPrev && next.length > 1) {
+              // user added another while All was selected -> drop All
+              next = next.filter(v => v !== 'all');
+            } else if (!hasAllNow && hadAllPrev) {
+              // user deselected All -> keep others as-is
+              // next already excludes 'all'
+            } else {
+              // normal multi-select, ensure 'all' not accidentally present
+              next = next.filter(v => v !== 'all');
+            }
+            setFilters(prevState => ({ ...prevState, probability: next }));
           }
         },
         {
@@ -118,7 +138,21 @@ const SearchResults = ({ searchParams, setShowResults, searchType = 'opportuniti
           options: repsOptions,
           value: Array.isArray(filters.reps) ? filters.reps : [],
           onChange: (values) => {
-            setFilters(prev => ({ ...prev, reps: values }));
+            const prev = Array.isArray(filters.reps) ? filters.reps : [];
+            let next = Array.isArray(values) ? [...values] : [];
+            const allToken = 'IE=all~';
+            const hasAllNow = next.includes(allToken);
+            const hadAllPrev = prev.includes(allToken);
+            if (hasAllNow && !hadAllPrev) {
+              next = [allToken];
+            } else if (hasAllNow && hadAllPrev && next.length > 1) {
+              next = next.filter(v => v !== allToken);
+            } else if (!hasAllNow && hadAllPrev) {
+              // user deselected All -> keep others
+            } else {
+              next = next.filter(v => v !== allToken);
+            }
+            setFilters(prevState => ({ ...prevState, reps: next }));
           }
         }
       ];
@@ -158,10 +192,10 @@ const SearchResults = ({ searchParams, setShowResults, searchType = 'opportuniti
     (async () => {
       try {
         const reps = await userServiceNew.getUsersForDropdown();
-        const formatted = [{ value: 'all', label: 'All Reps' }, ...reps.map(u => ({ value: u.value, label: u.display }))];
+        const formatted = [{ value: 'IE=all~', label: 'All Reps' }, ...reps.map(u => ({ value: u.value, label: u.display }))];
         setRepsOptions(formatted);
       } catch (e) {
-        setRepsOptions([{ value: 'all', label: 'All Reps' }]);
+        setRepsOptions([{ value: 'IE=all~', label: 'All Reps' }]);
       }
     })();
   }, []);
