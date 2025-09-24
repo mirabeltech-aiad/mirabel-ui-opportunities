@@ -88,7 +88,18 @@ const SearchResults = ({ searchParams, setShowResults, searchType = 'opportuniti
           options: repsOptions,
           value: Array.isArray(filters.proposalReps) ? filters.proposalReps : [],
           onChange: (values) => {
-            setFilters(prev => ({ ...prev, proposalReps: values }));
+            const allToken = 'IE=all~';
+            let next = Array.isArray(values) ? [...values] : [];
+            const hasAllNow = next.includes(allToken);
+            const hadAllPrev = Array.isArray(filters.proposalReps) && filters.proposalReps.includes(allToken);
+            if (hasAllNow && !hadAllPrev) {
+              next = [allToken];
+            } else if (hasAllNow && hadAllPrev && next.length > 1) {
+              next = next.filter(v => v !== allToken);
+            } else {
+              next = next.filter(v => v !== allToken);
+            }
+            setFilters(prev => ({ ...prev, proposalReps: next }));
           }
         }
       ];
