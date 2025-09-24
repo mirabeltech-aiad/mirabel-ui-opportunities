@@ -97,7 +97,7 @@ export class SearchPayloadBuilder {
    * @returns {any} The field value
    */
   getFieldValue(formData, sectionName, fieldKey) {
-    const fieldKeyWithSection = `${sectionName}_${fieldKey}`;
+    const fieldKeyWithSection = `${fieldKey}`;
     return formData[fieldKeyWithSection];
   }
 
@@ -435,6 +435,7 @@ export class SearchPayloadBuilder {
    * @returns {Object} API payload
    */
   buildPayload(formData, searchType = 'opportunities') {
+    debugger;
     if (searchType === 'proposals') {
       return this.buildProposalsPayload(formData);
     } else {

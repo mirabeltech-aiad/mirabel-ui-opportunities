@@ -944,10 +944,6 @@ const SearchResults = ({ searchParams, setShowResults, searchType = 'opportuniti
             // Import StageDropdown component for inline editing
             const StageDropdown = React.lazy(() => import('../table/StageDropdown'));
 
-            console.log('DEBUG: Stage render - masterData.stages:', masterData.stages);
-            console.log('DEBUG: Stage render - current stage:', stage);
-            console.log('DEBUG: Stage render - masterDataLoaded:', masterDataLoaded);
-
             if (!masterDataLoaded || !masterData.stages.length) {
               return (
                 <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium text-white bg-gray-500">

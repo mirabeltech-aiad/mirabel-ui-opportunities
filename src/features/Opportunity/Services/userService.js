@@ -8,15 +8,15 @@ export const userService = {
       // Make API call to get users/sales reps using the correct endpoint
       const response = await apiService.get(API_URLS.USER.ACCOUNTS_MASTER(getCurrentUserId()));
       
-      console.log('Sales reps API response:', response);
+      // // console.log('Sales reps API response:', response);
       
       // The API response structure is: response.content.List
       const users = response.content?.List || [];
       
-      console.log('Raw users from API:', users);
+      // // console.log('Raw users from API:', users);
       
       if (!Array.isArray(users) || users.length === 0) {
-        console.warn('No users found in API response or users is not an array');
+        // // console.warn('No users found in API response or users is not an array');
         return [];
       }
       
@@ -26,12 +26,12 @@ export const userService = {
         id: `IE=${user.Value}~`
       })).filter(user => user.display !== 'Unknown User'); // Filter out users without proper names
       
-      console.log('Formatted users for dropdown:', formattedUsers);
+      // // console.log('Formatted users for dropdown:', formattedUsers);
       
       return formattedUsers;
       
     } catch (error) {
-      console.error('Failed to fetch users from API:', error);
+      // // console.error('Failed to fetch users from API:', error);
       throw error; // Re-throw error instead of falling back to mock data
     }
   },
@@ -41,15 +41,15 @@ export const userService = {
       // Make API call to get opportunity creators using the new endpoint
       const response = await apiService.get(API_URLS.USER.ACCOUNTS_MASTER(getCurrentUserId()));
       
-      console.log('Opportunity creators API response:', response);
+      // // console.log('Opportunity creators API response:', response);
       
       // The API response structure is: response.content.List
       const creators = response.content?.List || [];
       
-      console.log('Raw creators from API:', creators);
+      // // console.log('Raw creators from API:', creators);
       
       if (!Array.isArray(creators) || creators.length === 0) {
-        console.warn('No creators found in API response or creators is not an array');
+        // // console.warn('No creators found in API response or creators is not an array');
         return [];
       }
       
@@ -58,12 +58,12 @@ export const userService = {
         value: creator.Value
       })).filter(creator => creator.label !== 'Unknown User'); // Filter out creators without proper names
       
-      console.log('Formatted creators for dropdown:', formattedCreators);
+      // // console.log('Formatted creators for dropdown:', formattedCreators);
       
       return formattedCreators;
       
     } catch (error) {
-      console.error('Failed to fetch opportunity creators from API:', error);
+      // // console.error('Failed to fetch opportunity creators from API:', error);
       throw error; // Re-throw error instead of falling back to mock data
     }
   },
@@ -73,15 +73,15 @@ export const userService = {
       // Make API call to get business units
       const response = await apiService.get(API_URLS.ADMIN.BUSINESS_UNITS);
       
-      console.log('Business units API response:', response);
+      // // console.log('Business units API response:', response);
       
       // The API response structure is: response.content.List
       const businessUnits = response.content?.List || [];
       
-      console.log('Raw business units from API:', businessUnits);
+      // // console.log('Raw business units from API:', businessUnits);
       
       if (!Array.isArray(businessUnits) || businessUnits.length === 0) {
-        console.warn('No business units found in API response or business units is not an array');
+        // // console.warn('No business units found in API response or business units is not an array');
         return [];
       }
       
@@ -90,12 +90,12 @@ export const userService = {
         value: unit.Value
       })).filter(unit => unit.label !== 'Unknown Business Unit'); // Filter out units without proper display names
       
-      console.log('Formatted business units for dropdown:', formattedBusinessUnits);
+      // // console.log('Formatted business units for dropdown:', formattedBusinessUnits);
       
       return formattedBusinessUnits;
       
     } catch (error) {
-      console.error('Failed to fetch business units from API:', error);
+      // // console.error('Failed to fetch business units from API:', error);
       throw error; // Re-throw error instead of falling back to mock data
     }
   },
@@ -105,15 +105,15 @@ export const userService = {
       // Make API call to get products
       const response = await apiService.get(API_URLS.ADMIN.PRODUCTS_MASTER);
       
-      console.log('Products API response:', response);
+      //  // console.log('Products API response:', response);
       
       // The API response structure is: response.content.List
       const products = response.content?.List || [];
       
-      console.log('Raw products from API:', products);
+      // // console.log('Raw products from API:', products);
       
       if (!Array.isArray(products) || products.length === 0) {
-        console.warn('No products found in API response or products is not an array');
+        // // console.warn('No products found in API response or products is not an array');
         return [];
       }
       
@@ -122,12 +122,12 @@ export const userService = {
         value: product.Value
       })).filter(product => product.label !== 'Unknown Product'); // Filter out products without proper display names
       
-      console.log('Formatted products for dropdown:', formattedProducts);
+      // // console.log('Formatted products for dropdown:', formattedProducts);
       
       return formattedProducts;
       
     } catch (error) {
-      console.error('Failed to fetch products from API:', error);
+      // // console.error('Failed to fetch products from API:', error);
       throw error; // Re-throw error instead of fallingback to mock data
     }
   },
@@ -136,21 +136,21 @@ export const userService = {
     try {
       const response = await apiService.get(API_URLS.MASTERS.OPPORTUNITY_SOURCE);
       
-      console.log('Campaign sources API response:', response);
+      // // console.log('Campaign sources API response:', response);
       
       const sources = response.content?.List || [];
       
-      console.log('Raw campaign sources from API:', sources);
+      // // console.log('Raw campaign sources from API:', sources);
       
       if (!Array.isArray(sources) || sources.length === 0) {
-        console.warn('No campaign sources found in API response or sources is not an array');
+        // // console.warn('No campaign sources found in API response or sources is not an array');
         return [];
       }
       
       // Debug: Log the first few items to understand the structure
       if (sources.length > 0) {
-        console.log('First campaign source item structure:', sources[0]);
-        console.log('Available keys in first item:', Object.keys(sources[0]));
+        // // console.log('First campaign source item structure:', sources[0]);
+        // console.log('Available keys in first item:', Object.keys(sources[0]));
       }
       
       const formattedSources = sources
@@ -159,7 +159,7 @@ export const userService = {
           const sourceValue = source.Source || source.Value || source.Display || source.label || source.value || source;
           const sourceLabel = source.Source || source.Value || source.Display || source.label || source.value || source;
           
-          console.log('Processing source item:', { source, sourceValue, sourceLabel });
+          // // console.log('Processing source item:', { source, sourceValue, sourceLabel });
           
           return {
             value: sourceValue,
@@ -174,12 +174,12 @@ export const userService = {
                  source.label.trim() !== '';
         });
       
-      console.log('Formatted campaign sources for dropdown:', formattedSources);
+      // // console.log('Formatted campaign sources for dropdown:', formattedSources);
       
       return formattedSources;
       
     } catch (error) {
-      console.error('Failed to fetch campaign sources from API:', error);
+      // // console.error('Failed to fetch campaign sources from API:', error);
       return [];
     }
   },
@@ -191,15 +191,15 @@ export const userService = {
       // Using a generic endpoint to get opportunities list
       const response = await apiService.get('/services/CRM/Opportunities/ByCriteria/0/0/0/false/false/1/25');
       
-      console.log('Opportunities API response:', response);
+      //  // console.log('Opportunities API response:', response);
       
       // The API response structure might be: response.content.List or response.content.Opportunities
       const opportunities = response.content?.List || response.content?.Opportunities || [];
       
-      console.log('Raw opportunities from API:', opportunities);
+      // // console.log('Raw opportunities from API:', opportunities);
       
       if (!Array.isArray(opportunities) || opportunities.length === 0) {
-        console.warn('No opportunities found in API response or opportunities is not an array');
+        // // console.warn('No opportunities found in API response or opportunities is not an array');
         return [];
       }
       
@@ -210,12 +210,12 @@ export const userService = {
         label: opportunity.Name || opportunity.OpportunityName || opportunity.Display || 'Unknown Opportunity'
       })).filter(opportunity => opportunity.name !== 'Unknown Opportunity'); // Filter out opportunities without proper names
       
-      console.log('Formatted opportunities for dropdown:', formattedOpportunities);
+      // // console.log('Formatted opportunities for dropdown:', formattedOpportunities);
       
       return formattedOpportunities;
       
     } catch (error) {
-      console.error('Failed to fetch opportunities from API:', error);
+      // // console.error('Failed to fetch opportunities from API:', error);
       throw error;
     }
   },
@@ -224,14 +224,14 @@ export const userService = {
     try {
       const response = await apiService.get(API_URLS.MASTERS.LEAD_SOURCES);
       
-      console.log('Lead sources API response:', response);
+      // console.log('Lead sources API response:', response);
       
       const leadSources = response.content?.Data?.LeadSources || [];
       
-      console.log('Raw lead sources from API:', leadSources);
+      // console.log('Raw lead sources from API:', leadSources);
       
       if (!Array.isArray(leadSources) || leadSources.length === 0) {
-        console.warn('No lead sources found in API response or lead sources is not an array');
+        // console.warn('No lead sources found in API response or lead sources is not an array');
         return [];
       }
       
@@ -240,12 +240,12 @@ export const userService = {
         label: source.Display
       })).filter(source => source.label && source.value);
       
-      console.log('Formatted lead sources for dropdown:', formattedLeadSources);
+      // console.log('Formatted lead sources for dropdown:', formattedLeadSources);
       
       return formattedLeadSources;
       
     } catch (error) {
-      console.error('Failed to fetch lead sources from API:', error);
+      // console.error('Failed to fetch lead sources from API:', error);
       throw error;
     }
   },
@@ -254,14 +254,14 @@ export const userService = {
     try {
       const response = await apiService.get(API_URLS.MASTERS.LEAD_TYPES);
       
-      console.log('Lead types API response:', response);
+      // console.log('Lead types API response:', response);
       
       const leadTypes = response.content?.Data?.LeadTypes || [];
       
-      console.log('Raw lead types from API:', leadTypes);
+      // console.log('Raw lead types from API:', leadTypes);
       
       if (!Array.isArray(leadTypes) || leadTypes.length === 0) {
-        console.warn('No lead types found in API response or lead types is not an array');
+        // console.warn('No lead types found in API response or lead types is not an array');
         return [];
       }
       
@@ -270,12 +270,12 @@ export const userService = {
         label: type.Display
       })).filter(type => type.label && type.value);
       
-      console.log('Formatted lead types for dropdown:', formattedLeadTypes);
+      // console.log('Formatted lead types for dropdown:', formattedLeadTypes);
       
       return formattedLeadTypes;
       
     } catch (error) {
-      console.error('Failed to fetch lead types from API:', error);
+      // console.error('Failed to fetch lead types from API:', error);
       throw error;
     }
   },
@@ -284,14 +284,14 @@ export const userService = {
     try {
       const response = await apiService.get(API_URLS.MASTERS.LEAD_STATUS);
       
-      console.log('Lead status API response:', response);
+      // console.log('Lead status API response:', response);
       
       const leadStatus = response.content?.Data?.LeadStatus || [];
       
-      console.log('Raw lead status from API:', leadStatus);
+      // console.log('Raw lead status from API:', leadStatus);
       
       if (!Array.isArray(leadStatus) || leadStatus.length === 0) {
-        console.warn('No lead status found in API response or lead status is not an array');
+        // console.warn('No lead status found in API response or lead status is not an array');
         return [];
       }
       
@@ -300,12 +300,12 @@ export const userService = {
         label: status.Display
       })).filter(status => status.label && status.value);
       
-      console.log('Formatted lead status for dropdown:', formattedLeadStatus);
+      // console.log('Formatted lead status for dropdown:', formattedLeadStatus);
       
       return formattedLeadStatus;
       
     } catch (error) {
-      console.error('Failed to fetch lead status from API:', error);
+      // console.error('Failed to fetch lead status from API:', error);
       throw error;
     }
   },
@@ -314,14 +314,14 @@ export const userService = {
     try {
       const response = await apiService.get(`/services/User/Accounts/Master/${getCurrentUserId()}/false/true`);
       
-      console.log('Sales presentations API response:', response);
+      // console.log('Sales presentations API response:', response);
       
       const presentations = response.content?.List || [];
       
-      console.log('Raw sales presentations from API:', presentations);
+      // console.log('Raw sales presentations from API:', presentations);
       
       if (!Array.isArray(presentations) || presentations.length === 0) {
-        console.warn('No sales presentations found in API response or presentations is not an array');
+        // console.warn('No sales presentations found in API response or presentations is not an array');
         return [];
       }
       
@@ -342,12 +342,12 @@ export const userService = {
                presentation.value.trim() !== '';
       });
       
-      console.log('Formatted sales presentations for dropdown:', formattedPresentations);
+      // console.log('Formatted sales presentations for dropdown:', formattedPresentations);
       
       return formattedPresentations;
       
     } catch (error) {
-      console.error('Failed to fetch sales presentations from API:', error);
+      // console.error('Failed to fetch sales presentations from API:', error);
       throw error;
     }
   },
@@ -356,17 +356,17 @@ export const userService = {
     try {
       const response = await apiService.get(API_URLS.ADMIN.OPPORTUNITY_STAGES);
       
-      console.log('Stages API response:', response);
-      console.log('Stages Response Type:', typeof response);
-      console.log('Stages Response Keys:', response ? Object.keys(response) : 'null');
+      // console.log('Stages API response:', response);
+      // console.log('Stages Response Type:', typeof response);
+      // console.log('Stages Response Keys:', response ? Object.keys(response) : 'null');
       
       // Handle the actual response structure: response.content.List
       const stages = response?.content?.List || response?.List || [];
       
-      console.log('Raw stages from API:', stages);
+      // console.log('Raw stages from API:', stages);
       
       if (!Array.isArray(stages) || stages.length === 0) {
-        console.warn('No stages found in API response or stages is not an array');
+        // console.warn('No stages found in API response or stages is not an array');
         return [];
       }
       
@@ -383,12 +383,12 @@ export const userService = {
                stage.value.toString().trim() !== '';
       });
       
-      console.log('Formatted stages for dropdown:', formattedStages);
+      // console.log('Formatted stages for dropdown:', formattedStages);
       
       return formattedStages;
       
     } catch (error) {
-      console.error('Failed to fetch stages from API:', error);
+      // console.error('Failed to fetch stages from API:', error);
       throw error;
     }
   },
@@ -397,14 +397,14 @@ export const userService = {
     try {
       const response = await apiService.get('/services/Admin/Masters/MasterData/ContactCountries');
       
-      console.log('Contact countries API response:', response);
+      // console.log('Contact countries API response:', response);
       
       const countries = response.content?.Data?.ContactCountries || [];
       
-      console.log('Raw contact countries from API:', countries);
+      // console.log('Raw contact countries from API:', countries);
       
       if (!Array.isArray(countries) || countries.length === 0) {
-        console.warn('No contact countries found in API response or countries is not an array');
+        // console.warn('No contact countries found in API response or countries is not an array');
         return [];
       }
       
@@ -413,12 +413,12 @@ export const userService = {
         label: country.Display
       })).filter(country => country.label && country.value);
       
-      console.log('Formatted contact countries for dropdown:', formattedCountries);
+      // console.log('Formatted contact countries for dropdown:', formattedCountries);
       
       return formattedCountries;
       
     } catch (error) {
-      console.error('Failed to fetch contact countries from API:', error);
+      // console.error('Failed to fetch contact countries from API:', error);
       throw error;
     }
   },
@@ -427,14 +427,14 @@ export const userService = {
     try {
       const response = await apiService.get('/services/Admin/Masters/MasterData/ContactStates');
       
-      console.log('Contact states API response:', response);
+      // console.log('Contact states API response:', response);
       
       const states = response.content?.Data?.ContactStates || [];
       
-      console.log('Raw contact states from API:', states);
+      // console.log('Raw contact states from API:', states);
       
       if (!Array.isArray(states) || states.length === 0) {
-        console.warn('No contact states found in API response or states is not an array');
+        // console.warn('No contact states found in API response or states is not an array');
         return [];
       }
       
@@ -443,12 +443,12 @@ export const userService = {
         label: state.Display
       })).filter(state => state.label && state.value);
       
-      console.log('Formatted contact states for dropdown:', formattedStates);
+      // console.log('Formatted contact states for dropdown:', formattedStates);
       
       return formattedStates;
       
     } catch (error) {
-      console.error('Failed to fetch contact states from API:', error);
+      // console.error('Failed to fetch contact states from API:', error);
       throw error;
     }
   },
@@ -457,14 +457,14 @@ export const userService = {
     try {
       const response = await apiService.get('/services/Admin/Masters/MasterData/ContactCities');
       
-      console.log('Contact cities API response:', response);
+      // console.log('Contact cities API response:', response);
       
       const cities = response.content?.Data?.ContactCities || [];
       
-      console.log('Raw contact cities from API:', cities);
+      // console.log('Raw contact cities from API:', cities);
       
       if (!Array.isArray(cities) || cities.length === 0) {
-        console.warn('No contact cities found in API response or cities is not an array');
+        // console.warn('No contact cities found in API response or cities is not an array');
         return [];
       }
       
@@ -473,12 +473,12 @@ export const userService = {
         label: city.Display
       })).filter(city => city.label && city.value);
       
-      console.log('Formatted contact cities for dropdown:', formattedCities);
+      // console.log('Formatted contact cities for dropdown:', formattedCities);
       
       return formattedCities;
       
     } catch (error) {
-      console.error('Failed to fetch contact cities from API:', error);
+      // console.error('Failed to fetch contact cities from API:', error);
       throw error;
     }
   },
@@ -487,14 +487,14 @@ export const userService = {
     try {
       const response = await apiService.get('/services/Admin/Masters/MasterData/ContactCounties');
       
-      console.log('Contact counties API response:', response);
+      // console.log('Contact counties API response:', response);
       
       const counties = response.content?.Data?.ContactCounties || [];
       
-      console.log('Raw contact counties from API:', counties);
+      // console.log('Raw contact counties from API:', counties);
       
       if (!Array.isArray(counties) || counties.length === 0) {
-        console.warn('No contact counties found in API response or counties is not an array');
+        // console.warn('No contact counties found in API response or counties is not an array');
         return [];
       }
       
@@ -509,12 +509,12 @@ export const userService = {
                county.value.trim() !== '';
       }); // Filter out empty values
       
-      console.log('Formatted contact counties for dropdown:', formattedCounties);
+      // console.log('Formatted contact counties for dropdown:', formattedCounties);
       
       return formattedCounties;
       
     } catch (error) {
-      console.error('Failed to fetch contact counties from API:', error);
+      // console.error('Failed to fetch contact counties from API:', error);
       throw error;
     }
   },
@@ -523,14 +523,14 @@ export const userService = {
     try {
       const response = await apiService.get(`/services/crm/contacts/search/SavedSearchesList/22/${getCurrentUserId()}/1`);
       
-      console.log('Saved searches API response:', response);
+      // console.log('Saved searches API response:', response);
       
       const searches = response.content?.List || [];
       
-      console.log('Raw saved searches from API:', searches);
+      // console.log('Raw saved searches from API:', searches);
       
       if (!Array.isArray(searches) || searches.length === 0) {
-        console.warn('No saved searches found in API response or searches is not an array');
+        // console.warn('No saved searches found in API response or searches is not an array');
         return { allOpportunities: [], myOpportunities: [] };
       }
       
@@ -547,19 +547,19 @@ export const userService = {
         search.Name !== "Recent Search"
       );
       
-      console.log('Grouped saved searches - All:', allOpportunities, 'My:', myOpportunities);
+      // console.log('Grouped saved searches - All:', allOpportunities, 'My:', myOpportunities);
       
       return { allOpportunities, myOpportunities };
       
     } catch (error) {
-      console.error('Failed to fetch saved searches from API:', error);
+      // console.error('Failed to fetch saved searches from API:', error);
       throw error;
     }
   },
 
   async saveSearch(searchData) {
     try {
-      console.log('Saving search with data:', searchData);
+      // console.log('Saving search with data:', searchData);
       
       // Wrap the API payload in the expected structure
       const wrappedPayload = {
@@ -580,10 +580,10 @@ export const userService = {
       
       const response = await apiService.post('/services/SavedSearch/', wrappedPayload);
       
-      console.log('Save search API response:', response);
+      // console.log('Save search API response:', response);
       
       if (response?.content?.Status === 'Success') {
-        console.log('Search saved successfully with ID:', response.content.ID);
+        // console.log('Search saved successfully with ID:', response.content.ID);
         return {
           success: true,
           searchId: response.content.ID,
@@ -594,18 +594,18 @@ export const userService = {
       }
       
     } catch (error) {
-      console.error('Failed to save search:', error);
+      // console.error('Failed to save search:', error);
       throw error;
     }
   },
 
   async loadSavedSearch(searchId) {
     try {
-      console.log('Loading saved search with ID:', searchId);
+      // console.log('Loading saved search with ID:', searchId);
       
       const response = await apiService.get(`/services/SavedSearch/${searchId}`);
       
-      console.log('Load saved search API response:', response);
+      // console.log('Load saved search API response:', response);
       
       if (response?.content?.SearchCriteria) {
         const searchCriteria = JSON.parse(response.content.SearchCriteria);
@@ -631,7 +631,7 @@ export const userService = {
       }
       
     } catch (error) {
-      console.error('Failed to load saved search:', error);
+      // console.error('Failed to load saved search:', error);
       throw error;
     }
   },
@@ -641,7 +641,7 @@ export const userService = {
       // Call the Reports/all API to get results
       const response = await apiService.post('/services/opportunities/report/all/', searchData.apiPayload);
       
-      console.log('Search results API response:', response);
+      // console.log('Search results API response:', response);
       
       if (response?.content) {
         // Extract data using the same structure as opportunitiesService.getOpportunities
@@ -652,22 +652,22 @@ export const userService = {
 
         // Extract data from axios response - the response has {responseHeader, content} structure
         const responseData = response;
-        console.log('Full response data structure:', responseData);
-        console.log('Response data keys:', Object.keys(responseData || {}));
+        // console.log('Full response data structure:', responseData);
+        // console.log('Response data keys:', Object.keys(responseData || {}));
 
         // Check if we have the nested content structure
         if (responseData && responseData.content && responseData.content.Data) {
-          console.log('Using response.content.Data path');
+          // console.log('Using response.content.Data path');
           const contentData = responseData.content.Data;
-          console.log('Content data:', contentData);
-          console.log('Content data keys:', Object.keys(contentData || {}));
+          // console.log('Content data:', contentData);
+          // console.log('Content data keys:', Object.keys(contentData || {}));
           opportunities = contentData.Opportunities || [];
           totalCount = contentData.Total || opportunities.length;
           opportunityResult = (contentData.OpportunityResult && contentData.OpportunityResult[0]) || {};
           
           // Check for ColumnConfig in the main search response
           if (contentData.ColumnConfig && Array.isArray(contentData.ColumnConfig)) {
-            console.log('Found ColumnConfig in search response:', contentData.ColumnConfig);
+            // console.log('Found ColumnConfig in search response:', contentData.ColumnConfig);
             apiColumnConfig = contentData.ColumnConfig.map(item => ({
               id: item.PropertyMappingName ? item.PropertyMappingName.toLowerCase() : item.DBColumnsNames?.toLowerCase(),
               label: item.VisibleColumns || item.PropertyMappingName || item.DBColumnsNames,
@@ -680,12 +680,12 @@ export const userService = {
             }));
           }
         } else if (responseData && responseData.content && responseData.content.List) {
-          console.log('Using response.content.List path (fallback)');
+          // console.log('Using response.content.List path (fallback)');
           opportunities = responseData.content.List || [];
           totalCount = responseData.content.TotalCount || opportunities.length;
           opportunityResult = {};
         } else {
-          console.log('No valid data structure found in response:', responseData);
+          // console.log('No valid data structure found in response:', responseData);
           opportunities = [];
           totalCount = 0;
         }
@@ -707,7 +707,7 @@ export const userService = {
       }
       
     } catch (error) {
-      console.error('Failed to execute search and get results:', error);
+      // console.error('Failed to execute search and get results:', error);
       throw error;
     }
   },
@@ -717,14 +717,14 @@ export const userService = {
       // Make API call to get opportunity status
       const response = await apiService.get('/services/Admin/Opportunities/Status/');
       
-      console.log('Opportunity status API response:', response);
+      // console.log('Opportunity status API response:', response);
       
       const statuses = response.content?.List || [];
       
-      console.log('Raw opportunity status from API:', statuses);
+      // console.log('Raw opportunity status from API:', statuses);
       
       if (!Array.isArray(statuses) || statuses.length === 0) {
-        console.warn('No opportunity status found in API response or statuses is not an array');
+        // console.warn('No opportunity status found in API response or statuses is not an array');
         return [];
       }
       
@@ -739,12 +739,12 @@ export const userService = {
                status.value.trim() !== '';
       });
       
-      console.log('Formatted opportunity status for dropdown:', formattedStatuses);
+      // console.log('Formatted opportunity status for dropdown:', formattedStatuses);
       
       return formattedStatuses;
       
     } catch (error) {
-      console.error('Failed to fetch opportunity status from API:', error);
+      // console.error('Failed to fetch opportunity status from API:', error);
       throw error;
     }
   },
@@ -754,14 +754,14 @@ export const userService = {
       // Make API call to get opportunity types with new response structure
       const response = await apiService.get('/services/Admin/Opportunities/Type/');
       
-      console.log('Opportunity types API response:', response);
+      // console.log('Opportunity types API response:', response);
       
       const types = response.content?.List || [];
       
-      console.log('Raw opportunity types from API:', types);
+      // console.log('Raw opportunity types from API:', types);
       
       if (!Array.isArray(types) || types.length === 0) {
-        console.warn('No opportunity types found in API response or types is not an array');
+        // console.warn('No opportunity types found in API response or types is not an array');
         return [];
       }
       
@@ -777,12 +777,12 @@ export const userService = {
                type.value.toString().trim() !== '';
       });
       
-      console.log('Formatted opportunity types for dropdown:', formattedTypes);
+      // console.log('Formatted opportunity types for dropdown:', formattedTypes);
       
       return formattedTypes;
       
     } catch (error) {
-      console.error('Failed to fetch opportunity types from API:', error);
+      // console.error('Failed to fetch opportunity types from API:', error);
       throw error;
     }
   },
@@ -792,14 +792,14 @@ export const userService = {
       // Make API call to get loss reasons with new response structure
       const response = await apiService.get('/services/Admin/Opportunities/lossreason/');
       
-      console.log('Loss reasons API response:', response);
+      // console.log('Loss reasons API response:', response);
       
       const lossReasons = response.content?.List || [];
       
-      console.log('Raw loss reasons from API:', lossReasons);
+      // console.log('Raw loss reasons from API:', lossReasons);
       
       if (!Array.isArray(lossReasons) || lossReasons.length === 0) {
-        console.warn('No loss reasons found in API response or loss reasons is not an array');
+        // console.warn('No loss reasons found in API response or loss reasons is not an array');
         return [];
       }
       
@@ -815,12 +815,12 @@ export const userService = {
                reason.value.toString().trim() !== '';
       });
       
-      console.log('Formatted loss reasons for dropdown:', formattedLossReasons);
+      // console.log('Formatted loss reasons for dropdown:', formattedLossReasons);
       
       return formattedLossReasons;
       
     } catch (error) {
-      console.error('Failed to fetch loss reasons from API:', error);
+      // console.error('Failed to fetch loss reasons from API:', error);
       throw error;
     }
   },
@@ -830,14 +830,14 @@ export const userService = {
       // Make API call to get probability options
       const response = await apiService.get('/services/Admin/Opportunities/Probability/');
       
-      console.log('Probability options API response:', response);
+      // console.log('Probability options API response:', response);
       
       const probabilities = response.content?.List || [];
       
-      console.log('Raw probability options from API:', probabilities);
+      // console.log('Raw probability options from API:', probabilities);
       
       if (!Array.isArray(probabilities) || probabilities.length === 0) {
-        console.warn('No probability options found in API response or probabilities is not an array');
+        // console.warn('No probability options found in API response or probabilities is not an array');
         return [];
       }
       
@@ -851,12 +851,12 @@ export const userService = {
                prob.value.toString().trim() !== '';
       });
       
-      console.log('Formatted probability options for dropdown:', formattedProbabilities);
+      // console.log('Formatted probability options for dropdown:', formattedProbabilities);
       
       return formattedProbabilities;
       
     } catch (error) {
-      console.error('Failed to fetch probability options from API:', error);
+      // console.error('Failed to fetch probability options from API:', error);
       throw error;
     }
   },
@@ -865,14 +865,14 @@ export const userService = {
     try {
       const response = await apiService.get(`/services/User/Accounts/Master/${getCurrentUserId()}/false/true`);
       
-      console.log('Proposal reps API response:', response);
+      // console.log('Proposal reps API response:', response);
       
       const reps = response.content?.List || [];
       
-      console.log('Raw proposal reps from API:', reps);
+      // console.log('Raw proposal reps from API:', reps);
       
       if (!Array.isArray(reps) || reps.length === 0) {
-        console.warn('No proposal reps found in API response or reps is not an array');
+        // console.warn('No proposal reps found in API response or reps is not an array');
         return [];
       }
       
@@ -881,12 +881,12 @@ export const userService = {
         label: rep.Display
       })).filter(rep => rep.label && rep.value);
       
-      console.log('Formatted proposal reps for dropdown:', formattedReps);
+      // console.log('Formatted proposal reps for dropdown:', formattedReps);
       
       return formattedReps;
       
     } catch (error) {
-      console.error('Failed to fetch proposal reps from API:', error);
+      // console.error('Failed to fetch proposal reps from API:', error);
       throw error;
     }
   },
@@ -895,14 +895,14 @@ export const userService = {
     try {
       const response = await apiService.get('/services/production/stages/proposal');
       
-      console.log('Proposal approval stages API response:', response);
+      // console.log('Proposal approval stages API response:', response);
       
       const stages = response.content?.List || [];
       
-      console.log('Raw proposal approval stages from API:', stages);
+      // console.log('Raw proposal approval stages from API:', stages);
       
       if (!Array.isArray(stages) || stages.length === 0) {
-        console.warn('No proposal approval stages found in API response or stages is not an array');
+        // console.warn('No proposal approval stages found in API response or stages is not an array');
         return [];
       }
       
@@ -911,12 +911,12 @@ export const userService = {
         label: stage.Name
       })).filter(stage => stage.label && stage.value);
       
-      console.log('Formatted proposal approval stages for dropdown:', formattedStages);
+      // console.log('Formatted proposal approval stages for dropdown:', formattedStages);
       
       return formattedStages;
       
     } catch (error) {
-      console.error('Failed to fetch proposal approval stages from API:', error);
+      // console.error('Failed to fetch proposal approval stages from API:', error);
       throw error;
     }
   },
@@ -931,12 +931,12 @@ export const userService = {
         label: status
       }));
       
-      console.log('Formatted proposal statuses for dropdown:', formattedStatuses);
+      // console.log('Formatted proposal statuses for dropdown:', formattedStatuses);
       
       return formattedStatuses;
       
     } catch (error) {
-      console.error('Failed to get proposal statuses:', error);
+      // console.error('Failed to get proposal statuses:', error);
       throw error;
     }
   },
@@ -950,37 +950,37 @@ export const userService = {
         { value: "2", label: "Approved" }
       ];
       
-      console.log('Formatted proposal approval statuses for dropdown:', approvalStatuses);
+      // console.log('Formatted proposal approval statuses for dropdown:', approvalStatuses);
       
       return approvalStatuses;
       
     } catch (error) {
-      console.error('Failed to get proposal approval statuses:', error);
+      // console.error('Failed to get proposal approval statuses:', error);
       throw error;
     }
   },
 
   async getRecentSearchData() {
     try {
-      console.log('Fetching recent search data...');
+      // console.log('Fetching recent search data...');
       
       const response = await apiService.get('/services/SavedSearch/RecentView/1/Recent Search/-1');
       
-      console.log('Recent search API response:', response);
+      // console.log('Recent search API response:', response);
       
       if (response?.content?.Status === 'Success' && response?.content?.Data) {
         // Parse the Data field which contains the search criteria as JSON string
         const searchData = JSON.parse(response.content.Data);
         
-        console.log('Parsed search data:', searchData);
+        // console.log('Parsed search data:', searchData);
         
         // Convert the API payload to form field format
-        const { convertApiPayloadToFormFields, convertApiResponseToSearchParams } = await import('@/features/Opportunity/utils/savedSearchConverter');
+        const { convertApiPayloadToFormFields, convertApiResponseToSearchParams } = await import('@/features/Opportunity-new/utils/savedSearchConverter');
         const formFields = convertApiPayloadToFormFields(searchData);
         const searchParams = convertApiResponseToSearchParams(response);
         
-        console.log('Converted form fields:', formFields);
-        console.log('Converted searchParams:', searchParams);
+        // console.log('Converted form fields:', formFields);
+        // console.log('Converted searchParams:', searchParams);
         
         return {
           success: true,
@@ -990,7 +990,7 @@ export const userService = {
           searchId: response.content.Value || null
         };
       } else {
-        console.warn('No recent search data found or invalid response format');
+        // console.warn('No recent search data found or invalid response format');
         return {
           success: false,
           formFields: {},
@@ -1001,7 +1001,7 @@ export const userService = {
       }
       
     } catch (error) {
-      console.error('Failed to fetch recent search data:', error);
+      // console.error('Failed to fetch recent search data:', error);
       return {
         success: false,
         formFields: {},
@@ -1015,31 +1015,31 @@ export const userService = {
 
   async getProposalRecentSearchData() {
     try {
-      console.log('🚀 Fetching proposal recent search data...');
-      console.log('📡 API Endpoint: /services/SavedSearch/RecentView/1/Recent Search/2');
+      // console.log('🚀 Fetching proposal recent search data...');
+      // console.log('📡 API Endpoint: /services/SavedSearch/RecentView/1/Recent Search/2');
       
       const response = await apiService.get('/services/SavedSearch/RecentView/1/Recent Search/2');
       
-      console.log('📥 Raw API response:', response);
+      // console.log('📥 Raw API response:', response);
       
       if (response?.content?.Status === 'Success' && response?.content?.Data) {
-        console.log('✅ API call successful, parsing data...');
+        // console.log('✅ API call successful, parsing data...');
         
         // Parse the Data field which contains the search criteria as JSON string
         const searchData = JSON.parse(response.content.Data);
         
-        console.log('📊 Parsed search data:', searchData);
+        // console.log('📊 Parsed search data:', searchData);
         
         // Convert the API payload to form field format
-        const { convertApiPayloadToFormFields, convertApiResponseToSearchParams } = await import('@/features/Opportunity/utils/savedSearchConverter');
+        const { convertApiPayloadToFormFields, convertApiResponseToSearchParams } = await import('@/features/Opportunity-new/utils/savedSearchConverter');
         
-        console.log('🔄 Converting API payload to form fields...');
+        // console.log('🔄 Converting API payload to form fields...');
         const formFields = convertApiPayloadToFormFields(searchData);
-        console.log('📋 Converted form fields:', formFields);
+        // console.log('📋 Converted form fields:', formFields);
         
-        console.log('🔄 Converting to searchParams format...');
+        // console.log('🔄 Converting to searchParams format...');
         const searchParams = convertApiResponseToSearchParams(response);
-        console.log('📋 Converted searchParams:', searchParams);
+        // console.log('📋 Converted searchParams:', searchParams);
         
         const result = {
           success: true,
@@ -1049,12 +1049,12 @@ export const userService = {
           searchId: response.content.Value || null
         };
         
-        console.log('✅ Final result object:', result);
+        // console.log('✅ Final result object:', result);
         return result;
         
       } else {
-        console.warn('⚠️ No proposal recent search data found or invalid response format');
-        console.log('📊 Response content:', response?.content);
+        // console.warn('⚠️ No proposal recent search data found or invalid response format');
+        // console.log('📊 Response content:', response?.content);
         
         const result = {
           success: false,
@@ -1064,12 +1064,12 @@ export const userService = {
           searchId: null
         };
         
-        console.log('❌ Returning empty result:', result);
+        // console.log('❌ Returning empty result:', result);
         return result;
       }
       
     } catch (error) {
-      console.error('❌ Failed to fetch proposal recent search data:', error);
+      // console.error('❌ Failed to fetch proposal recent search data:', error);
       
       const result = {
         success: false,
@@ -1080,7 +1080,7 @@ export const userService = {
         error: error.message
       };
       
-      console.log('❌ Returning error result:', result);
+      // console.log('❌ Returning error result:', result);
       return result;
     }
   }

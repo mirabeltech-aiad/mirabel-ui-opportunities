@@ -152,7 +152,7 @@ export const convertApiPayloadToFormFields = (apiPayload) => {
     }
     
     if (apiPayload.Status) {
-      formFields.status = apiPayload.Status;
+      formFields.status = apiPayload.Status === 'all' ? '' : apiPayload.Status;
     }
     
     if (apiPayload.Probability) {
