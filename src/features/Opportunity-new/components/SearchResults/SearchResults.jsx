@@ -14,6 +14,7 @@ import KanbanView from '../kanban/KanbanView';
 import { FloatingLabelSelect } from '@/shared/components/ui/FloatingLabelSelect';
 import { SimpleMultiSelect } from '@/shared/components/ui/SimpleMultiSelect';
 import { opportunityService } from '../../services/opportunityService';
+import { userServiceNew } from '../../services/userServiceNew';
 import contactsApi from '@/services/contactsApi';
 import {
   AlertDialog,
@@ -31,8 +32,8 @@ const SearchResults = ({ searchParams, setShowResults, searchType = 'opportuniti
   const [viewMode, setViewMode] = useState('table');
   const [filters, setFilters] = useState({
     all: searchType === 'opportunities' ? 'All Opportunities' : 'All Proposals',
-    probability: 'All Probability',
-    reps: 'All Reps'
+    probability: [],
+    reps: []
   });
   const [page, setPage] = useState(1);
   const navigate = useNavigate();
@@ -46,6 +47,16 @@ const SearchResults = ({ searchParams, setShowResults, searchType = 'opportuniti
     prospectingStages: []
   });
   const [masterDataLoaded, setMasterDataLoaded] = useState(false);
+  const [quickStatusOptions, setQuickStatusOptions] = useState([
+    { value: 'all', label: 'All Opportunities' },
+    { value: 'Open', label: 'Open Opportunities' },
+    { value: 'Won', label: 'Won Opportunities' },
+    { value: 'Lost', label: 'Lost Opportunities' }
+  ]);
+
+  // Reps options state (must be declared before use in filter definitions)
+  const [repsOptions, setRepsOptions] = useState([]);
+  const probabilityOptions = Array.from({ length: 11 }, (_, i) => ({ value: String(i * 10), label: `${i * 10}%` }));
 
   const isOpportunities = searchType === 'opportunities';
   const title = isOpportunities ? 'Opportunities' : 'Proposals';
@@ -88,12 +99,7 @@ const SearchResults = ({ searchParams, setShowResults, searchType = 'opportuniti
         {
           id: 'opportunities',
           placeholder: 'All Opportunities',
-          options: [
-            { value: 'all', label: 'All Opportunities' },
-            { value: 'active', label: 'Active Opportunities' },
-            { value: 'won', label: 'Won Opportunities' },
-            { value: 'lost', label: 'Lost Opportunities' }
-          ],
+          options: quickStatusOptions,
           value: 'all',
           onChange: (value) => {
             setFilters(prev => ({ ...prev, opportunities: value === 'all' ? undefined : value }));
@@ -102,28 +108,21 @@ const SearchResults = ({ searchParams, setShowResults, searchType = 'opportuniti
         {
           id: 'probability',
           placeholder: 'All Probability',
-          options: [
-            { value: 'all', label: 'All Probability' },
-            { value: 'high', label: 'High (80-100%)' },
-            { value: 'medium', label: 'Medium (40-79%)' },
-            { value: 'low', label: 'Low (0-39%)' }
-          ],
-          value: 'all',
-          onChange: (value) => {
-            setFilters(prev => ({ ...prev, probability: value === 'all' ? undefined : value }));
+          type: 'multi-select',
+          options: probabilityOptions,
+          value: Array.isArray(filters.probability) ? filters.probability : [],
+          onChange: (values) => {
+            setFilters(prev => ({ ...prev, probability: values }));
           }
         },
         {
           id: 'reps',
           placeholder: 'All Reps',
-          options: [
-            { value: 'all', label: 'All Reps' },
-            { value: 'assigned', label: 'Assigned' },
-            { value: 'unassigned', label: 'Unassigned' }
-          ],
-          value: 'all',
-          onChange: (value) => {
-            setFilters(prev => ({ ...prev, reps: value === 'all' ? undefined : value }));
+          type: 'multi-select',
+          options: repsOptions,
+          value: Array.isArray(filters.reps) ? filters.reps : [],
+          onChange: (values) => {
+            setFilters(prev => ({ ...prev, reps: values }));
           }
         }
       ];
@@ -131,6 +130,45 @@ const SearchResults = ({ searchParams, setShowResults, searchType = 'opportuniti
   };
 
   const filterDefinitions = getFilterDefinitions();
+
+  // Build params for quick filters → API payload subset
+  const buildQuickParams = (override = null) => {
+    const f = override || filters;
+    const params = {};
+    // quickStatus from opportunities dropdown
+    if (f.opportunities && f.opportunities !== 'all') {
+      // When a saved view/quick option is chosen
+      if (['Open', 'Won', 'Lost'].includes(f.opportunities)) {
+        params.quickStatus = f.opportunities;
+      } else {
+        params.quickStatus = f.opportunities; // saved search name; backend maps via ListID elsewhere if needed
+      }
+    }
+    // Probability: selected numeric percentages -> IE-format string array expected downstream
+    if (Array.isArray(f.probability) && f.probability.length > 0) {
+      // Keep as array of numeric strings; downstream can format to IE=
+      params.probability = f.probability;
+    }
+    // Reps: keep as array of IE= values
+    if (Array.isArray(f.reps) && f.reps.length > 0) {
+      params.assignedRep = f.reps;
+    }
+    // page info
+    params.CurPage = page;
+    return params;
+  };
+
+  useEffect(() => {
+    (async () => {
+      try {
+        const reps = await userServiceNew.getUsersForDropdown();
+        const formatted = [{ value: 'all', label: 'All Reps' }, ...reps.map(u => ({ value: u.value, label: u.display }))];
+        setRepsOptions(formatted);
+      } catch (e) {
+        setRepsOptions([{ value: 'all', label: 'All Reps' }]);
+      }
+    })();
+  }, []);
 
   // Edit functionality
   const handleEditClick = (e, row) => {
@@ -215,11 +253,12 @@ const SearchResults = ({ searchParams, setShowResults, searchType = 'opportuniti
   useEffect(() => {
     const fetchMasterData = async () => {
       try {
-        const [leadSourcesResponse, leadTypesResponse, stagesResponse, prospectingStagesResponse] = await Promise.all([
+        const [leadSourcesResponse, leadTypesResponse, stagesResponse, prospectingStagesResponse, savedSearches] = await Promise.all([
           contactsApi.getLeadSources(),
           contactsApi.getLeadTypes(),
           opportunityService.getOpportunityStages(),
-          contactsApi.getProspectingStages()
+          contactsApi.getProspectingStages(),
+          userServiceNew.getSavedSearches()
         ]);
 
         // Debug: Log the actual raw responses
@@ -274,6 +313,16 @@ const SearchResults = ({ searchParams, setShowResults, searchType = 'opportuniti
           stages: formattedStages,
           prospectingStages: formattedProspectingStages
         }));
+
+        // Build Quick Status options from saved searches
+        const qs = [
+          { value: 'all', label: 'All Opportunities' },
+          { value: 'Open', label: 'Open Opportunities' },
+          { value: 'Won', label: 'Won Opportunities' },
+          { value: 'Lost', label: 'Lost Opportunities' },
+          ...((savedSearches?.allOpportunities || []).map(s => ({ value: s.Name, label: s.Name })))
+        ];
+        setQuickStatusOptions(qs);
 
         // Debug: Log the processed data
         console.log('DEBUG: Processed master data:', {
@@ -1662,8 +1711,8 @@ const SearchResults = ({ searchParams, setShowResults, searchType = 'opportuniti
               )}
 
               // Actions
-              onRefresh={refetch}
-              onNextPage={refetch}
+              onRefresh={() => refetch(buildQuickParams())}
+              onNextPage={() => refetch(buildQuickParams())}
               // View controls
               activeView={viewMode}
               onViewChange={setViewMode}
@@ -1684,12 +1733,12 @@ const SearchResults = ({ searchParams, setShowResults, searchType = 'opportuniti
             view={viewMode}
             onViewChange={setViewMode}
             filters={filters}
-            onFilterChange={setFilters}
+            onFilterChange={(f) => { setFilters(f); refetch(buildQuickParams(f)); }}
             users={[]}
             savedSearches={[]}
             sortConfig={[]}
             onSort={() => { }}
-            onRefresh={refetch}
+            onRefresh={() => refetch(buildQuickParams())}
             currentPage={1}
             onNextPage={() => { }}
             onPreviousPage={() => { }}
@@ -1707,9 +1756,9 @@ const SearchResults = ({ searchParams, setShowResults, searchType = 'opportuniti
               view={viewMode}
               onViewChange={setViewMode}
               filters={filters}
-              onFilterChange={setFilters}
+              onFilterChange={(f) => { setFilters(f); refetch(buildQuickParams(f)); }}
               users={[]}
-              onRefresh={refetch}
+              onRefresh={() => refetch(buildQuickParams())}
               totalCount={data?.totalCount || 0}
               currentPage={page}
               onNextPage={() => setPage(page + 1)}

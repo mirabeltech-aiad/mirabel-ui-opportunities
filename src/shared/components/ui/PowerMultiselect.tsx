@@ -1,5 +1,5 @@
 import React, { useState, useCallback, useRef, useEffect } from 'react'
-import { createPortal } from 'react-dom'
+// removed portal usage to simplify types
 import { DndContext, DragEndEvent, DragOverlay, DragStartEvent, closestCenter } from '@dnd-kit/core'
 import { SortableContext, arrayMove, verticalListSortingStrategy } from '@dnd-kit/sortable'
 import { useSortable } from '@dnd-kit/sortable'
@@ -35,6 +35,8 @@ interface PowerMultiselectProps {
   getChipLabel?: (value: string) => string
   getChipBadge?: (value: string) => string
   onRemoveChip?: (value: string) => void
+  compact?: boolean
+  variant?: 'default' | 'borderless'
 }
 
 // Simple sortable chip component
@@ -104,7 +106,9 @@ export const PowerMultiselect: React.FC<PowerMultiselectProps> = ({
   chipLabel = 'Selected Items',
   getChipLabel,
   getChipBadge,
-  onRemoveChip
+  onRemoveChip,
+  compact = false,
+  variant = 'default'
 }) => {
   const [isOpen, setIsOpen] = useState(false)
   const [activeId, setActiveId] = useState<string | null>(null)
@@ -113,6 +117,7 @@ export const PowerMultiselect: React.FC<PowerMultiselectProps> = ({
   
   const buttonRef = useRef<HTMLDivElement>(null)
   const dropdownRef = useRef<HTMLDivElement>(null)
+  const instanceId = useRef<string>(Math.random().toString(36).slice(2))
 
   // Debug logging removed
 
@@ -133,6 +138,8 @@ export const PowerMultiselect: React.FC<PowerMultiselectProps> = ({
   // Handle opening dropdown
   const handleToggleDropdown = useCallback(() => {
     if (!isOpen) {
+      // Notify other PowerMultiselects to close
+      window.dispatchEvent(new CustomEvent('pm:open', { detail: { id: instanceId.current } }))
       calculateDropdownPosition()
     }
     setIsOpen(!isOpen)
@@ -173,6 +180,23 @@ export const PowerMultiselect: React.FC<PowerMultiselectProps> = ({
       }
     }
   }, [isOpen, calculateDropdownPosition])
+
+  // Close when another PowerMultiselect opens or when forced
+  useEffect(() => {
+    const handlePeerOpen = (e: any) => {
+      const otherId = e?.detail?.id
+      if (otherId && otherId !== instanceId.current) {
+        setIsOpen(false)
+      }
+    }
+    const handleForceClose = () => setIsOpen(false)
+    window.addEventListener('pm:open', handlePeerOpen as EventListener)
+    window.addEventListener('pm:forceClose', handleForceClose)
+    return () => {
+      window.removeEventListener('pm:open', handlePeerOpen as EventListener)
+      window.removeEventListener('pm:forceClose', handleForceClose)
+    }
+  }, [])
 
   // Filter options based on search
   const filteredOptions = options.filter(option => 
@@ -270,7 +294,7 @@ export const PowerMultiselect: React.FC<PowerMultiselectProps> = ({
           <div
             ref={buttonRef}
             onClick={handleToggleDropdown}
-            className="w-full h-10 px-3 text-base border border-gray-300 rounded-md bg-white focus:outline-none focus:ring-2 focus:ring-ocean-500/20 focus:border-ocean-500 hover:border-gray-400 flex items-center justify-between cursor-pointer"
+            className={`w-full ${compact ? 'h-9 text-sm' : 'h-10 text-base'} px-3 ${variant === 'borderless' ? 'border-0 bg-transparent' : 'border border-gray-300 bg-white'} rounded-none focus:outline-none focus:ring-2 focus:ring-ocean-500/20 ${variant === 'borderless' ? '' : 'focus:border-ocean-500 hover:border-gray-400'} flex items-center justify-between cursor-pointer`}
             role="button"
             tabIndex={0}
             onKeyDown={(e) => {
@@ -313,7 +337,7 @@ export const PowerMultiselect: React.FC<PowerMultiselectProps> = ({
           </div>
 
         {/* Dropdown */}
-        {isOpen && createPortal(
+        {isOpen && (
           <div
             ref={dropdownRef}
             className="fixed z-[9999] bg-white border border-gray-300 rounded-md shadow-lg max-h-80 overflow-y-auto min-w-[300px]"
@@ -387,8 +411,7 @@ export const PowerMultiselect: React.FC<PowerMultiselectProps> = ({
                   </div>
                 )}
               </div>
-            </div>,
-            document.body
+            </div>
           )}
         </div>
 

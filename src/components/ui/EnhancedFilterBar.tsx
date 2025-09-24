@@ -4,7 +4,7 @@ import { FC } from 'react'
 import { Button } from './button'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './select'
 import { SearchInput } from './SearchInput'
-import { SimpleMultiSelect } from './SimpleMultiSelect'
+import { PowerMultiselect } from '../../shared/components/ui/PowerMultiselect'
 
 import {
   RefreshCw,
@@ -141,7 +141,7 @@ export const EnhancedFilterBar: FC<EnhancedFilterBarProps> = ({
         {searchFilter && (
           <SearchInput
             value={searchFilter.value || ''}
-            onChange={useUnifiedSystem && filterManager
+            onChange={useUnifiedSystem && filterManager 
               ? (value) => filterManager.setFilterValue('search', value)
               : searchFilter.onChange || (() => { })
             }
@@ -152,148 +152,111 @@ export const EnhancedFilterBar: FC<EnhancedFilterBarProps> = ({
 
         {/* Connected Filter Dropdowns */}
         {nonSearchFilters.length > 0 && (
-          <div className="inline-flex border border-gray-300 rounded-md bg-white overflow-visible">
-            {nonSearchFilters.map((filter, index) => {
-              // Handle unified system filters
-              if (useUnifiedSystem && 'type' in filter) {
-                const unifiedFilter = filter as any
-                const isMultiSelect = unifiedFilter.type === 'multi-select'
-                const hasSelection = unifiedFilter.isActive
-                const displayValue = filterManager!.getFilterDisplayValue(unifiedFilter.id)
+          <div className="flex items-stretch flex-shrink-0">
+            <div className="flex items-stretch rounded-lg border border-gray-300 overflow-hidden">
+              {nonSearchFilters.map((filter, index) => {
+                const isLast = index === nonSearchFilters.length - 1
+                // Handle unified system filters
+                if (useUnifiedSystem && 'type' in filter) {
+                  const unifiedFilter = filter as any
+                  const isMultiSelect = unifiedFilter.type === 'multi-select'
+                  const hasSelection = unifiedFilter.isActive
 
-                if (isMultiSelect) {
-                  return (
-                    <div
-                      key={unifiedFilter.id}
-                      className={index > 0 ? 'border-l border-gray-300' : ''}
-                    >
-                      <div className="min-w-[160px]">
-                        <SimpleMultiSelect
+                  if (isMultiSelect) {
+                    const multiDiv = (
+                      <div key={unifiedFilter.id} className={`w-[170px] ${!isLast ? 'border-r border-gray-300' : ''}`}>
+                        <PowerMultiselect
                           placeholder={unifiedFilter.placeholder}
                           value={Array.isArray(unifiedFilter.value) ? unifiedFilter.value : []}
                           options={(unifiedFilter.options || []) as any}
                           onChange={(values) => filterManager!.setFilterValue(unifiedFilter.id, values)}
-                          variant="filter"
+                          showChips={false}
+                          compact
+                          variant="borderless"
                         />
                       </div>
-                    </div>
-                  )
+                    )
+                    return multiDiv
+                  } else {
+                    return (
+                      <div key={unifiedFilter.id} className={`w-[170px] ${!isLast ? 'border-r border-gray-300' : ''}`}>
+                        <Select
+                          value={unifiedFilter.value || ''}
+                          onValueChange={(value) => { window.dispatchEvent(new CustomEvent('pm:forceClose')); filterManager!.setFilterValue(unifiedFilter.id, value) }}
+                        >
+                          <SelectTrigger
+                            filter
+                            className={`
+                            h-9 w-[170px] px-3 text-sm font-normal shadow-none rounded-none border-0
+                            ${hasSelection ? 'text-gray-900 bg-blue-50 hover:bg-blue-100' : 'text-gray-600 bg-transparent hover:bg-gray-50'}
+                          `}>
+                            <div className="flex items-center justify-between w-full">
+                              <SelectValue placeholder={unifiedFilter.placeholder} />
+                            </div>
+                          </SelectTrigger>
+                          <SelectContent className="bg-white border border-gray-200 shadow-lg z-50">
+                            {unifiedFilter.options
+                              ?.filter((option: FilterOption) => option.value !== '')
+                              ?.map((option: FilterOption) => (
+                                <SelectItem key={option.value} value={option.value}>
+                                  {option.label}
+                                </SelectItem>
+                              ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    )
+                  }
                 } else {
-                  return (
-                    <div
-                      key={unifiedFilter.id}
-                      className={index > 0 ? 'border-l border-gray-300' : ''}
-                    >
-                      <Select
-                        value={unifiedFilter.value || ''}
-                        onValueChange={(value) => filterManager!.setFilterValue(unifiedFilter.id, value)}
-                      >
-                        <SelectTrigger
-                          filter
-                          className={`
-                          h-9 min-w-[120px] px-2.5 text-sm font-normal
-                          transition-all duration-200 ease-in-out
-                          hover:shadow-sm
-                          ${hasSelection
-                              ? 'text-gray-900 bg-blue-50 hover:bg-blue-100 shadow-sm'
-                              : 'text-gray-500 hover:bg-gray-50'
-                            }
-                        `}>
-                          <div className="flex items-center justify-between w-full">
-                            <SelectValue placeholder={unifiedFilter.placeholder} />
-                            {hasSelection && (
-                              <Badge
-                                variant="secondary"
-                                className="h-4 px-1.5 text-xs bg-blue-600 text-white ml-2"
-                              >
-                                1
-                              </Badge>
-                            )}
-                          </div>
-                        </SelectTrigger>
-                        <SelectContent className="bg-white border border-gray-200 shadow-lg z-50">
-                          {unifiedFilter.options
-                            ?.filter((option: FilterOption) => option.value !== '') // Filter out empty string values
-                            ?.map((option: FilterOption) => (
-                              <SelectItem key={option.value} value={option.value}>
-                                {option.label}
-                              </SelectItem>
-                            ))}
-                        </SelectContent>
-                      </Select>
-                    </div>
-                  )
-                }
-              } else {
-                // Handle legacy filters
-                const isMultiSelect = 'type' in filter && filter.type === 'multi-select'
-
-                if (isMultiSelect) {
-                  const multiFilter = filter as LegacyMultiSelectFilter
-                  return (
-                    <div
-                      key={multiFilter.id}
-                      className={index > 0 ? 'border-l border-gray-300' : ''}
-                    >
-                      <div className="min-w-[180px]">
-                        <SimpleMultiSelect
+                  // Legacy filters
+                  const isMultiSelect = 'type' in filter && filter.type === 'multi-select'
+                  if (isMultiSelect) {
+                    const multiFilter = filter as LegacyMultiSelectFilter
+                    return (
+                      <div key={multiFilter.id} className={`w-[170px] ${!isLast ? 'border-r border-gray-300' : ''}`}>
+                        <PowerMultiselect
                           placeholder={multiFilter.placeholder}
                           value={multiFilter.value}
                           options={multiFilter.options as any}
                           onChange={(values) => multiFilter.onChange(values)}
-                          variant="filter"
+                          showChips={false}
+                          compact
+                          variant="borderless"
                         />
                       </div>
-                    </div>
-                  )
-                } else {
-                  const singleFilter = filter as LegacyFilter
-                  const hasSelection = singleFilter.value && singleFilter.value !== '' && singleFilter.value !== 'all'
-
-                  return (
-                    <div
-                      key={singleFilter.id}
-                      className={index > 0 ? 'border-l border-gray-300' : ''}
-                    >
-                      <Select value={singleFilter.value} onValueChange={singleFilter.onChange}>
-                        <SelectTrigger
-                          filter
-                          className={`
-                          h-9 min-w-[120px] px-2.5 text-sm font-normal
-                          transition-all duration-200 ease-in-out
-                          hover:shadow-sm
-                          ${hasSelection
-                              ? 'text-gray-900 bg-blue-50 hover:bg-blue-100 shadow-sm'
-                              : 'text-gray-500 hover:bg-gray-50'
-                            }
-                        `}>
-                          <div className="flex items-center justify-between w-full">
-                            <SelectValue placeholder={singleFilter.placeholder} />
-                            {hasSelection && (
-                              <Badge
-                                variant="secondary"
-                                className="h-4 px-1.5 text-xs bg-blue-600 text-white ml-2"
-                              >
-                                1
-                              </Badge>
-                            )}
-                          </div>
-                        </SelectTrigger>
-                        <SelectContent className="bg-white border border-gray-200 shadow-lg z-50">
-                          {singleFilter.options
-                            .filter(option => option.value !== '') // Filter out empty string values
-                            .map((option) => (
-                              <SelectItem key={option.value} value={option.value}>
-                                {option.label}
-                              </SelectItem>
-                            ))}
-                        </SelectContent>
-                      </Select>
-                    </div>
-                  )
+                    )
+                  } else {
+                    const singleFilter = filter as LegacyFilter
+                    const hasSelection = singleFilter.value && singleFilter.value !== '' && singleFilter.value !== 'all'
+                    return (
+                      <div key={singleFilter.id} className={`w-[170px] ${!isLast ? 'border-r border-gray-300' : ''}`}>
+                        <Select value={singleFilter.value} onValueChange={(v) => { window.dispatchEvent(new CustomEvent('pm:forceClose')); singleFilter.onChange(v) }}>
+                          <SelectTrigger
+                            filter
+                            className={`
+                            h-9 w-[170px] px-3 text-sm font-normal shadow-none rounded-none border-0
+                            ${hasSelection ? 'text-gray-900 bg-blue-50 hover:bg-blue-100' : 'text-gray-600 bg-transparent hover:bg-gray-50'}
+                          `}>
+                            <div className="flex items-center justify-between w-full">
+                              <SelectValue placeholder={singleFilter.placeholder} />
+                            </div>
+                          </SelectTrigger>
+                          <SelectContent className="bg-white border border-gray-200 shadow-lg z-50">
+                            {singleFilter.options
+                              .filter(option => option.value !== '')
+                              .map((option) => (
+                                <SelectItem key={option.value} value={option.value}>
+                                  {option.label}
+                                </SelectItem>
+                              ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    )
+                  }
                 }
-              }
-            })}
+              })}
+            </div>
           </div>
         )}
 
@@ -307,58 +270,53 @@ export const EnhancedFilterBar: FC<EnhancedFilterBarProps> = ({
             iconOnly={compactResetButton}
           />
         )}
+      </div>
 
-        {/* Pagination Info Only */}
-        <div 
-          className="flex items-center gap-2 text-sm text-gray-600 whitespace-nowrap"
-          style={{
-            marginLeft: handleReset ? '' : '14vw'
-          }}
-        >
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Button
-                variant="ghost"
-                size="icon"
-                className="h-7 w-7"
-                onClick={() => {onNextPage && onNextPage({CurPage: page - 1}); setPage && setPage(page - 1)}}
-                disabled={page <= 1}
-                aria-label="Previous page"
-              >
-                <ChevronLeft className="h-4 w-4" />
-              </Button>
-            </TooltipTrigger>
-            <TooltipContent side="bottom" sideOffset={5}>
-              Previous page
-            </TooltipContent>
-          </Tooltip>
-          <span>
-            {((page - 1) * perPage) + 1}-{Math.min(page * perPage, total)} of {total}
-          </span>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Button
-                variant="ghost"
-                size="icon"
-                className="h-7 w-7"
-                onClick={() => {onNextPage && onNextPage({CurPage: page + 1}); setPage && setPage(page + 1)}}
-                disabled={page * perPage >= total}
-                aria-label="Next page"
-              >
-                <ChevronRight className="h-4 w-4" />
-              </Button>
-            </TooltipTrigger>
-            <TooltipContent side="bottom" sideOffset={5}>
-              Next page
-            </TooltipContent>
-          </Tooltip>
-        </div>
+      {/* Middle Section - Pagination centered */}
+      <div 
+        className="flex items-center justify-end gap-2 text-sm text-gray-600 whitespace-nowrap"
+      >
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-7 w-7"
+              onClick={() => {onNextPage && onNextPage({CurPage: page - 1}); setPage && setPage(page - 1)}}
+              disabled={page <= 1}
+              aria-label="Previous page"
+            >
+              <ChevronLeft className="h-4 w-4" />
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent side="bottom" sideOffset={5}>
+            Previous page
+          </TooltipContent>
+        </Tooltip>
+        <span>
+          {((page - 1) * perPage) + 1}-{Math.min(page * perPage, total)} of {total}
+        </span>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-7 w-7"
+              onClick={() => {onNextPage && onNextPage({CurPage: page + 1}); setPage && setPage(page + 1)}}
+              disabled={page * perPage >= total}
+              aria-label="Next page"
+            >
+              <ChevronRight className="h-4 w-4" />
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent side="bottom" sideOffset={5}>
+            Next page
+          </TooltipContent>
+        </Tooltip>
       </div>
 
       {/* Right Section */}
-
-      <div className="flex items-center gap-1">
-
+      <div className="flex items-center gap-1 justify-end">
         <Tooltip>
           <TooltipTrigger asChild>
             <Button
@@ -407,16 +365,12 @@ export const EnhancedFilterBar: FC<EnhancedFilterBarProps> = ({
           </TooltipContent>
         </Tooltip>
 
-
         {onSortPresetChange && (
           <SortPresetsDropdown
             onSortPresetChange={onSortPresetChange}
             activePreset={activeSortPreset}
           />
         )}
-
-
-
 
         {/* View Toggle Buttons - Only show when onViewChange is provided */}
         {onViewChange && (() => {
@@ -456,21 +410,6 @@ export const EnhancedFilterBar: FC<EnhancedFilterBarProps> = ({
           )
         })()}
 
-        {/* <Tooltip>
-          <TooltipTrigger asChild>
-            <Button
-              variant="outline"
-              onClick={() => {onFilterClick && onFilterClick()}}
-              className="gap-1 text-white h-8 px-2 bg-ocean-500 hover:bg-ocean-600 border-ocean-500 text-xs"
-            >
-              <Search className="h-3 w-3" />
-              Filter
-            </Button>
-          </TooltipTrigger>
-          <TooltipContent side="bottom" sideOffset={5}>
-            Advanced search
-          </TooltipContent>
-        </Tooltip> */}
         {onFilterClick && (
           <Tooltip>
             <TooltipTrigger asChild>
@@ -486,7 +425,7 @@ export const EnhancedFilterBar: FC<EnhancedFilterBarProps> = ({
             </TooltipContent>
           </Tooltip>
         )}
-        {/* Views Button - Only show when onViewsClick is provided */}
+
         {onViewsClick && (
           <Tooltip>
             <TooltipTrigger asChild>
@@ -504,9 +443,6 @@ export const EnhancedFilterBar: FC<EnhancedFilterBarProps> = ({
             </TooltipContent>
           </Tooltip>
         )}
-
-        {/* Filter Button - Only show when onFilterClick is provided */}
-
       </div>
     </div>
   )

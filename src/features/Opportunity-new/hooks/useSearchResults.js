@@ -25,7 +25,11 @@ export const useSearchResults = (searchParams, searchType = 'opportunities') => 
       
       logger.info(`useSearchResults: Using ${searchType} service`);
 
-      if (!params || Object.keys(params).length === 0) {
+      // If quick overrides (newParams) are provided, build default payload with overrides
+      if (newParams && Object.keys(newParams).length > 0) {
+        logger.info('useSearchResults: Using quick filter overrides');
+        results = await service.getInitialData(newParams);
+      } else if (!params || Object.keys(params).length === 0) {
         logger.info('useSearchResults: No search params, fetching initial data');
         results = await service.getInitialData(newParams);
       } else {
