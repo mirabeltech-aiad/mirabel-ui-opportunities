@@ -76,20 +76,16 @@ const SearchResults = ({ searchParams, setShowResults, searchType = 'opportuniti
   // Filter definitions for EnhancedFilterBar
   const getFilterDefinitions = () => {
     if (searchType === 'proposals') {
-      // For proposals, only show "All Proposal Reps" filter
+      // For proposals, show Proposal Reps as PowerMultiSelect
       return [
         {
           id: 'proposalReps',
           placeholder: 'All Proposal Reps',
-          options: [
-            { value: 'all', label: 'All Proposal Reps' },
-            // TODO: Add actual proposal reps from API
-            { value: 'rep1', label: 'Rep 1' },
-            { value: 'rep2', label: 'Rep 2' }
-          ],
-          value: 'all',
-          onChange: (value) => {
-            setFilters(prev => ({ ...prev, proposalReps: value === 'all' ? undefined : value }));
+          type: 'multi-select',
+          options: repsOptions,
+          value: Array.isArray(filters.proposalReps) ? filters.proposalReps : [],
+          onChange: (values) => {
+            setFilters(prev => ({ ...prev, proposalReps: values }));
           }
         }
       ];
@@ -108,21 +104,24 @@ const SearchResults = ({ searchParams, setShowResults, searchType = 'opportuniti
         {
           id: 'probability',
           placeholder: 'All Probability',
-          type: 'multi-select',
-          options: probabilityOptions,
-          value: Array.isArray(filters.probability) ? filters.probability : [],
-          onChange: (values) => {
-            setFilters(prev => ({ ...prev, probability: values }));
+          options: [
+            { value: 'all', label: 'All Probability' },
+            { value: 'IE=80~IE=90~IE=100~', label: 'High (80-100%)' },
+            { value: 'IE=40~IE=50~IE=60~IE=70~', label: 'Medium (40-79%)' },
+            { value: 'IE=0~IE=10~IE=20~IE=30~', label: 'Low (0-39%)' }
+          ],
+          value: 'all',
+          onChange: (value) => {
+            setFilters(prev => ({ ...prev, probability: value === 'all' ? undefined : value }));
           }
         },
         {
           id: 'reps',
           placeholder: 'All Reps',
-          type: 'multi-select',
           options: repsOptions,
-          value: Array.isArray(filters.reps) ? filters.reps : [],
-          onChange: (values) => {
-            setFilters(prev => ({ ...prev, reps: values }));
+          value: 'all',
+          onChange: (value) => {
+            setFilters(prev => ({ ...prev, reps: value === 'all' ? undefined : value }));
           }
         }
       ];
