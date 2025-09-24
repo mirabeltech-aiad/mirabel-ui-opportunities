@@ -100,7 +100,7 @@ const SearchResults = ({ searchParams, setShowResults, searchType = 'opportuniti
           id: 'opportunities',
           placeholder: 'All Opportunities',
           options: quickStatusOptions,
-          value: 'all',
+          value: (filters && filters.opportunities) ? filters.opportunities : 'all',
           onChange: (value) => {
             setFilters(prev => ({ ...prev, opportunities: value === 'all' ? undefined : value }));
           }

@@ -6,7 +6,7 @@ export const userService = {
   async getUsersForDropdown() {
     try {
       // Make API call to get users/sales reps using the correct endpoint
-      const response = await apiService.get(API_URLS.USER.ACCOUNTS_MASTER(getCurrentUserId()));
+      const response = await apiService.get(API_URLS.USER.ACCOUNTS_MASTER(1));
       
       console.log('Sales reps API response:', response);
       
@@ -39,7 +39,7 @@ export const userService = {
   async getOpportunityCreators() {
     try {
       // Make API call to get opportunity creators using the new endpoint
-      const response = await apiService.get(API_URLS.USER.ACCOUNTS_MASTER(getCurrentUserId()));
+      const response = await apiService.get(API_URLS.USER.ACCOUNTS_MASTER(1));
       
       console.log('Opportunity creators API response:', response);
       
@@ -312,7 +312,7 @@ export const userService = {
 
   async getSalesPresentations() {
     try {
-      const response = await apiService.get(`/services/User/Accounts/Master/${getCurrentUserId()}/false/true`);
+      const response = await apiService.get(`/services/User/Accounts/Master/1/false/true`);
       
       console.log('Sales presentations API response:', response);
       
@@ -521,7 +521,7 @@ export const userService = {
 
   async getSavedSearches() {
     try {
-      const response = await apiService.get(`/services/crm/contacts/search/SavedSearchesList/22/${getCurrentUserId()}/1`);
+      const response = await apiService.get(`/services/crm/contacts/search/SavedSearchesList/22/1/1`);
       
       console.log('Saved searches API response:', response);
       
@@ -863,7 +863,7 @@ export const userService = {
 
   async getProposalReps() {
     try {
-      const response = await apiService.get(`/services/User/Accounts/Master/${getCurrentUserId()}/false/true`);
+      const response = await apiService.get(`/services/User/Accounts/Master/1/false/true`);
       
       console.log('Proposal reps API response:', response);
       
