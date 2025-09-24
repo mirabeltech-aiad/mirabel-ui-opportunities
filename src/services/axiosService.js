@@ -73,10 +73,10 @@ axiosInstance.interceptors.request.use((config) => {
   // In development mode, add debugging
   if (isDevelopmentMode()) {
     config.metadata = { startTime: new Date() };
-    console.log(`🚀 API Request: ${config.method?.toUpperCase()} ${config.url}`);
+    // console.log(`🚀 API Request: ${config.method?.toUpperCase()} ${config.url}`);
   } else {
     // In production, ensure we're not triggering CORS preflight
-    console.log(`🚀 Production API Request: ${config.method?.toUpperCase()} ${envConfig.baseURL}${config.url}`);
+    // console.log(`🚀 Production API Request: ${config.method?.toUpperCase()} ${envConfig.baseURL}${config.url}`);
   }
 
   return config;
@@ -173,7 +173,7 @@ async function refreshTokenWithWebMethodCall() {
   }
 
   if (isDevelopmentMode()) {
-    console.log("🔄 Attempting token refresh...");
+    // console.log("🔄 Attempting token refresh...");
   }
 
   const envConfig = getEnvironmentConfig();

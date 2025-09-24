@@ -1,176 +1,126 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState, useMemo, useEffect, useCallback } from 'react';
 import { ChevronUp, ChevronDown, RotateCcw, Settings, Search } from 'lucide-react';
-import MultiSelectField from './MultiSelectField';
-import DateRangeField from './DateRangeField';
 import SearchResults from '../SearchResults/SearchResults';
-import opportunitiesConfig from './configs/opportunitiesConfig';
-import proposalsConfig from './configs/proposalsConfig';
+import DynamicFormRenderer from './DynamicFormRenderer';
+import { OPPORTUNITY_FORM_CONFIG } from '../config/opportunityFormConfig';
+import { PROPOSAL_FORM_CONFIG } from '../config/proposalFormConfig';
+import { getRecentSearchData, loadSavedSearch } from '@/services/userService';
+import { buildSearchJson } from '@/features/Opportunity/utils/searchJsonBuilder';
 
 const AdvancedSearch = () => {
   const [activeTab, setActiveTab] = useState('opportunities');
   const [opportunitiesFormData, setOpportunitiesFormData] = useState({});
   const [proposalsFormData, setProposalsFormData] = useState({});
-  const [opportunitiesExpandedSections, setOpportunitiesExpandedSections] = useState({});
-  const [proposalsExpandedSections, setProposalsExpandedSections] = useState({});
+  const [openOppSections, setOpenOppSections] = useState(['primary-fields']);
+  const [openPropSections, setOpenPropSections] = useState(['primary-fields']);
   const [showResults, setShowResults] = useState(false);
   const [searchParams, setSearchParams] = useState({});
 
-  const currentConfig = activeTab === 'opportunities' ? opportunitiesConfig : proposalsConfig;
+  // Recent search data
+  const [isLoadingRecentSearch, setIsLoadingRecentSearch] = useState(false);
+  const [hasLoadedRecentSearch, setHasLoadedRecentSearch] = useState(false);
+  const [componentMounted, setComponentMounted] = useState(false);
+  const [searchJSON, setSearchJSON] = useState(null);
 
-  const handleFieldChange = (sectionName, fieldKey, value) => {
-    const fieldKeyWithSection = `${sectionName}_${fieldKey}`;
-    
-    if (activeTab === 'opportunities') {
-      setOpportunitiesFormData(prev => ({
-        ...prev,
-        [fieldKeyWithSection]: value
-      }));
-    } else {
-      setProposalsFormData(prev => ({
-        ...prev,
-        [fieldKeyWithSection]: value
-      }));
-    }
-  };
+  const currentConfig = activeTab === 'opportunities' ? OPPORTUNITY_FORM_CONFIG : PROPOSAL_FORM_CONFIG;
+  const currentOpenSections = activeTab === 'opportunities' ? openOppSections : openPropSections;
 
   const handleReset = () => {
     if (activeTab === 'opportunities') {
       setOpportunitiesFormData({});
+      setOpenOppSections(['primary-fields']);
     } else {
       setProposalsFormData({});
-    }
-  };
-
-  const toggleSection = (sectionName) => {
-    if (activeTab === 'opportunities') {
-      setOpportunitiesExpandedSections(prev => ({
-        ...prev,
-        [sectionName]: !prev[sectionName]
-      }));
-    } else {
-      setProposalsExpandedSections(prev => ({
-        ...prev,
-        [sectionName]: !prev[sectionName]
-      }));
+      setOpenPropSections(['primary-fields']);
     }
   };
 
   const toggleAllSections = () => {
-    const allSections = currentConfig.map(section => section.sectionName);
-    const currentExpandedSections = activeTab === 'opportunities' 
-      ? opportunitiesExpandedSections 
-      : proposalsExpandedSections;
-    
-    // Check if all sections are currently expanded
-    const allExpanded = allSections.every(sectionName => 
-      currentExpandedSections[sectionName] !== false
-    );
-    
-    const newState = {};
-    allSections.forEach(sectionName => {
-      newState[sectionName] = !allExpanded; // If all expanded, collapse all; if not, expand all
-    });
-    
-    if (activeTab === 'opportunities') {
-      setOpportunitiesExpandedSections(newState);
-    } else {
-      setProposalsExpandedSections(newState);
-    }
+    const allIds = currentConfig.sections.map(s => s.id);
+    const allExpanded = allIds.every(id => currentOpenSections.includes(id));
+    const newOpen = allExpanded ? [] : allIds;
+    if (activeTab === 'opportunities') setOpenOppSections(newOpen); else setOpenPropSections(newOpen);
   };
 
-  // Check if all sections are expanded to determine button text and icon
-  const currentExpandedSections = activeTab === 'opportunities' 
-    ? opportunitiesExpandedSections 
-    : proposalsExpandedSections;
-    
-  const allSectionsExpanded = currentConfig.every(section => 
-    currentExpandedSections[section.sectionName] !== false
-  );
+  const allSectionsExpanded = useMemo(() => {
+    const allIds = currentConfig.sections.map(s => s.id);
+    return allIds.every(id => currentOpenSections.includes(id));
+  }, [currentConfig, currentOpenSections]);
 
   const handleSearch = () => {
     const currentFormData = activeTab === 'opportunities' ? opportunitiesFormData : proposalsFormData;
     setSearchParams(currentFormData);
     setShowResults(true);
-  };
+};
+console.log(opportunitiesFormData);
+console.log("searchParams",searchParams);
 
-  const handleBackToSearch = () => {
-    setShowResults(false);
-  };
+// Load recent search data when component mounts or when filters are cleared
+useEffect(() => {
+    const loadRecentSearch = async () => {
+      try {
+        setIsLoadingRecentSearch(true);
+        const recentSearchResult = await getRecentSearchData();
+
+        console.log('📥 API Response received:', recentSearchResult);
+
+        if (recentSearchResult.success && recentSearchResult.searchParams) {
+          // Update the filters with the recent search data in searchParams format
+          setSearchParams(recentSearchResult.searchParams);
+          setOpportunitiesFormData(recentSearchResult.searchParams);
+        //   setProposalsFormData(recentSearchResult.searchParams);
+          // Build searchJSON with the loaded data
+          buildSearchJSON(recentSearchResult.searchParams);
+
+        } else {
+          console.log('⚠️ No recent search data available or failed to load for opportunities');
+        }
+      } catch (error) {
+        console.error('❌ Error loading recent search data for opportunities:', error);
+      } finally {
+        setIsLoadingRecentSearch(false);
+        setHasLoadedRecentSearch(true);
+      }
+    };
+
+    // Always load recent search data when component mounts or when filters are empty
+    // This ensures we always have the latest saved search data
+    console.log('🔍 Checking if should load recent search for opportunities:', {
+      componentMounted,
+      hasLoadedRecentSearch,
+      searchParamsKeys: Object.keys(searchParams).length,
+      searchParams
+    });
+    
+    if ((!hasLoadedRecentSearch || Object.keys(searchParams).length === 0)) {
+      loadRecentSearch();
+    } else {
+    }
+  }, [hasLoadedRecentSearch]); // Depend on componentMounted and hasLoadedRecentSearch
+
+  // Function to build searchJSON in real-time
+  const buildSearchJSON = useCallback((params) => {
+    const apiPayload = buildSearchJson(params, activeTab);
+    const wrappedPayload = {
+      OpportunitySearch: apiPayload,
+      PageType: 1,
+      IsRecentSearch: true
+    };
+    setSearchJSON(wrappedPayload);
+    return wrappedPayload;
+  }, []);
 
   // If showing results, render the SearchResults component
   if (showResults) {
+    debugger;
     return (
       <SearchResults
         searchType={activeTab}
         searchParams={searchParams}
-        onBackToSearch={handleBackToSearch}
         setShowResults={setShowResults}
       />
     );
   }
-
-  const renderSection = (section) => {
-    const isExpanded = currentExpandedSections[section.sectionName] !== false; // Default to expanded
-
-    return (
-      <div key={section.sectionName} className="mb-6">
-        <button
-          onClick={() => toggleSection(section.sectionName)}
-          className="flex items-center justify-between w-full text-left mb-4 hover:bg-gray-50 p-3 rounded-md transition-colors cursor-pointer border-b border-gray-200 pb-3"
-        >
-          <div className="flex items-center space-x-3">
-            <div className={`w-1 h-6 rounded ${section.sectionName === 'Quick Search' ? 'bg-blue-600' : 'bg-orange-500'}`}></div>
-            <h3 className="text-lg font-semibold text-blue-900">{section.sectionName}</h3>
-          </div>
-          {isExpanded ? (
-            <ChevronUp className="h-5 w-5 text-blue-600" />
-          ) : (
-            <ChevronDown className="h-5 w-5 text-blue-600" />
-          )}
-        </button>
-
-        {isExpanded && (
-          <div className="grid grid-cols-3 gap-6 pt-4">
-            {section.fields.map((field, index) => {
-              const fieldKeyWithSection = `${section.sectionName}_${field.key}`;
-              const currentFormData = activeTab === 'opportunities' ? opportunitiesFormData : proposalsFormData;
-              if (field.type === 'dateRange') {
-                const fromKeyWithSection = `${section.sectionName}_${field.fromKey}`;
-                const toKeyWithSection = `${section.sectionName}_${field.toKey}`;
-                
-                return (
-                  <DateRangeField
-                    key={field.key}
-                    label={field.label}
-                    fromKey={field.fromKey}
-                    toKey={field.toKey}
-                    value={{
-                      from: currentFormData[fromKeyWithSection] || '',
-                      to: currentFormData[toKeyWithSection] || ''
-                    }}
-                    onChange={(key, value) => handleFieldChange(section.sectionName, key, value)}
-                    placeholder={`Select ${field.label.toLowerCase()} range...`}
-                  />
-                );
-              }
-              
-              return (
-                <MultiSelectField
-                  key={field.key}
-                  label={field.label}
-                  value={currentFormData[fieldKeyWithSection] || []}
-                  onChange={(value) => handleFieldChange(section.sectionName, field.key, value)}
-                  placeholder={`Select ${field.label.toLowerCase()}...`}
-                  fieldKey={field.key}
-                  tabType={activeTab}
-                />
-              );
-            })}
-          </div>
-        )}
-      </div>
-    );
-  };
 
   return (
     <div className="h-screen bg-gray-50 flex flex-col">
@@ -249,7 +199,31 @@ const AdvancedSearch = () => {
 
             {/* Dynamic Content based on active tab */}
             <div className="px-6 py-4">
-              {currentConfig.map(section => renderSection(section))}
+              {activeTab === 'opportunities' ? (
+                <DynamicFormRenderer
+                  config={currentConfig}
+                  searchParams={opportunitiesFormData}
+                  handleInputChange={(e) => setOpportunitiesFormData(prev => ({ ...prev, [e.target.name]: e.target.value }))}
+                  handleSelectChange={(name, value) => setOpportunitiesFormData(prev => ({ ...prev, [name]: value }))}
+                  handleSearch={handleSearch}
+                  openAccordions={openOppSections}
+                  setOpenAccordions={setOpenOppSections}
+                  isSearching={false}
+                  isLoadingRecentSearch={false}
+                />
+              ) : (
+                <DynamicFormRenderer
+                  config={currentConfig}
+                  searchParams={proposalsFormData}
+                  handleInputChange={(e) => setProposalsFormData(prev => ({ ...prev, [e.target.name]: e.target.value }))}
+                  handleSelectChange={(name, value) => setProposalsFormData(prev => ({ ...prev, [name]: value }))}
+                  handleSearch={handleSearch}
+                  openAccordions={openPropSections}
+                  setOpenAccordions={setOpenPropSections}
+                  isSearching={false}
+                  isLoadingRecentSearch={false}
+                />
+              )}
             </div>
           </div>
         </div>

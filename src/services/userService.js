@@ -92,12 +92,12 @@ export const getUserPermissions = async () => {
     // Permission logic matching ASP.NET: IsAdmin || IsSA
     const hasAdminAccess = isAdmin || isSA;
     
-    console.log('User permissions derived:', {
-      userInfo,
-      isAdmin,
-      isSA,
-      hasAdminAccess
-    });
+    // console.log('User permissions derived:', {
+    //   userInfo,
+    //   isAdmin,
+    //   isSA,
+    //   hasAdminAccess
+    // });
     
     return {
       canManageUsers: hasAdminAccess,
@@ -120,3 +120,135 @@ export const getUserPermissions = async () => {
     };
   }
 }; 
+
+export const saveSearch = async (searchData) => {
+  try {
+    // console.log('Saving search with data:', searchData);
+    
+    // Wrap the API payload in the expected structure
+    const wrappedPayload = {
+      OpportunitySearch: searchData.apiPayload || {},
+      PageType: 1,
+      IsRecentSearch: true
+    };
+    
+    // const payload = {
+    //   Name: searchData.name || 'Latest Search',
+    //   SearchCriteria: JSON.stringify(wrappedPayload),
+    //   Type: searchData.type || 'All Opportunities', // 'All Opportunities' or 'My Opportunities'
+    //   UserID: getCurrentUserId(),
+    //   IsDefault: false,
+    //   ResultType: searchData.resultType || 1, // 1 for Opportunity, 2 for Proposal
+    //   ...searchData.additionalFields
+    // };
+    
+    const response = await axiosService.post('/services/SavedSearch/', wrappedPayload);
+    
+    // console.log('Save search API response:', response);
+    
+    if (response?.content?.Status === 'Success') {
+      // console.log('Search saved successfully with ID:', response.content.ID);
+      return {
+        success: true,
+        searchId: response.content.ID,
+        message: 'Search saved successfully'
+      };
+    } else {
+      throw new Error(response?.content?.Message || 'Failed to save search');
+    }
+    
+  } catch (error) {
+    // console.error('Failed to save search:', error);
+    throw error;
+  }
+};
+
+export const loadSavedSearch = async (searchId) => {
+  try {
+    // console.log('Loading saved search with ID:', searchId);
+    
+    const response = await axiosService.get(`/services/SavedSearch/${searchId}`);
+    
+    // console.log('Load saved search API response:', response);
+    
+    if (response?.content?.SearchCriteria) {
+      const searchCriteria = JSON.parse(response.content.SearchCriteria);
+      
+      // Extract the OpportunitySearch from the wrapped payload
+      let apiPayload = searchCriteria;
+      if (searchCriteria.OpportunitySearch) {
+        apiPayload = searchCriteria.OpportunitySearch;
+      }
+      
+      return {
+        success: true,
+        searchData: {
+          name: response.content.Name,
+          type: response.content.Type,
+          resultType: response.content.ResultType,
+          apiPayload: apiPayload,
+          createdDate: response.content.CreatedDate
+        }
+      };
+    } else {
+      throw new Error('Invalid saved search data');
+    }
+    
+  } catch (error) {
+    // console.error('Failed to load saved search:', error);
+    throw error;
+  }
+};
+
+export const getRecentSearchData = async () => {
+  try {
+    // console.log('Fetching recent search data...');
+    
+    const response = await axiosService.get('/services/SavedSearch/RecentView/1/Recent Search/-1');
+    
+    // console.log('Recent search API response:', response);
+    
+    if (response?.content?.Status === 'Success' && response?.content?.Data) {
+      // Parse the Data field which contains the search criteria as JSON string
+      const searchData = JSON.parse(response.content.Data);
+      
+      // console.log('Parsed search data:', searchData);
+      
+      // Convert the API payload to form field format
+      const { convertApiPayloadToFormFields, convertApiResponseToSearchParams } = await import('@/features/Opportunity-new/utils/savedSearchConverter');
+      const formFields = convertApiPayloadToFormFields(searchData);
+      const searchParams = convertApiResponseToSearchParams(response);
+      
+      // console.log('Converted form fields:', formFields);
+      // console.log('Converted searchParams:', searchParams);
+      
+      return {
+        success: true,
+        formFields,
+        searchParams,
+        rawData: searchData,
+        searchId: response.content.Value || null
+      };
+    } else {
+      // console.warn('No recent search data found or invalid response format');
+      return {
+        success: false,
+        formFields: {},
+        searchParams: {},
+        rawData: null,
+        searchId: null
+      };
+    }
+    
+  } catch (error) {
+    // console.error('Failed to fetch recent search data:', error);
+    return {
+      success: false,
+      formFields: {},
+      searchParams: {},
+      rawData: null,
+      searchId: null,
+      error: error.message
+    };
+  }
+};
