@@ -32,8 +32,8 @@ const SearchResults = ({ searchParams, setShowResults, searchType = 'opportuniti
   const [viewMode, setViewMode] = useState('table');
   const [filters, setFilters] = useState({
     all: searchType === 'opportunities' ? 'All Opportunities' : 'All Proposals',
-    probability: [],
-    reps: []
+    probability: searchParams.probability || [],
+    reps: searchParams.assignedRep || []
   });
   const [page, setPage] = useState(1);
   const navigate = useNavigate();
