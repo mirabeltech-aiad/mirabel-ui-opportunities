@@ -10,10 +10,17 @@ const KanbanColumn = ({
   onDeleteOpportunity,
   onEditOpportunity,
 }) => {
-  const columnTotal = opportunities.reduce(
-    (sum, opp) => sum + (typeof opp.amount === "number" ? opp.amount : 0),
-    0
-  );
+  const toNumericAmount = (opp) => {
+    const raw = opp.amount ?? opp.Amount ?? 0;
+    if (typeof raw === 'number') return isNaN(raw) ? 0 : raw;
+    if (typeof raw === 'string') {
+      const num = parseFloat(raw.replace(/[^0-9.-]/g, ''));
+      return isNaN(num) ? 0 : num;
+    }
+    return 0;
+  };
+
+  const columnTotal = opportunities.reduce((sum, opp) => sum + toNumericAmount(opp), 0);
 
   const getColumnStyles = () => {
     if (!column.colorCode) {
@@ -51,7 +58,7 @@ const KanbanColumn = ({
           </Badge>
         </div>
         <div className="text-xs text-gray-600 mt-1">
-          ${columnTotal.toLocaleString()} total
+          {new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(columnTotal)} total
         </div>
       </div>
 

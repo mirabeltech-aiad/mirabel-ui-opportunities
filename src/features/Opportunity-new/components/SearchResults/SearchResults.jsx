@@ -3,7 +3,7 @@ import CardViewNew from './CardViewNew';
 import { EnhancedDataTable } from '../../../../components/ui/advanced-table';
 import { EnhancedFilterBar } from '../../../../components/ui/EnhancedFilterBar';
 import { useSearchResults } from '../../hooks/useSearchResults';
-import { ExternalLink, MoreVertical, Edit } from 'lucide-react';
+import { ExternalLink, MoreVertical, Edit, Check } from 'lucide-react';
 import { OpportunityStatsCards, ProposalStatsCards } from '../Stats';
 import { logger } from '../../../../components/shared/logger';
 import { useNavigate } from 'react-router-dom';
@@ -11,6 +11,20 @@ import { getDefaultColumnOrder } from '../../hooks/helperData';
 import ViewsSidebar from '@/components/ui/views/ViewsSidebar';
 import { NewLoader } from '@/components/ui/NewLoader';
 import KanbanView from '../kanban/KanbanView';
+import { FloatingLabelSelect } from '@/shared/components/ui/FloatingLabelSelect';
+import { SimpleMultiSelect } from '@/shared/components/ui/SimpleMultiSelect';
+import { opportunityService } from '../../services/opportunityService';
+import contactsApi from '@/services/contactsApi';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 const SearchResults = ({ searchParams, setShowResults, searchType = 'opportunities' }) => {
   const { data, loading, error, refetch } = useSearchResults(searchParams, searchType);
@@ -24,8 +38,29 @@ const SearchResults = ({ searchParams, setShowResults, searchType = 'opportuniti
   const navigate = useNavigate();
   const [isViewsSidebarOpen, setIsViewsSidebarOpen] = useState(false);
 
+  // Master data for dropdowns
+  const [masterData, setMasterData] = useState({
+    leadSources: [],
+    leadTypes: [],
+    stages: [],
+    prospectingStages: []
+  });
+  const [masterDataLoaded, setMasterDataLoaded] = useState(false);
+
   const isOpportunities = searchType === 'opportunities';
   const title = isOpportunities ? 'Opportunities' : 'Proposals';
+  // const [isLoading, setIsLoading] = useState(false);
+
+  // Enhance rows with dropdown options
+  const enhanceRowsWithOptions = (rows) => {
+    return rows.map(row => ({
+      ...row,
+      _leadSourceOptions: masterData.leadSources,
+      _leadTypeOptions: masterData.leadTypes,
+      _stages: masterData.stages,
+      _prospectingStages: masterData.prospectingStages
+    }));
+  };
 
   // Filter definitions for EnhancedFilterBar
   const getFilterDefinitions = () => {
@@ -176,13 +211,109 @@ const SearchResults = ({ searchParams, setShowResults, searchType = 'opportuniti
     }
   };
 
+  // Fetch master data for dropdowns
+  useEffect(() => {
+    const fetchMasterData = async () => {
+      try {
+        const [leadSourcesResponse, leadTypesResponse, stagesResponse, prospectingStagesResponse] = await Promise.all([
+          contactsApi.getLeadSources(),
+          contactsApi.getLeadTypes(),
+          opportunityService.getOpportunityStages(),
+          contactsApi.getProspectingStages()
+        ]);
+
+        // Debug: Log the actual raw responses
+        console.log('DEBUG: Raw API responses:', {
+          leadSourcesResponse,
+          leadTypesResponse,
+          stagesResponse,
+          prospectingStagesResponse
+        });
+
+        // Process LeadSources - data is in content.Data.LeadSources
+        const leadSources = leadSourcesResponse?.content?.Data?.LeadSources || [];
+        const formattedLeadSources = leadSources.map(source => ({
+          value: source.Value,
+          label: source.Display,
+          id: source.Value,
+          name: source.Display
+        }));
+
+        // Process LeadTypes - data is in content.Data.LeadTypes
+        const leadTypes = leadTypesResponse?.content?.Data?.LeadTypes || [];
+        const formattedLeadTypes = leadTypes.map(type => ({
+          value: type.Value,
+          label: type.Display,
+          id: type.Value,
+          name: type.Display
+        }));
+
+        // Process Stages - data is in content.List (not in Data object)
+        const stages = stagesResponse?.content?.List || [];
+        const formattedStages = stages.map(stage => ({
+          id: stage.ID || stage.id,
+          name: stage.Stage || stage.Name || stage.name,
+          value: stage.ID || stage.id,
+          label: stage.Stage || stage.Name || stage.name,
+          colorCode: stage.ColorCode || stage.colorCode || '#4fb3ff'
+        }));
+
+        // Process ProspectingStages - data is in content.Data.ProspectingStages
+        const prospectingStages = prospectingStagesResponse?.content?.Data?.ProspectingStages || [];
+        const formattedProspectingStages = prospectingStages.map(stage => ({
+          value: stage.Value,
+          label: stage.Display,
+          id: stage.Value,
+          name: stage.Display
+        }));
+
+        setMasterData(prev => ({
+          ...prev,
+          leadSources: formattedLeadSources,
+          leadTypes: formattedLeadTypes,
+          stages: formattedStages,
+          prospectingStages: formattedProspectingStages
+        }));
+
+        // Debug: Log the processed data
+        console.log('DEBUG: Processed master data:', {
+          leadSources: formattedLeadSources,
+          leadTypes: formattedLeadTypes,
+          stages: formattedStages,
+          prospectingStages: formattedProspectingStages
+        });
+
+        logger.info('SearchResults: Master data loaded successfully:', {
+          leadSourcesCount: formattedLeadSources.length,
+          leadTypesCount: formattedLeadTypes.length,
+          stagesCount: formattedStages.length,
+          prospectingStagesCount: formattedProspectingStages.length
+        });
+
+        setMasterDataLoaded(true);
+      } catch (error) {
+        logger.error('SearchResults: Failed to load master data:', error);
+        setMasterDataLoaded(true); // Set to true even on error to prevent infinite loading
+      }
+    };
+
+    fetchMasterData();
+  }, []);
+
+
+
   // Debug logging
-  // useEffect(() => {
-  //   logger.info('SearchResults: Component mounted with searchParams:', searchParams);
-  //   logger.info('SearchResults: Data received:', data);
-  //   logger.info('SearchResults: Loading state:', loading);
-  //   logger.info('SearchResults: Error state:', error);
-  // }, [searchParams, data, loading, error]);
+  useEffect(() => {
+    if (data) {
+      logger.info('SearchResults: Component mounted with searchParams:', searchParams);
+      logger.info('SearchResults: Data received:', data);
+      logger.info('SearchResults: Data keys:', Object.keys(data || {}));
+      logger.info('SearchResults: apiColumnConfig:', data?.apiColumnConfig);
+      logger.info('SearchResults: ColumnConfig:', data?.ColumnConfig);
+      logger.info('SearchResults: Loading state:', loading);
+      logger.info('SearchResults: Error state:', error);
+    }
+  }, [searchParams, data, loading, error]);
 
   // Helper function to get nested object values
   const getNestedValue = (obj, path) => {
@@ -223,32 +354,59 @@ const SearchResults = ({ searchParams, setShowResults, searchType = 'opportuniti
       )
     });
 
-    // Generate columns from API config - process ALL columns (following old system pattern)
-    logger.info('SearchResults: Processing ALL columns from API:', columnConfig.map(col => ({
-      VisibleColumns: col.VisibleColumns,
-      PropertyMappingName: col.PropertyMappingName,
-      IsDefault: col.IsDefault
+    // Deduplicate columns by PropertyMappingName to prevent duplicates
+    const seenMappings = new Set();
+    const uniqueColumnConfig = [];
+
+    columnConfig.forEach((col, index) => {
+      // Use propertyMappingName as the primary key for deduplication (note: camelCase from service transformation)
+      const mappingKey = col.propertyMappingName || col.dbName || col.visibleColumns;
+
+      if (mappingKey && !seenMappings.has(mappingKey)) {
+        seenMappings.add(mappingKey);
+        uniqueColumnConfig.push(col);
+        logger.info('SearchResults: Added unique column:', {
+          visibleColumns: col.visibleColumns,
+          propertyMappingName: col.propertyMappingName,
+          isDefault: col.isDefault,
+          mappingKey: mappingKey
+        });
+      } else {
+        logger.info('SearchResults: Skipped duplicate column:', {
+          visibleColumns: col.visibleColumns,
+          propertyMappingName: col.propertyMappingName,
+          isDefault: col.isDefault,
+          mappingKey: mappingKey,
+          reason: 'Duplicate PropertyMappingName'
+        });
+      }
+    });
+
+    logger.info('SearchResults: Processing unique columns:', uniqueColumnConfig.map(col => ({
+      visibleColumns: col.visibleColumns,
+      propertyMappingName: col.propertyMappingName,
+      isDefault: col.isDefault
     })));
 
     // Debug: Check specifically for Product and Loss Reason columns
-    const productColumn = columnConfig.find(col =>
-      col.PropertyMappingName === 'ProductDetails.Name' ||
-      col.VisibleColumns === 'Product'
+    const productColumn = uniqueColumnConfig.find(col =>
+      col.propertyMappingName === 'ProductDetails.Name' ||
+      col.visibleColumns === 'Product'
     );
-    const lossReasonColumn = columnConfig.find(col =>
-      col.PropertyMappingName === 'OppLossReasonDetails.Name' ||
-      col.VisibleColumns === 'Loss Reason'
+    const lossReasonColumn = uniqueColumnConfig.find(col =>
+      col.propertyMappingName === 'OppLossReasonDetails.Name' ||
+      col.visibleColumns === 'Loss Reason'
     );
 
     logger.info('SearchResults: Product column found:', productColumn);
     logger.info('SearchResults: Loss Reason column found:', lossReasonColumn);
 
-    columnConfig.forEach(col => {
+    uniqueColumnConfig.forEach(col => {
       logger.info('SearchResults: Processing column config:', {
-        VisibleColumns: col.VisibleColumns,
-        PropertyMappingName: col.PropertyMappingName,
-        DBColumnsNames: col.DBColumnsNames,
-        IsDefault: col.IsDefault
+        visibleColumns: col.visibleColumns,
+        propertyMappingName: col.propertyMappingName,
+        dbName: col.dbName,
+        isDefault: col.isDefault
       });
 
       const columnDef = createColumnFromConfig(col);
@@ -262,10 +420,10 @@ const SearchResults = ({ searchParams, setShowResults, searchType = 'opportuniti
         columns.push(columnDef);
       } else {
         logger.error('SearchResults: Failed to create column for config:', {
-          VisibleColumns: col.VisibleColumns,
-          PropertyMappingName: col.PropertyMappingName,
-          DBColumnsNames: col.DBColumnsNames,
-          IsDefault: col.IsDefault
+          visibleColumns: col.visibleColumns,
+          propertyMappingName: col.propertyMappingName,
+          dbName: col.dbName,
+          isDefault: col.isDefault
         });
       }
     });
@@ -296,10 +454,10 @@ const SearchResults = ({ searchParams, setShowResults, searchType = 'opportuniti
 
   // Create individual column from API config - following the old system's pattern
   const createColumnFromConfig = (config) => {
-    // Use correct case for API fields (following old system pattern)
-    const propertyMappingName = config.PropertyMappingName || config.propertyMappingName || config.propertyMapping || "";
-    const visibleColumns = config.VisibleColumns || config.visibleColumns || config.label || config.displayName || "";
-    const dbName = config.DBColumnsNames || config.dbName || config.DBName || "";
+    // Use correct case for API fields (note: service transforms to camelCase)
+    const propertyMappingName = config.propertyMappingName || config.PropertyMappingName || config.propertyMapping || "";
+    const visibleColumns = config.visibleColumns || config.VisibleColumns || config.label || config.displayName || "";
+    const dbName = config.dbName || config.DBColumnsNames || config.DBName || "";
 
     // Helper function to get nested value using dot notation (same as old system)
     const getValueByPath = (obj, path) => {
@@ -352,6 +510,9 @@ const SearchResults = ({ searchParams, setShowResults, searchType = 'opportuniti
         'product': 160,
         'lossReason': 120,
         'proposalId': 100,
+        'prospectingStage': 150,
+        'leadSource': 140,
+        'leadType': 140,
         'text': 120
       };
       return widths[type] || 120;
@@ -400,6 +561,18 @@ const SearchResults = ({ searchParams, setShowResults, searchType = 'opportuniti
     } else if (mappingPath === 'ProposalID') {
       columnType = 'proposalId';
       renderId = 'proposalId';
+    } else if (mappingPath === 'ProspectingStage' || mappingPath === 'SubContactDetails.ProspectingStage' || mappingPath === 'ContactDetails.ProspectingStage') {
+      columnType = 'prospectingStage';
+      renderId = 'prospectingStage';
+      logger.info('SearchResults: FOUND Prospecting Stage column mapping!', { mappingPath, visibleColumns });
+    } else if (mappingPath === 'LeadSource' || mappingPath === 'SubContactDetails.LeadSource' || mappingPath === 'ContactDetails.LeadSource') {
+      columnType = 'leadSource';
+      renderId = 'leadSource';
+      logger.info('SearchResults: FOUND Lead Source column mapping!', { mappingPath, visibleColumns });
+    } else if (mappingPath === 'LeadType' || mappingPath === 'SubContactDetails.LeadType' || mappingPath === 'ContactDetails.LeadType') {
+      columnType = 'leadType';
+      renderId = 'leadType';
+      logger.info('SearchResults: FOUND Lead Type column mapping!', { mappingPath, visibleColumns });
     } else {
       // Fallback to regex patterns and intelligent detection for other cases
       if (/(^|\.)status$/.test(pathLc)) {
@@ -438,6 +611,15 @@ const SearchResults = ({ searchParams, setShowResults, searchType = 'opportuniti
       } else if (/(^|\.)proposalid$/.test(pathLc)) {
         columnType = 'proposalId';
         renderId = 'proposalId';
+      } else if (/(^|\.)prospectingstage$/.test(pathLc) || /contactdetails\.prospectingstage$/.test(pathLc) || /subcontactdetails\.prospectingstage$/.test(pathLc)) {
+        columnType = 'prospectingStage';
+        renderId = 'prospectingStage';
+      } else if (/(^|\.)leadsource$/.test(pathLc) || /contactdetails\.leadsource$/.test(pathLc) || /subcontactdetails\.leadsource$/.test(pathLc)) {
+        columnType = 'leadSource';
+        renderId = 'leadSource';
+      } else if (/(^|\.)leadtype$/.test(pathLc) || /contactdetails\.leadtype$/.test(pathLc) || /subcontactdetails\.leadtype$/.test(pathLc)) {
+        columnType = 'leadType';
+        renderId = 'leadType';
       } else {
         // For completely unknown columns, try to infer type from visible column name
         const visibleLc = String(visibleColumns || "").toLowerCase();
@@ -468,9 +650,141 @@ const SearchResults = ({ searchParams, setShowResults, searchType = 'opportuniti
       visibleColumns
     });
 
-    // Create base column definition
+    // Create unique ID for the column
+    const uniqueId = mappingPath ? mappingPath.replace(/\./g, '_') : (renderId || 'unknown');
+
+    // Helper functions for stage timeline functionality
+    const getStageDateByLabel = (row, stageLabel) => {
+      if (!stageLabel) return null;
+      // 1) Stages dictionary coming from API (preferred)
+      if (row.Stages && typeof row.Stages === "object") {
+        const direct = row.Stages[stageLabel];
+        if (direct) return direct;
+      }
+      // 2) Flattened keys like Stage_<Name> or stage_<Name>
+      const variants = [
+        `Stage_${stageLabel}`,
+        `stage_${stageLabel}`,
+        `Stage_${stageLabel.replace(/\s+/g, "_")}`,
+        `stage_${stageLabel.replace(/\s+/g, "_")}`,
+      ];
+      for (const key of variants) {
+        if (row[key]) return row[key];
+      }
+      return null;
+    };
+
+    const formatDate = (dateString) => {
+      if (!dateString) return '';
+      try {
+        return new Date(dateString).toLocaleDateString();
+      } catch {
+        return dateString;
+      }
+    };
+
+    const handleStageCheckToggle = async (row, stageLabel) => {
+      try {
+        const stageMeta = masterData.stages.find((s) => s.name === stageLabel);
+        if (!stageMeta) {
+          console.error("Invalid stage. Please reload and try again.");
+          return;
+        }
+
+        // Optional: row-level restrictions if provided by API
+        const isReadOnly =
+          row?.CanView === 1 ||
+          row?.canView === 1 ||
+          row?.isReadOnly === true;
+        if (isReadOnly) {
+          console.error("You do not have permission to modify this opportunity.");
+          return;
+        }
+
+        // Guard: block edits for closed states
+        const stageLc = String(row?.stage || "").toLowerCase();
+        if (stageLc === "closed won" || stageLc === "closed lost") {
+          console.error("Closed opportunities cannot be modified via the grid. Use the Edit page.");
+          return;
+        }
+
+        const currentDate = getStageDateByLabel(row, stageLabel);
+        const shouldInsert = !currentDate;
+
+        // Call the API to toggle the stage date
+        await opportunityService.toggleOpportunityStageDate(
+          row.ID || row.id,
+          stageMeta.id,
+          shouldInsert
+        );
+
+        // Trigger refresh to update the data
+        refetch?.();
+      } catch (error) {
+        console.error("Stage toggle failed", error);
+      }
+    };
+
+    // Check if this column represents a stage timeline checkmark
+    const labelText = (visibleColumns || propertyMappingName || dbName || '').toLowerCase();
+    const isStageTimelineColumn = masterData.stages?.some(
+      (s) => String(s.name).toLowerCase() === labelText
+    );
+
+    if (
+      isStageTimelineColumn &&
+      columnType !== "stage" &&
+      columnType !== "status" &&
+      columnType !== "assignedRep"
+    ) {
+      const stage = masterData.stages.find(
+        (s) => String(s.name).toLowerCase() === labelText
+      );
+      
+      return {
+        id: uniqueId,
+        header: visibleColumns || propertyMappingName || dbName || 'Unknown',
+        accessor: mappingPath,
+        sortable: true,
+        width: 120,
+        columnType: 'stageTimeline',
+        render: (value, row) => {
+          const stageDate = getStageDateByLabel(row, stage?.name);
+          const isCompleted = Boolean(stageDate);
+          
+          return (
+            <button
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                handleStageCheckToggle(row, stage?.name);
+              }}
+              className="flex items-center gap-2 text-sm text-gray-700 hover:text-gray-900"
+              title={
+                isCompleted
+                  ? `Completed on ${formatDate(stageDate)}`
+                  : "Not completed"
+              }
+            >
+              <span
+                className={`h-4 w-4 rounded-full flex items-center justify-center ${
+                  isCompleted ? "bg-green-500" : "bg-gray-300"
+                }`}
+              >
+                <Check className="h-3 w-3 text-white" />
+              </span>
+              <span className="min-w-[84px] inline-block">
+                {isCompleted ? formatDate(stageDate) : ""}
+              </span>
+            </button>
+          );
+        }
+      };
+    }
+
+    // Create base column definition with unique ID based on mapping path
     const baseColumn = {
-      id: renderId || mappingPath || 'unknown',
+      id: uniqueId,
       header: visibleColumns || propertyMappingName || dbName || 'Unknown',
       accessor: mappingPath,
       sortable: true,
@@ -547,23 +861,40 @@ const SearchResults = ({ searchParams, setShowResults, searchType = 'opportuniti
             const stage = getValueByPath(row, mappingPath) ||
               getNestedValue(row, 'OppStageDetails.Stage') ||
               row.Stage || 'Unknown';
-            const getStageColor = (stage) => {
-              const stageColors = {
-                'prospecting': 'bg-purple-500',
-                'qualification': 'bg-blue-500',
-                'proposal': 'bg-yellow-500',
-                'negotiation': 'bg-orange-500',
-                'closed won': 'bg-green-500',
-                'closed': 'bg-green-500'
-              };
-              const stageLower = (stage || '').toLowerCase();
-              return stageColors[stageLower] || 'bg-gray-500';
-            };
+
+            // Import StageDropdown component for inline editing
+            const StageDropdown = React.lazy(() => import('../table/StageDropdown'));
+
+            console.log('DEBUG: Stage render - masterData.stages:', masterData.stages);
+            console.log('DEBUG: Stage render - current stage:', stage);
+            console.log('DEBUG: Stage render - masterDataLoaded:', masterDataLoaded);
+
+            if (!masterDataLoaded || !masterData.stages.length) {
+              return (
+                <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium text-white bg-gray-500">
+                  {stage}
+                </span>
+              );
+            }
 
             return (
-              <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium text-white ${getStageColor(stage)}`}>
-                {stage}
-              </span>
+              <React.Suspense fallback={
+                <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium text-white bg-gray-500">
+                  {stage}
+                </span>
+              }>
+                <StageDropdown
+                  stage={stage}
+                  opportunityId={row.ID || row.id}
+                  onStageChange={(opportunityId, newStage) => {
+                    logger.info(`Stage changed for opportunity ${opportunityId} to ${newStage}`);
+                    // Trigger refresh to update the data
+                    refetch?.();
+                  }}
+                  stages={masterData.stages}
+                  isReadOnly={row.CanView === 1 || row.canView === 1 || row.isReadOnly === true}
+                />
+              </React.Suspense>
             );
           }
         };
@@ -657,6 +988,189 @@ const SearchResults = ({ searchParams, setShowResults, searchType = 'opportuniti
           render: (value, row) => {
             const proposalId = getValueByPath(row, mappingPath) || row.ProposalID || '';
             return proposalId && proposalId !== '0' ? <span className="font-medium">#{proposalId}</span> : <span className="text-sm text-gray-400">-</span>;
+          }
+        };
+
+      case 'prospectingStage':
+        return {
+          ...baseColumn,
+          render: (value, row) => {
+            const prospectingStage = getValueByPath(row, mappingPath) ||
+              getNestedValue(row, 'SubContactDetails.ProspectingStage') ||
+              getNestedValue(row, 'ContactDetails.ProspectingStage') ||
+              row.ProspectingStage || '';
+
+            // Import ProspectingStageDropdown component for inline editing
+            const ProspectingStageDropdown = React.lazy(() => import('../table/ProspectingStageDropdown'));
+
+            console.log('DEBUG: Prospecting Stage render - masterData.prospectingStages:', masterData.prospectingStages);
+            console.log('DEBUG: Prospecting Stage render - current stage:', prospectingStage);
+            console.log('DEBUG: Prospecting Stage render - masterDataLoaded:', masterDataLoaded);
+
+            if (!masterDataLoaded || !masterData.prospectingStages.length) {
+              return (
+                <span className="text-sm text-gray-600 px-3 py-1 rounded-full bg-gray-100">
+                  {prospectingStage || 'None'}
+                </span>
+              );
+            }
+
+            return (
+              <React.Suspense fallback={
+                <span className="text-sm text-gray-600 px-3 py-1 rounded-full bg-gray-100">
+                  {prospectingStage || 'None'}
+                </span>
+              }>
+                <ProspectingStageDropdown
+                  prospectingStage={prospectingStage}
+                  opportunity={row}
+                  onStageChange={(opportunityId, newStage) => {
+                    logger.info(`Prospecting stage changed for opportunity ${opportunityId} to ${newStage}`);
+                    // Trigger refresh to update the data
+                    refetch?.();
+                  }}
+                  prospectingStages={masterData.prospectingStages}
+                  onRefresh={refetch}
+                />
+              </React.Suspense>
+            );
+          }
+        };
+
+      case 'leadSource':
+        return {
+          ...baseColumn,
+          render: (value, row) => {
+            const leadSource = getValueByPath(row, mappingPath) ||
+              getNestedValue(row, 'SubContactDetails.LeadSource') ||
+              getNestedValue(row, 'ContactDetails.LeadSource') ||
+              row.LeadSource || '';
+
+            const contactId = row?.SubContactDetails?.ID ||
+              row?.gsCustomersID ||
+              row?.ContactDetails?.ID;
+
+            const selectedValues = Array.isArray(leadSource)
+              ? leadSource
+              : typeof leadSource === 'string'
+                ? leadSource.split(',').map(s => s.trim()).filter(Boolean)
+                : [];
+
+            console.log('DEBUG: Lead Source render - masterData.leadSources:', masterData.leadSources);
+            console.log('DEBUG: Lead Source render - selectedValues:', selectedValues);
+            console.log('DEBUG: Lead Source render - masterDataLoaded:', masterDataLoaded);
+
+            if (!masterDataLoaded || !masterData.leadSources.length) {
+              return <span className="text-sm text-gray-500">Loading...</span>;
+            }
+
+            return (
+              <div onClick={(e) => e.stopPropagation()} className="min-w-[120px]">
+                <SimpleMultiSelect
+                  options={masterData.leadSources}
+                  value={selectedValues}
+                  onChange={async (selectedLabels) => {
+                    try {
+                      // Map selected display names back to their IDs
+                      const selectedIds = selectedLabels
+                        .map((labelOrId) => {
+                          const option = masterData.leadSources.find(
+                            (opt) => opt.label === labelOrId || String(opt.value) === String(labelOrId)
+                          );
+                          return option ? option.value : null;
+                        })
+                        .filter((id) => id !== null && id !== undefined);
+
+                      if (contactId) {
+                        await contactsApi.updateContact({
+                          ID: contactId,
+                          fieldName: "LeadSource",
+                          fieldValue: selectedIds.join(","),
+                          IsEmailIDVerificationEnabled: false,
+                          IsSubContactUpdate: false,
+                        });
+
+                        logger.info("LeadSource updated successfully", row.ID, selectedLabels);
+                        // Trigger refresh to update the data
+                        refetch?.();
+                      }
+                    } catch (error) {
+                      logger.error("Failed to update lead source:", error);
+                    }
+                  }}
+                  placeholder="Select lead sources"
+                  className="text-sm"
+                />
+              </div>
+            );
+          }
+        };
+
+      case 'leadType':
+        return {
+          ...baseColumn,
+          render: (value, row) => {
+            const leadType = getValueByPath(row, mappingPath) ||
+              getNestedValue(row, 'SubContactDetails.LeadType') ||
+              getNestedValue(row, 'ContactDetails.LeadType') ||
+              row.LeadType || '';
+
+            const contactId = row?.SubContactDetails?.ID ||
+              row?.gsCustomersID ||
+              row?.ContactDetails?.ID;
+
+            const selectedValues = Array.isArray(leadType)
+              ? leadType
+              : typeof leadType === 'string'
+                ? leadType.split(',').map(s => s.trim()).filter(Boolean)
+                : [];
+
+            console.log('DEBUG: Lead Type render - masterData.leadTypes:', masterData.leadTypes);
+            console.log('DEBUG: Lead Type render - selectedValues:', selectedValues);
+            console.log('DEBUG: Lead Type render - masterDataLoaded:', masterDataLoaded);
+
+            if (!masterDataLoaded || !masterData.leadTypes.length) {
+              return <span className="text-sm text-gray-500">Loading...</span>;
+            }
+
+            return (
+              <div onClick={(e) => e.stopPropagation()} className="min-w-[120px]">
+                <SimpleMultiSelect
+                  options={masterData.leadTypes}
+                  value={selectedValues}
+                  onChange={async (selectedLabels) => {
+                    try {
+                      const selectedIds = selectedLabels
+                        .map((labelOrId) => {
+                          const option = masterData.leadTypes.find(
+                            (opt) => opt.label === labelOrId || String(opt.value) === String(labelOrId)
+                          );
+                          return option ? option.value : null;
+                        })
+                        .filter((id) => id !== null && id !== undefined);
+
+                      if (contactId) {
+                        await contactsApi.updateContact({
+                          ID: contactId,
+                          fieldName: "LeadType",
+                          fieldValue: selectedIds.join(","),
+                          IsEmailIDVerificationEnabled: false,
+                          IsSubContactUpdate: false,
+                        });
+
+                        logger.info("LeadType updated successfully", row.ID, selectedLabels);
+                        // Trigger refresh to update the data
+                        refetch?.();
+                      }
+                    } catch (error) {
+                      logger.error("Failed to update lead type:", error);
+                    }
+                  }}
+                  placeholder="Select lead types"
+                  className="text-sm"
+                />
+              </div>
+            );
           }
         };
 
@@ -979,16 +1493,24 @@ const SearchResults = ({ searchParams, setShowResults, searchType = 'opportuniti
     return baseColumns;
   };
 
+  const handleRefetch = () => {
+    setIsViewsSidebarOpen(false);
+    refetch();
+  }
+
   // Define columns for EnhancedDataTable - fully API-driven
   const getColumns = () => {
-    // Always try to use API column config first
-    if (data?.apiColumnConfig && data.apiColumnConfig.length > 0) {
-      logger.info('SearchResults: Using API column configuration');
-      return generateColumnsFromConfig(data.apiColumnConfig);
+    // Check multiple possible locations for column config
+    const columnConfig = data?.apiColumnConfig || data?.ColumnConfig || data?.content?.Data?.ColumnConfig;
+
+    if (columnConfig && Array.isArray(columnConfig) && columnConfig.length > 0) {
+      logger.info('SearchResults: Using API column configuration:', columnConfig);
+      return generateColumnsFromConfig(columnConfig);
     }
 
     // If no API config, return minimal columns to avoid conflicts
     logger.warn('SearchResults: No API column configuration available, using minimal columns');
+    logger.info('SearchResults: Available data keys:', Object.keys(data || {}));
     return [
       {
         id: 'edit',
@@ -1110,14 +1632,16 @@ const SearchResults = ({ searchParams, setShowResults, searchType = 'opportuniti
         }
       `}</style>
       <div className="h-screen bg-gray-50 flex flex-col">
-        {/* Statistics Cards */}
-        <div className="bg-white border-b border-gray-200 px-6 py-4 flex-shrink-0">
-          {isOpportunities ? (
-            <OpportunityStatsCards stats={opportunityStatsData} />
-          ) : (
-            <ProposalStatsCards stats={proposalStatsData} />
-          )}
-        </div>
+        {/* Statistics Cards: hide in kanban and split views */}
+        {viewMode !== 'kanban' && viewMode !== 'split' && (
+          <div className="bg-white border-b border-gray-200 px-6 py-4 flex-shrink-0">
+            {isOpportunities ? (
+              <OpportunityStatsCards stats={opportunityStatsData} />
+            ) : (
+              <ProposalStatsCards stats={proposalStatsData} />
+            )}
+          </div>
+        )}
         {/* Enhanced Filter Bar */}
         <div className="bg-white border-b border-gray-200 flex-shrink-0">
           <div className="px-2">
@@ -1204,7 +1728,7 @@ const SearchResults = ({ searchParams, setShowResults, searchType = 'opportuniti
           <div className="flex-1 min-h-0">
             <div className="search-results-scroll-container">
               <EnhancedDataTable
-                data={data?.results || []}
+                data={enhanceRowsWithOptions(data?.results || [])}
                 columns={columns}
                 loading={loading}
                 enableSelection={true}
@@ -1236,14 +1760,19 @@ const SearchResults = ({ searchParams, setShowResults, searchType = 'opportuniti
       </div>
 
       {/* Views Sidebar */}
-      <ViewsSidebar
-        isOpen={isViewsSidebarOpen}
-        onClose={() => setIsViewsSidebarOpen(false)}
-        columnOrder={getDefaultColumnOrder()}
-        onColumnOrderChange={() => { }}
-        onViewSelected={() => { }}
-        pageType="opportunities"
-      />
+      <div className={`${loading ? 'mask' : 'none'}`}>
+
+        <ViewsSidebar
+          isOpen={isViewsSidebarOpen}
+          onClose={() => setIsViewsSidebarOpen(false)}
+          columnOrder={getDefaultColumnOrder()}
+          onColumnOrderChange={() => { }}
+          onViewSelected={() => { }}
+          pageType="opportunities"
+          handleRefetch={()=> handleRefetch()}
+          // setLoading={setIsLoading}
+          />
+      </div>
     </>
   );
 };

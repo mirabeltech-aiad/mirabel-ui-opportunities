@@ -1,16 +1,17 @@
 import { useState, useEffect, useRef, useCallback, useMemo } from "react";
 import { useNavigate, useSearchParams, useLocation } from "react-router-dom";
-import OpportunityStatsCards from "../../features/Opportunity/components/ui/OpportunityStatsCards";
+import { OpportunityStatsCards } from "@/features/Opportunity-new/components/Stats";
 import OpportunitiesTable from "../../features/Opportunity/components/ui/OpportunitiesTable";
 import OpportunityCardView from "../../features/Opportunity/components/ui/OpportunityCardView";
-import KanbanView from "../../features/opportunity-new/components/kanban/KanbanView";
+import KanbanView from "../../features/Opportunity-new/components/kanban/KanbanView";
 import SplitScreenView from "../../features/Opportunity/components/ui/SplitScreenView";
 import ViewToggle from "@/components/ui/ViewToggle";
 import { useApiData } from "@/features/Opportunity/hooks/useApiData";
 import { useOpportunitySearch } from "@/features/Opportunity/contexts/OpportunitySearchContext";
 import { processOpportunitySearchParams } from "@/features/Opportunity/components/AdvancedSearch/searchHelpers";
 import Loader from "@/components/ui/loader";
-import { opportunitiesService } from "@/features/Opportunity/Services/opportunitiesService";
+// Do not import from old Opportunity folder
+import { opportunityService as opportunitiesService } from "@/features/Opportunity-new/services/opportunityService";
 import apiService from "@/features/Opportunity/Services/apiService";
 import contactsApi from "@/services/contactsApi";
 
@@ -1460,7 +1461,17 @@ const Pipeline = () => {
         </div>
 
         {view !== "kanban" && view !== "split" && (
-          <OpportunityStatsCards stats={stats} />
+          <OpportunityStatsCards
+            stats={{
+              totalCount: stats.total || 0,
+              totalAmount: `$${(stats.amount || 0).toLocaleString()}`,
+              totalWon: stats.won || 0,
+              totalWinAmount: `$${(stats.winTotal || 0).toLocaleString()}`,
+              totalOpen: stats.open || 0,
+              totalLost: stats.lost || 0,
+              winPercentage: `${stats.winPercentage || 0}%`
+            }}
+          />
         )}
 
         {/* Only render real API data; show loader or empty when appropriate */}

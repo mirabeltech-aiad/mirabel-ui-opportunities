@@ -24,6 +24,8 @@ const ViewsSidebar = ({
   onColumnOrderChange,
   onViewSelected,
   pageType = "opportunities", // Default to opportunities for backward compatibility
+  handleRefetch = () => {},
+  // setLoading = () => {}
 }) => {
   const [refreshKey, setRefreshKey] = useState(0);
   const [activeTab, setActiveTab] = useState("saved");
@@ -111,7 +113,7 @@ const ViewsSidebar = ({
     try {
       // Step 1: Get detailed view information including visible columns
       console.log("ViewsSidebar: Fetching view details for ID:", view.ID);
-
+      // setLoading(true);
       let viewDetailsResponse = null;
       try {
         viewDetailsResponse = await apiService.getViewDetails(view.ID);
@@ -120,6 +122,8 @@ const ViewsSidebar = ({
           "ViewsSidebar: Failed to get view details, using provided view data:",
           detailsError.message
         );
+      } finally {
+        // setLoading(false);
       }
 
       let visibleColumns = view.VisibleColumns;
@@ -178,11 +182,14 @@ const ViewsSidebar = ({
       console.log("ViewsSidebar: Updating view with payload:", updatePayload);
 
       try {
+        // setLoading(true);
         await apiService.updateView(updatePayload);
         console.log("ViewsSidebar: View updated successfully");
       } catch (updateError) {
         console.error("ViewsSidebar: Failed to update view:", updateError);
         // Continue with the operation even if update fails
+      } finally {
+        // setLoading(false);
       }
 
       // Also save this as the user's default view preference (as per documentation)
@@ -196,6 +203,7 @@ const ViewsSidebar = ({
           userPageViewPayload
         );
 
+        // setLoading(true);
         await apiService.saveUserPageView(userPageViewPayload);
         console.log(
           "ViewsSidebar: User page view preference saved successfully"
@@ -206,10 +214,15 @@ const ViewsSidebar = ({
           error.message
         );
         // Don't fail the entire operation if this fails
+      } finally {
+        // setLoading(false);
       }
 
       // Step 3: For opportunities, skip manual column updates - let API column config handle it
       if (pageType === "opportunities") {
+        //refetch
+        //setrefetch
+        handleRefetch();
         console.log(
           "ViewsSidebar: For opportunities, relying on API column config instead of manual column updates"
         );
