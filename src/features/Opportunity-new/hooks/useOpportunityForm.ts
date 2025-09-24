@@ -9,9 +9,14 @@ import {
 import { 
   validateRequiredFields, 
   calculateForecastRevenue,
-  isLostReasonRequired 
+  isLostReasonRequired,
+  shouldAmountBeReadOnly,
+  shouldAutoUpdateStage,
+  shouldAutoUpdateProbability,
+  isValidProbabilityForStatus,
+  isValidStageForStatus
 } from '../utils/validation';
-import { STAGE_PERCENTAGES } from '../constants/opportunityOptions';
+import { STAGE_PERCENTAGES, STAGE_NAMES, findStageIdByName } from '../constants/opportunityOptions';
 
 // Function to generate unique opportunity ID
 const generateOpportunityId = (): string => {
@@ -106,6 +111,28 @@ export const useOpportunityForm = (opportunityId?: string) => {
   const [previousStage, setPreviousStage] = useState('');
   const [previousProbability, setPreviousProbability] = useState('');
   const [isBatchUpdating, setIsBatchUpdating] = useState(false);
+  
+  // Stage options for ID lookup
+  const [stageOptions, setStageOptions] = useState<Array<{id: string, name: string}>>([]);
+
+  // Load stages on mount
+  useEffect(() => {
+    const loadStages = async () => {
+      try {
+        const response = await opportunityService.getOpportunityStages();
+        if (response?.content?.List) {
+          const stages = response.content.List.map((stageData: any) => ({
+            id: stageData.ID,
+            name: stageData.Stage
+          }));
+          setStageOptions(stages);
+        }
+      } catch (error) {
+        console.error('Failed to load stages:', error);
+      }
+    };
+    loadStages();
+  }, []);
 
   // Load opportunity data on mount
   useEffect(() => {
@@ -146,6 +173,14 @@ export const useOpportunityForm = (opportunityId?: string) => {
     }
   };
 
+  // Helper functions to get stage IDs
+  const getClosedWonStageId = () => findStageIdByName(stageOptions, STAGE_NAMES.CLOSED_WON);
+  const getClosedLostStageId = () => findStageIdByName(stageOptions, STAGE_NAMES.CLOSED_LOST);
+  const getStageNameById = (stageId: string) => {
+    const stage = stageOptions.find(s => s.id === stageId);
+    return stage ? stage.name : '';
+  };
+
   // Handle input changes with validation and business logic
   const handleInputChange = useCallback((field: string, value: any) => {
 
@@ -164,6 +199,48 @@ export const useOpportunityForm = (opportunityId?: string) => {
       return;
     }
 
+    // Handle probability changes that would trigger status changes
+    if (field === 'probability' && !isBatchUpdating) {
+      const probValue = parseInt(value) || 0;
+      if (probValue === 100 && formData.status !== 'Won') {
+        setStatusConfirmDialog({
+          isOpen: true,
+          newStatus: 'Won',
+          pendingChange: { field, value, oldValue }
+        });
+        return;
+      }
+      if (probValue === 0 && formData.status !== 'Lost') {
+        setStatusConfirmDialog({
+          isOpen: true,
+          newStatus: 'Lost',
+          pendingChange: { field, value, oldValue }
+        });
+        return;
+      }
+    }
+
+    // Handle stage changes that would trigger status changes
+    if (field === 'stage' && !isBatchUpdating) {
+      const stageName = getStageNameById(value);
+      if (stageName === STAGE_NAMES.CLOSED_WON && formData.status !== 'Won') {
+        setStatusConfirmDialog({
+          isOpen: true,
+          newStatus: 'Won',
+          pendingChange: { field, value, oldValue }
+        });
+        return;
+      }
+      if (stageName === STAGE_NAMES.CLOSED_LOST && formData.status !== 'Lost') {
+        setStatusConfirmDialog({
+          isOpen: true,
+          newStatus: 'Lost',
+          pendingChange: { field, value, oldValue }
+        });
+        return;
+      }
+    }
+
     // Update form data
     setFormData(prev => {
       const updatedData = { ...prev, [field]: value };
@@ -175,35 +252,154 @@ export const useOpportunityForm = (opportunityId?: string) => {
         updatedData.forecastRevenue = calculateForecastRevenue(amount, probability);
       }
 
-      // Auto-update stage percentage when stage changes
-      if (field === 'stage' && STAGE_PERCENTAGES[value]) {
-        updatedData.stagePercentage = STAGE_PERCENTAGES[value].toString();
-        updatedData.probability = STAGE_PERCENTAGES[value].toString();
-      }
-
-      // Auto-update probability and stage when status changes
-      if (field === 'status') {
-        if (value === 'Won') {
-          updatedData.probability = '100';
-          updatedData.stage = 'Closed Won';
-        } else if (value === 'Lost') {
-          updatedData.probability = '0';
-          updatedData.stage = 'Closed Lost';
+      // Business Logic: Handle Probability, Status, and Stage interactions
+      
+      // 1. PROBABILITY CHANGES - Auto-update Status and Stage
+      if (field === 'probability') {
+        const probValue = parseInt(value) || 0;
+        
+        if (probValue === 100) {
+          // 100% probability = Won status + Closed Won stage
+          updatedData.status = 'Won';
+          const closedWonStageId = getClosedWonStageId();
+          if (closedWonStageId) {
+            updatedData.stage = closedWonStageId;
+          }
+          updatedData.stagePercentage = '100';
+          if (!prev.actualCloseDate) {
+            updatedData.actualCloseDate = new Date().toISOString().split('T')[0];
+          }
+          // Clear lost reason if previously set
+          updatedData.lostReason = '';
+        } else if (probValue === 0) {
+          // 0% probability = Lost status + Closed Lost stage
+          updatedData.status = 'Lost';
+          const closedLostStageId = getClosedLostStageId();
+          if (closedLostStageId) {
+            updatedData.stage = closedLostStageId;
+          }
+          updatedData.stagePercentage = '0';
+          if (!prev.actualCloseDate) {
+            updatedData.actualCloseDate = new Date().toISOString().split('T')[0];
+          }
+          // Clear win reason if previously set
+          updatedData.winReason = '';
+        } else {
+          // Any other probability = Open status (if currently Won/Lost)
+          if (prev.status === 'Won' || prev.status === 'Lost') {
+            updatedData.status = 'Open';
+            updatedData.actualCloseDate = '';
+            updatedData.winReason = '';
+            updatedData.lostReason = '';
+            
+            // Reset stage if it was closed, or set based on stage percentages
+            const currentStageName = getStageNameById(prev.stage);
+            if (currentStageName === STAGE_NAMES.CLOSED_WON || currentStageName === STAGE_NAMES.CLOSED_LOST) {
+              // Find appropriate stage based on probability
+              const appropriateStageName = Object.keys(STAGE_PERCENTAGES).find(
+                stage => STAGE_PERCENTAGES[stage] === probValue
+              );
+              if (appropriateStageName) {
+                const appropriateStageId = findStageIdByName(stageOptions, appropriateStageName);
+                updatedData.stage = appropriateStageId || '';
+              } else {
+                updatedData.stage = '';
+              }
+              updatedData.stagePercentage = probValue.toString();
+            }
+          }
         }
       }
 
-      // Auto-update status based on probability
-      if (field === 'probability') {
-        const probValue = parseInt(value);
-        if (probValue === 100) {
+      // 2. STATUS CHANGES - Auto-update Probability and Stage
+      if (field === 'status') {
+        if (value === 'Won') {
+          // Won status = 100% probability + Closed Won stage
+          updatedData.probability = '100';
+          const closedWonStageId = getClosedWonStageId();
+          if (closedWonStageId) {
+            updatedData.stage = closedWonStageId;
+          }
+          updatedData.stagePercentage = '100';
+          if (!prev.actualCloseDate) {
+            updatedData.actualCloseDate = new Date().toISOString().split('T')[0];
+          }
+          // Clear lost reason
+          updatedData.lostReason = '';
+        } else if (value === 'Lost') {
+          // Lost status = 0% probability + Closed Lost stage
+          updatedData.probability = '0';
+          const closedLostStageId = getClosedLostStageId();
+          if (closedLostStageId) {
+            updatedData.stage = closedLostStageId;
+          }
+          updatedData.stagePercentage = '0';
+          if (!prev.actualCloseDate) {
+            updatedData.actualCloseDate = new Date().toISOString().split('T')[0];
+          }
+          // Clear win reason
+          updatedData.winReason = '';
+        } else if (value === 'Open') {
+          // Open status = clear close dates and reasons
+          updatedData.actualCloseDate = '';
+          updatedData.winReason = '';
+          updatedData.lostReason = '';
+          
+          // Reset closed stages
+          const currentStageName = getStageNameById(prev.stage);
+          if (currentStageName === STAGE_NAMES.CLOSED_WON || currentStageName === STAGE_NAMES.CLOSED_LOST) {
+            updatedData.stage = '';
+            updatedData.stagePercentage = '';
+            // Set probability to a reasonable default for open opportunities
+            if (prev.probability === '0' || prev.probability === '100') {
+              updatedData.probability = '50'; // Default to 50% for open opportunities
+            }
+          }
+        }
+      }
+
+      // 3. STAGE CHANGES - Auto-update Status and Probability
+      if (field === 'stage') {
+        const stageName = getStageNameById(value);
+        
+        if (stageName === STAGE_NAMES.CLOSED_WON) {
+          // Closed Won stage = Won status + 100% probability
           updatedData.status = 'Won';
-          updatedData.stage = 'Closed Won';
-        } else if (probValue === 0) {
+          updatedData.probability = '100';
+          updatedData.stagePercentage = '100';
+          if (!prev.actualCloseDate) {
+            updatedData.actualCloseDate = new Date().toISOString().split('T')[0];
+          }
+          updatedData.lostReason = '';
+        } else if (stageName === STAGE_NAMES.CLOSED_LOST) {
+          // Closed Lost stage = Lost status + 0% probability
           updatedData.status = 'Lost';
-          updatedData.stage = 'Closed Lost';
-        } else if (prev.status === 'Won' || prev.status === 'Lost') {
-          // Reset status to Open if probability is changed from 100% or 0%
-          updatedData.status = 'Open';
+          updatedData.probability = '0';
+          updatedData.stagePercentage = '0';
+          if (!prev.actualCloseDate) {
+            updatedData.actualCloseDate = new Date().toISOString().split('T')[0];
+          }
+          updatedData.winReason = '';
+        } else if (stageName && STAGE_PERCENTAGES[stageName]) {
+          // Regular stage = Update probability based on stage percentage + Open status
+          const stagePercentage = STAGE_PERCENTAGES[stageName];
+          updatedData.stagePercentage = stagePercentage.toString();
+          
+          // Only auto-update probability if not manually set to extreme values
+          if (prev.probability !== '0' && prev.probability !== '100') {
+            updatedData.probability = stagePercentage.toString();
+          }
+          
+          // Ensure status is Open for non-closed stages
+          if (prev.status === 'Won' || prev.status === 'Lost') {
+            updatedData.status = 'Open';
+            updatedData.actualCloseDate = '';
+            updatedData.winReason = '';
+            updatedData.lostReason = '';
+          }
+        } else if (value === '') {
+          // Empty stage = reset stage percentage
+          updatedData.stagePercentage = '';
         }
       }
 
@@ -213,12 +409,15 @@ export const useOpportunityForm = (opportunityId?: string) => {
     // Real-time validation if form has been submitted
     if (hasSubmitted) {
       setTimeout(() => {
-        const newFormData = { ...formData, [field]: value };
-        const errors = validateRequiredFields(newFormData);
-        setValidationErrors(errors);
-      }, 50);
+        // Use the updated form data for validation
+        setFormData(currentData => {
+          const errors = validateRequiredFields(currentData);
+          setValidationErrors(errors);
+          return currentData;
+        });
+      }, 100);
     }
-  }, [formData, hasSubmitted, isBatchUpdating]);
+  }, [formData, hasSubmitted, isBatchUpdating, stageOptions]);
 
   // Handle batch updates (for proposal linking)
   const handleBatchInputChange = useCallback((updates: Partial<OpportunityFormData>) => {
@@ -230,9 +429,66 @@ export const useOpportunityForm = (opportunityId?: string) => {
       // Auto-calculate forecast revenue if amount or probability changed
       if (updates.amount || updates.probability) {
         newData.forecastRevenue = calculateForecastRevenue(
-          newData.amount, 
-          newData.probability
+          newData.amount || prev.amount, 
+          newData.probability || prev.probability
         );
+      }
+
+      // Apply business logic for batch updates too
+      if (updates.probability) {
+        const probValue = parseInt(updates.probability) || 0;
+        if (probValue === 100) {
+          newData.status = 'Won';
+          const closedWonStageId = getClosedWonStageId();
+          if (closedWonStageId) {
+            newData.stage = closedWonStageId;
+          }
+          newData.stagePercentage = '100';
+        } else if (probValue === 0) {
+          newData.status = 'Lost';
+          const closedLostStageId = getClosedLostStageId();
+          if (closedLostStageId) {
+            newData.stage = closedLostStageId;
+          }
+          newData.stagePercentage = '0';
+        }
+      }
+
+      if (updates.status) {
+        if (updates.status === 'Won') {
+          newData.probability = '100';
+          const closedWonStageId = getClosedWonStageId();
+          if (closedWonStageId) {
+            newData.stage = closedWonStageId;
+          }
+          newData.stagePercentage = '100';
+        } else if (updates.status === 'Lost') {
+          newData.probability = '0';
+          const closedLostStageId = getClosedLostStageId();
+          if (closedLostStageId) {
+            newData.stage = closedLostStageId;
+          }
+          newData.stagePercentage = '0';
+        }
+      }
+
+      if (updates.stage) {
+        const stageName = getStageNameById(updates.stage);
+        if (stageName === STAGE_NAMES.CLOSED_WON) {
+          newData.status = 'Won';
+          newData.probability = '100';
+          newData.stagePercentage = '100';
+        } else if (stageName === STAGE_NAMES.CLOSED_LOST) {
+          newData.status = 'Lost';
+          newData.probability = '0';
+          newData.stagePercentage = '0';
+        } else if (stageName && STAGE_PERCENTAGES[stageName]) {
+          const stagePercentage = STAGE_PERCENTAGES[stageName];
+          newData.stagePercentage = stagePercentage.toString();
+          if (!updates.probability && prev.probability !== '0' && prev.probability !== '100') {
+            newData.probability = stagePercentage.toString();
+          }
+        }
       }
       
       return newData;
@@ -241,10 +497,12 @@ export const useOpportunityForm = (opportunityId?: string) => {
     // Re-validate after batch update
     if (hasSubmitted) {
       setTimeout(() => {
-        const newFormData = { ...formData, ...updates };
-        const errors = validateRequiredFields(newFormData);
-        setValidationErrors(errors);
-      }, 50);
+        setFormData(currentData => {
+          const errors = validateRequiredFields(currentData);
+          setValidationErrors(errors);
+          return currentData;
+        });
+      }, 100);
     }
 
     setTimeout(() => {
@@ -333,8 +591,125 @@ export const useOpportunityForm = (opportunityId?: string) => {
         setPreviousProbability(formData.probability);
       }
 
-      // Apply the change
-      handleInputChange(field, value);
+      // Apply the change by setting isBatchUpdating to true to bypass confirmation
+      setIsBatchUpdating(true);
+      
+      // Apply the change directly
+      setFormData(prev => {
+        const updatedData = { ...prev, [field]: value };
+
+        // Auto-calculate forecast revenue when amount or probability changes
+        if (field === 'amount' || field === 'probability') {
+          const amount = field === 'amount' ? value : prev.amount;
+          const probability = field === 'probability' ? value : prev.probability;
+          updatedData.forecastRevenue = calculateForecastRevenue(amount, probability);
+        }
+
+        // Apply all business logic based on the field that was changed
+        if (field === 'probability') {
+          const probValue = parseInt(value) || 0;
+          if (probValue === 100) {
+            updatedData.status = 'Won';
+            const closedWonStageId = getClosedWonStageId();
+            if (closedWonStageId) {
+              updatedData.stage = closedWonStageId;
+            }
+            updatedData.stagePercentage = '100';
+            if (!prev.actualCloseDate) {
+              updatedData.actualCloseDate = new Date().toISOString().split('T')[0];
+            }
+            updatedData.lostReason = '';
+          } else if (probValue === 0) {
+            updatedData.status = 'Lost';
+            const closedLostStageId = getClosedLostStageId();
+            if (closedLostStageId) {
+              updatedData.stage = closedLostStageId;
+            }
+            updatedData.stagePercentage = '0';
+            if (!prev.actualCloseDate) {
+              updatedData.actualCloseDate = new Date().toISOString().split('T')[0];
+            }
+            updatedData.winReason = '';
+          }
+        }
+
+        if (field === 'status') {
+          if (value === 'Won') {
+            updatedData.probability = '100';
+            const closedWonStageId = getClosedWonStageId();
+            if (closedWonStageId) {
+              updatedData.stage = closedWonStageId;
+            }
+            updatedData.stagePercentage = '100';
+            if (!prev.actualCloseDate) {
+              updatedData.actualCloseDate = new Date().toISOString().split('T')[0];
+            }
+            updatedData.lostReason = '';
+          } else if (value === 'Lost') {
+            updatedData.probability = '0';
+            const closedLostStageId = getClosedLostStageId();
+            if (closedLostStageId) {
+              updatedData.stage = closedLostStageId;
+            }
+            updatedData.stagePercentage = '0';
+            if (!prev.actualCloseDate) {
+              updatedData.actualCloseDate = new Date().toISOString().split('T')[0];
+            }
+            updatedData.winReason = '';
+          }
+        }
+
+        if (field === 'stage') {
+          const stageName = getStageNameById(value);
+          if (stageName === STAGE_NAMES.CLOSED_WON) {
+            updatedData.status = 'Won';
+            updatedData.probability = '100';
+            updatedData.stagePercentage = '100';
+            if (!prev.actualCloseDate) {
+              updatedData.actualCloseDate = new Date().toISOString().split('T')[0];
+            }
+            updatedData.lostReason = '';
+          } else if (stageName === STAGE_NAMES.CLOSED_LOST) {
+            updatedData.status = 'Lost';
+            updatedData.probability = '0';
+            updatedData.stagePercentage = '0';
+            if (!prev.actualCloseDate) {
+              updatedData.actualCloseDate = new Date().toISOString().split('T')[0];
+            }
+            updatedData.winReason = '';
+          } else if (stageName && STAGE_PERCENTAGES[stageName]) {
+            const stagePercentage = STAGE_PERCENTAGES[stageName];
+            updatedData.stagePercentage = stagePercentage.toString();
+            if (prev.probability !== '0' && prev.probability !== '100') {
+              updatedData.probability = stagePercentage.toString();
+            }
+            if (prev.status === 'Won' || prev.status === 'Lost') {
+              updatedData.status = 'Open';
+              updatedData.actualCloseDate = '';
+              updatedData.winReason = '';
+              updatedData.lostReason = '';
+            }
+          }
+        }
+
+        return updatedData;
+      });
+
+      // Reset batch updating flag
+      setTimeout(() => {
+        setIsBatchUpdating(false);
+      }, 100);
+
+      // Re-validate if form has been submitted
+      if (hasSubmitted) {
+        setTimeout(() => {
+          setFormData(currentData => {
+            const errors = validateRequiredFields(currentData);
+            setValidationErrors(errors);
+            return currentData;
+          });
+        }, 150);
+      }
     }
     
     setStatusConfirmDialog({ isOpen: false, newStatus: null, pendingChange: null });
@@ -355,15 +730,19 @@ export const useOpportunityForm = (opportunityId?: string) => {
   };
 
   const shouldShowUnlinkOption = (): boolean => {
-    const hasLinkedProposal = formData.proposalId && formData.proposalId.trim() !== '';
+    const hasLinkedProposal = formData.proposalId && String(formData.proposalId).trim() !== '';
     const isOriginalProposal = formData.proposalId === originalProposalId;
     return hasLinkedProposal && isOriginalProposal;
   };
 
   const isProposalReplacement = (newProposalId: string): boolean => {
-    const hasOriginalProposal = originalProposalId && originalProposalId.trim() !== '';
+    const hasOriginalProposal = originalProposalId && String(originalProposalId).trim() !== '';
     const isDifferentProposal = newProposalId !== originalProposalId;
     return hasOriginalProposal && isDifferentProposal;
+  };
+
+  const isAmountReadOnly = (): boolean => {
+    return shouldAmountBeReadOnly(formData.proposalId || '');
   };
 
   return {
@@ -383,6 +762,7 @@ export const useOpportunityForm = (opportunityId?: string) => {
     handleStatusConfirm,
     handleStatusCancel,
     validationErrors,
-    hasValidationErrors
+    hasValidationErrors,
+    isAmountReadOnly
   };
 };

@@ -86,6 +86,19 @@ export class OpportunityService {
     }
   }
 
+  // Get opportunity stages
+  async getOpportunityStages(): Promise<any> {
+    try {
+      console.log('OpportunityService: Fetching opportunity stages');
+      const response = await axiosService.get(API_URLS.ADMIN.OPPORTUNITY_STAGES);
+      console.log('OpportunityService: Stages API Response:', response);
+      return response;
+    } catch (error) {
+      console.error('Failed to fetch opportunity stages:', error);
+      throw error;
+    }
+  }
+
   // Update opportunity stage via drag and drop
   async updateOpportunityStage(opportunityId: string, stageId: number, userId?: string): Promise<any> {
     try {

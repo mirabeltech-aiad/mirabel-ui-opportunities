@@ -420,7 +420,7 @@ const CustomerSearchBar: React.FC<CustomerSearchBarProps> = ({
                     value={searchTerm}
                     onChange={handleInputChange}
                     disabled={isLoading}
-                    showClearButton={true}
+                
                     className="w-full [&>div:last-child]:flex-1 [&>div:last-child]:w-full"
                     onClear={() => {
                         setSearchTerm('');

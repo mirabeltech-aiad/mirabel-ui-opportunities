@@ -78,9 +78,13 @@ const LinkedProposalsTab: React.FC<LinkedProposalsTabProps> = ({
       header: '',
       accessor: () => '',
       render: (value, row) => (
-        <RadioGroup value={selectedProposal} onValueChange={handleProposalSelect}>
-          <RadioGroupItem value={row.ID} />
-        </RadioGroup>
+        <div className="flex items-center justify-center">
+          <RadioGroupItem
+            value={row.ID}
+            checked={selectedProposal === row.ID}
+            onClick={() => handleProposalSelect(row.ID)}
+          />
+        </div>
       ),
       sortable: false,
       width: 50
@@ -170,16 +174,14 @@ const LinkedProposalsTab: React.FC<LinkedProposalsTabProps> = ({
 
   // Search for proposals based on BU/Product from formData
   const searchProposals = async () => {
-    if (!formData.customerId && !formData.contactDetails?.ID) {
-      setError('Please select a customer first');
+    const customerSelected = !!(formData.company || formData.contactDetails?.ID);
+    const productSelected = !!(formData.businessUnitId?.length || formData.productId?.length);
+
+    // Only show error if NEITHER condition is met (both are false)
+    if (!customerSelected && !productSelected) {
+      setError("Please select either a customer OR at least one Business Unit/Product to proceed");
       return;
     }
-
-    if (!formData.businessUnitId?.length && !formData.productId?.length) {
-      setError('Please select at least one Business Unit or Product');
-      return;
-    }
-
     setIsLoading(true);
     setError(null);
 
@@ -200,9 +202,9 @@ const LinkedProposalsTab: React.FC<LinkedProposalsTabProps> = ({
       if (formData.productId?.length > 1 || formData.company !== "") {
         // Filter proposals that match current opportunity ID (if editing existing)
         if (opportunityId) {
-          const proposalPageRecordData = data.filter((item) => item.ID == opportunityId);
           // You can use proposalPageRecordData if needed for current proposal
         }
+
 
         // Filter proposals that are not linked to any opportunity (OpportunityID == 0)
         const availableProposals = data.filter((item) => item.OpportunityID == 0);
@@ -264,10 +266,10 @@ const LinkedProposalsTab: React.FC<LinkedProposalsTabProps> = ({
 
   // Auto-search when BU/Product changes
   useEffect(() => {
-    if (formData.businessUnitId?.length || formData.productId?.length) {
+    if (formData.businessUnitId?.length || formData.productId?.length || formData.company?.length) {
       searchProposals();
     }
-  }, [formData.businessUnitId, formData.productId, formData.customerId]);
+  }, [formData.businessUnitId, formData.productId, formData.company]);
 
   return (
     <div className="space-y-6">
@@ -340,16 +342,18 @@ const LinkedProposalsTab: React.FC<LinkedProposalsTabProps> = ({
         {/* Proposals Table with AdvancedDataTable */}
         {proposals.length > 0 ? (
           <div className="p-4">
-            <AdvancedDataTable
-              data={proposals}
-              columns={columns}
-              loading={isLoading}
-              enableSelection={false}
-              enablePagination={true}
-              initialPageSize={10}
-              className="border border-gray-200 rounded-lg"
-              onRowClick={(row) => handleProposalSelect(row.ID)}
-            />
+            <RadioGroup value={selectedProposal} onValueChange={handleProposalSelect}>
+              <AdvancedDataTable
+                data={proposals}
+                columns={columns}
+                loading={isLoading}
+                enableSelection={false}
+                enablePagination={true}
+                initialPageSize={10}
+                className="border border-gray-200 rounded-lg"
+                onRowClick={(row) => handleProposalSelect(row.ID)}
+              />
+            </RadioGroup>
           </div>
         ) : !isLoading && !error && (
           <div className="p-8 text-center text-gray-500">
