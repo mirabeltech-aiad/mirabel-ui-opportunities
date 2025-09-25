@@ -6,6 +6,7 @@ import { OPPORTUNITY_FORM_CONFIG } from '../config/opportunityFormConfig';
 import { PROPOSAL_FORM_CONFIG } from '../config/proposalFormConfig';
 import { getRecentSearchData, loadSavedSearch } from '@/services/userService';
 import { buildSearchJson } from '@/features/Opportunity/utils/searchJsonBuilder';
+import SettingsPanel from '@/components/ui/SettingsPanel';
 
 const AdvancedSearch = () => {
   const [activeTab, setActiveTab] = useState('opportunities');
@@ -15,6 +16,7 @@ const AdvancedSearch = () => {
   const [openPropSections, setOpenPropSections] = useState(['primary-fields']);
   const [showResults, setShowResults] = useState(false);
   const [searchParams, setSearchParams] = useState({});
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
 
   // Recent search data
   const [isLoadingRecentSearch, setIsLoadingRecentSearch] = useState(false);
@@ -149,7 +151,9 @@ useEffect(() => {
               <RotateCcw className="h-4 w-4" />
               <span>Reset</span>
             </button>
-            <button className="flex items-center space-x-2 px-4 py-2 text-gray-700 hover:text-gray-900 border border-gray-300 rounded-md hover:bg-gray-50">
+            <button className="flex items-center space-x-2 px-4 py-2 text-gray-700 hover:text-gray-900 border border-gray-300 rounded-md hover:bg-gray-50"
+              onClick={() => setIsSettingsOpen(true)}
+            >
               <Settings className="h-4 w-4" />
               <span>Settings</span>
             </button>
@@ -228,6 +232,7 @@ useEffect(() => {
           </div>
         </div>
       </div>
+      <SettingsPanel isOpen={isSettingsOpen} onClose={() => setIsSettingsOpen(false)} />
     </div>
   );
 };

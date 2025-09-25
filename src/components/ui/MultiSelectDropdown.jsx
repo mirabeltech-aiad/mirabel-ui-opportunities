@@ -90,19 +90,39 @@ const MultiSelectDropdown = ({
     };
   }, [isOpen]);
 
-  // Update portal position when open
+  // Helper to update portal position next to the trigger
+  const updatePortalPosition = () => {
+    if (!buttonRef.current) return;
+    const rect = buttonRef.current.getBoundingClientRect();
+    setPortalStyle({
+      position: 'fixed',
+      top: rect.bottom + 4,
+      left: rect.left,
+      width: rect.width,
+      zIndex: 99
+    });
+  };
+
+  // Update portal position when open or size changes
   useEffect(() => {
-    if (isOpen && buttonRef.current) {
-      const rect = buttonRef.current.getBoundingClientRect();
-      setPortalStyle({
-        position: 'absolute',
-        top: rect.bottom + window.scrollY + 4,
-        left: rect.left + window.scrollX,
-        width: rect.width,
-        zIndex: 99
-      });
+    if (isOpen) {
+      updatePortalPosition();
     }
   }, [isOpen, dropdownWidth]);
+
+  // Reposition on scroll (including scrolling containers) and resize
+  useEffect(() => {
+    if (!isOpen) return;
+    const handleScroll = () => updatePortalPosition();
+    const handleResize = () => updatePortalPosition();
+    // capture=true catches scrolls on any ancestor scrollable element
+    document.addEventListener('scroll', handleScroll, true);
+    window.addEventListener('resize', handleResize);
+    return () => {
+      document.removeEventListener('scroll', handleScroll, true);
+      window.removeEventListener('resize', handleResize);
+    };
+  }, [isOpen]);
 
   // Global dropdown coordination - close other dropdowns when this one opens
   useEffect(() => {

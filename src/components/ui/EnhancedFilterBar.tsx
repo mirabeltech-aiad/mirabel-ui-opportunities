@@ -1,10 +1,11 @@
 // import { logger } from '../../utils/logger'
 
-import { FC } from 'react'
+import { FC, useState } from 'react'
 import { Button } from './button'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './select'
 import { SearchInput } from './SearchInput'
 import { PowerMultiselect } from '../../shared/components/ui/PowerMultiselect'
+import SettingsPanel from './SettingsPanel'
 
 import {
   RefreshCw,
@@ -63,6 +64,7 @@ interface EnhancedFilterBarProps {
   onRefresh?: () => void;
   onViewsClick?: () => void;
   onFilterClick?: () => void;
+  onSettingsClick?: () => void;
   onSortPresetChange?: (preset: SortPreset | null) => void;
   activeSortPreset?: string | null;
   searchPlaceholder?: string;
@@ -92,6 +94,7 @@ export const EnhancedFilterBar: FC<EnhancedFilterBarProps> = ({
   onRefresh,
   onViewsClick,
   onFilterClick,
+  onSettingsClick,
   onSortPresetChange,
   activeSortPreset = null,
   searchPlaceholder = "Search...",
@@ -109,6 +112,7 @@ export const EnhancedFilterBar: FC<EnhancedFilterBarProps> = ({
   compactResetButton = false,
   onNextPage
 }) => {
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false)
   // Determine which system to use
   const useUnifiedSystem = !!filterManager
 
@@ -355,7 +359,7 @@ export const EnhancedFilterBar: FC<EnhancedFilterBarProps> = ({
               variant="outline"
               size="sm"
               className="h-9 w-9 p-0"
-              onClick={() => { }}
+              onClick={() => (onSettingsClick ? onSettingsClick() : setIsSettingsOpen(true))}
             >
               <Settings className="h-4 w-4" />
             </Button>
@@ -444,6 +448,8 @@ export const EnhancedFilterBar: FC<EnhancedFilterBarProps> = ({
           </Tooltip>
         )}
       </div>
+      {/* Embedded Settings Panel for default behavior */}
+      <SettingsPanel isOpen={isSettingsOpen} onClose={() => setIsSettingsOpen(false)} />
     </div>
   )
 }

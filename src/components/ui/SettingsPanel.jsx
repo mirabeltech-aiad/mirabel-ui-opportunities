@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import apiService from '@/features/Opportunity/Services/apiService';
+import apiService from '@/features/Opportunity-new/services/apiService';
 
 const SettingsPanel = ({ isOpen, onClose }) => {
   const [startPage, setStartPage] = useState('Quick Search/Results');
