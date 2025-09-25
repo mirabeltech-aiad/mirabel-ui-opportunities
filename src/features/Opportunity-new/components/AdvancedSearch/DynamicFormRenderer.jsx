@@ -352,7 +352,6 @@ const DynamicFormRenderer = ({
 
       // Handler for when dropdown button is clicked
       const handleDropdownClick = () => {
-        debugger;
         if (
           dataSource &&
           !dropdownData[dataSource] &&

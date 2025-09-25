@@ -213,7 +213,7 @@ const FloatingActionPanel = ({ searchParams, onSearch, onClear, openAccordions, 
   // Helper to get label from value for known fields
   const getLabelForValue = (key, value) => {
     // Special handling for opportunity name basic - handle predefined options
-    if (key === "opportunityNameBasic") {
+    if (key === "opportunityName") {
       if (value === "IN=Is Empty~") {
         return "Is Empty";
       }

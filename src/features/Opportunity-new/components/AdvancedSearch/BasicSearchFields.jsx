@@ -139,7 +139,7 @@ const BasicSearchFields = ({ handleInputChange, handleSelectChange, searchParams
             <EnhancedOpportunityNameField
               label="Opportunity Name"
               value={Array.isArray(searchParams.opportunityNameBasic) ? searchParams.opportunityNameBasic : (searchParams.opportunityNameBasic ? [searchParams.opportunityNameBasic] : [])}
-              onChange={handleMultiSelectChange("opportunityNameBasic")}
+              onChange={handleMultiSelectChange("opportunityName")}
               placeholder="Type opportunity name or select option..."
             />
           </div>
