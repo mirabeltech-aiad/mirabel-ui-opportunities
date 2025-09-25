@@ -218,13 +218,30 @@ const KanbanView = ({
         destinationStage.id
       );
 
-      // Update local state optimistically
+      // Update local state optimistically (mirror old behavior for Closed Won)
+      const destNameLc = String(destinationStage.name || destination.droppableId).toLowerCase();
+      const todayStr = new Date().toLocaleDateString('en-US', { month: '2-digit', day: '2-digit', year: 'numeric' });
+
       const updatedOpportunities = localOpportunities.map((opp, index) => {
         const oppDragId = getDragId(opp, index);
-        if (oppDragId === draggableId) {
-          return { ...opp, stage: destination.droppableId };
+        if (oppDragId !== draggableId) return opp;
+
+        const base = { ...opp, stage: destination.droppableId };
+        // Keep OppStageDetails in sync for consumers expecting nested path
+        if (base.OppStageDetails && typeof base.OppStageDetails === 'object') {
+          base.OppStageDetails = { ...base.OppStageDetails, Stage: destination.droppableId };
         }
-        return opp;
+        if (destNameLc.includes('closed') && destNameLc.includes('won')) {
+          return {
+            ...base,
+            // Old behavior: set probability 100 and Actual Close Date today (also set CloseDate for UI)
+            Probability: 100,
+            Status: 'Won',
+            CloseDate: todayStr,
+            ActualCloseDate: todayStr,
+          };
+        }
+        return base;
       });
 
       setLocalOpportunities(updatedOpportunities);
