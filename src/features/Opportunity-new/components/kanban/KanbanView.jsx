@@ -7,6 +7,7 @@ import {
   findOpportunityByDragId,
   getDragId,
   extractOpportunityIdFromDragId,
+  attachDragIds,
 } from "../../utils/kanbanUtils";
 
 const KanbanView = ({
@@ -29,7 +30,7 @@ const KanbanView = ({
   onAddOpportunity,
 }) => {
   const [localOpportunities, setLocalOpportunities] =
-    React.useState(opportunities);
+    React.useState(attachDragIds(opportunities || []));
   const [localStages, setLocalStages] = React.useState(stages);
   const [isUpdating, setIsUpdating] = React.useState(false);
   const [isLoading, setIsLoading] = React.useState(false);
@@ -116,7 +117,7 @@ const KanbanView = ({
       // Always use Pipeline data if provided, even if empty (means Pipeline loaded but found no results)
       if (opportunities !== undefined && !opportunitiesFetched) {
         console.log("KanbanView: Using opportunities from Pipeline:", opportunities.length);
-        setLocalOpportunities(opportunities);
+        setLocalOpportunities(attachDragIds(opportunities));
         setIsLoading(false);
         setOpportunitiesFetched(true);
         return;
@@ -141,7 +142,7 @@ const KanbanView = ({
           
           if (result.opportunitiesData && Array.isArray(result.opportunitiesData)) {
             console.log("KanbanView: Setting opportunities from direct API:", result.opportunitiesData.length);
-            setLocalOpportunities(result.opportunitiesData);
+            setLocalOpportunities(attachDragIds(result.opportunitiesData));
           } else {
             console.warn("KanbanView: No data from direct API call");
             setLocalOpportunities([]);
@@ -228,10 +229,10 @@ const KanbanView = ({
 
       setLocalOpportunities(updatedOpportunities);
 
-      // Refresh data to get updated information
-      if (onRefresh) {
-        onRefresh();
-      }
+      // Do not trigger a global refresh here to avoid loader in Kanban view
+      // if (onRefresh) {
+      //   onRefresh();
+      // }
     } catch (error) {
       console.error("Failed to update opportunity stage:", error);
       alert("Failed to update opportunity stage. Please try again.");
