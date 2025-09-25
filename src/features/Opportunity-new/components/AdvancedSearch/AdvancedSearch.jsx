@@ -4,9 +4,11 @@ import SearchResults from '../SearchResults/SearchResults';
 import DynamicFormRenderer from './DynamicFormRenderer';
 import { OPPORTUNITY_FORM_CONFIG } from '../config/opportunityFormConfig';
 import { PROPOSAL_FORM_CONFIG } from '../config/proposalFormConfig';
+import { GradientTabBar } from '@/shared/components/ui/GradientTabBar';
 import { getRecentSearchData, loadSavedSearch } from '@/services/userService';
 import { buildSearchJson } from '@/features/Opportunity/utils/searchJsonBuilder';
 import SettingsPanel from '@/components/ui/SettingsPanel';
+import { ADVANCED_SEARCH_TABS } from '../../constants/constants';
 
 const AdvancedSearch = () => {
   const [activeTab, setActiveTab] = useState('opportunities');
@@ -180,28 +182,13 @@ useEffect(() => {
               <h2 className="text-xl font-semibold text-blue-900 mb-4">Advanced Search</h2>
               
               {/* Tabs */}
-              <div className="flex space-x-8">
-                <button
-                  onClick={() => setActiveTab('opportunities')}
-                  className={`pb-2 text-sm font-medium border-b-2 transition-colors ${
-                    activeTab === 'opportunities'
-                      ? 'text-blue-600 border-blue-600'
-                      : 'text-gray-500 border-transparent hover:text-gray-700'
-                  }`}
-                >
-                  Opportunities
-                </button>
-                <button
-                  onClick={() => setActiveTab('proposals')}
-                  className={`pb-2 text-sm font-medium border-b-2 transition-colors ${
-                    activeTab === 'proposals'
-                      ? 'text-blue-600 border-blue-600'
-                      : 'text-gray-500 border-transparent hover:text-gray-700'
-                  }`}
-                >
-                  Proposals
-                </button>
-              </div>
+              <GradientTabBar
+                tabs={ADVANCED_SEARCH_TABS}
+                activeTab={activeTab}
+                onTabChange={setActiveTab}
+                variant="compact"
+                className="mb-1"
+              />
             </div>
 
             {/* Dynamic Content based on active tab */}
