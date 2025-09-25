@@ -1,13 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/shared/components/ui/button';
-import { RadioGroup, RadioGroupItem } from '@/shared/components/ui/radio-group';
+
 import { Link2Off, ExternalLink, AlertCircle, CheckCircle2 } from 'lucide-react';
 import { OpportunityFormData } from '../../../types/opportunity';
 import { Alert, AlertDescription } from '@/shared/components/ui/alert';
 import { opportunityService } from '../../../services/opportunityService';
 import AdvancedDataTable from '@/shared/components/ui/advanced-table/AdvancedDataTable';
 import { ColumnDefinition } from '@/shared/components/ui/advanced-table/types/column.types';
-import { getRepColor } from '@/utils/commonHelpers';
+import { getRepColor, formatAmountWithCurrency } from '@/utils/commonHelpers';
+import { formatLongDate } from '@/utils/dateFormatters';
 import RepAvatar from '@/shared/components/ui/RepAvatar';
 
 interface LinkedProposalsTabProps {
@@ -33,7 +34,10 @@ interface Proposal {
   Products: string;
   Description: string;
   Rep: SalesRep;
+  SalesRep: SalesRep;
   CreatedDate: string;
+  ProposalDate: string;
+  Net: number;
   OpportunityID: number;
   repWithInitials: HTMLElement
 }
@@ -52,24 +56,7 @@ const LinkedProposalsTab: React.FC<LinkedProposalsTabProps> = ({
   const [selectedProposal, setSelectedProposal] = useState(formData.proposalId);
   const [error, setError] = useState<string | null>(null);
 
-  // Format currency
-  const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: 'USD',
-      minimumFractionDigits: 0,
-      maximumFractionDigits: 0,
-    }).format(amount);
-  };
 
-  // Format date
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('en-US', {
-      month: 'numeric',
-      day: 'numeric',
-      year: 'numeric'
-    });
-  };
 
   // Define columns for AdvancedDataTable
   const columns: ColumnDefinition<Proposal>[] = [
@@ -79,10 +66,13 @@ const LinkedProposalsTab: React.FC<LinkedProposalsTabProps> = ({
       accessor: () => '',
       render: (value, row) => (
         <div className="flex items-center justify-center">
-          <RadioGroupItem
+          <input
+            type="radio"
+            name="proposalSelection"
             value={row.ID}
             checked={selectedProposal === row.ID}
-            onClick={() => handleProposalSelect(row.ID)}
+            onChange={() => handleProposalSelect(row.ID)}
+            className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300"
           />
         </div>
       ),
@@ -123,9 +113,9 @@ const LinkedProposalsTab: React.FC<LinkedProposalsTabProps> = ({
     {
       id: 'rep',
       header: 'Rep',
-      accessor: (row) => row.Rep?.Name || '',
+      accessor: (row) => row.SalesRep?.Name || '',
       render: (value, row) => {
-        const repName = row.Rep?.Name || 'N/A';
+        const repName = row.SalesRep?.Name || 'N/A';
         return (
           <div className="flex items-center gap-2">
             <RepAvatar name={repName} size="sm" />
@@ -140,7 +130,7 @@ const LinkedProposalsTab: React.FC<LinkedProposalsTabProps> = ({
       accessor: 'CreatedDate',
       render: (value, row) => (
         <div className="text-sm text-gray-900">
-          {formatDate(row.CreatedDate)}
+          {formatLongDate(row.ProposalDate)}
         </div>
       )
     },
@@ -150,7 +140,7 @@ const LinkedProposalsTab: React.FC<LinkedProposalsTabProps> = ({
       accessor: 'Amount',
       render: (value, row) => (
         <div className="text-sm font-medium text-gray-900">
-          {formatCurrency(row.Amount)}
+          {formatAmountWithCurrency(row.Amount || row.Net, true)}
         </div>
       )
     },
@@ -191,9 +181,14 @@ const LinkedProposalsTab: React.FC<LinkedProposalsTabProps> = ({
         Customer: formData.company || "",
         ProductIDs: formData.productId?.join(",") || "",
         BusinessUnitIDs: formData.businessUnitId?.join(",") || "",
-        Status: 'Active',
-        ExcludeLinked: true
+        ConvertedToContract: "No",
+        FromDate: "",
+        ToDate: "",
+        ProductTypeID: -1,
+        UserID: -1
       };
+
+
 
       // Use the opportunityService method with the specified logic
       const data = await opportunityService.getProposalsBasedOnOpportunity("ALL", BaseSearchParametersDTO);
@@ -202,9 +197,11 @@ const LinkedProposalsTab: React.FC<LinkedProposalsTabProps> = ({
       if (formData.productId?.length > 1 || formData.company !== "") {
         // Filter proposals that match current opportunity ID (if editing existing)
         if (opportunityId) {
+
+          const selectedProposal = data.find((item) => item.OpportunityID == opportunityId);
+          setSelectedProposal(selectedProposal?.ID);
           // You can use proposalPageRecordData if needed for current proposal
         }
-
 
         // Filter proposals that are not linked to any opportunity (OpportunityID == 0)
         const availableProposals = data.filter((item) => item.OpportunityID == 0);
@@ -213,7 +210,7 @@ const LinkedProposalsTab: React.FC<LinkedProposalsTabProps> = ({
 
         const proposalsWithColors = availableProposals.map(proposal => ({
           ...proposal,
-          repWithInitials: proposal.Rep?.Name ? getRepColor(proposal.Rep.Name, distinctReps) : undefined
+          repWithInitials: proposal.SalesRep?.Name ? getRepColor(proposal.SalesRep.Name, distinctReps) : undefined
         }));
 
         setProposals(proposalsWithColors);
@@ -342,18 +339,16 @@ const LinkedProposalsTab: React.FC<LinkedProposalsTabProps> = ({
         {/* Proposals Table with AdvancedDataTable */}
         {proposals.length > 0 ? (
           <div className="p-4">
-            <RadioGroup value={selectedProposal} onValueChange={handleProposalSelect}>
-              <AdvancedDataTable
-                data={proposals}
-                columns={columns}
-                loading={isLoading}
-                enableSelection={false}
-                enablePagination={true}
-                initialPageSize={10}
-                className="border border-gray-200 rounded-lg"
-                onRowClick={(row) => handleProposalSelect(row.ID)}
-              />
-            </RadioGroup>
+            <AdvancedDataTable
+              data={proposals}
+              columns={columns}
+              loading={isLoading}
+              enableSelection={false}
+              enablePagination={true}
+              initialPageSize={10}
+              className="border border-gray-200 rounded-lg"
+              onRowClick={(row) => handleProposalSelect(row.ID)}
+            />
           </div>
         ) : !isLoading && !error && (
           <div className="p-8 text-center text-gray-500">

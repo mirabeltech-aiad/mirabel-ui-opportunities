@@ -43,15 +43,25 @@ const EditOpportunity: React.FC = () => {
     } = useOpportunityForm(id);
 
     const handleSave = async () => {
-        const success = await saveOpportunity();
-        if (success) {
-            toast({
-                title: "Success!",
-                description: `The opportunity has been successfully ${isAddMode ? 'created' : 'updated'}.`,
-                className: 'border-green-200 bg-green-50 text-green-900 shadow-lg',
-                duration: 4000,
-            });
-            navigate('/opportunities');
+        console.log('HandleSave: Save button clicked');
+        try {
+            const success = await saveOpportunity();
+            console.log('HandleSave: Save result:', success);
+            
+            if (success) {
+                console.log('HandleSave: Save successful, showing success toast and navigating');
+                toast({
+                    title: "Success!",
+                    description: `The opportunity has been successfully ${isAddMode ? 'created' : 'updated'}.`,
+                    className: 'border-green-200 bg-green-50 text-green-900 shadow-lg',
+                    duration: 4000,
+                });
+                navigate('/opportunities');
+            } else {
+                console.log('HandleSave: Save failed');
+            }
+        } catch (error) {
+            console.error('HandleSave: Unexpected error:', error);
         }
     };
 
@@ -207,12 +217,17 @@ const EditOpportunity: React.FC = () => {
                                     </div>
                                 </div>
                             )}
+               <div className="bg-white border border-gray-200 rounded-lg">
+                    <div className="p-6 border-b border-gray-200">
+                        <GradientTabBar
+                        tabs={tabs}
+                        activeTab={activeTab}
+                        onTabChange={setActiveTab}
+                        variant="default"
+                        />
+                    </div>
 
-                            <GradientTabBar
-                                tabs={tabs}
-                                activeTab={activeTab}
-                                onTabChange={setActiveTab}
-                            />
+              </div>                 
 
                             {/* Tab Content */}
                             <div className="mt-6">

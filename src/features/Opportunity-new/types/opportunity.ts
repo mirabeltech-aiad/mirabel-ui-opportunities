@@ -40,7 +40,7 @@ export interface OpportunityFormData {
     Name?: string;
   };
   createdBy: string;
-  source: string;
+  
   leadSource: string;
   leadType: string;
   leadStatus: string;

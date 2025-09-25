@@ -46,7 +46,7 @@ export const numberWithCommas = function (number) {
     // Used `window.top` instead of `window` is to reuse `MMClientMessage` loaded in `Home.aspx` page
     const messageWindow = isWindowTopAccessible() ? window.top : window;
     return (
-      (messageWindow.MMClientMessage && messageWindow.MMClientMessage[code]) || ""
+      (messageWindow.MMClientMessage && messageWindow.MMClientMessage[code]) || (code=="MMCurrency" && "$")
     );
   };
   export const formatAmountWithCurrency = function (
@@ -122,15 +122,6 @@ export const numberWithCommas = function (number) {
     /Android|webOS|iPhone|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
       navigator.userAgent
     );
-
-export const formatDate = (dateString) => {
-  const date = new Date(dateString);
-  return date.toLocaleDateString('en-US', {
-    month: 'short',
-    day: 'numeric',
-    year: 'numeric'
-  });
-};
 
 
 

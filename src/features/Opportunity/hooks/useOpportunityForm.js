@@ -1113,7 +1113,6 @@ export const useOpportunityForm = (opportunityId, apiStages = []) => {
         if (formData.proposalId && formData.proposalId !== originalProposalId) {
           updateOriginalProposalId(formData.proposalId);
         }
-        
         toast({
           title: "Success",
           description: "Opportunity has been saved successfully.",

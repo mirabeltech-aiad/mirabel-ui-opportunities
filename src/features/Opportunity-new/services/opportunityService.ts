@@ -161,6 +161,19 @@ export class OpportunityService {
     }
   }
 
+  // Get required fields configuration from API
+  async getRequiredFields(): Promise<any> {
+    try {
+      console.log('OpportunityService: Fetching required fields configuration');
+      const response = await axiosService.get('/services/Admin/RequiredFields/PageName/OpportunityRequiredRequest');
+      console.log('OpportunityService: Required fields API Response:', response);
+      return response;
+    } catch (error) {
+      console.error('Failed to fetch required fields configuration:', error);
+      throw error;
+    }
+  }
+
   // Update opportunity stage via drag and drop
   async updateOpportunityStage(opportunityId: string, stageId: number, userId?: string): Promise<any> {
     try {

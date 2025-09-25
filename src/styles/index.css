@@ -1,4 +1,3 @@
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -76,70 +75,371 @@
   * {
     @apply border-border;
   }
+
   body {
     @apply bg-background text-foreground;
   }
 }
 
 /* Ocean theme utility classes */
-.text-ocean-50 { color: rgb(240 249 255); }
-.text-ocean-100 { color: rgb(224 242 254); }
-.text-ocean-200 { color: rgb(186 230 253); }
-.text-ocean-300 { color: rgb(125 211 252); }
-.text-ocean-400 { color: rgb(56 189 248); }
-.text-ocean-500 { color: rgb(14 165 233); }
-.text-ocean-600 { color: rgb(2 132 199); }
-.text-ocean-700 { color: rgb(3 105 161); }
-.text-ocean-800 { color: rgb(7 89 133); }
-.text-ocean-900 { color: rgb(12 74 110); }
+.text-ocean-50 {
+  color: rgb(240 249 255);
+}
 
-.bg-ocean-50 { background-color: rgb(240 249 255); }
-.bg-ocean-100 { background-color: rgb(224 242 254); }
-.bg-ocean-200 { background-color: rgb(186 230 253); }
-.bg-ocean-300 { background-color: rgb(125 211 252); }
-.bg-ocean-400 { background-color: rgb(56 189 248); }
-.bg-ocean-500 { background-color: rgb(14 165 233); }
-.bg-ocean-600 { background-color: rgb(2 132 199); }
-.bg-ocean-700 { background-color: rgb(3 105 161); }
-.bg-ocean-800 { background-color: rgb(7 89 133); }
-.bg-ocean-900 { background-color: rgb(12 74 110); }
+.text-ocean-100 {
+  color: rgb(224 242 254);
+}
 
-.border-ocean-50 { border-color: rgb(240 249 255); }
-.border-ocean-100 { border-color: rgb(224 242 254); }
-.border-ocean-200 { border-color: rgb(186 230 253); }
-.border-ocean-300 { border-color: rgb(125 211 252); }
-.border-ocean-400 { border-color: rgb(56 189 248); }
-.border-ocean-500 { border-color: rgb(14 165 233); }
-.border-ocean-600 { border-color: rgb(2 132 199); }
-.border-ocean-700 { border-color: rgb(3 105 161); }
-.border-ocean-800 { border-color: rgb(7 89 133); }
-.border-ocean-900 { border-color: rgb(12 74 110); }
+.text-ocean-200 {
+  color: rgb(186 230 253);
+}
+
+.text-ocean-300 {
+  color: rgb(125 211 252);
+}
+
+.text-ocean-400 {
+  color: rgb(56 189 248);
+}
+
+.text-ocean-500 {
+  color: rgb(14 165 233);
+}
+
+.text-ocean-600 {
+  color: rgb(2 132 199);
+}
+
+.text-ocean-700 {
+  color: rgb(3 105 161);
+}
+
+.text-ocean-800 {
+  color: rgb(7 89 133);
+}
+
+.text-ocean-900 {
+  color: rgb(12 74 110);
+}
+
+.bg-ocean-50 {
+  background-color: rgb(240 249 255);
+}
+
+.bg-ocean-100 {
+  background-color: rgb(224 242 254);
+}
+
+.bg-ocean-200 {
+  background-color: rgb(186 230 253);
+}
+
+.bg-ocean-300 {
+  background-color: rgb(125 211 252);
+}
+
+.bg-ocean-400 {
+  background-color: rgb(56 189 248);
+}
+
+.bg-ocean-500 {
+  background-color: rgb(14 165 233);
+}
+
+.bg-ocean-600 {
+  background-color: rgb(2 132 199);
+}
+
+.bg-ocean-700 {
+  background-color: rgb(3 105 161);
+}
+
+.bg-ocean-800 {
+  background-color: rgb(7 89 133);
+}
+
+.bg-ocean-900 {
+  background-color: rgb(12 74 110);
+}
+
+.border-ocean-50 {
+  border-color: rgb(240 249 255);
+}
+
+.border-ocean-100 {
+  border-color: rgb(224 242 254);
+}
+
+.border-ocean-200 {
+  border-color: rgb(186 230 253);
+}
+
+.border-ocean-300 {
+  border-color: rgb(125 211 252);
+}
+
+.border-ocean-400 {
+  border-color: rgb(56 189 248);
+}
+
+.border-ocean-500 {
+  border-color: rgb(14 165 233);
+}
+
+.border-ocean-600 {
+  border-color: rgb(2 132 199);
+}
+
+.border-ocean-700 {
+  border-color: rgb(3 105 161);
+}
+
+.border-ocean-800 {
+  border-color: rgb(7 89 133);
+}
+
+.border-ocean-900 {
+  border-color: rgb(12 74 110);
+}
 
 /* Ring colors for focus states */
-.ring-ocean-50 { --tw-ring-color: rgb(240 249 255); }
-.ring-ocean-100 { --tw-ring-color: rgb(224 242 254); }
-.ring-ocean-200 { --tw-ring-color: rgb(186 230 253); }
-.ring-ocean-300 { --tw-ring-color: rgb(125 211 252); }
-.ring-ocean-400 { --tw-ring-color: rgb(56 189 248); }
-.ring-ocean-500 { --tw-ring-color: rgb(14 165 233); }
-.ring-ocean-600 { --tw-ring-color: rgb(2 132 199); }
-.ring-ocean-700 { --tw-ring-color: rgb(3 105 161); }
-.ring-ocean-800 { --tw-ring-color: rgb(7 89 133); }
-.ring-ocean-900 { --tw-ring-color: rgb(12 74 110); }
+.ring-ocean-50 {
+  --tw-ring-color: rgb(240 249 255);
+}
 
-.hover\:bg-ocean-50:hover { background-color: rgb(240 249 255); }
-.hover\:bg-ocean-100:hover { background-color: rgb(224 242 254); }
-.hover\:bg-ocean-200:hover { background-color: rgb(186 230 253); }
-.hover\:bg-ocean-300:hover { background-color: rgb(125 211 252); }
-.hover\:bg-ocean-400:hover { background-color: rgb(56 189 248); }
-.hover\:bg-ocean-500:hover { background-color: rgb(14 165 233); }
-.hover\:bg-ocean-600:hover { background-color: rgb(2 132 199); }
-.hover\:bg-ocean-700:hover { background-color: rgb(3 105 161); }
-.hover\:bg-ocean-800:hover { background-color: rgb(7 89 133); }
-.hover\:bg-ocean-900:hover { background-color: rgb(12 74 110); }
+.ring-ocean-100 {
+  --tw-ring-color: rgb(224 242 254);
+}
 
-/* Ocean gradient - Proper diagonal flow from deep navy to bright ocean */
+.ring-ocean-200 {
+  --tw-ring-color: rgb(186 230 253);
+}
+
+.ring-ocean-300 {
+  --tw-ring-color: rgb(125 211 252);
+}
+
+.ring-ocean-400 {
+  --tw-ring-color: rgb(56 189 248);
+}
+
+.ring-ocean-500 {
+  --tw-ring-color: rgb(14 165 233);
+}
+
+.ring-ocean-600 {
+  --tw-ring-color: rgb(2 132 199);
+}
+
+.ring-ocean-700 {
+  --tw-ring-color: rgb(3 105 161);
+}
+
+.ring-ocean-800 {
+  --tw-ring-color: rgb(7 89 133);
+}
+
+.ring-ocean-900 {
+  --tw-ring-color: rgb(12 74 110);
+}
+
+.hover\:bg-ocean-50:hover {
+  background-color: rgb(240 249 255);
+}
+
+.hover\:bg-ocean-100:hover {
+  background-color: rgb(224 242 254);
+}
+
+.hover\:bg-ocean-200:hover {
+  background-color: rgb(186 230 253);
+}
+
+.hover\:bg-ocean-300:hover {
+  background-color: rgb(125 211 252);
+}
+
+.hover\:bg-ocean-400:hover {
+  background-color: rgb(56 189 248);
+}
+
+.hover\:bg-ocean-500:hover {
+  background-color: rgb(14 165 233);
+}
+
+.hover\:bg-ocean-600:hover {
+  background-color: rgb(2 132 199);
+}
+
+.hover\:bg-ocean-700:hover {
+  background-color: rgb(3 105 161);
+}
+
+.hover\:bg-ocean-800:hover {
+  background-color: rgb(7 89 133);
+}
+
+.hover\:bg-ocean-900:hover {
+  background-color: rgb(12 74 110);
+}
+
+/* Ocean gradient utilities for Tailwind */
 @layer utilities {
+
+  /* From ocean colors */
+  .from-ocean-50 {
+    --tw-gradient-from: rgb(240 249 255);
+    --tw-gradient-to: rgb(240 249 255 / 0);
+    --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to);
+  }
+
+  .from-ocean-100 {
+    --tw-gradient-from: rgb(224 242 254);
+    --tw-gradient-to: rgb(224 242 254 / 0);
+    --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to);
+  }
+
+  .from-ocean-200 {
+    --tw-gradient-from: rgb(186 230 253);
+    --tw-gradient-to: rgb(186 230 253 / 0);
+    --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to);
+  }
+
+  .from-ocean-300 {
+    --tw-gradient-from: rgb(125 211 252);
+    --tw-gradient-to: rgb(125 211 252 / 0);
+    --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to);
+  }
+
+  .from-ocean-400 {
+    --tw-gradient-from: rgb(56 189 248);
+    --tw-gradient-to: rgb(56 189 248 / 0);
+    --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to);
+  }
+
+  .from-ocean-500 {
+    --tw-gradient-from: rgb(14 165 233);
+    --tw-gradient-to: rgb(14 165 233 / 0);
+    --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to);
+  }
+
+  .from-ocean-600 {
+    --tw-gradient-from: rgb(2 132 199);
+    --tw-gradient-to: rgb(2 132 199 / 0);
+    --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to);
+  }
+
+  .from-ocean-700 {
+    --tw-gradient-from: rgb(3 105 161);
+    --tw-gradient-to: rgb(3 105 161 / 0);
+    --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to);
+  }
+
+  .from-ocean-800 {
+    --tw-gradient-from: rgb(7 89 133);
+    --tw-gradient-to: rgb(7 89 133 / 0);
+    --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to);
+  }
+
+  .from-ocean-900 {
+    --tw-gradient-from: rgb(12 74 110);
+    --tw-gradient-to: rgb(12 74 110 / 0);
+    --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to);
+  }
+
+  /* To ocean colors */
+  .to-ocean-50 {
+    --tw-gradient-to: rgb(240 249 255);
+  }
+
+  .to-ocean-100 {
+    --tw-gradient-to: rgb(224 242 254);
+  }
+
+  .to-ocean-200 {
+    --tw-gradient-to: rgb(186 230 253);
+  }
+
+  .to-ocean-300 {
+    --tw-gradient-to: rgb(125 211 252);
+  }
+
+  .to-ocean-400 {
+    --tw-gradient-to: rgb(56 189 248);
+  }
+
+  .to-ocean-500 {
+    --tw-gradient-to: rgb(14 165 233);
+  }
+
+  .to-ocean-600 {
+    --tw-gradient-to: rgb(2 132 199);
+  }
+
+  .to-ocean-700 {
+    --tw-gradient-to: rgb(3 105 161);
+  }
+
+  .to-ocean-800 {
+    --tw-gradient-to: rgb(7 89 133);
+  }
+
+  .to-ocean-900 {
+    --tw-gradient-to: rgb(12 74 110);
+  }
+
+  /* Via ocean colors */
+  .via-ocean-50 {
+    --tw-gradient-to: rgb(240 249 255 / 0);
+    --tw-gradient-stops: var(--tw-gradient-from), rgb(240 249 255), var(--tw-gradient-to);
+  }
+
+  .via-ocean-100 {
+    --tw-gradient-to: rgb(224 242 254 / 0);
+    --tw-gradient-stops: var(--tw-gradient-from), rgb(224 242 254), var(--tw-gradient-to);
+  }
+
+  .via-ocean-200 {
+    --tw-gradient-to: rgb(186 230 253 / 0);
+    --tw-gradient-stops: var(--tw-gradient-from), rgb(186 230 253), var(--tw-gradient-to);
+  }
+
+  .via-ocean-300 {
+    --tw-gradient-to: rgb(125 211 252 / 0);
+    --tw-gradient-stops: var(--tw-gradient-from), rgb(125 211 252), var(--tw-gradient-to);
+  }
+
+  .via-ocean-400 {
+    --tw-gradient-to: rgb(56 189 248 / 0);
+    --tw-gradient-stops: var(--tw-gradient-from), rgb(56 189 248), var(--tw-gradient-to);
+  }
+
+  .via-ocean-500 {
+    --tw-gradient-to: rgb(14 165 233 / 0);
+    --tw-gradient-stops: var(--tw-gradient-from), rgb(14 165 233), var(--tw-gradient-to);
+  }
+
+  .via-ocean-600 {
+    --tw-gradient-to: rgb(2 132 199 / 0);
+    --tw-gradient-stops: var(--tw-gradient-from), rgb(2 132 199), var(--tw-gradient-to);
+  }
+
+  .via-ocean-700 {
+    --tw-gradient-to: rgb(3 105 161 / 0);
+    --tw-gradient-stops: var(--tw-gradient-from), rgb(3 105 161), var(--tw-gradient-to);
+  }
+
+  .via-ocean-800 {
+    --tw-gradient-to: rgb(7 89 133 / 0);
+    --tw-gradient-stops: var(--tw-gradient-from), rgb(7 89 133), var(--tw-gradient-to);
+  }
+
+  .via-ocean-900 {
+    --tw-gradient-to: rgb(12 74 110 / 0);
+    --tw-gradient-stops: var(--tw-gradient-from), rgb(12 74 110), var(--tw-gradient-to);
+  }
+
+  /* Ocean gradient - Proper diagonal flow from deep navy to bright ocean */
   .bg-ocean-gradient {
     background: linear-gradient(135deg, #0c4a6e 0%, #38bdf8 100%) !important;
   }
@@ -162,6 +462,15 @@
   --tw-ring-offset-shadow: none !important;
   --tw-ring-shadow: none !important;
   ring: none !important;
+}
+
+/* Hide scrollbar utility */
+.scrollbar-hide {
+  -ms-overflow-style: none;  /* Internet Explorer 10+ */
+  scrollbar-width: none;  /* Firefox */
+}
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;  /* Safari and Chrome */
 }
 
 /* Announcements Side Panel Styles (matching legacy) */
