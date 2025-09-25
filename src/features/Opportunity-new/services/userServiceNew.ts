@@ -10,8 +10,9 @@ export const userServiceNew = {
     return users
       .map((u: any) => ({
         display: u.Display || `${u.FirstName ?? ''} ${u.LastName ?? ''}`.trim() || 'Unknown User',
-        value: `IE=${u.Value}~`,
-        id: `IE=${u.Value}~`
+        // Keep raw id here; add IE=...~ only when building API payloads
+        value: String(u.Value ?? ''),
+        id: String(u.Value ?? '')
       }))
       .filter((u: any) => u.display && u.display !== 'Unknown User');
   },

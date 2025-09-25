@@ -54,8 +54,7 @@ const AdvancedSearch = () => {
     setSearchParams(currentFormData);
     setShowResults(true);
 };
-console.log(opportunitiesFormData);
-console.log("searchParams",searchParams);
+
 
 // Load recent search data when component mounts or when filters are cleared
 useEffect(() => {
@@ -112,13 +111,17 @@ useEffect(() => {
     return wrappedPayload;
   }, []);
 
+  useEffect(() => {
+    setOpportunitiesFormData(searchParams);
+  }, [searchParams]);
+
   // If showing results, render the SearchResults component
   if (showResults) {
-    debugger;
     return (
       <SearchResults
         searchType={activeTab}
         searchParams={searchParams}
+        setSearchParams={setSearchParams}
         setShowResults={setShowResults}
       />
     );

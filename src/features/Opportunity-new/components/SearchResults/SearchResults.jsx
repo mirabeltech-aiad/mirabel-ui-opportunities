@@ -27,13 +27,14 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 
-const SearchResults = ({ searchParams, setShowResults, searchType = 'opportunities' }) => {
+const SearchResults = ({ searchParams, setShowResults, searchType = 'opportunities', setSearchParams }) => {
   const { data, loading, error, refetch } = useSearchResults(searchParams, searchType);
   const [viewMode, setViewMode] = useState('table');
   const [filters, setFilters] = useState({
     all: searchType === 'opportunities' ? 'All Opportunities' : 'All Proposals',
     probability: searchParams.probability || [],
-    reps: searchParams.assignedRep || []
+    // Keep raw rep IDs in UI state; format to IE=...~ only when building payloads
+    reps: Array.isArray(searchParams.assignedRep) ? searchParams.assignedRep : []
   });
   const [page, setPage] = useState(1);
   const navigate = useNavigate();
@@ -139,6 +140,7 @@ const SearchResults = ({ searchParams, setShowResults, searchType = 'opportuniti
               // normal multi-select, ensure 'all' not accidentally present
               next = next.filter(v => v !== 'all');
             }
+            setSearchParams(prev => ({ ...prev, probability: next.filter(v => v !== 'all') }));
             setFilters(prevState => ({ ...prevState, probability: next }));
           }
         },
@@ -151,7 +153,7 @@ const SearchResults = ({ searchParams, setShowResults, searchType = 'opportuniti
           onChange: (values) => {
             const prev = Array.isArray(filters.reps) ? filters.reps : [];
             let next = Array.isArray(values) ? [...values] : [];
-            const allToken = 'IE=all~';
+            const allToken = 'all';
             const hasAllNow = next.includes(allToken);
             const hadAllPrev = prev.includes(allToken);
             if (hasAllNow && !hadAllPrev) {
@@ -163,6 +165,7 @@ const SearchResults = ({ searchParams, setShowResults, searchType = 'opportuniti
             } else {
               next = next.filter(v => v !== allToken);
             }
+            setSearchParams(prev => ({ ...prev, assignedRep: next.filter(rep => rep !== allToken) }));
             setFilters(prevState => ({ ...prevState, reps: next }));
           }
         }
@@ -190,7 +193,7 @@ const SearchResults = ({ searchParams, setShowResults, searchType = 'opportuniti
       // Keep as array of numeric strings; downstream can format to IE=
       params.probability = f.probability;
     }
-    // Reps: keep as array of IE= values
+    // Reps: keep raw ids here; payload layer will add IE=...~
     if (Array.isArray(f.reps) && f.reps.length > 0) {
       params.assignedRep = f.reps;
     }
@@ -203,10 +206,11 @@ const SearchResults = ({ searchParams, setShowResults, searchType = 'opportuniti
     (async () => {
       try {
         const reps = await userServiceNew.getUsersForDropdown();
-        const formatted = [{ value: 'IE=all~', label: 'All Reps' }, ...reps.map(u => ({ value: u.value, label: u.display }))];
+        // Keep raw value; 'All Reps' uses token 'all'
+        const formatted = [{ value: 'all', label: 'All Reps' }, ...reps.map(u => ({ value: u.value, label: u.display }))];
         setRepsOptions(formatted);
       } catch (e) {
-        setRepsOptions([{ value: 'IE=all~', label: 'All Reps' }]);
+        setRepsOptions([{ value: 'all', label: 'All Reps' }]);
       }
     })();
   }, []);
@@ -1719,7 +1723,7 @@ const SearchResults = ({ searchParams, setShowResults, searchType = 'opportuniti
       `}</style>
       <div className="h-screen bg-gray-50 flex flex-col">
         {/* Statistics Cards: hide in kanban and split views */}
-        {viewMode !== 'kanban' && viewMode !== 'split' && (
+        {viewMode !== 'split' && (
           <div className="bg-white border-b border-gray-200 px-6 py-4 flex-shrink-0">
             {isOpportunities ? (
               <OpportunityStatsCards stats={opportunityStatsData} />
