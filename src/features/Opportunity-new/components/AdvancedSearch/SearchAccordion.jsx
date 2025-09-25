@@ -4,7 +4,7 @@ import {
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
-} from "@/components/ui/accordion";
+} from "@/shared/components/ui/accordion";
 import { Separator } from "@/components/ui/separator";
 import { getSectionColorClass } from "./sectionColors";
 

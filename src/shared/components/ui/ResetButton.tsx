@@ -4,7 +4,7 @@ import { Badge } from './badge'
 import { RotateCcw } from 'lucide-react'
 import { cn } from '@/shared/lib/utils'
 import { Tooltip } from './tooltip'
-import { getTooltip } from '@/shared/constants/tooltips'
+import { getTooltip } from '@/components/shared/constants/tooltips'
 
 interface ResetButtonProps {
   onReset: () => void

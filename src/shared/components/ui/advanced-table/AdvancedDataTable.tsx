@@ -4,6 +4,8 @@ import { AdvancedDataTableProps } from './types/table.types'
 import { useSelection } from './hooks/useSelection'
 import { usePagination } from './hooks/usePagination'
 import { useKeyboardNavigation } from './hooks/useKeyboardNavigation'
+import { useColumnDragDrop } from './hooks/useColumnDragDrop'
+import { useTableConfiguration } from './hooks/useTableConfiguration'
 
 import TableHeader from './components/TableHeader'
 import TableBody from './components/TableBody'
@@ -114,8 +116,18 @@ const AdvancedDataTable = <T extends Record<string, any>>({
     onBulkAction?.(actionId, selectedData)
   }
 
-  // Memoize table ID
-  const tableId = useMemo(() => id || `table-${Date.now()}`, [id])
+  // Initialize drag-and-drop and resizing
+  const dragDrop = useColumnDragDrop({
+    columns,
+    storageKey: id ? `${id}-columns` : 'table-columns'
+  })
+
+  // Table configuration (widths, order)
+  const { tableId, columnStates } = useTableConfiguration({
+    id,
+    columns,
+    dragDrop
+  })
 
   return (
     <div 
@@ -139,15 +151,15 @@ const AdvancedDataTable = <T extends Record<string, any>>({
 
       {/* Table container */}
       <div className="table-container border border-gray-200 rounded-lg overflow-hidden">
-        <div className="overflow-x-auto">
-          <table ref={tableRef} className="w-full border-collapse bg-white">
+        <div className="overflow-x-auto min-w-0">
+          <table ref={tableRef} className="w-full border-collapse bg-white min-w-max">
             {/* Table header */}
             <TableHeader
-              columns={columns}
-              columnStates={[]}
+              columns={dragDrop.orderedColumns}
+              columnStates={columnStates}
               sortConfig={[]}
               onSort={undefined}
-              onResize={undefined}
+              onResize={dragDrop.handleColumnResize}
               enableSelection={enableSelection}
               isAllSelected={selection.isAllSelected}
               isPartiallySelected={selection.isPartiallySelected}
@@ -157,10 +169,10 @@ const AdvancedDataTable = <T extends Record<string, any>>({
             {/* Table body */}
             <TableBody
               data={displayData}
-              columns={columns}
-              columnStates={[]}
+              columns={dragDrop.orderedColumns}
+              columnStates={columnStates}
               selectedRows={selection.selectedRows}
-              rowDensity="normal"
+              rowDensity="compact"
               loading={loading}
               error={error}
               onRowClick={handleRowClick}

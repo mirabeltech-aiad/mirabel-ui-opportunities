@@ -37,25 +37,16 @@ export const useTableEvents = <T extends Record<string, any>>({
   
   // Handle row click with keyboard support
   const handleRowClick = useCallback((row: T, index: number, event?: React.MouseEvent) => {
-    // Check if click was on an interactive element
+    // Check if click was on an interactive element (including checkboxes)
     const target = event?.target as HTMLElement
     if (target?.closest('button') || target?.closest('input') || target?.closest('select')) {
       return // Don't handle row actions if clicking on interactive elements
     }
     
-    // Single click: Toggle row selection (checkbox behavior)
-    if (event && enableSelection && (!event.detail || event.detail === 1)) {
-      selection.toggleRowSelection(row)
-      
-      // Notify parent component
-      if (onRowSelect) {
-        onRowSelect(selection.selectedRowData)
-      }
-    }
-    
-    // Always call parent onRowClick for custom handling
+    // Row click: Primary action (edit) - NO selection behavior
+    // Selection is now handled exclusively by checkbox clicks
     onRowClick?.(row)
-  }, [enableSelection, onRowClick, onRowSelect, selection])
+  }, [onRowClick])
 
   // Handle row double-click
   const handleRowDoubleClick = useCallback((row: T, index: number, event?: React.MouseEvent) => {

@@ -1,5 +1,5 @@
 import React from "react";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/shared/components/ui/button";
 import { X } from "lucide-react";
 import { useKanbanOpportunityForm } from "../../hooks/useKanbanOpportunityForm";
 import Loader from "@/components/ui/loader";

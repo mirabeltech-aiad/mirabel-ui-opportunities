@@ -234,16 +234,29 @@ const TableBody = <T extends Record<string, any>>({
         const isSelected = selectedRows.has(rowId)
         const isFocused = focusedRowIndex === index
         
+        // DEBUG (gated) – emit computed row style and container id
+        if (process.env.NODE_ENV !== 'production') {
+          if (index === 0 && typeof window !== 'undefined') {
+            try {
+              const el = document.getElementById('asset-mgmt-right') || document.getElementById('product-schedule-left')
+              if (el) {
+                // eslint-disable-next-line no-console
+                console.log('EnhancedTable Debug → container:', el.id, 'rowDensity:', rowDensity)
+              }
+            } catch {}
+          }
+        }
+
         return (
           <tr
             key={rowId}
             className={`${getRowClasses(isSelected, isFocused)} ${onRowClick || onRowDoubleClick ? 'cursor-pointer' : ''}`}
-            style={getRowStyles()}
+            style={{ ...getRowStyles(), height: '32px', minHeight: '32px', maxHeight: '32px' }}
             onClick={(e) => handleRowClick(row, index, e)}
             onDoubleClick={(e) => handleRowDoubleClick(row, index, e)}
             role={onRowClick || onRowDoubleClick ? 'button' : undefined}
             tabIndex={isFocused ? 0 : -1}
-            title="Click to select, double-click to edit"
+            title="Click to edit"
             onKeyDown={(e) => {
               if (onRowClick && (e.key === 'Enter' || e.key === ' ')) {
                 e.preventDefault()
@@ -258,7 +271,13 @@ const TableBody = <T extends Record<string, any>>({
                   type="checkbox"
                   checked={isSelected}
                   onChange={(e) => handleRowSelect(e, row)}
-                  className="h-4 w-4 text-ocean-600 focus:ring-ocean-500 focus:ring-2 border-gray-300 rounded transition-colors duration-200"
+                  className="table-checkbox"
+                  style={{
+                    width: '16px',
+                    height: '16px',
+                    accentColor: 'rgb(14, 165, 233)', // ocean-500
+                    cursor: 'pointer'
+                  }}
                   aria-label={`Select row ${index + 1}`}
                   onClick={(e) => e.stopPropagation()}
                 />

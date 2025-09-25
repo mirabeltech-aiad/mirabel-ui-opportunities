@@ -1,5 +1,5 @@
 import React from 'react';
-import { Button } from '@/components/ui/button';
+import { Button } from '@/shared/components/ui/button';
 import { ArrowLeft, Save, X } from 'lucide-react';
 import { OpportunityFormData } from '../../types/opportunity';
 

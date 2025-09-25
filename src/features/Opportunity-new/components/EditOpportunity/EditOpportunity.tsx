@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/shared/components/ui/card';
 
 import { toast } from '@/features/Opportunity/hooks/use-toast';
 import { GradientTabBar, TabItem } from '@/shared/components/ui/GradientTabBar';

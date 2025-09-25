@@ -5,7 +5,7 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
+} from "@/shared/components/ui/select";
 import { ChevronDown } from "lucide-react";
 import { opportunityService } from "../../services/opportunityService";
 import {

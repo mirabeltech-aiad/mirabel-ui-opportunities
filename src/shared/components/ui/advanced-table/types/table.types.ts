@@ -23,6 +23,10 @@ export interface AdvancedDataTableProps<T = any> {
   enableColumnManagement?: boolean
   enablePagination?: boolean
   initialPageSize?: number
+  // Internal UI toggles/slots
+  showTableControls?: boolean
+  showInternalFooter?: boolean
+  footerContent?: React.ReactNode
   // Optional editing state used by some pages
   editing?: any
   savedViews?: SavedView[]

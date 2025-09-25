@@ -65,15 +65,8 @@ const BulkActionsToolbar = <T extends Record<string, any>>({
     setShowLargeSelectionWarning(selectedCount > 1000)
   }, [selectedCount])
 
-  // Default bulk actions matching the image design
+  // Default bulk actions - Export removed (now handled by top-level export button)
   const defaultActions: BulkAction[] = [
-    {
-      id: 'export',
-      label: 'Export',
-      icon: <FileText className="h-4 w-4" />,
-      variant: 'default'
-    },
-
     {
       id: 'batch-update',
       label: 'Batch Update',

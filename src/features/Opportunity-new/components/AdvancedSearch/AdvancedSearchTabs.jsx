@@ -1,6 +1,6 @@
 
 import React from "react";
-import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/shared/components/ui/tabs";
 import OpportunitiesTabContent from "./OpportunitiesTabContent";
 import ProposalsTabContent from "./ProposalsTabContent";
 // import ProposalsAdvancedSearchTabContent from "../ProposalsAdvancedSearch/ProposalsAdvancedSearchTabContent";

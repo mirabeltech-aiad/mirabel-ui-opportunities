@@ -97,14 +97,15 @@ export const useColumnResize = ({
   const ResizeHandle = useCallback(({ columnId, className = '' }: { columnId: string, className?: string }) => (
     <div
       ref={resizeHandleRef}
-      className={`absolute right-0 top-0 bottom-0 w-1 cursor-col-resize hover:bg-ocean-300 transition-colors ${className}`}
+      className={`resize-handle absolute right-0 top-0 bottom-0 w-2 hover:bg-ocean-300 transition-colors cursor-col-resize ${className}`}
       onMouseDown={(e) => handleResizeStart(e, columnId)}
-      style={{
-        zIndex: 10,
-        background: resizeState.isResizing && resizeState.columnId === columnId ? '#0ea5e9' : 'transparent'
-      }}
+      role="separator"
+      aria-orientation="vertical"
+      aria-label="Resize column"
+      aria-valuenow={getColumnWidth(columnId)}
+      style={{ zIndex: 10 }}
     />
-  ), [handleResizeStart, resizeState])
+  ), [handleResizeStart, getColumnWidth])
 
   return {
     resizeState,

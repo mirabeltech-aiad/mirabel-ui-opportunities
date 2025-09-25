@@ -1,6 +1,6 @@
 
 import React from "react";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/shared/components/ui/button";
 import { Search, ChevronDown, ChevronUp } from "lucide-react";
 
 const SearchHeader = ({ onSearch, isExpanded, onToggle }) => {

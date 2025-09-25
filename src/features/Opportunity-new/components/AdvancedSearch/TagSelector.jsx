@@ -1,13 +1,13 @@
 
 import React, { useState } from "react";
-import { Label } from "@/components/ui/label";
+import { Label } from "@/shared/components/ui/label";
 import {
   DropdownMenu,
-  DropdownMenuCheckboxItem,
   DropdownMenuContent,
+  DropdownMenuItem,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { Badge } from "@/components/ui/badge";
+} from "@/shared/components/ui/dropdown-menu";
+import { Badge } from "@/shared/components/ui/badge";
 import { ChevronDown, X } from "lucide-react";
 
 // Extracted constant for clarity
@@ -123,14 +123,14 @@ const TagSelector = ({ handleSelectChange }) => {
                 {category.name}
               </div>
               {category.tags.map((tag) => (
-                <DropdownMenuCheckboxItem
+                <DropdownMenuItem
                   key={tag}
                   checked={selectedTags.includes(tag)}
                   onCheckedChange={() => handleTagSelect(tag)}
                   className="capitalize"
                 >
                   {tag.replace(/-/g, ' ')}
-                </DropdownMenuCheckboxItem>
+                </DropdownMenuItem>
               ))}
             </div>
           ))}

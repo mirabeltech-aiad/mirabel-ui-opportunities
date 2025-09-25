@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect } from "react";
-import { Button } from "@/components/ui/button";
-import { Checkbox } from "@/components/ui/checkbox";
+import { Button } from "@/shared/components/ui/button";
+import { Checkbox } from "@/shared/components/ui/checkbox";
 import { Search, ChevronDown, ChevronUp, X } from "lucide-react";
 import { OPPORTUNITY_OPTIONS } from "@OpportunityConstants/opportunityOptions";
 import { userService } from "@/features/Opportunity/Services/userService";

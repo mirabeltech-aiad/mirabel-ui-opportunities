@@ -7,7 +7,7 @@ import {
   DropdownMenuTrigger,
 } from './dropdown-menu'
 import { ArrowUpDown, Check } from 'lucide-react'
-import { SortPreset, SORT_PRESETS } from '../../types/sortPresets'
+import { SortPreset, SORT_PRESETS } from '@/components/shared/types/sortPresets'
 
 interface SortPresetsDropdownProps {
   onSortPresetChange: (preset: SortPreset | null) => void

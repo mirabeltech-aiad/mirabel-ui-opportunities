@@ -4,16 +4,16 @@ import {
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
-} from "@/components/ui/accordion";
+} from "@/shared/components/ui/accordion";
 import MultiSelectDropdown from "@/components/ui/MultiSelectDropdown";
 import AutocompleteSelect from "../../../../components/shared/AutocompleteSelect";
 import EnhancedOpportunityNameField from "./EnhancedOpportunityNameField";
 
 import { userService } from "@/features/Opportunity/Services/userService";
 import { getAutocompleteValue } from "@OpportunityUtils/searchUtils";
-import FloatingLabelSelect from "@/components/ui/FloatingLabelSelect";
+import FloatingLabelSelect from "@/shared/components/ui/FloatingLabelSelect";
 import { getSectionColorClass } from "./sectionColors";
-import FloatingLabelInput from "@/components/ui/FloatingLabelInput";
+import FloatingLabelInput from "@/shared/components/ui/FloatingLabelInput";
 import EnhancedPhoneField from "./EnhancedPhoneField";
 import EnhancedZipCodeField from "./EnhancedZipCodeField";
 import EnhancedProposalIdField from "../ProposalsAdvancedSearch/EnhancedProposalIdField";

@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect } from "react";
-import FloatingLabelInput from "../EditOpportunity/FloatingLabelInput";
+import FloatingLabelInput from "@/shared/components/ui/FloatingLabelInput";
 import MultiSelectDropdown from "@/components/ui/MultiSelectDropdown";
 import { userService } from "@/features/Opportunity/Services/userService";
 import AutocompleteSelect from "../../../../components/shared/AutocompleteSelect";

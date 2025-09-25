@@ -1,9 +1,9 @@
 import React from "react";
 import PropTypes from "prop-types";
 import { useNavigate } from "react-router-dom";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/shared/components/ui/card";
+import { Badge } from "@/shared/components/ui/badge";
+import { Button } from "@/shared/components/ui/button";
 import { Calendar, DollarSign, User, Building2, Edit } from "lucide-react";
 import TableFilterControls from "@/features/Opportunity/components/table/TableFilterControls";
 import TableBadge from "../../ui/TableBadge";

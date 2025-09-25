@@ -7,7 +7,7 @@ import { Check } from "lucide-react";
 import { cn } from "@/lib/utils";
 import apiService from "@/features/Opportunity/Services/apiService";
 import { API_URLS } from "@/utils";
-import { FloatingLabelSearchInput } from "@/components/ui/FloatingLabelSearchInput";
+import { FloatingLabelSearchInput } from "@/shared/components/ui/FloatingLabelSearchInput";
 
 // Type definitions
 interface Customer {

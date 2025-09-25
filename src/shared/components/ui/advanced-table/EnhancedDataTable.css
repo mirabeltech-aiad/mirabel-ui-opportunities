@@ -1,7 +1,14 @@
 /* Enhanced Data Table Styling - Based on Design System Standards */
+/* 
+ * CRITICAL RULES:
+ * 1. ALL rows MUST be 32px compact height (Products table standard)
+ * 2. NO multi-line text allowed - use truncate with ellipsis
+ * 3. Action buttons MUST be h-9 w-9 p-0 (36px square)
+ * 4. Primary text MUST be font-semibold text-sm text-ocean-800
+ */
 
 /* Import design tokens */
-/* @import '../../../design-system/tokens/index.css'; */
+/*@import '../../../design-system/tokens/index.css';*/
 
 /* CRITICAL: Force table styling to override any global styles */
 /* This ensures our table styles take precedence over any conflicting CSS */
@@ -157,9 +164,10 @@ div.advanced-data-table {
   font-size: 0.875rem !important; /* text-sm */
   line-height: 1.2 !important;
   background-color: rgb(243, 244, 246) !important; /* --color-gray-100 - Better contrast */
+  position: relative !important; /* ensure resize handle positioning */
 }
 
-/* Body - Following tables.md standards */
+/* Body - Following tables.md standards - COMPACT BY DEFAULT */
 .enhanced-data-table .table-body,
 .enhanced-data-table tbody.table-body {
   background-color: rgb(255, 255, 255) !important; /* --color-white */
@@ -167,7 +175,9 @@ div.advanced-data-table {
 
 .enhanced-data-table .table-row,
 .enhanced-data-table tbody tr {
-  height: 48px !important; /* Standard row height - will be overridden for compact */
+  height: 32px !important; /* COMPACT BY DEFAULT - Products table standard */
+  min-height: 32px !important;
+  max-height: 32px !important;
   transition: background-color 150ms ease-in-out !important;
   border-bottom: 1px solid rgb(243, 244, 246) !important; /* --color-gray-100 */
 }
@@ -183,15 +193,18 @@ div.advanced-data-table {
   border-color: rgb(186, 230, 253) !important; /* --color-ocean-200 */
 }
 
-/* Cells - Following tables.md standards */
+/* Cells - Following tables.md standards - SINGLE LINE ONLY */
 .enhanced-data-table .table-cell,
 .enhanced-data-table tbody td {
-  padding: 12px 16px !important;
+  padding: 6px 16px !important; /* Compact padding for 32px rows */
   vertical-align: middle !important;
   color: rgb(17, 24, 39) !important; /* --color-gray-900 */
   font-size: 0.875rem !important; /* text-sm */
-  line-height: 1.4 !important;
+  line-height: 1.2 !important; /* Tighter for single-line text */
   border-right: none !important;
+  white-space: nowrap !important; /* PREVENT multi-line text */
+  overflow: hidden !important; /* Hide overflow text */
+  text-overflow: ellipsis !important; /* Show ... for long text */
 }
 
 /* Action cell styling - Products table standard */
@@ -246,7 +259,7 @@ div.advanced-data-table {
 
 /* Row Density Variants - Products Table Standard (32px compact) */
 
-/* Compact density - Products table standard */
+/* Compact density - Products table standard - SINGLE LINE ONLY */
 .enhanced-data-table[data-density="compact"] .table-row,
 .enhanced-data-table[data-density="compact"] tbody tr,
 .enhanced-data-table[data-density="compact"] tbody tr.table-row {
@@ -262,38 +275,44 @@ div.advanced-data-table {
   padding-bottom: 6px !important;
   padding-left: 16px !important;
   padding-right: 16px !important;
+  white-space: nowrap !important; /* PREVENT multi-line text */
+  overflow: hidden !important; /* Hide overflow text */
+  text-overflow: ellipsis !important; /* Show ... for long text */
 }
 
-/* Normal density */
+/* Normal density - ALSO COMPACT (32px) */
 .enhanced-data-table[data-density="normal"] .table-row,
 .enhanced-data-table[data-density="normal"] tbody tr {
-  height: 48px !important;
-  min-height: 48px !important;
-  max-height: 48px !important;
+  height: 32px !important; /* Products table standard - NO tall rows */
+  min-height: 32px !important;
+  max-height: 32px !important;
 }
 
 .enhanced-data-table[data-density="normal"] .table-cell,
 .enhanced-data-table[data-density="normal"] tbody tr td {
-  padding-top: 12px !important;
-  padding-bottom: 12px !important;
+  padding-top: 6px !important;
+  padding-bottom: 6px !important;
   padding-left: 16px !important;
   padding-right: 16px !important;
 }
 
-/* Comfortable density */
+/* Comfortable density - STILL SINGLE LINE ONLY */
 .enhanced-data-table[data-density="comfortable"] .table-row,
 .enhanced-data-table[data-density="comfortable"] tbody tr {
-  height: 64px !important;
-  min-height: 64px !important;
-  max-height: 64px !important;
+  height: 40px !important; /* Slightly taller but still compact */
+  min-height: 40px !important;
+  max-height: 40px !important;
 }
 
 .enhanced-data-table[data-density="comfortable"] .table-cell,
 .enhanced-data-table[data-density="comfortable"] tbody tr td {
-  padding-top: 16px !important;
-  padding-bottom: 16px !important;
+  padding-top: 10px !important;
+  padding-bottom: 10px !important;
   padding-left: 16px !important;
   padding-right: 16px !important;
+  white-space: nowrap !important; /* PREVENT multi-line text */
+  overflow: hidden !important; /* Hide overflow text */
+  text-overflow: ellipsis !important; /* Show ... for long text */
 }
 
 /* Force compact density for schedules table specifically */
@@ -352,11 +371,122 @@ div#schedules-table .enhanced-data-table {
   }
 }
 
-/* Focus styles for accessibility */
-.table-header-cell:focus,
-.table-row:focus {
+/* Focus styles for accessibility (keyboard only) */
+.table-header-cell:focus-visible,
+.table-row:focus-visible {
   outline: 2px solid var(--color-ocean-500);
   outline-offset: 2px;
+}
+
+/* Checkbox styling - Ensure checkboxes are visible and properly styled */
+.enhanced-data-table input[type="checkbox"],
+.advanced-data-table input[type="checkbox"] {
+  appearance: auto !important;
+  -webkit-appearance: checkbox !important;
+  -moz-appearance: checkbox !important;
+  width: 16px !important;
+  height: 16px !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: 2px solid rgb(209, 213, 219) !important; /* gray-300 */
+  border-radius: 4px !important;
+  background-color: rgb(255, 255, 255) !important;
+  cursor: pointer !important;
+  position: relative !important;
+  display: inline-block !important;
+  vertical-align: middle !important;
+}
+
+.enhanced-data-table input[type="checkbox"]:checked,
+.advanced-data-table input[type="checkbox"]:checked {
+  background-color: rgb(14, 165, 233) !important; /* ocean-500 */
+  border-color: rgb(14, 165, 233) !important; /* ocean-500 */
+  color: rgb(255, 255, 255) !important;
+}
+
+.enhanced-data-table input[type="checkbox"]:focus,
+.advanced-data-table input[type="checkbox"]:focus {
+  outline: none !important; /* prevent blue outline artifacts */
+  outline-offset: 0 !important;
+  border-color: rgb(14, 165, 233) !important; /* ocean-500 subtle focus */
+}
+
+.enhanced-data-table input[type="checkbox"]:hover,
+.advanced-data-table input[type="checkbox"]:hover {
+  border-color: rgb(14, 165, 233) !important; /* ocean-500 */
+}
+
+/* Ensure checkbox is visible in action cells */
+.enhanced-data-table .table-cell--action input[type="checkbox"],
+.advanced-data-table .table-cell--action input[type="checkbox"] {
+  margin: auto !important;
+  display: block !important;
+}
+
+/* Table checkbox specific styling */
+.table-checkbox {
+  appearance: auto !important;
+  -webkit-appearance: checkbox !important;
+  -moz-appearance: checkbox !important;
+  width: 16px !important;
+  height: 16px !important;
+  margin: 0 auto !important;
+  padding: 0 !important;
+  border: 2px solid rgb(209, 213, 219) !important; /* gray-300 */
+  border-radius: 4px !important;
+  background-color: rgb(255, 255, 255) !important;
+  cursor: pointer !important;
+  position: relative !important;
+  display: block !important;
+  vertical-align: middle !important;
+  accent-color: rgb(14, 165, 233) !important; /* ocean-500 */
+}
+
+.table-checkbox:checked {
+  background-color: rgb(14, 165, 233) !important; /* ocean-500 */
+  border-color: rgb(14, 165, 233) !important; /* ocean-500 */
+  color: rgb(255, 255, 255) !important;
+}
+
+.table-checkbox:focus {
+  outline: none !important;
+  outline-offset: 0 !important;
+  border-color: rgb(14, 165, 233) !important; /* ocean-500 */
+}
+
+.table-checkbox:hover {
+  border-color: rgb(14, 165, 233) !important; /* ocean-500 */
+}
+
+/* Column resize handle */
+.resize-handle {
+  width: 12px !important; /* easier to grab */
+  margin-right: -6px !important; /* overlap to keep column width visually stable */
+  background-color: transparent !important;
+  position: absolute !important;
+  right: 0 !important;
+  top: 0 !important;
+  bottom: 0 !important;
+  cursor: col-resize !important;
+}
+
+.resize-handle:hover {
+  background-color: rgba(14, 165, 233, 0.35) !important; /* ocean-500 tint */
+}
+
+/* visible divider line */
+.resize-handle::after {
+  content: '';
+  position: absolute;
+  top: 6px;
+  bottom: 6px;
+  left: 50%;
+  width: 1px;
+  background-color: rgb(209, 213, 219); /* gray-300 */
+}
+
+.resize-handle:hover::after {
+  background-color: rgb(14, 165, 233); /* ocean-500 */
 }
 
 /* COMPREHENSIVE ADVANCED DATA TABLE SUPPORT */
@@ -398,7 +528,9 @@ div#schedules-table .enhanced-data-table {
 }
 
 .advanced-data-table tbody tr {
-  height: 48px !important;
+  height: 32px !important; /* COMPACT BY DEFAULT - Products table standard */
+  min-height: 32px !important;
+  max-height: 32px !important;
   transition: background-color 150ms ease-in-out !important;
   border-bottom: 1px solid rgb(243, 244, 246) !important;
 }
@@ -413,11 +545,11 @@ div#schedules-table .enhanced-data-table {
 }
 
 .advanced-data-table tbody td {
-  padding: 12px 16px !important;
+  padding: 6px 16px !important; /* Compact padding for 32px rows */
   vertical-align: middle !important;
   color: rgb(17, 24, 39) !important;
   font-size: 0.875rem !important;
-  line-height: 1.4 !important;
+  line-height: 1.2 !important; /* Tighter line height for single-line text */
   border-right: none !important;
 }
 
@@ -459,14 +591,44 @@ div#schedules-table .enhanced-data-table {
   }
 }
 
-/* Responsive behavior */
+/* Responsive behavior - Prevent column cutting */
+.enhanced-data-table .overflow-x-auto,
+.advanced-data-table .overflow-x-auto {
+  overflow-x: auto !important;
+  overflow-y: visible !important;
+  min-width: 0 !important;
+  scroll-snap-type: x mandatory;
+  scroll-behavior: smooth;
+  scrollbar-gutter: stable both-edges;
+}
+
+/* Ensure table spans full container width */
+.enhanced-data-table .data-table,
+.advanced-data-table .data-table {
+  min-width: 100% !important;
+  width: 100% !important;
+}
+
+/* Column width constraints to prevent cutting */
+.enhanced-data-table .table-cell,
+.enhanced-data-table .table-header-cell,
+.advanced-data-table .table-cell,
+.advanced-data-table .table-header-cell {
+  min-width: fit-content !important;
+  white-space: nowrap !important;
+}
+
+/* Align snap to column starts to avoid half columns showing */
+.enhanced-data-table thead.table-header th.table-header-cell,
+.advanced-data-table thead th {
+  scroll-snap-align: start;
+  scroll-snap-stop: always;
+}
+
 @media (max-width: 1024px) {
-  .enhanced-data-table {
-    overflow-x: auto;
-  }
-  
-  .data-table {
-    min-width: 800px;
+  .enhanced-data-table,
+  .advanced-data-table {
+    overflow-x: auto !important;
   }
 }
 
@@ -478,24 +640,21 @@ div#schedules-table .enhanced-data-table {
   .table-header-cell {
     padding: 12px;
   }
-  
-  .data-table {
-    min-width: 600px;
-  }
 }
 
 /* Typography Standards - Products Table Pattern */
 
-/* Primary text (names, titles) - Products table standard */
+/* Primary text (names, titles) - Products table standard - SINGLE LINE ONLY */
 .table-text-primary {
   font-weight: 600 !important; /* font-semibold */
   font-size: 0.875rem !important; /* text-sm */
   color: rgb(7, 89, 133) !important; /* text-ocean-800 */
   display: block !important;
-  white-space: nowrap !important;
+  white-space: nowrap !important; /* ENFORCE single line */
   overflow: hidden !important;
   text-overflow: ellipsis !important;
   max-width: 100% !important;
+  line-height: 1.2 !important; /* Tight line height */
 }
 
 /* Secondary text (descriptions) */

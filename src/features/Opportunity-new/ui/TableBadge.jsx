@@ -1,5 +1,5 @@
 
-import { Badge } from "@/components/ui/badge";
+import { Badge } from "@/shared/components/ui/badge";
 
 const TableBadge = ({ status }) => {
   const getStatusVariant = (status) => {

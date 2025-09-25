@@ -1,7 +1,7 @@
 
 import React from "react";
 import FloatingLabelInput from "@/shared/components/ui/FloatingLabelInput";
-import FloatingLabelSelect from "@/components/ui/FloatingLabelSelect";
+import FloatingLabelSelect from "@/shared/components/ui/FloatingLabelSelect";
 
 const StatusProcessFields = ({ handleInputChange, handleSelectChange, searchParams = {} }) => {
   const handleFieldChange = (field) => (value) => {

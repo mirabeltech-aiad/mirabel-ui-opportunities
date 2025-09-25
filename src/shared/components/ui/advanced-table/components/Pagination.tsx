@@ -23,7 +23,7 @@ const Pagination: React.FC<PaginationProps> = ({
   totalItems,
   onPageChange,
   onPageSizeChange,
-  pageSizeOptions = [25, 50, 100, 200],
+  pageSizeOptions = [10, 25, 50, 100],
   showPageSizeSelector = true,
   showJumpToPage = true,
   className = ''

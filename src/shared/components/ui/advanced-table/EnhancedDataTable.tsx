@@ -12,7 +12,7 @@ import { useTableConfiguration } from './hooks/useTableConfiguration'
 import TableHeader from './components/TableHeader'
 import TableBody from './components/TableBody'
 import BulkActionsToolbar from './components/BulkActionsToolbar'
-import Pagination from './components/Pagination'
+import EnhancedTableFooter from '../EnhancedTableFooter'
 import TableContainer from './components/TableContainer'
 import TableControls from './components/TableControls'
 
@@ -43,7 +43,10 @@ const EnhancedDataTable = React.memo(<T extends Record<string, any>>({
   rowDensity = 'compact',
   className = '',
   id,
-  bulkActionContext = 'products'
+  bulkActionContext = 'products',
+  showTableControls = true,
+  showInternalFooter = true,
+  footerContent
 }: AdvancedDataTableProps<T>) => {
   const tableRef = useRef<HTMLTableElement>(null)
   const [selectedRows, setSelectedRows] = useState<Set<string>>(new Set())
@@ -126,8 +129,8 @@ const EnhancedDataTable = React.memo(<T extends Record<string, any>>({
       )}
 
       {/* Table container */}
-      <div className="overflow-x-auto">
-        <table ref={tableRef} className="data-table">
+      <div className="overflow-x-auto min-w-0">
+        <table ref={tableRef} className="data-table min-w-max">
           <TableHeader
             columns={dragDrop.orderedColumns}
             columnStates={columnStates}
@@ -170,44 +173,36 @@ const EnhancedDataTable = React.memo(<T extends Record<string, any>>({
       </div>
       
       {/* Column management controls */}
-      <TableControls
-        sortConfig={sortConfig}
-        dragState={dragDrop.dragState}
-        onClearSort={() => setSortConfig([])}
-        onResetColumns={dragDrop.resetColumnOrder}
-      />
+      {showTableControls && (
+        <TableControls
+          sortConfig={sortConfig}
+          dragState={dragDrop.dragState}
+          onClearSort={() => setSortConfig([])}
+          onResetColumns={dragDrop.resetColumnOrder}
+        />
+      )}
       
-      {/* Pagination */}
-      {enablePagination && (
+      {/* Standardized footer */}
+      {showInternalFooter && (
         <div className="mt-4">
-          <Pagination
-            currentPage={pagination.currentPage}
-            totalPages={pagination.totalPages}
-            pageSize={pagination.pageSize}
-            totalItems={pagination.totalItems}
-            onPageChange={pagination.setPage}
-            onPageSizeChange={pagination.setPageSize}
-            pageSizeOptions={[25, 50, 100, 200]}
-            showPageSizeSelector={true}
-            showJumpToPage={true}
+          <EnhancedTableFooter
+            currentPage={enablePagination ? pagination.currentPage : 1}
+            totalPages={enablePagination ? pagination.totalPages : 1}
+            totalItems={enablePagination ? pagination.totalItems : data.length}
+            pageSize={enablePagination ? pagination.pageSize : data.length || 1}
+            pageSizeOptions={[10, 25, 50, 100]}
+            onPageChange={enablePagination ? pagination.setPage : () => {}}
+            onPageSizeChange={enablePagination ? pagination.setPageSize : undefined}
+            selectedCount={enableSelection ? selection.selectionCount : 0}
+            onClearSelection={enableSelection ? selection.deselectAll : undefined}
+            showJumpToPage={enablePagination}
+            showPageSizeSelector={enablePagination}
           />
         </div>
       )}
 
-      {/* Table footer with stats */}
-      {!enablePagination && (
-        <div className="table-footer mt-4 flex items-center justify-between text-sm text-gray-500">
-          <div>
-            Showing {data.length} items
-          </div>
-          
-          <div className="flex items-center gap-4">
-            {enableSelection && selection.selectionCount > 0 && (
-              <span>{selection.selectionCount} selected</span>
-            )}
-          </div>
-        </div>
-      )}
+      {/* Custom footer slot attached to the table container */}
+      {footerContent}
     </TableContainer>
   )
 }) as unknown as <T extends Record<string, any>>(props: AdvancedDataTableProps<T>) => JSX.Element

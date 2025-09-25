@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { FormInput } from '../../ui/FormInput';
-import FloatingLabelSelect from '@/components/ui/FloatingLabelSelect';
+import FloatingLabelSelect from '@/shared/components/ui/FloatingLabelSelect';
 import { FloatingMultiSelect } from '@/shared/components/ui/FloatingMultiSelect';
 import { Textarea } from '@/shared/components/ui/textarea';
 import { TabProps } from '../../../types/opportunity';

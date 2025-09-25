@@ -1,12 +1,12 @@
 
 import React, { useState } from "react";
-import { Label } from "@/components/ui/label";
+import { Label } from "@/shared/components/ui/label";
 import {
   DropdownMenu,
-  DropdownMenuCheckboxItem,
   DropdownMenuContent,
+  DropdownMenuItem,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+} from "@/shared/components/ui/dropdown-menu";
 import { ChevronDown } from "lucide-react";
 
 const StageSelector = ({ handleSelectChange }) => {
@@ -40,48 +40,48 @@ const StageSelector = ({ handleSelectChange }) => {
           </button>
         </DropdownMenuTrigger>
         <DropdownMenuContent className="w-full min-w-[240px]" align="start">
-          <DropdownMenuCheckboxItem
+          <DropdownMenuItem
             checked={selectedStages.includes("prospecting")}
             onCheckedChange={() => handleStageSelect("prospecting")}
           >
             Prospecting
-          </DropdownMenuCheckboxItem>
-          <DropdownMenuCheckboxItem
+          </DropdownMenuItem>
+          <DropdownMenuItem
             checked={selectedStages.includes("qualification")}
             onCheckedChange={() => handleStageSelect("qualification")}
           >
             Qualification
-          </DropdownMenuCheckboxItem>
-          <DropdownMenuCheckboxItem
+          </DropdownMenuItem>
+          <DropdownMenuItem
             checked={selectedStages.includes("needs-analysis")}
             onCheckedChange={() => handleStageSelect("needs-analysis")}
           >
             Needs Analysis
-          </DropdownMenuCheckboxItem>
-          <DropdownMenuCheckboxItem
+          </DropdownMenuItem>
+          <DropdownMenuItem
             checked={selectedStages.includes("proposal")}
             onCheckedChange={() => handleStageSelect("proposal")}
           >
             Proposal
-          </DropdownMenuCheckboxItem>
-          <DropdownMenuCheckboxItem
+          </DropdownMenuItem>
+          <DropdownMenuItem
             checked={selectedStages.includes("negotiation")}
             onCheckedChange={() => handleStageSelect("negotiation")}
           >
             Negotiation
-          </DropdownMenuCheckboxItem>
-          <DropdownMenuCheckboxItem
+          </DropdownMenuItem>
+          <DropdownMenuItem
             checked={selectedStages.includes("closed-won")}
             onCheckedChange={() => handleStageSelect("closed-won")}
           >
             Closed Won
-          </DropdownMenuCheckboxItem>
-          <DropdownMenuCheckboxItem
+          </DropdownMenuItem>
+          <DropdownMenuItem
             checked={selectedStages.includes("closed-lost")}
             onCheckedChange={() => handleStageSelect("closed-lost")}
           >
             Closed Lost
-          </DropdownMenuCheckboxItem>
+          </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
     </div>

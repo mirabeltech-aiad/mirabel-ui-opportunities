@@ -225,10 +225,10 @@ const TableHeader = <T extends Record<string, any>>({
               }`}>
                 {definition.align !== 'right' && (
                   <div className="flex items-center gap-2">
-                    {/* Drag handle */}
+                    {/* Drag handle (absolute so it doesn't shift header text) */}
                     {onDragStart && (
                       <div 
-                        className="drag-handle opacity-0 group-hover:opacity-100 cursor-grab active:cursor-grabbing transition-opacity"
+                        className="drag-handle absolute left-1 top-1 opacity-0 group-hover:opacity-100 cursor-grab active:cursor-grabbing transition-opacity"
                         style={{ cursor: isDragging ? 'grabbing' : 'grab' }}
                         title="Drag to reorder column"
                       >
@@ -270,10 +270,10 @@ const TableHeader = <T extends Record<string, any>>({
                       </span>
                     )}
                     
-                    {/* Drag handle */}
+                    {/* Drag handle (absolute so it doesn't shift header text) */}
                     {onDragStart && (
                       <div 
-                        className="drag-handle opacity-0 group-hover:opacity-100 cursor-grab active:cursor-grabbing transition-opacity"
+                        className="drag-handle absolute right-1 top-1 opacity-0 group-hover:opacity-100 cursor-grab active:cursor-grabbing transition-opacity"
                         style={{ cursor: isDragging ? 'grabbing' : 'grab' }}
                         title="Drag to reorder column"
                       >

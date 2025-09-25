@@ -1,6 +1,6 @@
 import React from "react";
 import FloatingLabelInput from "@/shared/components/ui/FloatingLabelInput";
-import FloatingLabelSelect from "@/components/ui/FloatingLabelSelect";
+import FloatingLabelSelect from "@/shared/components/ui/FloatingLabelSelect";
 
 interface StatusProgressSectionProps {
   formData: any;

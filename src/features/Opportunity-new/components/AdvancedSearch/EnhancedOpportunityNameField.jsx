@@ -1,9 +1,9 @@
 import React, { useState, useRef, useEffect } from "react";
-import { createPortal } from "react-dom";
 import { X, ChevronDown } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Input } from "@/components/ui/input";
+import { Button } from "@/shared/components/ui/button";
+import { Badge } from "@/shared/components/ui/badge";
+import { Input } from "@/shared/components/ui/input";
+import ReactDOM from "react-dom";
 
 const EnhancedOpportunityNameField = ({ 
   value = [], 
@@ -325,7 +325,7 @@ const EnhancedOpportunityNameField = ({
         </div>
 
         {/* Dropdown menu - rendered via portal */}
-        {isDropdownOpen && createPortal(
+        {isDropdownOpen && ReactDOM.createPortal(
           <div 
             ref={dropdownRef}
             className="fixed z-[99] bg-white border border-gray-300 rounded-md shadow-lg max-h-60 overflow-auto"

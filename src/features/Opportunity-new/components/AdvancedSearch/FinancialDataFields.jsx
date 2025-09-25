@@ -1,7 +1,7 @@
 
 import React from "react";
-import FloatingLabelInput from "../EditOpportunity/FloatingLabelInput";
-import FloatingLabelSelect from "../EditOpportunity/FloatingLabelSelect";
+import FloatingLabelInput from "@/shared/components/ui/FloatingLabelInput";
+import FloatingLabelSelect from "@/shared/components/ui/FloatingLabelSelect";
 import MultiSelectDropdown from "@/components/ui/MultiSelectDropdown";
 import { OPPORTUNITY_OPTIONS } from "@OpportunityConstants/opportunityOptions";
 
