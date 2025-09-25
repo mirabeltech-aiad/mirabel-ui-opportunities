@@ -1723,7 +1723,7 @@ const SearchResults = ({ searchParams, setShowResults, searchType = 'opportuniti
       `}</style>
       <div className="h-screen bg-gray-50 flex flex-col">
         {/* Statistics Cards: hide in kanban and split views */}
-        {viewMode !== 'kanban' && viewMode !== 'split' && (
+        {viewMode !== 'split' && (
           <div className="bg-white border-b border-gray-200 px-6 py-4 flex-shrink-0">
             {isOpportunities ? (
               <OpportunityStatsCards stats={opportunityStatsData} />
