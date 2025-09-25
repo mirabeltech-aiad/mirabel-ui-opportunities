@@ -8,6 +8,7 @@ import {
   RotateCcw,
   Settings,
 } from "lucide-react";
+import SettingsPanel from "@/components/ui/SettingsPanel";
 
 const SearchHeader = ({
   onSearch,
@@ -19,6 +20,7 @@ const SearchHeader = ({
 }) => {
   const [isVisible, setIsVisible] = useState(true);
   const [lastScrollY, setLastScrollY] = useState(0);
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -94,7 +96,7 @@ const SearchHeader = ({
 
             {/* Settings Button */}
             <Button
-              onClick={onOpenSettings}
+              onClick={() => (onOpenSettings ? onOpenSettings() : setIsSettingsOpen(true))}
               variant="outline"
               className="border-gray-300 text-gray-700 hover:bg-gray-50 rounded-lg"
             >
@@ -113,6 +115,7 @@ const SearchHeader = ({
           </div>
         </div>
       </div>
+      <SettingsPanel isOpen={isSettingsOpen} onClose={() => setIsSettingsOpen(false)} />
     </div>
   );
 };
