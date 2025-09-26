@@ -975,7 +975,7 @@ export const userService = {
         console.log('Parsed search data:', searchData);
         
         // Convert the API payload to form field format
-        const { convertApiPayloadToFormFields, convertApiResponseToSearchParams } = await import('@/features/Opportunity/utils/savedSearchConverter');
+        const { convertApiPayloadToFormFields, convertApiResponseToSearchParams } = await import('@/features/Opportunity-new/utils/savedSearchConverter');
         const formFields = convertApiPayloadToFormFields(searchData);
         const searchParams = convertApiResponseToSearchParams(response);
         
@@ -1031,7 +1031,7 @@ export const userService = {
         console.log('📊 Parsed search data:', searchData);
         
         // Convert the API payload to form field format
-        const { convertApiPayloadToFormFields, convertApiResponseToSearchParams } = await import('@/features/Opportunity/utils/savedSearchConverter');
+        const { convertApiPayloadToFormFields, convertApiResponseToSearchParams } = await import('@/features/Opportunity-new/utils/savedSearchConverter');
         
         console.log('🔄 Converting API payload to form fields...');
         const formFields = convertApiPayloadToFormFields(searchData);
