@@ -164,7 +164,7 @@ useEffect(() => {
             </button>
             <button 
               onClick={handleSearch}
-              className="flex items-center space-x-2 px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+              className="flex items-center space-x-2 px-6 py-2 bg-ocean-500 text-white rounded-md hover:bg-ocean-700"
             >
               <Search className="h-4 w-4" />
               <span>Search {activeTab === 'opportunities' ? 'Opportunities' : 'Proposals'}</span>
