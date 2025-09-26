@@ -187,7 +187,7 @@ useEffect(() => {
                 activeTab={activeTab}
                 onTabChange={setActiveTab}
                 variant="compact"
-                className="mb-1"
+                className="mb-1 w-80"
               />
             </div>
 

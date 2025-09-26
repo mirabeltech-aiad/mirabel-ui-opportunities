@@ -18,6 +18,7 @@ import EnhancedPhoneField from "./EnhancedPhoneField";
 import EnhancedZipCodeField from "./EnhancedZipCodeField";
 import EnhancedProposalIdField from "../ProposalsAdvancedSearch/EnhancedProposalIdField";
 import EnhancedProposalNameField from "../ProposalsAdvancedSearch/EnhancedProposalNameField";
+import ProposalEnhancedOpportunityNameField from "../ProposalsAdvancedSearch/ProposalEnhancedOpportunityNameField";
 
 // Helper function to extract values from formatted strings (IE=, SW=, etc.)
 const extractFormattedValues = (formattedValue) => {
@@ -233,12 +234,12 @@ const DynamicFormRenderer = ({
           key={fieldName}
           className={gridCols || "col-span-12 sm:col-span-4"}
         >
-          {/* <ProposalEnhancedOpportunityNameField
+          <ProposalEnhancedOpportunityNameField
             label={label}
             value={Array.isArray(value) ? value : value ? [value] : []}
             onChange={handleMultiSelectChange(fieldName)}
             placeholder={placeholder}
-          /> */}
+          />
         </div>
       );
     }
