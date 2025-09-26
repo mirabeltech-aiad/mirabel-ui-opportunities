@@ -43,13 +43,19 @@ export class SearchPayloadBuilder {
    * @returns {string} Formatted value
    */
   formatTextSearchValue(value) {
-    if (!value) return '';
+    let formattedValue = '';
+    if(Array.isArray(value)) {
+      formattedValue = value.length > 0 ? value[0] : '';
+    } else {
+      formattedValue = value;
+    }
+    if (!formattedValue) return '';
 
     // If it's already formatted (contains SW=), return as is
-    if (value.includes('SW=')) return value;
+    if (formattedValue.includes('SW=')) return formattedValue;
 
     // Format with SW= prefix
-    return `SW=${value.trim()}~`;
+    return `SW=${formattedValue.trim()}~`;
   }
 
   /**

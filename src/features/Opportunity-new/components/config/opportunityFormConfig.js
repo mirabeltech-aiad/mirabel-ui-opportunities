@@ -6,7 +6,7 @@ export const OPPORTUNITY_FORM_CONFIG = {
       title: "Quick Search",
       fields: [
         {
-          fieldName: "opportunityNameBasic",
+          fieldName: "opportunityName",
           label: "Opportunity Name",
           componentType: "enhanced-opportunity-name",
           placeholder: "Type opportunity name or select option...",
