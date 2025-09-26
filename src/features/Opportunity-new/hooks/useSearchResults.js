@@ -38,7 +38,12 @@ export const useSearchResults = (searchParams, searchType = 'opportunities') => 
           // For proposals, use the service's default payload for now
           // TODO: Update this to use searchPayloadBuilder when filter mapping is ready
           logger.info('useSearchResults: Using default proposals payload');
-          results = await service.getInitialData();
+          const apiPayload = searchPayloadBuilder.buildPayload(params, searchType);
+          logger.info('useSearchResults: Executing search with API payload:', apiPayload);
+          await userServiceNew.saveSearch({
+            apiPayload: apiPayload
+          });
+          results = await service.executeSearch(apiPayload);
         } else {
           logger.info('useSearchResults: Converting form data to API payload');
           // Convert form data to proper API payload
