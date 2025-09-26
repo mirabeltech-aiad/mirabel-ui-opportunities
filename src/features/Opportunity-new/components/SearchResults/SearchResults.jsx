@@ -14,6 +14,8 @@ import KanbanView from '../kanban/KanbanView';
 import { opportunityService } from '../../services/opportunityService';
 import { userServiceNew } from '../../services/userServiceNew';
 import contactsApi from '@/services/contactsApi';
+import { useSearchMasterData } from '../../hooks/useSearchMasterData';
+import { useQuickFilters } from '../../hooks/useQuickFilters';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -39,18 +41,13 @@ const SearchResults = ({ searchParams, setShowResults, searchType = 'opportuniti
   const navigate = useNavigate();
   const [isViewsSidebarOpen, setIsViewsSidebarOpen] = useState(false);
 
-  // Master data for dropdowns
-  const [masterData, setMasterData] = useState({
-    leadSources: [],
-    leadTypes: [],
-    stages: [],
-    prospectingStages: []
-  });
-  const [masterDataLoaded, setMasterDataLoaded] = useState(false);
-  const [quickStatusOptions, setQuickStatusOptions] = useState([]);
-
-  // Reps options state (must be declared before use in filter definitions)
-  const [repsOptions, setRepsOptions] = useState([]);
+  // Master data and dropdown options via hook
+  const {
+    masterData,
+    masterDataLoaded,
+    repsOptions,
+    quickStatusOptions
+  } = useSearchMasterData();
   const probabilityOptions = [
     { value: 'all', label: 'All Probabilities' },
     ...Array.from({ length: 11 }, (_, i) => ({ value: String(i * 10), label: `${i * 10}%` }))
@@ -84,115 +81,16 @@ const SearchResults = ({ searchParams, setShowResults, searchType = 'opportuniti
     });
   };
 
-  // Filter definitions for EnhancedFilterBar
-  const getFilterDefinitions = () => {
-    if (searchType === 'proposals') {
-      // For proposals, use PowerMultiSelect with reps loaded from API
-      return [
-        {
-          id: 'proposalReps',
-          placeholder: 'All Proposal Reps',
-          type: 'multi-select',
-          options: repsOptions,
-          value: Array.isArray(filters.proposalReps) ? filters.proposalReps : [],
-          onChange: (values) => {
-            const allToken = 'all';
-            let next = Array.isArray(values) ? [...values] : [];
-            const hasAllNow = next.includes(allToken);
-            const hadAllPrev = Array.isArray(filters.proposalReps) && filters.proposalReps.includes(allToken);
-            if (hasAllNow && !hadAllPrev) {
-              next = [allToken];
-            } else if (hasAllNow && hadAllPrev && next.length > 1) {
-              next = next.filter(v => v !== allToken);
-            } else {
-              next = next.filter(v => v !== allToken);
-            }
-            setSearchParams(prev => ({ ...prev, proposalReps: next }));
-            setFilters(prev => ({ ...prev, proposalReps: next }));
-          }
-        }
-      ];
-    } else {
-      // For opportunities, all options must come from API (saved searches)
-      return [
-        {
-          id: 'opportunities',
-          placeholder: 'All Opportunities',
-          options: quickStatusOptions,
-          value: (filters.ListID ? String(filters.ListID) : ''),
-          onChange: (value) => {
-            // Ignore group header selections
-            if (value && String(value).startsWith('__group_')) return;
-            const nextVal = value ? value : undefined;
-            // Drive API by ListID only (no static quickStatus)
-            if (nextVal && /^\d+$/.test(String(nextVal))) {
-              setSearchParams?.(prev => ({ ...prev, ListID: parseInt(String(nextVal), 10), quickStatus: '' }));
-              setFilters(prevState => ({ ...prevState, ListID: parseInt(String(nextVal), 10) }));
-            } else {
-              // Clear ListID if nothing selected
-              setSearchParams?.(prev => ({ ...prev, ListID: undefined }));
-              setFilters(prevState => ({ ...prevState, ListID: undefined }));
-            }
-          }
-        },
-        {
-          id: 'probability',
-          placeholder: 'All Probability',
-          type: 'multi-select',
-          options: probabilityOptions,
-          value: Array.isArray(filters.probability) ? filters.probability : [],
-          onChange: (values) => {
-            const prev = Array.isArray(filters.probability) ? filters.probability : [];
-            let next = Array.isArray(values) ? [...values] : [];
-            const hasAllNow = next.includes('all');
-            const hadAllPrev = prev.includes('all');
-            if (hasAllNow && !hadAllPrev) {
-              // user selected All -> keep only All
-              next = ['all'];
-            } else if (hasAllNow && hadAllPrev && next.length > 1) {
-              // user added another while All was selected -> drop All
-              next = next.filter(v => v !== 'all');
-            } else if (!hasAllNow && hadAllPrev) {
-              // user deselected All -> keep others as-is
-              // next already excludes 'all'
-            } else {
-              // normal multi-select, ensure 'all' not accidentally present
-              next = next.filter(v => v !== 'all');
-            }
-            setSearchParams(prev => ({ ...prev, probability: next.filter(v => v !== 'all') }));
-            setFilters(prevState => ({ ...prevState, probability: next }));
-          }
-        },
-        {
-          id: 'reps',
-          placeholder: 'All Reps',
-          type: 'multi-select',
-          options: repsOptions,
-          value: Array.isArray(filters.reps) ? filters.reps : [],
-          onChange: (values) => {
-            const prev = Array.isArray(filters.reps) ? filters.reps : [];
-            let next = Array.isArray(values) ? [...values] : [];
-            const allToken = 'all';
-            const hasAllNow = next.includes(allToken);
-            const hadAllPrev = prev.includes(allToken);
-            if (hasAllNow && !hadAllPrev) {
-              next = [allToken];
-            } else if (hasAllNow && hadAllPrev && next.length > 1) {
-              next = next.filter(v => v !== allToken);
-            } else if (!hasAllNow && hadAllPrev) {
-              // user deselected All -> keep others
-            } else {
-              next = next.filter(v => v !== allToken);
-            }
-            setSearchParams(prev => ({ ...prev, assignedRep: next.filter(rep => rep !== allToken) }));
-            setFilters(prevState => ({ ...prevState, reps: next }));
-          }
-        }
-      ];
-    }
-  };
-
-  const filterDefinitions = getFilterDefinitions();
+  // Build quick filter definitions using hook
+  const filterDefinitions = useQuickFilters({
+    searchType,
+    filters,
+    setFilters,
+    setSearchParams,
+    repsOptions,
+    quickStatusOptions,
+    probabilityOptions
+  });
 
   // Build params for quick filters → API payload subset
   const buildQuickParams = (override = null) => {
@@ -216,18 +114,7 @@ const SearchResults = ({ searchParams, setShowResults, searchType = 'opportuniti
     return params;
   };
 
-  useEffect(() => {
-    (async () => {
-      try {
-        const reps = await userServiceNew.getUsersForDropdown();
-        // Keep raw value; 'All Reps' uses token 'all'
-        const formatted = [{ value: 'all', label: 'All Reps' }, ...reps.map(u => ({ value: u.value, label: u.display }))];
-        setRepsOptions(formatted);
-      } catch (e) {
-        setRepsOptions([{ value: 'all', label: 'All Reps' }]);
-      }
-    })();
-  }, []);
+  // reps loaded via useSearchMasterData
 
   // Edit functionality
   const handleEditClick = (e, row) => {
@@ -308,86 +195,7 @@ const SearchResults = ({ searchParams, setShowResults, searchType = 'opportuniti
     }
   };
 
-  // Fetch master data for dropdowns
-  useEffect(() => {
-    const fetchMasterData = async () => {
-      try {
-        const [leadSourcesResponse, leadTypesResponse, stagesResponse, prospectingStagesResponse, savedSearches] = await Promise.all([
-          contactsApi.getLeadSources(),
-          contactsApi.getLeadTypes(),
-          opportunityService.getOpportunityStages(),
-          contactsApi.getProspectingStages(),
-          userServiceNew.getSavedSearches()
-        ]);
-
-        // Process LeadSources - data is in content.Data.LeadSources
-        const leadSources = leadSourcesResponse?.content?.Data?.LeadSources || [];
-        const formattedLeadSources = leadSources.map(source => ({
-          value: source.Value,
-          label: source.Display,
-          id: source.Value,
-          name: source.Display
-        }));
-
-        // Process LeadTypes - data is in content.Data.LeadTypes
-        const leadTypes = leadTypesResponse?.content?.Data?.LeadTypes || [];
-        const formattedLeadTypes = leadTypes.map(type => ({
-          value: type.Value,
-          label: type.Display,
-          id: type.Value,
-          name: type.Display
-        }));
-
-        // Process Stages - data is in content.List (not in Data object)
-        const stages = stagesResponse?.content?.List || [];
-        const formattedStages = stages.map(stage => ({
-          id: stage.ID || stage.id,
-          name: stage.Stage || stage.Name || stage.name,
-          value: stage.ID || stage.id,
-          label: stage.Stage || stage.Name || stage.name,
-          colorCode: stage.ColorCode || stage.colorCode || '#4fb3ff'
-        }));
-
-        // Process ProspectingStages - data is in content.Data.ProspectingStages
-        const prospectingStages = prospectingStagesResponse?.content?.Data?.ProspectingStages || [];
-        const formattedProspectingStages = prospectingStages.map(stage => ({
-          value: stage.Value,
-          label: stage.Display,
-          id: stage.Value,
-          name: stage.Display
-        }));
-
-        setMasterData(prev => ({
-          ...prev,
-          leadSources: formattedLeadSources,
-          leadTypes: formattedLeadTypes,
-          stages: formattedStages,
-          prospectingStages: formattedProspectingStages
-        }));
-
-        // Build grouped options: All Opportunities and My Opportunities
-        const grouped = [];
-        const allList = savedSearches?.allOpportunities || [];
-        const myList = savedSearches?.myOpportunities || [];
-        if (allList.length > 0) {
-          grouped.push({ value: '__group_all__', label: 'All Opportunities' });
-          grouped.push(...allList.map((s) => ({ value: String(s.ID), label: s.Name })));
-        }
-        if (myList.length > 0) {
-          grouped.push({ value: '__group_my__', label: 'My Opportunities' });
-          grouped.push(...myList.map((s) => ({ value: String(s.ID), label: s.Name })));
-        }
-        setQuickStatusOptions(grouped);
-
-        setMasterDataLoaded(true);
-      } catch (error) {
-        logger.error('SearchResults: Failed to load master data:', error);
-        setMasterDataLoaded(true); // Set to true even on error to prevent infinite loading
-      }
-    };
-
-    fetchMasterData();
-  }, []);
+  // master data loaded via useSearchMasterData
 
   // Debug logging
   useEffect(() => {
