@@ -3,7 +3,7 @@ import { opportunitiesReportService } from '../services/opportunitiesReportServi
 import { proposalsReportService } from '../services/proposalsReportService';
 import { searchPayloadBuilder } from '../services/searchPayloadBuilder';
 import { logger } from '../../../components/shared/logger';
-import { saveSearch } from '@/services/userService';
+import { userServiceNew } from '../services/userServiceNew';
 
 export const useSearchResults = (searchParams, searchType = 'opportunities') => {
   const [data, setData] = useState(null);
@@ -44,9 +44,11 @@ export const useSearchResults = (searchParams, searchType = 'opportunities') => 
           // Convert form data to proper API payload
           const apiPayload = searchPayloadBuilder.buildPayload(params, searchType);
           logger.info('useSearchResults: Executing search with API payload:', apiPayload);
-          await saveSearch({
-            apiPayload: apiPayload
-          });
+          try {
+            await userServiceNew.saveSearch({ apiPayload });
+          } catch (e) {
+            logger.warn('useSearchResults: saveSearch failed, continuing to execute search', e);
+          }
           results = await service.executeSearch(apiPayload);
         }
       }

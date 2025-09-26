@@ -11,8 +11,6 @@ import { getDefaultColumnOrder } from '../../hooks/helperData';
 import ViewsSidebar from '@/components/ui/views/ViewsSidebar';
 import { NewLoader } from '@/components/ui/NewLoader';
 import KanbanView from '../kanban/KanbanView';
-import { FloatingLabelSelect } from '@/shared/components/ui/FloatingLabelSelect';
-import { SimpleMultiSelect } from '@/shared/components/ui/SimpleMultiSelect';
 import { opportunityService } from '../../services/opportunityService';
 import { userServiceNew } from '../../services/userServiceNew';
 import contactsApi from '@/services/contactsApi';
@@ -34,7 +32,8 @@ const SearchResults = ({ searchParams, setShowResults, searchType = 'opportuniti
     all: searchType === 'opportunities' ? 'All Opportunities' : 'All Proposals',
     probability: searchParams.probability || [],
     // Keep raw rep IDs in UI state; format to IE=...~ only when building payloads
-    reps: Array.isArray(searchParams.assignedRep) ? searchParams.assignedRep : []
+    reps: Array.isArray(searchParams.assignedRep) ? searchParams.assignedRep : [],
+    ListID: undefined,
   });
   const [page, setPage] = useState(1);
   const navigate = useNavigate();
@@ -48,12 +47,7 @@ const SearchResults = ({ searchParams, setShowResults, searchType = 'opportuniti
     prospectingStages: []
   });
   const [masterDataLoaded, setMasterDataLoaded] = useState(false);
-  const [quickStatusOptions, setQuickStatusOptions] = useState([
-    { value: 'all', label: 'All Opportunities' },
-    { value: 'Open', label: 'Open Opportunities' },
-    { value: 'Won', label: 'Won Opportunities' },
-    { value: 'Lost', label: 'Lost Opportunities' }
-  ]);
+  const [quickStatusOptions, setQuickStatusOptions] = useState([]);
 
   // Reps options state (must be declared before use in filter definitions)
   const [repsOptions, setRepsOptions] = useState([]);
@@ -105,15 +99,24 @@ const SearchResults = ({ searchParams, setShowResults, searchType = 'opportuniti
         }
       ];
     } else {
-      // For opportunities, show the original filters
+      // For opportunities, all options must come from API (saved searches)
       return [
         {
           id: 'opportunities',
           placeholder: 'All Opportunities',
           options: quickStatusOptions,
-          value: 'all',
+          value: (filters.ListID ? String(filters.ListID) : ''),
           onChange: (value) => {
-            setFilters(prev => ({ ...prev, opportunities: value === 'all' ? undefined : value }));
+            const nextVal = value ? value : undefined;
+            // Drive API by ListID only (no static quickStatus)
+            if (nextVal && /^\d+$/.test(String(nextVal))) {
+              setSearchParams?.(prev => ({ ...prev, ListID: parseInt(String(nextVal), 10), quickStatus: '' }));
+              setFilters(prevState => ({ ...prevState, ListID: parseInt(String(nextVal), 10) }));
+            } else {
+              // Clear ListID if nothing selected
+              setSearchParams?.(prev => ({ ...prev, ListID: undefined }));
+              setFilters(prevState => ({ ...prevState, ListID: undefined }));
+            }
           }
         },
         {
@@ -179,14 +182,9 @@ const SearchResults = ({ searchParams, setShowResults, searchType = 'opportuniti
   const buildQuickParams = (override = null) => {
     const f = override || filters;
     const params = {};
-    // quickStatus from opportunities dropdown
-    if (f.opportunities && f.opportunities !== 'all') {
-      // When a saved view/quick option is chosen
-      if (['Open', 'Won', 'Lost'].includes(f.opportunities)) {
-        params.quickStatus = f.opportunities;
-      } else {
-        params.quickStatus = f.opportunities; // saved search name; backend maps via ListID elsewhere if needed
-      }
+    // Include ListID if present (saved search)
+    if (f.ListID && /^\d+$/.test(String(f.ListID))) {
+      params.ListID = parseInt(String(f.ListID), 10);
     }
     // Probability: selected numeric percentages -> IE-format string array expected downstream
     if (Array.isArray(f.probability) && f.probability.length > 0) {
@@ -306,14 +304,6 @@ const SearchResults = ({ searchParams, setShowResults, searchType = 'opportuniti
           userServiceNew.getSavedSearches()
         ]);
 
-        // Debug: Log the actual raw responses
-        console.log('DEBUG: Raw API responses:', {
-          leadSourcesResponse,
-          leadTypesResponse,
-          stagesResponse,
-          prospectingStagesResponse
-        });
-
         // Process LeadSources - data is in content.Data.LeadSources
         const leadSources = leadSourcesResponse?.content?.Data?.LeadSources || [];
         const formattedLeadSources = leadSources.map(source => ({
@@ -359,30 +349,9 @@ const SearchResults = ({ searchParams, setShowResults, searchType = 'opportuniti
           prospectingStages: formattedProspectingStages
         }));
 
-        // Build Quick Status options from saved searches
-        const qs = [
-          { value: 'all', label: 'All Opportunities' },
-          { value: 'Open', label: 'Open Opportunities' },
-          { value: 'Won', label: 'Won Opportunities' },
-          { value: 'Lost', label: 'Lost Opportunities' },
-          ...((savedSearches?.allOpportunities || []).map(s => ({ value: s.Name, label: s.Name })))
-        ];
+        // Build Quick Status options from saved searches only (no static options)
+        const qs = (savedSearches?.allOpportunities || []).map(s => ({ value: String(s.ID), label: s.Name }));
         setQuickStatusOptions(qs);
-
-        // Debug: Log the processed data
-        console.log('DEBUG: Processed master data:', {
-          leadSources: formattedLeadSources,
-          leadTypes: formattedLeadTypes,
-          stages: formattedStages,
-          prospectingStages: formattedProspectingStages
-        });
-
-        logger.info('SearchResults: Master data loaded successfully:', {
-          leadSourcesCount: formattedLeadSources.length,
-          leadTypesCount: formattedLeadTypes.length,
-          stagesCount: formattedStages.length,
-          prospectingStagesCount: formattedProspectingStages.length
-        });
 
         setMasterDataLoaded(true);
       } catch (error) {
@@ -393,8 +362,6 @@ const SearchResults = ({ searchParams, setShowResults, searchType = 'opportuniti
 
     fetchMasterData();
   }, []);
-
-
 
   // Debug logging
   useEffect(() => {
