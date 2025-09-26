@@ -5,7 +5,7 @@ import DynamicFormRenderer from './DynamicFormRenderer';
 import { OPPORTUNITY_FORM_CONFIG } from '../config/opportunityFormConfig';
 import { PROPOSAL_FORM_CONFIG } from '../config/proposalFormConfig';
 import { GradientTabBar } from '@/shared/components/ui/GradientTabBar';
-import { getRecentSearchData, loadSavedSearch } from '@/services/userService';
+import { getProposalRecentSearchData, getRecentSearchData, loadSavedSearch } from '@/services/userService';
 import { buildSearchJson } from '@/features/Opportunity/utils/searchJsonBuilder';
 import SettingsPanel from '@/components/ui/SettingsPanel';
 import { ADVANCED_SEARCH_TABS } from '../../constants/constants';
@@ -64,14 +64,19 @@ useEffect(() => {
       try {
         setIsLoadingRecentSearch(true);
         const recentSearchResult = await getRecentSearchData();
+        setActiveTab(recentSearchResult.rawData?.ResultType == 2 ? 'proposals' : 'opportunities');
+
 
         console.log('📥 API Response received:', recentSearchResult);
 
         if (recentSearchResult.success && recentSearchResult.searchParams) {
           // Update the filters with the recent search data in searchParams format
           setSearchParams(recentSearchResult.searchParams);
-          setOpportunitiesFormData(recentSearchResult.searchParams);
-        //   setProposalsFormData(recentSearchResult.searchParams);
+          if(recentSearchResult.rawData?.ResultType == 1 ) { 
+            setOpportunitiesFormData(recentSearchResult.searchParams);
+          } else {
+            setProposalsFormData(recentSearchResult.searchParams);
+          }
           // Build searchJSON with the loaded data
           buildSearchJSON(recentSearchResult.searchParams);
 

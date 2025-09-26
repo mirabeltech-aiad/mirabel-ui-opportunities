@@ -83,7 +83,7 @@ const SearchResults = ({ searchParams, setShowResults, searchType = 'opportuniti
           options: repsOptions,
           value: Array.isArray(filters.proposalReps) ? filters.proposalReps : [],
           onChange: (values) => {
-            const allToken = 'IE=all~';
+            const allToken = 'all';
             let next = Array.isArray(values) ? [...values] : [];
             const hasAllNow = next.includes(allToken);
             const hadAllPrev = Array.isArray(filters.proposalReps) && filters.proposalReps.includes(allToken);
@@ -94,6 +94,7 @@ const SearchResults = ({ searchParams, setShowResults, searchType = 'opportuniti
             } else {
               next = next.filter(v => v !== allToken);
             }
+            setSearchParams(prev => ({ ...prev, proposalReps: next }));
             setFilters(prev => ({ ...prev, proposalReps: next }));
           }
         }
@@ -221,7 +222,7 @@ const SearchResults = ({ searchParams, setShowResults, searchType = 'opportuniti
       if (isOpportunities) {
         window.location.href = `/edit-opportunity/${id}`;
       } else {
-        window.location.href = `/edit-opportunity/${id}`;
+        window.location.href = `/edit-proposal/${id}`;
       }
     }
   };
