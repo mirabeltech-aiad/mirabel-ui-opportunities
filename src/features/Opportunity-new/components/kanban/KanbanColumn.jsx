@@ -84,6 +84,7 @@ const KanbanColumn = ({
                   isUpdating={isUpdating}
                   onDeleteOpportunity={onDeleteOpportunity}
                   onEditOpportunity={onEditOpportunity}
+                  stageColor={column.colorCode}
                 />
               ))
             )}

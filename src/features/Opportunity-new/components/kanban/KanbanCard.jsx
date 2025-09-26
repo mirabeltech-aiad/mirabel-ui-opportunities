@@ -19,6 +19,7 @@ const KanbanCard = ({
   isUpdating = false,
   onDeleteOpportunity,
   onEditOpportunity,
+  stageColor,
 }) => {
   const readPath = (obj, path) => {
     try {
@@ -128,6 +129,15 @@ const KanbanCard = ({
     readPath(opportunity, 'Proposal.Status')
   );
 
+  // Compute subtle background from stageColor
+  const color = stageColor || '#e5e7eb';
+  const hex = String(color).replace('#','');
+  const r = parseInt(hex.substring(0,2), 16);
+  const g = parseInt(hex.substring(2,4), 16);
+  const b = parseInt(hex.substring(4,6), 16);
+  const bgTint = `rgba(${isNaN(r)?229:r}, ${isNaN(g)?231:g}, ${isNaN(b)?235:b}, 0.12)`;
+  const borderTint = stageColor || '#e5e7eb';
+
   return (
     <Draggable
       draggableId={draggableId}
@@ -148,9 +158,14 @@ const KanbanCard = ({
           title="Drag to move this opportunity"
         >
           <Card
-            className={`hover:shadow-md transition-shadow bg-white border border-gray-200 ${
+            className={`hover:shadow-md transition-shadow border ${
               isUpdating ? "opacity-75" : ""
             }`}
+            style={{
+              borderColor: '#e5e7eb',
+              background: bgTint,
+              boxShadow: 'inset 4px 0 0 0 ' + borderTint,
+            }}
           >
             <CardHeader className="pb-1 p-2">
               <div className="flex items-start justify-between">
