@@ -62,13 +62,26 @@ const SearchResults = ({ searchParams, setShowResults, searchType = 'opportuniti
 
   // Enhance rows with dropdown options
   const enhanceRowsWithOptions = (rows) => {
-    return rows.map(row => ({
-      ...row,
-      _leadSourceOptions: masterData.leadSources,
-      _leadTypeOptions: masterData.leadTypes,
-      _stages: masterData.stages,
-      _prospectingStages: masterData.prospectingStages
-    }));
+    return rows.map((row, index) => {
+      const stableId = (
+        row.id ||
+        row.ID ||
+        row.OpportunityID ||
+        row.ProposalID ||
+        row.RecordID ||
+        row.GUID ||
+        (row.Proposal && (row.Proposal.ID || row.ProposalId)) ||
+        `row-${row.Name || row.OpportunityName || ''}-${row.ContactDetails?.ID || ''}-${index}`
+      );
+      return {
+        id: String(stableId),
+        ...row,
+        _leadSourceOptions: masterData.leadSources,
+        _leadTypeOptions: masterData.leadTypes,
+        _stages: masterData.stages,
+        _prospectingStages: masterData.prospectingStages
+      };
+    });
   };
 
   // Filter definitions for EnhancedFilterBar
