@@ -9,6 +9,7 @@ import { getProposalRecentSearchData, getRecentSearchData, loadSavedSearch } fro
 import { buildSearchJson } from '@/features/Opportunity/utils/searchJsonBuilder';
 import SettingsPanel from '@/components/ui/SettingsPanel';
 import { ADVANCED_SEARCH_TABS } from '../../constants/constants';
+import viewsApi from '../../services/viewsApi';
 
 const AdvancedSearch = () => {
   const [activeTab, setActiveTab] = useState('opportunities');
@@ -62,6 +63,10 @@ const AdvancedSearch = () => {
 useEffect(() => {
     const loadRecentSearch = async () => {
       try {
+        // get page settings
+        const viewPage = await viewsApi.getPageSettings(1, -1);
+        const showType = viewPage.content.Data.ShowType;
+
         setIsLoadingRecentSearch(true);
         const recentSearchResult = await getRecentSearchData();
         setActiveTab(recentSearchResult.rawData?.ResultType == 2 ? 'proposals' : 'opportunities');
@@ -79,6 +84,10 @@ useEffect(() => {
           }
           // Build searchJSON with the loaded data
           buildSearchJSON(recentSearchResult.searchParams);
+          if(showType == 1) {
+            // show results if showType is 1
+            setShowResults(true);
+          }
 
         } else {
           console.log('⚠️ No recent search data available or failed to load for opportunities');
