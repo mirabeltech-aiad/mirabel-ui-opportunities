@@ -201,11 +201,26 @@ export const EnhancedFilterBar: FC<EnhancedFilterBarProps> = ({
                           <SelectContent className="bg-white border border-gray-200 shadow-lg z-50">
                             {unifiedFilter.options
                               ?.filter((option: FilterOption) => option.value !== '')
-                              ?.map((option: FilterOption) => (
-                                <SelectItem key={option.value} value={option.value}>
-                                  {option.label}
-                                </SelectItem>
-                              ))}
+                              ?.map((option: FilterOption) => {
+                                const isHeader = typeof option.value === 'string' && option.value.startsWith('__group_');
+                                if (isHeader) {
+                                  return (
+                                    <SelectItem
+                                      key={option.value}
+                                      value={option.value}
+                                      disabled
+                                      className="font-semibold text-gray-900 pl-2 cursor-default pointer-events-none select-none"
+                                    >
+                                      {option.label}
+                                    </SelectItem>
+                                  )
+                                }
+                                return (
+                                  <SelectItem key={option.value} value={option.value}>
+                                    {option.label}
+                                  </SelectItem>
+                                )
+                              })}
                           </SelectContent>
                         </Select>
                       </div>
@@ -248,11 +263,26 @@ export const EnhancedFilterBar: FC<EnhancedFilterBarProps> = ({
                           <SelectContent className="bg-white border border-gray-200 shadow-lg z-50">
                             {singleFilter.options
                               .filter(option => option.value !== '')
-                              .map((option) => (
-                                <SelectItem key={option.value} value={option.value}>
-                                  {option.label}
-                                </SelectItem>
-                              ))}
+                              .map((option) => {
+                                const isHeader = typeof option.value === 'string' && option.value.startsWith('__group_');
+                                if (isHeader) {
+                                  return (
+                                    <SelectItem
+                                      key={option.value}
+                                      value={option.value}
+                                      disabled
+                                      className="font-semibold text-gray-900 pl-2 cursor-default pointer-events-none select-none"
+                                    >
+                                      {option.label}
+                                    </SelectItem>
+                                  )
+                                }
+                                return (
+                                  <SelectItem key={option.value} value={option.value}>
+                                    {option.label}
+                                  </SelectItem>
+                                )
+                              })}
                           </SelectContent>
                         </Select>
                       </div>
