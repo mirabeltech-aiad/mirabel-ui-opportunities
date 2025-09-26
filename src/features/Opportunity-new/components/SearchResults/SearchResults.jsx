@@ -108,6 +108,8 @@ const SearchResults = ({ searchParams, setShowResults, searchType = 'opportuniti
           options: quickStatusOptions,
           value: (filters.ListID ? String(filters.ListID) : ''),
           onChange: (value) => {
+            // Ignore group header selections
+            if (value && String(value).startsWith('__group_')) return;
             const nextVal = value ? value : undefined;
             // Drive API by ListID only (no static quickStatus)
             if (nextVal && /^\d+$/.test(String(nextVal))) {
@@ -350,9 +352,19 @@ const SearchResults = ({ searchParams, setShowResults, searchType = 'opportuniti
           prospectingStages: formattedProspectingStages
         }));
 
-        // Build Quick Status options from saved searches only (no static options)
-        const qs = (savedSearches?.allOpportunities || []).map(s => ({ value: String(s.ID), label: s.Name }));
-        setQuickStatusOptions(qs);
+        // Build grouped options: All Opportunities and My Opportunities
+        const grouped = [];
+        const allList = savedSearches?.allOpportunities || [];
+        const myList = savedSearches?.myOpportunities || [];
+        if (allList.length > 0) {
+          grouped.push({ value: '__group_all__', label: 'All Opportunities' });
+          grouped.push(...allList.map((s) => ({ value: String(s.ID), label: s.Name })));
+        }
+        if (myList.length > 0) {
+          grouped.push({ value: '__group_my__', label: 'My Opportunities' });
+          grouped.push(...myList.map((s) => ({ value: String(s.ID), label: s.Name })));
+        }
+        setQuickStatusOptions(grouped);
 
         setMasterDataLoaded(true);
       } catch (error) {
